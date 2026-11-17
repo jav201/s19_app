@@ -81,6 +81,7 @@ from textual.dom import DOMNode
 from textual.widgets import Button
 
 from s19_app.tui.app import S19TuiApp
+from tests.support.b103_inc8_p import show_tab
 
 # Both pilot regimes — the batch-47 `_SIZES` both-regimes loop, reused.
 _SIZES = ((80, 24), (120, 30))
@@ -215,10 +216,10 @@ def test_at076a_docked_buttons_are_grouped_chips() -> None:
                 "apply": app.query_one("#patch_doc_apply_button", Button),
                 "checks": app.query_one("#patch_checks_run_button", Button),
             }
+            await show_tab(pilot, "patch_tab_inspector")
             heights = {k: b.region.height for k, b in probes.items() if k != "checks"}
             # batch-97 Inc-4: Run checks lives on the inspector's Checks tab.
-            app.query_one("#patch_tab_checks", Button).press()
-            await pilot.pause()
+            await show_tab(pilot, "patch_tab_checks")
             heights["checks"] = probes["checks"].region.height
             return {
                 "count": len(buttons),

@@ -58,6 +58,8 @@ from s19_app.tui.changes.io import (
 from s19_app.tui.screens_directionb import PatchEditorPanel
 from s19_app.tui.services.load_service import build_loaded_hex, build_loaded_s19
 from tests.b97_probes import settled
+from tests.support.b100_workers import settle_workers
+from tests.support.b103_inc8_p import click_visible, show_tab
 from tests.support.b103_inc10 import shown as shown_widget  # Inc 10 (R-CHG-003.1)
 from tests.support.timing import wait_until
 
@@ -299,8 +301,7 @@ def test_paste_parse_then_apply_matches_file_loaded(tmp_path: Path) -> None:
             )
 
             panel.request_action("apply_doc")
-            for _ in range(6):  # the layout pass that gives the prompt its region
-                await pilot.pause()
+            await settle_workers(pilot)
 
             prompt = app.query_one("#patch_saveback_row", Container)
             name_input = app.query_one("#patch_saveback_name_input", Input)
@@ -372,7 +373,7 @@ def test_action_routing_observable_effects(tmp_path: Path) -> None:
             panel.request_action("remove_entry")
             await pilot.pause()
             empty = app.query_one("#patch_doc_empty_state", Static)
-            outcomes["empty_visible"] = not empty.has_class("hidden")
+            outcomes["empty_visible"] = shown_widget(empty)
 
             # load_doc
             _set_entry_inputs(app, path_text=str(doc_path))
@@ -389,7 +390,7 @@ def test_action_routing_observable_effects(tmp_path: Path) -> None:
 
             # apply_doc (no image loaded -> skipped-no-image dispositions)
             panel.request_action("apply_doc")
-            await pilot.pause()
+            await settle_workers(pilot)
             summary = app._change_service.last_summary
             outcomes["apply_counts"] = (
                 summary.counts["skipped-no-image"] if summary else None
@@ -570,9 +571,10 @@ def test_save_back_prompt(tmp_path: Path) -> None:
 
             async def _apply() -> None:
                 panel.request_action("apply_doc")
+                await settle_workers(pilot)
                 await settled(
                     pilot,
-                    lambda: not prompt.has_class("hidden"),
+                    lambda: shown_widget(prompt),
                     "TC-051: the apply showed the save-back prompt",
                 )
 
@@ -728,7 +730,7 @@ def test_declaration_faults_visible(tmp_path: Path) -> None:
 
             # The faults ride the apply summary (report carrier).
             panel.request_action("apply_doc")
-            await pilot.pause()
+            await settle_workers(pilot)
             summary = app._change_service.last_summary
             outcomes["summary_issue_codes"] = sorted(
                 issue["code"] for issue in summary.to_dict()["issues"]
@@ -882,7 +884,7 @@ async def _apply_one_entry(app: S19TuiApp, pilot, panel: PatchEditorPanel) -> No
     panel.request_action("add_entry")
     await pilot.pause()
     panel.request_action("apply_doc")
-    await pilot.pause()
+    await settle_workers(pilot)
 
 
 # TC-007 — format-aware save filename suggestion (LLR-002.3)
@@ -1098,7 +1100,7 @@ def _drive_saveback_width(
             panel.request_action("add_entry")
             await pilot.pause()
             panel.request_action("apply_doc")
-            await pilot.pause()
+            await settle_workers(pilot)
 
             # Cycle the SHIPPED width selector to the target (default is 32).
             width_button = app.query_one(
@@ -1979,8 +1981,7 @@ def test_ac4_patch_paste_textarea_min_height(tmp_path: Path) -> None:
             await pilot.pause()
             # batch-97 Inc-4 (named supersession, HLR-144): the paste buffer
             # lives on the inspector's JSON tab.
-            app.query_one("#patch_tab_json").press()
-            await pilot.pause()
+            await show_tab(pilot, "patch_tab_json")
             return app.query_one("#patch_paste_text", TextArea).outer_size.height
 
     height = asyncio.run(_drive())
@@ -2466,8 +2467,7 @@ def test_at057a_two_labeled_sections_ids_and_parentage(
             app.action_show_screen("patch")
             await pilot.pause()
             # batch-97 Inc-4: the Checks section is the inspector's Checks tab.
-            app.query_one("#patch_tab_checks", Button).press()
-            await pilot.pause()
+            await show_tab(pilot, "patch_tab_checks")
             outcomes["script_label"] = str(
                 app.query_one("#patch_script_section_label", Label).render()
             )
@@ -2598,30 +2598,39 @@ def test_at057b_regroup_wiring_and_binding_regression(
 
             _set_entry_inputs(app, path_text=str(doc_path))
             app.query_one("#patch_doc_load_button", Button).press()
-            await pilot.pause()
+            await _settled(pilot, lambda: table.row_count == 2, "AT-057b Load rendered two rows")
             outcomes["loaded_rows"] = table.row_count
 
             app.query_one("#patch_doc_validate_button", Button).press()
-            await pilot.pause()
+            await _settled(
+                pilot,
+                lambda: any(line.startswith("Validate:") for line in app.log_lines),
+                "AT-057b Validate status",
+            )
             outcomes["validate_line"] = any(
                 line.startswith("Validate:") for line in app.log_lines
             )
 
             app.query_one("#patch_doc_apply_button", Button).press()
-            await pilot.pause()
+            await settle_workers(pilot)
             outcomes["apply_line"] = any(
                 line.startswith("Apply:") for line in app.log_lines
             )
 
             app.query_one("#patch_doc_save_button", Button).press()
-            await pilot.pause()
             workarea = tmp_path / ".s19tool" / "workarea"
+            await _settled(
+                pilot,
+                lambda: len(list(workarea.rglob("changes*.json"))) == 1,
+                "AT-057b Save wrote one change file",
+            )
             outcomes["saved_files"] = len(
                 list(workarea.rglob("changes*.json"))
             )
 
+            await show_tab(pilot, "patch_tab_checks")
             app.query_one("#patch_checks_run_button", Button).press()
-            await pilot.pause()
+            await settle_workers(pilot)
             outcomes["checks_line"] = any(
                 "Checks: not run" in line for line in app.log_lines
             )
@@ -2718,8 +2727,9 @@ def test_at058b_id_census_and_wiring_survive_reparent(tmp_path: Path) -> None:
             _set_entry_inputs(app, address="0x100", bytes_text="AA")
             panel.request_action("add_entry")
             await pilot.pause()
+            await show_tab(pilot, "patch_tab_checks")
             app.query_one("#patch_checks_run_button", Button).press()
-            await pilot.pause()
+            await settle_workers(pilot)
             outcomes["checks_line"] = any(
                 line.startswith("Checks:") for line in app.log_lines
             )
@@ -3315,10 +3325,18 @@ def test_at_batch41_escape_cancels_changeset_json_popup(tmp_path: Path) -> None:
             app.action_show_screen("patch")
             await pilot.pause()
             _seed_via_paste(app, seed)
-            await pilot.pause()
+            await _settled(
+                pilot,
+                lambda: len(_entry_addresses(app)) == 1,
+                "paste seed parse render (Escape arm)",
+            )
 
             app.query_one("#patch_edit_json_button", Button).press()
-            await pilot.pause()
+            await _settled(
+                pilot,
+                lambda: _json_popup_ready(app),
+                "JSON popup ready (Escape arm)",
+            )
             outcomes["popup_open_before_escape"] = isinstance(
                 app.screen, ChangeSetJsonScreen
             )
@@ -3408,7 +3426,11 @@ def test_at064c_edit_json_disabled_for_file_backed_document(
 
             # (b) PASTE-authored document → source_path None → enabled + opens.
             _seed_via_paste(app, paste)
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: app._change_service.document.source_path is None,
+                "the parsed paste replaced the file-backed document",
+            )
             outcomes["paste_source_none"] = (
                 app._change_service.document.source_path is None
             )
@@ -3667,39 +3689,17 @@ def test_at068a_undo_redo_roundtrip_through_surface(tmp_path: Path) -> None:
     )
 
     async def _click(pilot: object, app: S19TuiApp, selector: str) -> None:
-        """Drive a REAL pointer click on a panel control (C-16).
-
-        batch-94: the panel is the ONE vertical scroll (all three
-        ``#patch_win_*`` windows are content-height ``auto``, stacked
-        script→json→checks), so the docked rows — the entry chips in the
-        SCRIPT window and the history strip / Undo-Redo in the JSON window —
-        are reached by scrolling the PANEL, not a window. Scroll
-        ``#patch_editor_panel`` so the target control is on-screen, then
-        ``pilot.click`` delivers a genuine mouse event to the button (no
-        ``.focus()``, no direct handler / service call).
-        """
-        panel = app.query_one("#patch_editor_panel")
+        """Open the control's current tab, scroll it into view and really click."""
         target = app.query_one(selector)
-        # batch-97 Inc-4 (named supersession, HLR-144): a control on an
-        # inspector tab is clicked with its tab open, as the operator does.
         homes = {a.id for a in target.ancestors if getattr(a, "id", None)}
-        # Inc 8 R-TUI-063.3: the ledger's own tab joins (the ledger is no longer always shown).
-        for pane, chip in (("patch_win_json", "#patch_tab_json"), ("patch_pane_inspector", "#patch_tab_inspector"), ("patch_win_script", "#patch_tab_script")):
+        for pane, chip in (
+            ("patch_win_json", "patch_tab_json"),
+            ("patch_pane_inspector", "patch_tab_inspector"),
+            ("patch_win_script", "patch_tab_script"),
+        ):
             if pane in homes:
-                await pilot.click(chip)
-                await pilot.pause()
-        for _ in range(4):
-            panel.scroll_y = max(
-                0,
-                target.region.y
-                - panel.content_region.y
-                + panel.scroll_offset.y,
-            )
-            await pilot.pause()
-        # Inc 8 R-PE-DEF.1.1: a tab's content scrolls inside the 9-row landing pane.
-        target.scroll_visible(animate=False)
-        await pilot.pause()
-        await pilot.click(selector)
+                await show_tab(pilot, chip)
+        assert await click_visible(pilot, selector), f"click missed {selector}"
         await pilot.pause()
 
     async def _drive() -> dict[str, object]:
@@ -3806,7 +3806,11 @@ def test_tc344_undo_redo_disabled_for_file_backed_document(
 
             # (b) PASTE-authored document → source_path None → enabled.
             _seed_via_paste(app, paste)
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: app._change_service.document.source_path is None,
+                "the parsed paste replaced the file-backed document",
+            )
             outcomes["paste_source_none"] = (
                 app._change_service.document.source_path is None
             )
@@ -3982,23 +3986,9 @@ def test_at068b_per_entry_json_popup_edits_only_selected_entry(
     )
 
     async def _click_entry_json(pilot: object, app: S19TuiApp) -> None:
-        """Drive a REAL pointer click on the per-entry Edit-JSON button (C-16).
-
-        batch-46: the per-entry buttons row is docked below the PATCH SCRIPT
-        window body. Scroll the WINDOW (``#patch_win_script`` — the scroll
-        container that reveals the docked rows) to its end, then ``pilot.click``
-        delivers a genuine mouse event (no ``.focus()`` / no direct call).
-        """
-        # Inc 8 R-TUI-063.3 / R-PE-DEF.3: the per-entry buttons ride the Inspector pane (a
-        # tab of the landing pane), so its chip is clicked and that pane is scrolled to its
-        # end (was: the ledger window ``#patch_win_script`` scrolled, with no tab to open).
-        # E4 integration: the Use parameter row and the tally follow the chips (R-PE-DEF.3), so the
-        # pane's end passes them; the button is scrolled into view inside the 9-row pane (R-PE-DEF.1.1).
-        await pilot.click("#patch_tab_inspector")
-        await pilot.pause()
-        app.query_one("#patch_entry_edit_json_button").scroll_visible(animate=False)
-        await pilot.pause()
-        await pilot.click("#patch_entry_edit_json_button")
+        """Open Inspector, scroll to the per-entry button and really click it."""
+        await show_tab(pilot, "patch_tab_inspector")
+        assert await click_visible(pilot, "#patch_entry_edit_json_button")
         await pilot.pause()
 
     async def _drive() -> dict[str, object]:
@@ -4009,13 +3999,19 @@ def test_at068b_per_entry_json_popup_edits_only_selected_entry(
             app.action_show_screen("patch")
             await pilot.pause()
             _seed_via_paste(app, paste)
-            await pilot.pause()
+            expected_before = [("0x200", "REV_A"), ("0x300", "DE AD"), ("0x400", "REV_C")]
+            await _settled(
+                pilot,
+                lambda: _entry_addr_values(app) == expected_before,
+                "three pasted rows rendered before selecting the middle entry",
+            )
             outcomes["before"] = _entry_addr_values(app)
 
             # Select the MIDDLE entry (index 1 -> 0x300); i != 0 proves scoping.
             table = app.query_one("#patch_doc_entries_table", DataTable)
             table.move_cursor(row=1)
             await pilot.pause()
+            assert table.cursor_row == 1, table.cursor_row
 
             # REAL click -> the per-entry popup (C-16).
             await _click_entry_json(pilot, app)
@@ -4107,7 +4103,11 @@ def test_tc345_entry_edit_json_disabled_for_file_backed_document(
 
             # (b) PASTE-authored document -> source_path None -> enabled.
             _seed_via_paste(app, paste)
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: app._change_service.document.source_path is None,
+                "the parsed paste replaced the file-backed document",
+            )
             outcomes["paste_source_none"] = (
                 app._change_service.document.source_path is None
             )
