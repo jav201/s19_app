@@ -121,6 +121,9 @@ SNAPSHOT_EXCLUSIONS: dict[str, str] = {
     # Inc 7 (E3A-09, E1-slice 5.2): the two app attributes the A2L list of labels adds.
     "_a2l_label_ranker": "one worker host per app; not session state (Inc 7)",
     "_a2l_list_resolution": "derived from the filter text and the enriched tags at every refresh (Inc 7)",
+    # Inc 1b (E2 N3): one transient right-click candidate, consumed or cleared
+    # by the gesture; it carries no project-session state across a load.
+    "_right_gesture": "transient mouse-gesture candidate; UI input state, not session state (Inc 1b N3)",
 }
 
 # The K1/K2 allow-list (ARQ §2.2): names a load-over may differ in BY
@@ -234,11 +237,9 @@ def test_tc_b100_08_reset_runs_once_before_the_first_install(tmp_path: Path) -> 
         _seed_project_p1(app.workarea)
         events: list[str] = []
         original_reset = getattr(app, "_reset_project_session", None)
-        # Inc 7 re-pin (LLR-169.6): the project variant now installs through
-        # ``_install_project_image`` (parse first, then apply), the MAC
-        # through ``load_selected_file``; both apply through
-        # ``_apply_loaded_file``, so that is the install marker.
-        original_apply = app._apply_loaded_file
+        # Inc 12b re-pin (HLR-177): the worker prepares both bundles and
+        # `_install_prepared_project` applies S19 then MAC through this seam.
+        original_apply = app._apply_prepared_load
 
         def _recording_reset() -> int:
             events.append("reset")
@@ -246,12 +247,12 @@ def test_tc_b100_08_reset_runs_once_before_the_first_install(tmp_path: Path) -> 
                 return 0
             return original_reset()
 
-        def _recording_apply(loaded, path, load_started) -> None:
+        def _recording_apply(loaded, path, load_started, *, publish_a2l=True) -> bool:
             events.append("install")
-            original_apply(loaded, path, load_started)
+            return original_apply(loaded, path, load_started, publish_a2l=publish_a2l)
 
         app._reset_project_session = _recording_reset
-        app._apply_loaded_file = _recording_apply
+        app._apply_prepared_load = _recording_apply
         async with app.run_test() as pilot:
             await pilot.pause()
             app._handle_load_project(P1_NAME)
@@ -1055,6 +1056,9 @@ def test_tc_b100_10_reset_leaves_the_patch_editor_clean_for_the_next_load(
 #: Re-frozen again at Inc 10a's E4 rulings (E4-R3): ``_focus_landing_fallback``
 #: (the widget a focus landing chose when the window's target was not shown)
 #: joins it; it is classified in ``SNAPSHOT_EXCLUSIONS`` with its reason.
+#: Batch-103 G3 re-pin: the approved Inc 7 ranker/resolution and Inc 1b
+#: right-gesture candidate join the historical base; Inc 12b's delta remains
+#: exactly ``_quit_pending``. All four current additions are classified.
 _CENSUS_AT_12B_BASE = frozenset({
     '_a2l_cache_data',
     '_a2l_cache_key',
@@ -1062,6 +1066,8 @@ _CENSUS_AT_12B_BASE = frozenset({
     '_a2l_enriched_tags',
     '_a2l_filter_debounce_token',
     '_a2l_filtered_tags',
+    '_a2l_label_ranker',
+    '_a2l_list_resolution',
     '_a2l_row_key_to_tag',
     '_a2l_summary_lines',
     '_a2l_summary_start',
@@ -1104,6 +1110,7 @@ _CENSUS_AT_12B_BASE = frozenset({
     '_parsed_paste_text',
     '_pending_variant_id',
     '_report_filter_path',
+    '_right_gesture',
     '_save_confirmed',
     '_save_painted_preview',
     '_save_session',

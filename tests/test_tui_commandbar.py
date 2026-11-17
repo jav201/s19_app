@@ -88,7 +88,9 @@ def test_tc007_palette_lists_every_bindings_action(tmp_path: Path) -> None:
     entry carries an action id outside ``BINDINGS`` (apart from the two
     explicit extras: the resurfaced ``open_settings_menu`` command and
     batch-95 change 4's palette-first ``open_split_join_export`` screen
-    entry). Built programmatically so a palette missing an action fails loudly.
+    entry). Inc 1b (R-COPY.24) is the one named projection: ``help_quit``
+    maps to the existing immediate ``quit`` palette action. Built
+    programmatically so a palette missing an action fails loudly.
     """
 
     async def _drive() -> tuple[set[str], set[str]]:
@@ -99,10 +101,10 @@ def test_tc007_palette_lists_every_bindings_action(tmp_path: Path) -> None:
             palette_actions = set(bar.visible_palette_actions())
         binding_actions: set[str] = set()
         for binding in S19TuiApp.BINDINGS:
-            if isinstance(binding, Binding):
-                binding_actions.add(binding.action)
-            else:
-                binding_actions.add(binding[1])
+            action = binding.action if isinstance(binding, Binding) else binding[1]
+            # Inc 1b (R-COPY.24): q opens the quit help, while palette Quit
+            # deliberately keeps the immediate `quit` action.
+            binding_actions.add("quit" if action == "help_quit" else action)
         return binding_actions, palette_actions
 
     binding_actions, palette_actions = asyncio.run(_drive())
@@ -2709,12 +2711,19 @@ def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
     # node exists to break). batch-94's two non-digit rail bindings are NOT
     # in the freeze — each is pinned as a named live-only delta below
     # (Inc-001's Check Editor `=`; Inc-003's Flow Execution `]`, US-007).
+    # Batch-100 Inc 12a adds Describe tag and Flow Execution Confirm; Inc 1b's
+    # help_quit projection leaves the frozen `quit` row unchanged (R-COPY.24).
     assert len(expected) == 38, (
         f"the frozen artifact must still carry the 37 Inc-0 actions plus the "
         f"one batch-95 amendment; it has {len(expected)} -- if this fails "
         f"the artifact was REGENERATED, which restores the tautology"
     )
-    live_deltas = ["show_screen('check_editor')", "show_screen('flow_execution')"]
+    live_deltas = [
+        "show_screen('check_editor')",
+        "show_screen('flow_execution')",
+        "a2l_describe_tag",
+        "confirm_attention",
+    ]
     for added in live_deltas:
         assert added in observed, (
             f"a non-digit rail binding must add exactly one palette action "
