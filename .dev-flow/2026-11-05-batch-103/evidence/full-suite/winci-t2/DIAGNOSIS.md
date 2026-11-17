@@ -36,3 +36,16 @@ No payloads, first-line/multiline expectations, AT cell cardinality, manifest ob
 - `git diff --check`: passed.
 
 The real clipboard end-to-end feedback loop is exclusively the isolated hosted Windows workflow. No local clipboard probe, `GITHUB_ACTIONS` override, product assumption, merge, or G3 closure is part of this change.
+
+## Hosted verification
+
+- Tested revision: `12c5343cd44d2f2b4b81251a7fb0b8568cf65d4a`.
+- Manual workflow run: `44191091285`, `workflow_dispatch`, completed successfully in 37 min 6 s.
+- URL: https://github.com/jav201/s19_app/actions/runs/44191091285
+- Pytest: 216 passed, 0 failed, 44 skipped, 2 warnings in 2160.75 s.
+- Gate: `WINCI_GATE_RESULT PASS violations=0 pytest_exit=0 gate_exit=0`; 108/108 obligations; AT 28/28 (P1 14/14, P2 14/14).
+- Independent JUnit comparison: all 17 original failing nodeids passed; no remaining failures.
+- Artifact safety: `ARTIFACT_SAFETY_RESULT PASS violations=0`.
+- The 44 skips are the same allowed platform/manual skips as baseline, including the operator-only Windows Terminal test. No manual operator acceptance was claimed.
+
+The first watcher was interrupted by a GitHub REST core-rate-limit reset at 22:46:38 UTC. Waiting resumed after that reset without dispatching a duplicate manual run; the workflow itself continued normally. The push-triggered run `44191071498` is separate from the requested manual evidence run.

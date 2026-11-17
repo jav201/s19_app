@@ -1,0 +1,5 @@
+BASELINE {'tests': '260', 'failures': '17', 'errors': '0', 'skipped': '44'}
+CURRENT {'tests': '260', 'failures': '0', 'errors': '0', 'skipped': '44'}
+ORIGINAL_FAILURES_NOW_PASSED 17/17
+REMAINING_FAILURES 0
+ORIGINAL_FAILURE_REGRESSION_CHECK PASS
