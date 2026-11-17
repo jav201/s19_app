@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="8.464" timestamp="2026-11-16T17:55:11.703619-06:00" hostname="[HOST]"><testcase classname="tests.test_b103_inc9b_at" name="test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step" time="8.136"><failure message="AssertionError: precondition: cue title without the busy corner: #c7c7c7&#10;assert '#c7c7c7' == '#f5c26b'&#10;  &#10;  - #f5c26b&#10;  + #c7c7c7">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/head__bench_100_3/tmp/pytest-of-[ACCOUNT]/pytest-0/test_r_pe_bench_100_3_a_writte0')
+defc_dir = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/head__bench_100_3/tmp/pytest-of-[ACCOUNT]/pytest-0/b103_inc9_w_defc0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000232EF16AE40&gt;
+
+    @pytest.mark.serial_timing
+    def test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.100/3. VAL_BLK_DEF_0001 with Set `10` previewed, alt+s with its encode held past the grace (the
+        `stage VAL_BLK_DEF_0001` cue is painted), then released: the document gets its entry and the window is idle
+        (border not amber, title exactly `STAGING SHEET`) within 0.3 s of the last change the screen painted before it.
+        Operator need (P-127): a cue left on after the job ended says the window is still working.
+        Negative control: the inline border left or the last busy title left -&gt; never idle (RED)."""
+        gate = Gate(monkeypatch, "encode_values")
+
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            try:
+                await vb_edit(pilot, sheet, "s", "10")
+                gate.hold.add(VB)
+                t_key = send(app, "alt+s")
+                cue = await watch(app, lambda s, o: titled(s, "stage", VB), t_key + 2.0)
+                held = gate.entered.is_set()
+                if not titled(cue[-1], "stage", VB):
+                    return cue, [], entries_of(app), held
+            finally:
+                gate.release()
+            done = await watch(app, lambda s, o: s.entries &gt;= 1 and is_idle(s), time.monotonic() + 30.0, full=True)
+            return cue, done, entries_of(app), held
+
+        cue, done, entries, held = run(tmp_path, defc_dir, body)
+        assert held, "control: the record's encode never reached the gate, so no record stage was running"
+        assert titled(cue[-1], "stage", VB), f"precondition: no `stage {VB}` cue while held; last top row {cue[-1].row!r} ({load()})"
+&gt;       assert cue[-1].corner == BUSY_HEX, f"precondition: cue title without the busy corner: {cue[-1].corner}"
+E       AssertionError: precondition: cue title without the busy corner: #c7c7c7
+E       assert '#c7c7c7' == '#f5c26b'
+E
+E         - #f5c26b
+E         + #c7c7c7
+
+tests\test_b103_inc9b_at.py:493: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,653 @@
+lane	nodeid	category	base_status	head_status	base_signature	head_signature	base_message	head_message	base_time	head_time
+main	tests/test_b103_a2l_reader.py::test_r_a2l_read_1_crlf_cr_mixed_read_as_lf	heredado_misma_firma	failure	failure	tests\test_b103_a2l_reader.py:206: AssertionError	tests\test_b103_a2l_reader.py:206: AssertionError	"AssertionError: WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-base/examples/case_00_public/merge_inc_test.a2l')
+assert ['Line 9: /in... is not read'] == ['Line 5: /in... is not read']
+
+  At index 0 diff: 'Line 9: /include included.a2l is not read' != 'Line 5: /include included.a2l is not read'
+  Use -v to get more diff"	"AssertionError: WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local/examples/case_00_public/merge_inc_test.a2l')
+assert ['Line 9: /in... is not read'] == ['Line 5: /in... is not read']
+
+  At index 0 diff: 'Line 9: /include included.a2l is not read' != 'Line 5: /include included.a2l is not read'
+  Use -v to get more diff"	0.416	0.431
+main	tests/test_b103_a2l_reader_coverage.py::test_cov_read_1_line_end_variants_equal_lf	heredado_misma_firma	failure	failure	tests\test_b103_a2l_reader_coverage.py:127: AssertionError	tests\test_b103_a2l_reader_coverage.py:127: AssertionError	"AssertionError: (('[USER_HOME]\\Github\\s19_app-b103-g3-base\\examples\\case_00_public\\ASAP2_Demo_V161.a2l', 'crlf', 0), {'end_line': (8169, 4085), 'line_numbers': ([7, 17], [4, 9]), 'meta_line': (3, 2), 'start_line': (3, 2)})
+assert not {'end_line': (8169, 4085), 'line_numbers': ([7, 17], [4, 9]), 'meta_line': (3, 2), 'start_line': (3, 2)}"	"AssertionError: (('[USER_HOME]\\Github\\s19_app-b103-g3-local\\examples\\case_00_public\\ASAP2_Demo_V161.a2l', 'crlf', 0), {'end_line': (8169, 4085), 'line_numbers': ([7, 17], [4, 9]), 'meta_line': (3, 2), 'start_line': (3, 2)})
+assert not {'end_line': (8169, 4085), 'line_numbers': ([7, 17], [4, 9]), 'meta_line': (3, 2), 'start_line': (3, 2)}"	0.172	0.061
+main	tests/test_b103_a2l_reader_coverage.py::test_cov_read_1_cr_cr_lf_full_equality	heredado_misma_firma	failure	failure	tests\test_b103_a2l_reader_coverage.py:174: AssertionError	tests\test_b103_a2l_reader_coverage.py:174: AssertionError	assert 4 == ((2 * 2) - 1)	assert 4 == ((2 * 2) - 1)	0.006	0.014
+main	tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[raw-transcript-transport-crlf]	absent	absent	failure		tests\test_b103_winci_gate.py:608: AssertionError		"assert False
+ +  where False = any(<generator object test_artifact_scanner_known_bad_canary_forms.<locals>.<genexpr> at 0x000001858D0B32A0>)"		0.019
+main	tests/test_b103_a2l_reader.py::test_r_a2l_read_1_cr_cr_lf_counts_two_ends	heredado_misma_firma	failure	failure	tests\test_b103_a2l_reader.py:216: AssertionError	tests\test_b103_a2l_reader.py:216: AssertionError	assert 4 == 3	assert 4 == 3	0.005	0.005
+main	tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[raw-transcript-matrix-p2]	absent	absent	failure		tests\test_b103_winci_gate.py:608: AssertionError		"assert False
+ +  where False = any(<generator object test_artifact_scanner_known_bad_canary_forms.<locals>.<genexpr> at 0x000001858EC95150>)"		0.011
+main	tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[raw-transcript-paste-payload]	absent	absent	failure		tests\test_b103_winci_gate.py:608: AssertionError		"assert False
+ +  where False = any(<generator object test_artifact_scanner_known_bad_canary_forms.<locals>.<genexpr> at 0x000001858EC979F0>)"		0.010
+main	tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[raw-junit-transport-crlf]	absent	absent	failure		tests\test_b103_winci_gate.py:608: AssertionError		"assert False
+ +  where False = any(<generator object test_artifact_scanner_known_bad_canary_forms.<locals>.<genexpr> at 0x000001858D2C1D80>)"		0.012
+main	tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-transcript-xml-secret]	absent	absent	failure		tests\test_b103_winci_gate.py:608: AssertionError		"assert False
+ +  where False = any(<generator object test_artifact_scanner_known_bad_canary_forms.<locals>.<genexpr> at 0x000001858EC96400>)"		0.009
+main	tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-transcript-transport-crlf]	absent	absent	failure		tests\test_b103_winci_gate.py:608: AssertionError		"assert False
+ +  where False = any(<generator object test_artifact_scanner_known_bad_canary_forms.<locals>.<genexpr> at 0x000001858EC958A0>)"		0.006
+main	tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-transcript-matrix-p2]	absent	absent	failure		tests\test_b103_winci_gate.py:608: AssertionError		"assert False
+ +  where False = any(<generator object test_artifact_scanner_known_bad_canary_forms.<locals>.<genexpr> at 0x000001858EC95D80>)"		0.006
+main	tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-transcript-paste-payload]	absent	absent	failure		tests\test_b103_winci_gate.py:608: AssertionError		"assert False
+ +  where False = any(<generator object test_artifact_scanner_known_bad_canary_forms.<locals>.<genexpr> at 0x000001858D113E00>)"		0.006
+main	tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-junit-xml-secret]	absent	absent	failure		tests\test_b103_winci_gate.py:608: AssertionError		"assert False
+ +  where False = any(<generator object test_artifact_scanner_known_bad_canary_forms.<locals>.<genexpr> at 0x000001858D2C01E0>)"		0.010
+main	tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-junit-transport-crlf]	absent	absent	failure		tests\test_b103_winci_gate.py:608: AssertionError		"assert False
+ +  where False = any(<generator object test_artifact_scanner_known_bad_canary_forms.<locals>.<genexpr> at 0x000001858D2C24D0>)"		0.006
+main	tests/test_b103_inc8b_s1.py::test_r_pe_def_103_1_every_cue_survives_without_colour	absent	absent	passed						0.011
+main	tests/test_b100_document.py::test_tc_b100_29_forced_write_failure_saves_without_the_document	regresion_base_pass_head_fail	passed	failure		tests\test_b100_document.py:132: AssertionError		assert False	5.465	2.624
+main	tests/test_b103_inc12_tag_table.py::test_r_tui_042a_3_4_card_keeps_the_full_name	heredado_misma_firma	failure	failure	tests\test_b103_inc12_tag_table.py:549: AssertionError	tests\test_b103_inc12_tag_table.py:549: AssertionError	"AssertionError: ('SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END', 'Highlight a tag to inspect its fields.')
+assert 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' in 'Highlight a tag to inspect its fields.'
+ +  where 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' = longname(48)"	"AssertionError: ('SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END', 'Highlight a tag toinspect its fields.')
+assert 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' in 'Highlight a tag toinspect its fields.'
+ +  where 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' = longname(48)"	4.848	4.673
+main	tests/test_b103_a2l_reader.py::test_at_b103_i11_2_commented_old_copy_changes_nothing	heredado_misma_firma	failure	failure	tests\test_b103_a2l_reader.py:1945: AssertionError	tests\test_b103_a2l_reader.py:1945: AssertionError	"AssertionError: expected exactly one X row, got ['0x00001234']
+assert ['0x00001234'] == ['X']
+
+  At index 0 diff: '0x00001234' != 'X'
+  Use -v to get more diff"	"AssertionError: expected exactly one X row, got ['0x00001234']
+assert ['0x00001234'] == ['X']
+
+  At index 0 diff: '0x00001234' != 'X'
+  Use -v to get more diff"	2.591	2.872
+main	tests/test_b100_busy.py::test_tc_b100_50_project_raise_ends_the_action_first	heredado_firma_distinta	failure	failure	tests\test_b100_busy.py:1497: AssertionError	tests\test_b100_busy.py:1495: AssertionError	"AssertionError: [namespace(key='project_load', gen=1, outcome=""Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"", result=True, timers=0, status=""Loaded project 'P' -> firmware.s19"")]
+assert ['Loaded proj...- details: p'] == ['Loading project P failed']
+
+  At index 0 diff: ""Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"" != 'Loading project P failed'
+  Use -v to get more diff"	"AssertionError: [namespace(key='project_load', gen=1, outcome=""Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"", result=True, timers=0, status=""Loaded project 'P' -> firmware.s19"")]
+assert ['Loaded proj...- details: p'] == ['Loading project P failed']
+
+  At index 0 diff: ""Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p"" != 'Loading project P failed'
+  Use -v to get more diff"	2.453	2.939
+main	tests/test_b100_busy.py::test_tc_b100_51_every_baseline_bar_site_maps_to_a_seam_event	heredado_firma_distinta	failure	failure	tests\test_b100_busy.py:1639: AssertionError	tests\test_b100_busy.py:1637: AssertionError	"AssertionError: [('load_a2l_from_path', 'begin', 'a2l_load', None, '0/1'), ('_install_attached_a2l', 'end', 'a2l_load', None, '0/1'), ('_start_load_worker', 'end', 'file_load', None, '0/1')]
+assert [('load_a2l_f... None, '0/1')] == []
+
+  Left contains 3 more items, first extra item: ('load_a2l_from_path', 'begin', 'a2l_load', None, '0/1')
+  Use -v to get more diff"	"AssertionError: [('load_a2l_from_path', 'begin', 'a2l_load', None, '0/1'), ('_install_attached_a2l', 'end', 'a2l_load', None, '0/1'), ('_start_load_worker', 'end', 'file_load', None, '0/1')]
+assert [('load_a2l_f... None, '0/1')] == []
+
+  Left contains 3 more items, first extra item: ('load_a2l_from_path', 'begin', 'a2l_load', None, '0/1')
+  Use -v to get more diff"	0.301	0.439
+main	tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project[size1]	regresion_base_pass_head_fail	passed	failure		tests\test_b100_document.py:1992: AssertionError		"AssertionError: click missed #patch_paste_text
+assert False"	14.918	10.420
+main	tests/test_b100_busy.py::test_tc_b100_51_twelve_b_seam_sites_sit_in_the_workers_and_handlers	heredado_firma_distinta	failure	failure	tests\test_b100_busy.py:2635: AssertionError	tests\test_b100_busy.py:2633: AssertionError	"AssertionError: [('load_a2l_from_path', 'begin', 'a2l_load', None), ('_install_attached_a2l', 'end', 'a2l_load', None)]
+assert [('load_a2l_f..._load', None)] == []
+
+  Left contains 2 more items, first extra item: ('load_a2l_from_path', 'begin', 'a2l_load', None)
+  Use -v to get more diff"	"AssertionError: [('load_a2l_from_path', 'begin', 'a2l_load', None), ('_install_attached_a2l', 'end', 'a2l_load', None)]
+assert [('load_a2l_f..._load', None)] == []
+
+  Left contains 2 more items, first extra item: ('load_a2l_from_path', 'begin', 'a2l_load', None)
+  Use -v to get more diff"	0.275	0.148
+main	tests/test_b103_clipboard_core.py::test_r_tui_044_1_18_every_single_line_box_is_os_clipboard_input	regresion_base_pass_head_fail	passed	failure		tests\test_b103_clipboard_core.py:1719: AssertionError		"AssertionError: {'CappedTextArea': 7, 'Input': 0, 'JsonHighlightTextArea': 1, 'OsClipboardInput': 42, ...}
+assert 42 == 41"	1.213	1.704
+main	tests/test_b103_clipboard_core.py::test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes	regresion_base_pass_head_fail	passed	failure		tests\test_b103_clipboard_core.py:1733: AssertionError		"AssertionError: {'CappedTextArea': 7, 'Input': 0, 'JsonHighlightTextArea': 1, 'OsClipboardInput': 42, ...}
+assert 42 == 41"	0.902	1.352
+main	tests/test_b97_chips_help.py::test_tc_b97_32_patch_help_names_every_label	heredado_firma_distinta	failure	failure	tests\test_b97_chips_help.py:1112: AssertionError	tests\test_b97_chips_help.py:1114: AssertionError	"AssertionError: labels with no `label — effect` line: ['', 'Add list', 'Pick']
+assert ['', 'Add list', 'Pick'] == []
+
+  Left contains 3 more items, first extra item: ''
+  Use -v to get more diff"	"AssertionError: labels with no `label — effect` line: ['', 'Format']
+assert ['', 'Format'] == []
+
+  Left contains 2 more items, first extra item: ''
+  Use -v to get more diff"	7.075	6.966
+main	tests/test_b100_save_image.py::test_tc_b100_15_mac_and_a2l_stay_byte_copies	contexto_head_serial_pass	passed	passed					2.801	3.051
+main	tests/test_b100_save_image.py::test_tc_b100_59_open_project_unchanged	contexto_head_serial_pass	failure	passed	tests\test_b100_save_image.py:158: AssertionError		AssertionError: timed out waiting for the save into the open project		18.086	2.690
+main	tests/test_b97_flow_builder.py::test_tc_b97_18_crc_card_painted_in_the_crc_colour	contexto_head_serial_pass	passed	passed					4.173	4.376
+main	tests/test_b100_save_image.py::test_tc_b100_70_refused_save_keeps_the_flag	regresion_base_pass_head_fail	passed	failure		tests\test_b100_save_image.py:1835: AssertionError		assert False	5.653	2.890
+main	tests/test_b100_save_image.py::test_tc_b100_70_written_document_clears_the_flag	regresion_base_pass_head_fail	passed	failure		tests\test_b100_save_image.py:1835: AssertionError		assert False	7.364	3.074
+main	tests/test_b100_save_image.py::test_tc_b100_70_failed_document_write_keeps_the_flag	regresion_base_pass_head_fail	passed	failure		tests\test_b100_save_image.py:1835: AssertionError		assert False	6.043	2.880
+main	tests/test_b100_save_image.py::test_tc_b100_70_file_backed_document_from_outside_keeps_the_flag	regresion_base_pass_head_fail	passed	failure		tests\test_b100_save_image.py:1835: AssertionError		assert False	6.316	2.908
+main	tests/test_b97_flow_builder.py::test_tc_b97_49_ribbon_paints_saved_then_unsaved	contexto_head_serial_pass	passed	passed					5.027	5.363
+main	tests/test_b100_save_image.py::test_tc_b100_70_natural_path_load_edit_save_keeps_the_flag	regresion_base_pass_head_fail	passed	failure		tests\test_b100_save_image.py:1835: AssertionError		assert False	7.198	3.963
+main	tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size0]	regresion_base_pass_head_fail	passed	failure		tests\test_b100_save_image.py:1835: AssertionError		assert False	18.201	10.596
+main	tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[patch]	heredado_firma_distinta	failure	failure	tests\test_b97_chips_help.py:2299: AssertionError	tests\test_b97_chips_help.py:2316: AssertionError	"AssertionError: patch: painted labels with no help line: ['Add list', 'Pick']
+assert ['Add list', 'Pick'] == []
+
+  Left contains 2 more items, first extra item: 'Add list'
+  Use -v to get more diff"	"AssertionError: patch: painted labels with no help line: ['Format']
+assert ['Format'] == []
+
+  Left contains one more item: 'Format'
+  Use -v to get more diff"	10.251	10.004
+main	tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size1]	regresion_base_pass_head_fail	passed	failure		tests\test_b100_save_image.py:1835: AssertionError		assert False	18.547	10.233
+main	tests/test_tui_app.py::test_load_selected_file_attaches_mac_to_loaded_binary	heredado_misma_firma	failure	failure	..\..\anaconda3\Lib\site-packages\textual\app.py:1641: ScreenStackError	..\..\anaconda3\Lib\site-packages\textual\app.py:1641: ScreenStackError	textual.app.ScreenStackError: No screens on stack	textual.app.ScreenStackError: No screens on stack	0.007	0.007
+main	tests/test_b100_load_question.py::test_tc_b100_44_project_load_asks_iff_a_flag_is_set	regresion_base_pass_head_fail	passed	failure		tests\test_b100_load_question.py:683: AssertionError		assert False	13.182	6.472
+main	tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses	regresion_base_pass_head_fail	passed	failure		tests\test_suite_hygiene.py:2053: AssertionError		"AssertionError: unredacted batch records or evidence:
+  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
+  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
+  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
+  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
+  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
+  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
+  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
+  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
+  inc-10/04-validation.md: pytest temp folder of an account: pytest-of-j
+  inc-8b/04-validation.md: posix home path outside the runner image: [HOME]
+  inc-8b/evidence/e5/runs/out-green/law-suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-8b/evidence/e5/runs/out-green/law-suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-8b/steps.log: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]
+  inc-9b/steps.log: posix home path outside the runner image: [HOME]
+  steps.log: posix home path outside the runner image: [HOME]
+assert not ['evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME] 'evidence/full-suit...ge: [HOME] 'evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME] ...]"	24.930	12.693
+main	tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_1_name_without_display_identifier	heredado_firma_distinta	failure	failure	tests\test_b103_inc12_tag_table.py:1163: AssertionError	tests\test_b103_inc12_tag_table.py:1169: AssertionError	"AssertionError: ('SYN]0;PWN31m0;xq_END', 'Highlight a tag to inspect its fields.')
+assert 'SYN]0;PWN31m0;xq_END' in 'Highlight a tag to inspect its fields.'"	"AssertionError: ('SYN]0;PWN31m0;xq_END', 'Highlight a tag toinspect its fields.')
+assert 'SYN]0;PWN31m0;xq_END' in 'Highlight a tag toinspect its fields.'"	4.580	4.514
+main	tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_2_display_identifier	heredado_firma_distinta	failure	failure	tests\test_b103_inc12_tag_table.py:1163: AssertionError	tests\test_b103_inc12_tag_table.py:1169: AssertionError	"AssertionError: ('SYN]0;PWN31m0;xq_DISP', 'Highlight a tag to inspect its fields.')
+assert 'SYN]0;PWN31m0;xq_DISP' in 'Highlight a tag to inspect its fields.'"	"AssertionError: ('SYN]0;PWN31m0;xq_DISP', 'Highlight a tag toinspect its fields.')
+assert 'SYN]0;PWN31m0;xq_DISP' in 'Highlight a tag toinspect its fields.'"	4.348	4.567
+main	tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_3_description	heredado_firma_distinta	failure	failure	tests\test_b103_inc12_tag_table.py:1163: AssertionError	tests\test_b103_inc12_tag_table.py:1169: AssertionError	"AssertionError: ('DESC_]0;PWN31m0;xq_END', 'Highlight a tag to inspect its fields.')
+assert 'DESC_]0;PWN31m0;xq_END' in 'Highlight a tag to inspect its fields.'"	"AssertionError: ('DESC_]0;PWN31m0;xq_END', 'Highlight a tag toinspect its fields.')
+assert 'DESC_]0;PWN31m0;xq_END' in 'Highlight a tag toinspect its fields.'"	5.065	4.774
+main	tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_4_unit	heredado_firma_distinta	failure	failure	tests\test_b103_inc12_tag_table.py:1163: AssertionError	tests\test_b103_inc12_tag_table.py:1169: AssertionError	"AssertionError: ('m]0;PWN31m0;xq_u', 'Highlight a tag to inspect its fields.')
+assert 'm]0;PWN31m0;xq_u' in 'Highlight a tag to inspect its fields.'"	"AssertionError: ('m]0;PWN31m0;xq_u', 'Highlight a tag toinspect its fields.')
+assert 'm]0;PWN31m0;xq_u' in 'Highlight a tag toinspect its fields.'"	4.642	4.788
+main	tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_9_deep_value_gives_the_reason_not_a_raise	heredado_misma_firma	failure	failure	tests\test_b101_crc_model_and_reasons.py:484: AssertionError	tests\test_b101_crc_model_and_reasons.py:484: AssertionError	"AssertionError: {""CRC config is structurally invalid: field 'init' is not a number: [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[…""}
+assert {'CRC config ...[[[[[[[[[[[…'} == {'CRC config ...[[[[[[[[[[[…'}
+
+  Extra items in the right set:
+  'CRC config is not valid JSON: nesting too deep'
+  Use -v to get more diff"	"AssertionError: {""CRC config is structurally invalid: field 'init' is not a number: [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[…""}
+assert {'CRC config ...[[[[[[[[[[[…'} == {'CRC config ...[[[[[[[[[[[…'}
+
+  Extra items in the right set:
+  'CRC config is not valid JSON: nesting too deep'
+  Use -v to get more diff"	0.041	0.033
+main	tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_5_conversion	heredado_firma_distinta	failure	failure	tests\test_b103_inc12_tag_table.py:1163: AssertionError	tests\test_b103_inc12_tag_table.py:1169: AssertionError	"AssertionError: ('CV_]0;PWN31m0;xq_END', 'Highlight a tag to inspect its fields.')
+assert 'CV_]0;PWN31m0;xq_END' in 'Highlight a tag to inspect its fields.'"	"AssertionError: ('CV_]0;PWN31m0;xq_END', 'Highlight a tag toinspect its fields.')
+assert 'CV_]0;PWN31m0;xq_END' in 'Highlight a tag toinspect its fields.'"	4.650	4.406
+main	tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_6_limits	heredado_firma_distinta	failure	failure	tests\test_b103_inc12_tag_table.py:1149: AssertionError	tests\test_b103_inc12_tag_table.py:1155: AssertionError	"AssertionError: Highlight a tag to inspect its fields.
+assert 'byteorder ' in 'Highlight a tag to inspect its fields.'"	"AssertionError: Highlight a tag to inspect its fields.
+assert 'byteorder ' in 'Highlight a tag to inspect its fields.'"	4.165	4.677
+main	tests/test_changes_symbol_entries.py::test_tc718_battery_refused_encode_limbs_named[Drifty-210-limb_fragments3]	heredado_misma_firma	failure	failure	tests\test_changes_symbol_entries.py:712: AssertionError	tests\test_changes_symbol_entries.py:712: AssertionError	"AssertionError: assert 'CHG-SYMBOL-UNRESOLVED' == 'CHG-SYMBOL-VALUE'
+
+  - CHG-SYMBOL-VALUE
+  + CHG-SYMBOL-UNRESOLVED"	"AssertionError: assert 'CHG-SYMBOL-UNRESOLVED' == 'CHG-SYMBOL-VALUE'
+
+  - CHG-SYMBOL-VALUE
+  + CHG-SYMBOL-UNRESOLVED"	0.011	0.012
+main	tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_7_name_on_the_name_line	heredado_firma_distinta	failure	failure	tests\test_b103_inc12_tag_table.py:1263: AssertionError	tests\test_b103_inc12_tag_table.py:1269: AssertionError	"AssertionError: ['Highlight a tag to inspect its fields.']
+assert (['Highlight a tag to inspect its fields.'] and False)
+ +  where False = <built-in method startswith of str object at 0x000001FD3C7CDA20>('✓ SYN_DISP_C')
+ +    where <built-in method startswith of str object at 0x000001FD3C7CDA20> = 'Highlight a tag to inspect its fields.'.startswith"	"AssertionError: ['Highlight a tag to', 'inspect its fields.']
+assert (['Highlight a tag to', 'inspect its fields.'] and False)
+ +  where False = <built-in method startswith of str object at 0x0000018597A07230>('✓ SYN_DISP_C')
+ +    where <built-in method startswith of str object at 0x0000018597A07230> = 'Highlight a tag to'.startswith"	4.531	4.238
+main	tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_2_1_description_break_run	heredado_firma_distinta	failure	failure	tests\test_b103_inc12_tag_table.py:1291: AssertionError	tests\test_b103_inc12_tag_table.py:1297: AssertionError	"AssertionError: Highlight a tag to inspect its fields.
+assert 'desc SYN  desc part two' in 'Highlight a tag to inspect its fields.'"	"AssertionError: Highlight a tag toinspect its fields.
+assert 'desc SYN  desc part two' in 'Highlight a tag toinspect its fields.'"	4.295	4.885
+main	tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_10_operations_execute_survives_deep_value	heredado_misma_firma	failure	failure	tests\test_b101_crc_model_and_reasons.py:756: AssertionError	tests\test_b101_crc_model_and_reasons.py:756: AssertionError	"AssertionError: assert 'CRC config e...[[[[[[[[[[[[…' == 'CRC config e...ting too deep'
+
+  Skipping 41 identical leading characters in diff, use -v to show
+  - config is not valid JSON: nesting too deep
+  + config is structurally invalid: field 'init' is not a number: [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[…"	"AssertionError: assert 'CRC config e...[[[[[[[[[[[[…' == 'CRC config e...ting too deep'
+
+  Skipping 41 identical leading characters in diff, use -v to show
+  - config is not valid JSON: nesting too deep
+  + config is structurally invalid: field 'init' is not a number: [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[…"	8.613	8.862
+main	tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_2_2_unit_break_run	heredado_firma_distinta	failure	failure	tests\test_b103_inc12_tag_table.py:1310: AssertionError	tests\test_b103_inc12_tag_table.py:1316: AssertionError	"AssertionError: Highlight a tag to inspect its fields.
+assert 'unit m s' in 'Highlight a tag to inspect its fields.'"	"AssertionError: Highlight a tag toinspect its fields.
+assert 'unit m s' in 'Highlight a tag toinspect its fields.'"	4.216	4.774
+main	tests/test_b103_inc12_tag_table.py::test_r_tui_042a_8_1_name_line_with_a_display_identifier	heredado_firma_distinta	failure	failure	tests\test_b103_inc12_tag_table.py:1325: AssertionError	tests\test_b103_inc12_tag_table.py:1331: AssertionError	"AssertionError: ['Highlight a tag to inspect its fields.']
+assert (['Highlight a tag to inspect its fields.'] and 'Highlight a ...t its fields.' == '✓ SYN_DISP_W  0x1C2D3E00'
+
+  - ✓ SYN_DISP_W  0x1C2D3E00
+  + Highlight a tag to inspect its fields.)"	"AssertionError: ['Highlight a tag to', 'inspect its fields.']
+assert (['Highlight a tag to', 'inspect its fields.'] and 'Highlight a tag to' == '✓ SYN_DISP_W  0x1C2D3E00'
+
+  - ✓ SYN_DISP_W  0x1C2D3E00
+  + Highlight a tag to)"	5.398	5.053
+main	tests/test_tui_commandbar.py::test_tc007_palette_lists_every_bindings_action	regresion_base_pass_head_fail	passed	failure		tests\test_tui_commandbar.py:110: AssertionError		"AssertionError: these BINDINGS actions have no palette entry: ['help_quit']
+assert not {'help_quit'}"	1.965	2.218
+main	tests/test_b103_inc12_tag_table.py::test_r_tui_042a_8_2_no_name_line_without_a_display_identifier	heredado_firma_distinta	failure	failure	tests\test_b103_inc12_tag_table.py:1341: AssertionError	tests\test_b103_inc12_tag_table.py:1347: AssertionError	"AssertionError: ('SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END', 'Highlight a tag to inspect its fields.')
+assert 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' in 'Highlight a tag to inspect its fields.'
+ +  where 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' = longname(48)"	"AssertionError: ('SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END', 'Highlight a tag toinspect its fields.')
+assert 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' in 'Highlight a tag toinspect its fields.'
+ +  where 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' = longname(48)"	5.244	4.955
+main	tests/test_b103_inc12_tag_table.py::test_at_b103_i12_1_no_glued_or_cut_values	heredado_firma_distinta	failure	failure	tests\test_b103_inc12_tag_table.py:1384: AssertionError	tests\test_b103_inc12_tag_table.py:1390: AssertionError	"AssertionError: ['Highlight a tag to inspect its fields.']
+assert (['Highlight a tag to inspect its fields.'] and 'Highlight a ...t its fields.' == '✓ SYN_MAP_W  0x1C2D3E00'
+
+  - ✓ SYN_MAP_W  0x1C2D3E00
+  + Highlight a tag to inspect its fields.)"	"AssertionError: ['Highlight a tag to inspect its fields.']
+assert (['Highlight a tag to inspect its fields.'] and 'Highlight a ...t its fields.' == '✓ SYN_MAP_W  0x1C2D3E00'
+
+  - ✓ SYN_MAP_W  0x1C2D3E00
+  + Highlight a tag to inspect its fields.)"	4.643	5.143
+main	tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched	regresion_base_pass_head_fail	passed	failure		tests\test_tui_diff_screen.py:3922: AssertionError		"AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('q', 'help_quit', 'Quit', True)]; removed: [('q', 'quit', 'Quit', True)]
+assert frozenset({('... False), ...}) == frozenset({('... False), ...})
+
+  Extra items in the left set:
+  ('q', 'help_quit', 'Quit', True)
+  Extra items in the right set:
+  ('q', 'quit', 'Quit', True)
+  Use -v to get more diff"	0.003	0.005
+main	tests/test_b100_load_question.py::test_tc_b100_12_cancelled_question_rehomes_the_focus	regresion_base_pass_head_fail	passed	failure		tests\test_b100_load_question.py:2743: AssertionError		assert False	18.305	4.829
+main	tests/test_b100_load_question.py::test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved	regresion_base_pass_head_fail	passed	failure		tests\test_b100_load_question.py:2791: AssertionError		assert False	11.691	4.807
+main	tests/test_b100_load_question.py::test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route	regresion_base_pass_head_fail	passed	failure		tests\test_b100_load_question.py:2933: AssertionError		assert False	62.114	10.738
+main	tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[map]	contexto_head_serial_pass	failure	passed	tests\test_b100_focus.py:218: AssertionError		AssertionError: timed out waiting for the LLR-116.5 landing: the focus on the auto-selected region row (region_start = the panel's resolved selection); last painted focus: MemoryMapPanel#memory_map_panel, region Region(x=6, y=5, width=72, height=7)		17.291	7.184
+main	tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact	heredado_firma_distinta	failure	failure	tests\test_tui_commandbar.py:2727: AssertionError	tests\test_tui_commandbar.py:2729: AssertionError	"AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+  missing: []
+  unexpected: ['a2l_describe_tag', 'confirm_attention']
+assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+
+  At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+  Left contains 2 more items, first extra item: 'open_settings_menu'
+  Use -v to get more diff"	"AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+  missing: []
+  unexpected: ['a2l_describe_tag', 'confirm_attention']
+assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+
+  At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+  Left contains 2 more items, first extra item: 'open_settings_menu'
+  Use -v to get more diff"	2.372	2.040
+main	tests/test_b97_check_editor.py::test_tc_b97_12_hostile_names_render_literally	heredado_misma_firma	failure	failure	tests\test_b97_check_editor.py:466: ValueError	tests\test_b97_check_editor.py:466: ValueError	ValueError: 'b97[bold]x[/]y[red]z[link=https://e.invalid]l[/link][@click=app.quit]q\x07' is not in list	ValueError: 'b97[bold]x[/]y[red]z[link=https://e.invalid]l[/link][@click=app.quit]q\x07' is not in list	5.233	4.982
+main	tests/test_b100_workers.py::test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install	heredado_firma_distinta	failure	failure	tests\test_b100_workers.py:1420: AssertionError	tests\test_b100_workers.py:1416: AssertionError	"AssertionError: ['worker_end', 'reset@main']
+assert ['worker_end', 'reset@main'] == ['worker_end'...l', 'install']
+
+  Right contains 2 more items, first extra item: 'install'
+  Use -v to get more diff"	"AssertionError: ['worker_end', 'reset@main']
+assert ['worker_end', 'reset@main'] == ['worker_end'...l', 'install']
+
+  Right contains 2 more items, first extra item: 'install'
+  Use -v to get more diff"	3.745	3.476
+main	tests/test_b97_patch_editor.py::test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size1]	contexto_head_serial_pass	passed	passed					4.171	5.243
+main	tests/test_b97_check_editor.py::test_at_b97_05_hostile_parameter_reads_literally	heredado_misma_firma	failure	failure	tests\test_b97_check_editor.py:166: AssertionError	tests\test_b97_check_editor.py:166: AssertionError	AssertionError: did not settle: the filter isolates the hostile parameter	AssertionError: did not settle: the filter isolates the hostile parameter	13.376	13.315
+main	tests/test_b100_save_dialog.py::test_at_b100_21_painted_plan_is_the_saved_tree[pending]	regresion_base_pass_head_fail	passed	failure		tests\test_b100_save_dialog.py:272: AssertionError		assert False	20.857	8.675
+main	tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back	regresion_base_pass_head_fail	passed	failure		tests\test_b99_staging.py:1364: AssertionError		"AssertionError: click missed #patch_entry_address_input
+assert False"	16.572	10.918
+main	tests/test_b100_save_dialog.py::test_at_b100_21_painted_plan_is_the_saved_tree[document]	regresion_base_pass_head_fail	passed	failure		tests\test_b100_save_dialog.py:272: AssertionError		assert False	24.691	11.556
+main	tests/test_b100_workers.py::test_tc_b100_53_quit_asks_only_while_a_session_action_runs	regresion_base_pass_head_fail	passed	failure		tests\test_b100_workers.py:2362: AssertionError		"AssertionError: ('q', False, 1)
+assert (False, 1) == (True, 0)
+
+  At index 0 diff: False != True
+  Use -v to get more diff"	11.059	17.457
+main	tests/test_tui_patch_card.py::test_at080d_reachable_with_card[size1]	regresion_base_pass_head_fail	passed	failure		tests\test_tui_patch_card.py:566: AssertionError		"AssertionError: @(120, 30): B2 REGRESSION — buttons trapped inside a scrollable body: ['patch_saveback_format_button', 'patch_saveback_width_button', 'patch_saveback_confirm_button', 'patch_saveback_decline_button', 'patch_before_after_button']
+assert ['patch_saveb...after_button'] == []
+
+  Left contains 5 more items, first extra item: 'patch_saveback_format_button'
+  Use -v to get more diff"	5.635	5.731
+main	tests/test_tui_patch_card.py::test_tc080_2_c7_purity_probe	heredado_firma_distinta	failure	failure	tests\test_tui_patch_card.py:760: AssertionError	tests\test_tui_patch_card.py:784: AssertionError	"AssertionError: PatchEditorPanel reaches self.app at 2 site(s) — the card must be fed by parameter, not by reaching for the app
+assert [<ast.Attribu...01FD3C924450>] == []
+
+  Left contains 2 more items, first extra item: <ast.Attribute object at 0x000001FD39F2FA90>
+  Use -v to get more diff"	"AssertionError: PatchEditorPanel reaches self.app at 2 site(s) — the card must be fed by parameter, not by reaching for the app
+assert [<ast.Attribu...018596BFB4D0>] == []
+
+  Left contains 2 more items, first extra item: <ast.Attribute object at 0x0000018596CB8E90>
+  Use -v to get more diff"	0.100	0.039
+main	tests/test_b99_export.py::test_tc_b99_29_hostile_set_writes_nothing_outside	heredado_misma_firma	failure	failure	s19_app\tui\segment_split_view.py:942: ExportRefusedError	s19_app\tui\segment_split_view.py:942: ExportRefusedError	"s19_app.tui.segment_split_view.ExportRefusedError: ""t_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.s19"" stages at 263 characters — over the platform limit of 260"	"s19_app.tui.segment_split_view.ExportRefusedError: ""t_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.s19"" stages at 263 characters — over the platform limit of 260"	0.875	0.883
+main	tests/test_b99_export.py::test_tc_b99_41_collision_reason_is_scrubbed_clipped_and_indexed	contexto_head_serial_pass	passed	passed					0.006	0.006
+main	tests/test_b99_export.py::test_at_b99_11_sanitised_mac_only_second_export_takes_suffix	regresion_base_pass_head_fail	passed	failure		tests\test_b99_export.py:1122: AssertionError		"AssertionError: click missed #patch_entry_address_input
+assert False"	32.125	27.651
+main	tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors	heredado_misma_firma	failure	failure	tests\test_address_census.py:309: AssertionError	tests\test_address_census.py:309: AssertionError	"AssertionError: address arguments outside {literal, name, fstring} appeared: tests/test_b103_a2l_refresh.py:218 other:IfExp, tests/test_b103_a2l_refresh.py:282 other:IfExp, tests/test_b103_picker_model.py:94 other:IfExp, tests/test_b103_picker_model.py:185 other:Subscript, tests/test_b103_picker_model.py:196 other:Subscript, tests/test_b103_picker_model.py:190 other:Subscript, tests/test_b103_picker_model.py:636 other:IfExp, tests/test_b103_picker_model.py:703 other:IfExp
+assert not [AddressSite(file='tests/test_b103_a2l_refresh.py', line=218, api='query_one', form='other:IfExp', shape=None, interp=...ts/test_b103_picker_model.py', line=190, api='query_one', form='other:Subscript', shape=None, interp=[], note=''), ...]"	"AssertionError: address arguments outside {literal, name, fstring} appeared: tests/test_b103_a2l_refresh.py:218 other:IfExp, tests/test_b103_a2l_refresh.py:282 other:IfExp, tests/test_b103_picker_model.py:94 other:IfExp, tests/test_b103_picker_model.py:186 other:Subscript, tests/test_b103_picker_model.py:197 other:Subscript, tests/test_b103_picker_model.py:191 other:Subscript, tests/test_b103_picker_model.py:664 other:IfExp, tests/test_b103_picker_model.py:731 other:IfExp
+assert not [AddressSite(file='tests/test_b103_a2l_refresh.py', line=218, api='query_one', form='other:IfExp', shape=None, interp=...ts/test_b103_picker_model.py', line=191, api='query_one', form='other:Subscript', shape=None, interp=[], note=''), ...]"	12.726	12.679
+main	tests/test_b100_workers.py::test_at_b100_18_worker_half_case06_project_load_by_keys	heredado_firma_distinta	failure	failure	tests\test_b100_workers.py:2972: AssertionError	tests\test_b100_workers.py:2968: AssertionError	AssertionError: the P6 load never ended	AssertionError: the P6 load never ended	314.871	318.482
+main	tests/test_b99_export.py::test_tc_b99_41_part_way_failure_status_names_the_first_file	contexto_head_serial_pass	passed	passed					15.108	17.369
+main	tests/test_b100_session_reset.py::test_tc_b100_08_reset_runs_once_before_the_first_install	heredado_firma_distinta	failure	failure	tests\test_b100_session_reset.py:261: ValueError	tests\test_b100_session_reset.py:266: ValueError	ValueError: 'install' is not in list	ValueError: 'install' is not in list	4.898	5.493
+main	tests/test_b100_session_reset.py::test_tc_b100_09_domain_matches_the_live_source_census	regresion_base_pass_head_fail	passed	failure		tests\test_b100_session_reset.py:347: AssertionError		"AssertionError: unclassified census names: ['_right_gesture']
+assert not {'_right_gesture'}"	2.580	2.689
+main	tests/test_b101_inplace_views.py::test_r_a2l_048_3_save_back_shows_in_the_tag_table	regresion_base_pass_head_fail	passed	failure		tests\support\timing.py:66: AssertionError		AssertionError: #patch_entry_edit_button is not shown on the screen	19.050	74.362
+main	tests/test_b101_reach_and_reports_escape.py::test_r_shell_keys_3_1_every_action_has_a_reach	heredado_misma_firma	failure	failure	tests\test_b101_reach_and_reports_escape.py:565: AssertionError	tests\test_b101_reach_and_reports_escape.py:565: AssertionError	"AssertionError: assert ['_DeadAlone....nd_nxt_probe'] == ['PlainCard.a...nd_nxt_probe']
+
+  At index 0 diff: '_DeadAlone.action_dead_mac_alias' != 'PlainCard.action_copy'
+  Right contains one more item: '_IdOnly.action_find_nxt_probe'
+  Use -v to get more diff"	"AssertionError: assert ['_DeadAlone....nd_nxt_probe'] == ['PlainCard.a...nd_nxt_probe']
+
+  At index 0 diff: '_DeadAlone.action_dead_mac_alias' != 'PlainCard.action_copy'
+  Right contains one more item: '_IdOnly.action_find_nxt_probe'
+  Use -v to get more diff"	4.125	3.809
+main	tests/test_checks_engine.py::test_no_textual_in_static_import_graph	regresion_base_pass_head_fail	passed	failure		tests\test_checks_engine.py:405: AssertionError		"AssertionError: textual reached the headless check path: [('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.app'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.app.ComposeResult'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.binding'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.binding.Binding'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.containers'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.containers.Container'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.containers.Horizontal'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.containers.Vertical'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.events'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.message'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.message.Message'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.widgets'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.widgets.Input'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.widgets.Label'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.widgets.Static'), ('s19_app.tui.os_clipboard_input', 'textual'), ('s19_app.tui.os_clipboard_input', 'textual.actions'), ('s19_app.tui.os_clipboard_input', 'textual.actions.SkipAction'), ('s19_app.tui.os_clipboard_input', 'textual.app'), ('s19_app.tui.os_clipboard_input', 'textual.app.App'), ('s19_app.tui.os_clipboard_input', 'textual.events'), ('s19_app.tui.os_clipboard_input', 'textual.widgets'), ('s19_app.tui.os_clipboard_input', 'textual.widgets.Input')]
+assert [('s19_app.tu...ainers'), ...] == []
+
+  Left contains 24 more items, first extra item: ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual')
+  Use -v to get more diff"	0.135	0.274
+main	tests/test_a2l_inline_axis_length.py::test_tc136_post_axis_pass_ordering_and_precedence	heredado_misma_firma	failure	failure	tests\test_a2l_inline_axis_length.py:313: AssertionError	tests\test_a2l_inline_axis_length.py:313: AssertionError	assert None == 999	assert None == 999	0.023	0.020
+main	tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface	regresion_base_pass_head_fail	passed	failure		tests\test_tui_patch_editor_b94.py:254: AssertionError		"AssertionError: the table is visible at 120x30
+assert False"	5.276	2.655
+main	tests/test_tui_patch_json.py::test_ac1_editor_fills_json_window_when_room_exists	regresion_base_pass_head_fail	passed	failure		tests\test_tui_patch_json.py:1295: AssertionError		"AssertionError: the JSON editor must GROW past the old fixed cap of 8 when the window has free vertical space (120x50); painted region.height is 8
+assert 8 > 8"	2.666	2.889
+main	tests/test_tui_patch_json.py::test_ac3_fill_does_not_leak_to_sibling_windows	regresion_base_pass_head_fail	passed	failure		tests\test_tui_patch_json.py:1431: AssertionError		"AssertionError: (Region(x=7, y=35, width=108, height=3), Region(x=7, y=38, width=108, height=9))
+assert (3 >= 8)
+ +  where 3 = Region(x=7, y=35, width=108, height=3).height"	3.221	2.794
+main	tests/test_tui_patch_json.py::test_ac5_gauge_stays_above_editor	regresion_base_pass_head_fail	passed	failure		tests\test_tui_patch_json.py:1504: AssertionError		"AssertionError: precondition: the editor must have grown at 120x50
+assert 8 > 8"	2.508	2.678
+main	tests/test_b101_reach_and_reports_escape.py::test_at_i12_2_rail_keys_and_issue_peek_after_the_aliases_go	heredado_misma_firma	failure	failure	tests\test_b101_reach_and_reports_escape.py:1115: AssertionError	tests\test_b101_reach_and_reports_escape.py:1115: AssertionError	"AssertionError: no listed issue has an address inside the image
+assert []"	"AssertionError: no listed issue has an address inside the image
+assert []"	12.995	13.104
+main	tests/test_b100_session_reset.py::test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag	regresion_base_pass_head_fail	passed	failure		tests\test_b100_session_reset.py:1178: AssertionError		"AssertionError: ['_a2l_label_ranker', '_a2l_list_resolution', '_quit_pending', '_right_gesture']
+assert {'_a2l_label_...ight_gesture'} == {'_quit_pending'}
+
+  Extra items in the left set:
+  '_a2l_label_ranker'
+  '_a2l_list_resolution'
+  '_right_gesture'
+  Use -v to get more diff"	0.402	0.225
+main	tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_4_save_back_then_display	regresion_base_pass_head_fail	passed	failure		tests\support\timing.py:66: AssertionError		AssertionError: timed out waiting for #patch_entry_address_input after key '6'	79.719	81.782
+main	tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection	heredado_misma_firma	failure	failure	tests\test_tui_report_filter_surface.py:775: AssertionError	tests\test_tui_report_filter_surface.py:775: AssertionError	"AssertionError: baseline wrote []
+assert set() == {'20260710T12...ff-report.md'}
+
+  Extra items in the right set:
+  '20260710T120000Z-diff-report.md'
+  '20260710T120000Z-diff-report.html'
+  Use -v to get more diff"	"AssertionError: baseline wrote []
+assert set() == {'20260710T12...ff-report.md'}
+
+  Extra items in the right set:
+  '20260710T120000Z-diff-report.md'
+  '20260710T120000Z-diff-report.html'
+  Use -v to get more diff"	12.944	13.346
+main	tests/test_synth_release_case.py::test_a2l_zero_issues	heredado_misma_firma	failure	failure	tests\test_synth_release_case.py:113: AssertionError	tests\test_synth_release_case.py:113: AssertionError	"AssertionError: assert ['Line 1235: ...and 256', ...] == []
+
+  Left contains 60 more items, first extra item: 'Line 1235: CHARACTERISTIC VAL_BLK_0001 declares the sizes 2 and 256'
+  Use -v to get more diff"	"AssertionError: assert ['Line 1235: ...and 256', ...] == []
+
+  Left contains 60 more items, first extra item: 'Line 1235: CHARACTERISTIC VAL_BLK_0001 declares the sizes 2 and 256'
+  Use -v to get more diff"	1.876	1.765
+main	tests/test_synth_release_case.py::test_addresses_inside_image	heredado_misma_firma	failure	failure	tests\test_synth_release_case.py:169: AssertionError	tests\test_synth_release_case.py:169: AssertionError	"AssertionError: VAL_BLK_0001
+assert None is not None"	"AssertionError: VAL_BLK_0001
+assert None is not None"	0.871	1.177
+main	tests/test_synth_release_case.py::test_a2l_issues_reported	heredado_misma_firma	failure	failure	tests\test_synth_release_case.py:257: AssertionError	tests\test_synth_release_case.py:257: AssertionError	"AssertionError: assert ['Line 1235: ...and 256', ...] == []
+
+  Left contains 60 more items, first extra item: 'Line 1235: CHARACTERISTIC VAL_BLK_0001 declares the sizes 2 and 256'
+  Use -v to get more diff"	"AssertionError: assert ['Line 1235: ...and 256', ...] == []
+
+  Left contains 60 more items, first extra item: 'Line 1235: CHARACTERISTIC VAL_BLK_0001 declares the sizes 2 and 256'
+  Use -v to get more diff"	1.217	0.939
+main	tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once	heredado_misma_firma	failure	failure	tests\test_requirements_canon.py:176: Failed	tests\test_requirements_canon.py:176: Failed	"Failed: R-DOC-CANON.4 the obligation word is not used exactly once: 3 offending (2988 checked)
+  line 1321 R-A2L-DEF.153: 'shall' appears 2 times
+  line 3926 R-PICKER-CORRECT.004: 'shall' appears 2 times
+  line 3930 R-PICKER-CORRECT.008: 'shall' appears 2 times"	"Failed: R-DOC-CANON.4 the obligation word is not used exactly once: 3 offending (3317 checked)
+  line 1373 R-A2L-DEF.153: 'shall' appears 2 times
+  line 4211 R-PICKER-CORRECT.004: 'shall' appears 2 times
+  line 4215 R-PICKER-CORRECT.008: 'shall' appears 2 times"	0.026	0.035
+main	tests/test_b101_inplace_views.py::test_r_tui_004_7_2_save_back_shows_in_the_a2l_hex_view	regresion_base_pass_head_fail	passed	failure		tests\support\timing.py:66: AssertionError		AssertionError: #patch_entry_edit_button is not shown on the screen	8.490	67.107
+main	tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_5_save_project_then_display	regresion_base_pass_head_fail	passed	failure		tests\support\timing.py:66: AssertionError		AssertionError: timed out waiting for #patch_entry_address_input after key '6'	84.463	82.546
+main	tests/test_b99_a2l_encode.py::test_at_b99_09_a2l_window_physical_column	heredado_misma_firma	failure	failure	tests\test_b99_a2l_encode.py:624: AssertionError	tests\test_b99_a2l_encode.py:624: AssertionError	"AssertionError: SYM_U16_MSB does not paint at (80, 24): '                                                                                \n  ⭘                             Hex Edit Tool                                   \n    │                             A2L Explorer                               ?  \n ▏◫ │                                                                           \n ▏≡ │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ \n ▏◉ │▊                A2L Tags                ▎▊                              ▎ \n ▏▤ │▊                                        ▎▊  Highlight a tag to inspect  ▎ \n ▏! │▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎▊  its fields.                 ▎ \n ▏✎ │▊ ▊    ▎  Field: name         All        ▎▊ ──────────────────────────── ▎ \n ▏✔ │▊ ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎▊          Hex Viewer          ▎ \n ▏⏚ │▊                                        ▎▊                              ▎ \n ▏✦ │▊          ▏                             ▎▊                              ▎ \n    │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎ \n ────────────────────────────────────────────────────────────────────────────── \n  Loaded case.s19 (S19 only)                               (none)  |  case.a2l  \n                                                                                \n  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%                                         \n                                                                                \n  Loaded case.s19 (S19 only)                                                    \n  Loaded case.s19                                                               \n  A2L loaded: case.a2l                                                          \n  ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help        \n  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend     \n                                                                                '
+assert 'SYM_U16_MSB' in '                                                                                \n  ⭘                             Hex...Page-  d Describe tag  k Legend     \n                                                                                '
+ +  where '                                                                                \n  ⭘                             Hex...Page-  d Describe tag  k Legend     \n                                                                                ' = _screen_text(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}))"	"AssertionError: SYM_U16_MSB does not paint at (80, 24): '                                                                                \n  ⭘                             Hex Edit Tool                                   \n    │                             A2L Explorer                               ?  \n ▏◫ │                                                                           \n ▏≡ │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ \n ▏◉ │▊                A2L Tags                ▎▊                              ▎ \n ▏▤ │▊                                        ▎▊  Highlight a tag to inspect  ▎ \n ▏! │▊ FILTER▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎▊  its fields.                 ▎ \n ▏✎ │▊       ▊    ▎ Paste list…  alt+p   Fiel ▎▊ ──────────────────────────── ▎ \n ▏✔ │▊       ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎▊          Hex Viewer          ▎ \n ▏⏚ │▊                                        ▎▊                              ▎ \n ▏✦ │▊  TEXT   no text filter  ·  showing 8 … ▎▊                              ▎ \n    │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎ \n ────────────────────────────────────────────────────────────────────────────── \n  Loaded case.s19 (S19 only)                               (none)  |  case.a2l  \n                                                                                \n  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0%                                         \n                                                                                \n  Loaded case.s19 (S19 only)                                                    \n  Loaded case.s19                                                               \n  A2L loaded: case.a2l                                                          \n  ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help        \n  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend     \n                                                                                '
+assert 'SYM_U16_MSB' in '                                                                                \n  ⭘                             Hex...Page-  d Describe tag  k Legend     \n                                                                                '
+ +  where '                                                                                \n  ⭘                             Hex...Page-  d Describe tag  k Legend     \n                                                                                ' = _screen_text(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}))"	34.344	36.708
+main	tests/test_tui_patch_history_strip.py::test_tc081_2_strip	heredado_firma_distinta	failure	failure	tests\test_tui_patch_history_strip.py:537: AssertionError	tests\test_tui_patch_history_strip.py:544: AssertionError	"AssertionError: the panel must not reach `self.app` — it is a view widget and its data is threaded in (C-7); found 2 access(es)
+assert not [<ast.Attribute object at 0x000001FD37C16D10>, <ast.Attribute object at 0x000001FD37FA5DD0>]"	"AssertionError: the panel must not reach `self.app` — it is a view widget and its data is threaded in (C-7); found 2 access(es)
+assert not [<ast.Attribute object at 0x00000185929C3D10>, <ast.Attribute object at 0x0000018590527E90>]"	2.546	2.117
+main	tests/test_b99_s0.py::test_at_b99_02_save_back_excludes_s0	regresion_base_pass_head_fail	passed	failure		tests\test_b99_s0.py:396: AssertionError		"AssertionError: click missed #patch_entry_address_input
+assert False"	23.468	9.240
+main	tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_7_blocked_save_back_still_refreshes	regresion_base_pass_head_fail	passed	failure		tests\support\timing.py:66: AssertionError		AssertionError: timed out waiting for #patch_entry_address_input after key '6'	95.810	83.580
+main	tests/test_tui_patch_checks_strip.py::test_tc078_2_aggregates_param	heredado_firma_distinta	failure	failure	tests\test_tui_patch_checks_strip.py:567: AssertionError	tests\test_tui_patch_checks_strip.py:582: AssertionError	"AssertionError: the panel must not reach `self.app` — it is a view widget and its data is threaded in (C-7); found 2 access(es) at lines [1020, 1108]
+assert not [<ast.Attribute object at 0x000001FD92FBE390>, <ast.Attribute object at 0x000001FD36469A90>]"	"AssertionError: the panel must not reach `self.app` — it is a view widget and its data is threaded in (C-7); found 2 access(es) at lines [24, 102]
+assert not [<ast.Attribute object at 0x000001858CB33CD0>, <ast.Attribute object at 0x000001859683C550>]"	0.129	0.035
+main	tests/test_b101_inc11_acceptance.py::test_at_i11_1_clean_demo_issues_without_standard_blocks	heredado_misma_firma	failure	failure	tests\test_b101_inc11_acceptance.py:234: AssertionError	tests\test_b101_inc11_acceptance.py:234: AssertionError	"AssertionError: assert 'total=322 | ...rows 1-40/322' == 'total=262 | ...rows 1-40/262'
+
+  - total=262 | errors=0 | warnings=262 | info=0 | filter=all | page 1/7 rows 1-40/262
+  ?        -                                                           ^            -
+  + total=322 | errors=60 | warnings=262 | info=0 | filter=all | page 1/9 rows 1-40/322
+  ?       +            +                                                ^           +"	"AssertionError: assert 'total=322 | ...rows 1-40/322' == 'total=262 | ...rows 1-40/262'
+
+  - total=262 | errors=0 | warnings=262 | info=0 | filter=all | page 1/7 rows 1-40/262
+  ?        -                                                           ^            -
+  + total=322 | errors=60 | warnings=262 | info=0 | filter=all | page 1/9 rows 1-40/322
+  ?       +            +                                                ^           +"	38.908	30.620
+main	tests/test_tui_patch_chips.py::test_at076a_docked_buttons_are_grouped_chips	regresion_base_pass_head_fail	passed	failure		tests\test_tui_patch_chips.py:246: AssertionError		"AssertionError: @(80, 24): the entry chip must render as a single row (Textual's default Button is 3); got height=0
+assert 0 == 1"	7.487	1.906
+main	tests/test_b101_inc11_acceptance.py::test_at_i11_2_faulty_demo_errors_first	heredado_misma_firma	failure	failure	tests\test_b101_inc11_acceptance.py:258: AssertionError	tests\test_b101_inc11_acceptance.py:258: AssertionError	"AssertionError: assert 'total=345 | ...rows 1-40/345' == 'total=285 | ...rows 1-40/285'
+
+  - total=285 | errors=8 | warnings=277 | info=0 | filter=all | page 1/8 rows 1-40/285
+  ?       ^^                                                           ^           ^^
+  + total=345 | errors=68 | warnings=277 | info=0 | filter=all | page 1/9 rows 1-40/345
+  ?       ^^           +                                                ^           ^^"	"AssertionError: assert 'total=345 | ...rows 1-40/345' == 'total=285 | ...rows 1-40/285'
+
+  - total=285 | errors=8 | warnings=277 | info=0 | filter=all | page 1/8 rows 1-40/285
+  ?       ^^                                                           ^           ^^
+  + total=345 | errors=68 | warnings=277 | info=0 | filter=all | page 1/9 rows 1-40/345
+  ?       ^^           +                                                ^           ^^"	39.609	34.371
+main	tests/test_a2l_f841_cleanup.py::test_tc094_no_f841_finding_in_a2l	heredado_misma_firma	failure	failure	tests\test_a2l_f841_cleanup.py:63: AssertionError	tests\test_a2l_f841_cleanup.py:63: AssertionError	"AssertionError: ruff --select F841 must report zero findings on a2l.py after the dead-store removal; got:
+  s19_app\tui\a2l.py:674:5: F841 Local variable `n` is assigned to but never used
+      |
+  672 |     backslashes immediately before it (E3A-18: ``str.find``, no per-character
+  673 |     alternation).""""""
+  674 |     n = len(body)
+      |     ^ F841
+  675 |     while True:
+  676 |         j = body.find('""', i)
+      |
+      = help: Remove assignment to unused variable `n`
+
+  Found 1 error.
+  No fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).
+
+
+assert 1 == 0
+ +  where 1 = CompletedProcess(args=['[USER_HOME]\\anaconda3\\python.exe', '-m', 'ruff', 'check', '--select', 'F841', 'C:\\User...n`\n\nFound 1 error.\nNo fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).\n', stderr='').returncode"	"AssertionError: ruff --select F841 must report zero findings on a2l.py after the dead-store removal; got:
+  s19_app\tui\a2l.py:674:5: F841 Local variable `n` is assigned to but never used
+      |
+  672 |     backslashes immediately before it (E3A-18: ``str.find``, no per-character
+  673 |     alternation).""""""
+  674 |     n = len(body)
+      |     ^ F841
+  675 |     while True:
+  676 |         j = body.find('""', i)
+      |
+      = help: Remove assignment to unused variable `n`
+
+  Found 1 error.
+  No fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).
+
+
+assert 1 == 0
+ +  where 1 = CompletedProcess(args=['[USER_HOME]\\anaconda3\\python.exe', '-m', 'ruff', 'check', '--select', 'F841', 'C:\\User...n`\n\nFound 1 error.\nNo fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).\n', stderr='').returncode"	0.101	0.098
+main	tests/test_a2l_f841_cleanup.py::test_at094_demo_parse_stable_after_dead_store_removal	heredado_misma_firma	failure	failure	tests\test_a2l_f841_cleanup.py:107: AssertionError	tests\test_a2l_f841_cleanup.py:107: AssertionError	"AssertionError: assert 25 == 24
+ +  where 25 = len([{'access': None, 'address': 80384, 'axis_meta': [], 'bit_org': None, ...}, {'access': None, 'address': 80384, 'axis_m...'axis_meta': [], 'bit_org': None, ...}, {'access': None, 'address': 80384, 'axis_meta': [], 'bit_org': None, ...}, ...])"	"AssertionError: assert 25 == 24
+ +  where 25 = len([{'access': None, 'address': 80384, 'axis_meta': [], 'bit_org': None, ...}, {'access': None, 'address': 80384, 'axis_m...'axis_meta': [], 'bit_org': None, ...}, {'access': None, 'address': 80384, 'axis_meta': [], 'bit_org': None, ...}, ...])"	0.021	0.015
+main	tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_8_zero_applied_restore_still_refreshes	regresion_base_pass_head_fail	passed	failure		tests\support\timing.py:66: AssertionError		AssertionError: timed out waiting for #patch_entry_address_input after key '6'	95.177	80.617
+main	tests/test_b101_designer_writes.py::test_r_crc_preview_002_1_6_save_project_commit_while_displayed_schedules_a_recompute	regresion_base_pass_head_fail	passed	failure		tests\support\timing.py:66: AssertionError		AssertionError: timed out waiting for #patch_entry_address_input after key '6'	83.652	80.589
+main	tests/test_b101_designer_writes.py::test_r_crc_preview_002_1_6_save_project_commit_while_displayed_recomputes_after_the_quiet_time	regresion_base_pass_head_fail	passed	failure		tests\support\timing.py:66: AssertionError		AssertionError: timed out waiting for #patch_entry_address_input after key '6'	84.257	80.788
+main	tests/test_b101_designer_writes.py::test_control_other_patch_actions_do_not_mark_the_coverage_stale	regresion_base_pass_head_fail	passed	failure		tests\support\timing.py:66: AssertionError		AssertionError: timed out waiting for #patch_entry_address_input after key '6'	47.523	70.111
+main	tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size]	heredado_firma_distinta	failure	failure	tests\test_b100_workers.py:3273: AssertionError	tests\test_b100_workers.py:3269: AssertionError	"AssertionError: ['A2L loaded: firmware.a2l']
+assert ['A2L loaded: firmware.a2l'] == ['A2L file no...firmware.a2l']
+
+  At index 0 diff: 'A2L loaded: firmware.a2l' != 'A2L file not found: [USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\tmp\\test_tc_b100_54_a2l_attach_ref0\\src\\firmware.a2l'
+  Use -v to get more diff"	"AssertionError: ['A2L loaded: firmware.a2l']
+assert ['A2L loaded: firmware.a2l'] == ['A2L file no...firmware.a2l']
+
+  At index 0 diff: 'A2L loaded: firmware.a2l' != 'A2L file not found: [USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\head\\main\\tmp\\test_tc_b100_54_a2l_attach_ref0\\src\\firmware.a2l'
+  Use -v to get more diff"	3.312	2.433
+main	tests/test_b101_designer_writes.py::test_r_chked_057_2_save_back_clears_the_validation_results	regresion_base_pass_head_fail	passed	failure		tests\support\timing.py:66: AssertionError		AssertionError: timed out waiting for #patch_entry_address_input after key '6'	93.747	85.746
+main	tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved	regresion_base_pass_head_fail	passed	failure		tests\test_b100_document.py:132: AssertionError		assert False	14.893	2.866
+main	tests/test_b101_designer_writes.py::test_r_chked_057_3_save_project_commit_clears_the_validation_results	regresion_base_pass_head_fail	passed	failure		tests\support\timing.py:66: AssertionError		AssertionError: timed out waiting for #patch_entry_address_input after key '6'	99.604	86.209
+main	tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_9_save_back_raising_after_the_adopt_ends_the_app	regresion_base_pass_head_fail	passed	failure		tests\support\timing.py:66: AssertionError		AssertionError: timed out waiting for #patch_entry_address_input after key '6'	88.526	82.186
+serial	tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]	contexto_head_serial_pass	failure	passed	tests\test_b100_active_variant.py:749: AssertionError		"AssertionError: 1.2721044999780133
+assert 1.2721044999780133 < 1.0
+ +  where 1.0 = report_margin('TC-B100-20 variant-append', 1.2721044999780133, 1.0)
+ +    where 1.0 = timing_bound(1.0)"		5.479	4.452
+serial	tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]	contexto_head_serial_pass	failure	passed	tests\test_b100_active_variant.py:749: AssertionError		"AssertionError: 1.2837688999716192
+assert 1.2837688999716192 < 1.0
+ +  where 1.0 = report_margin('TC-B100-20 mac-sync', 1.2837688999716192, 1.0)
+ +    where 1.0 = timing_bound(1.0)"		5.684	4.630
+serial	tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]	contexto_head_serial_pass	failure	passed	tests\test_b100_active_variant.py:749: AssertionError		"AssertionError: 1.3013424999662675
+assert 1.3013424999662675 < 1.0
+ +  where 1.0 = report_margin('TC-B100-20 a2l-sync', 1.3013424999662675, 1.0)
+ +    where 1.0 = timing_bound(1.0)"		5.591	4.394
+serial	tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]	contexto_head_serial_pass	failure	passed	tests\test_b100_active_variant.py:749: AssertionError		"AssertionError: 1.2345914000179619
+assert 1.2345914000179619 < 1.0
+ +  where 1.0 = report_margin('TC-B100-20 save-project', 1.2345914000179619, 1.0)
+ +    where 1.0 = timing_bound(1.0)"		5.339	4.582
+serial	tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling	contexto_head_serial_pass	failure	passed	tests\test_b100_project_check.py:1148: AssertionError		"AssertionError: {'appended': 1.079817300022114, 'load': 1.1963932999642566, 'painted': 0.4929824999999255, 'read': 0.42617649998283014}
+assert (1.1963932999642566 is not None and 1.1963932999642566 < 1.0)
+ +  where 1.0 = report_margin('sec6_5 load', 1.1963932999642566, 1.0)
+ +    where 1.0 = timing_bound(1.0)"		9.972	7.928
+serial	tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]	contexto_head_serial_pass	failure	passed	tests\test_b100_project_check.py:1555: AssertionError		"AssertionError: []
+assert ([])"		4.513	3.858
+serial	tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]	contexto_head_serial_pass	failure	passed	tests\test_b100_project_check.py:1148: AssertionError		"AssertionError: {'appended': 1.1808849000371993, 'load': 1.2354575999779627, 'painted': 0.29569290002109483, 'read': 0.45613919995957986}
+assert (1.2354575999779627 is not None and 1.2354575999779627 < 1.0)
+ +  where 1.0 = report_margin('sec6_5 load', 1.2354575999779627, 1.0)
+ +    where 1.0 = timing_bound(1.0)"		9.765	7.921
+serial	tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l	heredado_misma_firma	failure	failure	tests\test_b101_inplace_views.py:1653: AssertionError	tests\test_b101_inplace_views.py:1653: AssertionError	"AssertionError: 220040 tags: 1.986 s
+assert 1.9864552999497391 < 1.0
+ +  where 1.0 = report_margin('QC-TM-10b-1 A2L refresh 220040 tags', 1.9864552999497391, 1.0)
+ +    where 1.0 = timing_bound(1.0)"	"AssertionError: 220040 tags: 1.633 s
+assert 1.6330763000296429 < 1.0
+ +  where 1.0 = report_margin('QC-TM-10b-1 A2L refresh 220040 tags', 1.6330763000296429, 1.0)
+ +    where 1.0 = timing_bound(1.0)"	399.804	316.014
+serial	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_3_shared_layout_first_line_value	heredado_misma_firma	failure	failure	tests\test_b103_a2l_definition_arrays_scale.py:179: ZeroDivisionError	tests\test_b103_a2l_definition_arrays_scale.py:179: ZeroDivisionError	ZeroDivisionError: float division by zero	ZeroDivisionError: float division by zero	21.077	18.351
+serial	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_9_shared_range_table	contexto_head_serial_pass	passed	passed					46.963	36.837
+serial	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word	contexto_head_serial_pass	passed	passed					23.462	19.370
+serial	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_values	heredado_misma_firma	failure	failure	tests\test_b103_a2l_definition_arrays_scale.py:179: ZeroDivisionError	tests\test_b103_a2l_definition_arrays_scale.py:179: ZeroDivisionError	ZeroDivisionError: float division by zero	ZeroDivisionError: float division by zero	24.744	20.158
+serial	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_19_tab_through_own_method_val_blks	contexto_head_serial_pass	passed	passed					21.398	17.794
+serial	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_19_tab_through_own_method_values	contexto_head_serial_pass	passed	passed					20.923	16.584
+serial	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_1_shared_enum_table_decode	regresion_base_pass_head_fail	passed	failure		tests\test_b103_a2l_definition_arrays_scale.py:181: AssertionError		"AssertionError: {256: 0.015625, 512: 0.03125, 2048: 0.03125}
+assert 2.0 <= 1.5
+ +  where 1.5 = report_margin('R-A2L-DEF.148 150/arr-1 enum table decode per-object part 2S/S', 2.0, 1.5)
+ +    where 1.5 = timing_bound(1.5)"	68.077	50.827
+serial	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk	contexto_head_serial_pass	passed	passed					66.849	51.569
+serial	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_6_long_matched_range_text_referenced	contexto_head_serial_pass	passed	passed					23.391	19.492
+serial	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_7_tab_intp_decode	contexto_head_serial_pass	passed	passed					21.719	17.019
+serial	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_10_element_decode_does_not_grow_with_name[enum]	heredado_misma_firma	failure	failure	tests\test_b103_a2l_definition_arrays_scale.py:782: ZeroDivisionError	tests\test_b103_a2l_definition_arrays_scale.py:782: ZeroDivisionError	ZeroDivisionError: float division by zero	ZeroDivisionError: float division by zero	15.972	13.432
+serial	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_10_element_decode_does_not_grow_with_name[number]	heredado_misma_firma	failure	failure	tests\test_b103_a2l_definition_arrays_scale.py:782: ZeroDivisionError	tests\test_b103_a2l_definition_arrays_scale.py:782: ZeroDivisionError	ZeroDivisionError: float division by zero	ZeroDivisionError: float division by zero	15.973	13.196
+serial	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_scaling_method	heredado_misma_firma	failure	failure	tests\test_b103_a2l_definition_perf.py:231: AssertionError	tests\test_b103_a2l_definition_perf.py:231: AssertionError	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	16.112	12.589
+serial	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table	regresion_base_pass_head_fail	passed	failure		tests\test_b103_a2l_definition_perf.py:231: AssertionError		"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	58.629	43.568
+serial	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_scaling_range_table	heredado_misma_firma	failure	failure	tests\test_b103_a2l_definition_perf.py:231: AssertionError	tests\test_b103_a2l_definition_perf.py:231: AssertionError	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.015625}
+assert 0.0 >= 0.002"	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	55.533	42.660
+serial	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout	heredado_misma_firma	failure	failure	tests\test_b103_a2l_definition_perf.py:231: AssertionError	tests\test_b103_a2l_definition_perf.py:231: AssertionError	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	13.419	11.114
+serial	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object	heredado_misma_firma	failure	failure	tests\test_b103_a2l_definition_perf.py:458: AssertionError	tests\test_b103_a2l_definition_perf.py:458: AssertionError	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	15.136	11.957
+serial	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object	heredado_misma_firma	failure	failure	tests\test_b103_a2l_definition_perf.py:458: AssertionError	tests\test_b103_a2l_definition_perf.py:458: AssertionError	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	20.664	17.041
+serial	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object	heredado_misma_firma	failure	failure	tests\test_b103_a2l_definition_perf.py:458: AssertionError	tests\test_b103_a2l_definition_perf.py:458: AssertionError	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	9.034	7.214
+serial	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid	heredado_misma_firma	failure	failure	tests\test_b103_a2l_definition_perf.py:458: AssertionError	tests\test_b103_a2l_definition_perf.py:458: AssertionError	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.015625}
+assert 0.0 >= 0.002"	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	11.959	9.445
+serial	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object	heredado_misma_firma	failure	failure	tests\test_b103_a2l_definition_perf.py:458: AssertionError	tests\test_b103_a2l_definition_perf.py:458: AssertionError	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	"AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+assert 0.0 >= 0.002"	29.084	23.916
+serial	tests/test_b103_a2l_list_view.py::test_r_a2l_list_035_1	absent	absent	failure		tests\test_b103_a2l_list_view.py:760: AttributeError		AttributeError: module 'os' has no attribute 'getloadavg'		0.788
+serial	tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_time	heredado_misma_firma	failure	failure	tests\test_b103_a2l_reader_perf.py:162: AssertionError	tests\test_b103_a2l_reader_perf.py:162: AssertionError	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	1.586	1.323
+serial	tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time	heredado_misma_firma	failure	failure	tests\test_b103_a2l_reader_perf.py:162: AssertionError	tests\test_b103_a2l_reader_perf.py:162: AssertionError	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	1.239	1.026
+serial	tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_time	heredado_misma_firma	failure	failure	tests\test_b103_a2l_reader_perf.py:162: AssertionError	tests\test_b103_a2l_reader_perf.py:162: AssertionError	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	1.215	1.147
+serial	tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_memory	heredado_misma_firma	failure	failure	tests\test_b103_a2l_reader_perf.py:162: AssertionError	tests\test_b103_a2l_reader_perf.py:162: AssertionError	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	1.204	1.059
+serial	tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_memory	heredado_misma_firma	failure	failure	tests\test_b103_a2l_reader_perf.py:162: AssertionError	tests\test_b103_a2l_reader_perf.py:162: AssertionError	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	1.221	1.071
+serial	tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_memory	heredado_misma_firma	failure	failure	tests\test_b103_a2l_reader_perf.py:162: AssertionError	tests\test_b103_a2l_reader_perf.py:162: AssertionError	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	1.201	1.059
+serial	tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_words_memory	heredado_misma_firma	failure	failure	tests\test_b103_a2l_reader_perf.py:162: AssertionError	tests\test_b103_a2l_reader_perf.py:162: AssertionError	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	"AssertionError: Traceback (most recent call last):
+  File ""<string>"", line 17, in <module>
+  File ""<string>"", line 6, in _rss
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'"	1.262	1.043
+serial	tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_12_1_a_200_name_software_a_page_paints_within_half_a_second	absent	absent	failure		tests\test_b103_inc8_s2_sheet_rows.py:192: AttributeError		AttributeError: module 'os' has no attribute 'getloadavg'		1.613
+serial	tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_12_2_a_page_of_200_one_mebibyte_text_spans_paints_within_half_a_second	absent	absent	failure		tests\test_b103_inc8_s2_sheet_rows.py:214: AttributeError		AttributeError: module 'os' has no attribute 'getloadavg'		0.547
+serial	tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second	absent	absent	passed						86.229
+serial	tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_82_1_a_key_is_handled_within_one_second_while_a_record_encode_runs	absent	absent	passed						105.753
+serial	tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds	absent	absent	passed						34.897
+serial	tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs	absent	absent	passed						6.783
+serial	tests/test_b103_inc9b_w.py::test_r_pe_bench_95_0_control_a_decode_held_past_the_grace_does_paint_the_cue	absent	absent	passed						7.645
+serial	tests/test_b103_inc9b_w.py::test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work	absent	absent	passed						8.440
+serial	tests/test_b103_inc9b_w.py::test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour	absent	absent	passed						7.136
+serial	tests/test_b103_inc9b_w.py::test_r_pe_bench_96_3_the_job_words_are_preview_and_stage	absent	absent	passed						7.739
+serial	tests/test_b103_inc9b_w.py::test_r_pe_bench_97_2_the_frames_follow_the_cycle_one_step_per_tick_none_skipped	absent	absent	passed						10.552
+serial	tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show	absent	absent	passed						7.344
+serial	tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result	absent	absent	passed						7.184
+serial	tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s	absent	absent	passed						7.221
+serial	tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s	absent	absent	passed						7.346
+serial	tests/test_b103_inc9b_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs	absent	absent	passed						8.605
+serial	tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s	absent	absent	passed						7.531
+serial	tests/test_b103_label_list.py::test_r_a2l_list_078_3	absent	absent	failure		tests\test_b103_label_list.py:1465: AttributeError		AttributeError: module 'os' has no attribute 'getloadavg'		11.449

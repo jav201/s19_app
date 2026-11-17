@@ -1,0 +1,19 @@
+[USER_HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0
+rootdir: [USER_HOME]\Github\s19_app-b103-g3-inc9b
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collected 1 item
+
+tests\test_b103_inc9b_at.py .                                            [100%]
+
+- generated xml file: [USER_HOME]\Github\s19_app-b103-g3-repro-a2l\junit\control_color__bench_100_3.xml -
+============================ QC-TM timing margins =============================
+22.0%  0.234 s / 0.300 s  R-PE-BENCH.100/3 idle after the last step  tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step
+QC-TM: 1 bounds, 0 under 20 % margin
+============================== 1 passed in 8.01s ==============================

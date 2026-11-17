@@ -1,0 +1,11 @@
+tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[raw-transcript-transport-crlf]
+tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[raw-transcript-matrix-p2]
+tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[raw-transcript-paste-payload]
+tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[raw-junit-transport-crlf]
+tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-transcript-xml-secret]
+tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-transcript-transport-crlf]
+tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-transcript-matrix-p2]
+tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-transcript-paste-payload]
+tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-junit-xml-secret]
+tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-junit-transport-crlf]
+tests/test_b103_inc8b_s1.py::test_r_pe_def_103_1_every_cue_survives_without_colour

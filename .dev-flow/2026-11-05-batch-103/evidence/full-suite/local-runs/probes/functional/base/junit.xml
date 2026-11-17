@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="20" time="701.060" timestamp="2026-11-16T18:00:39.784506-06:00" hostname="[HOST]"><testcase classname="tests.test_b100_document" name="test_tc_b100_29_second_save_of_the_bound_document_writes_nothing" time="9.931" /><testcase classname="tests.test_b100_document" name="test_at_b100_08_saved_document_reopens_with_the_project[size0]" time="19.911" /><testcase classname="tests.test_b99_bytes_field" name="test_at_b99_12_typed_hex_run_saves_back" time="13.196" /><testcase classname="tests.test_b101_designer_writes" name="test_at_i5_4_save_back_by_keys_then_display" time="101.467" /><testcase classname="tests.test_b100_save_image" name="test_tc_b100_59_files_row" time="21.214"><failure message="AssertionError: timed out waiting for the save">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-functional/base/tmp/pytest-of-[ACCOUNT]/pytest-1/test_tc_b100_59_files_row0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002881313AF90&gt;
+
+    def test_tc_b100_59_files_row(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -&gt; None:
+        """Inc 7 (LED .63, LED .19 B-06): the plan's ``project.json`` keys
+        include ``files``, and the written ``files`` records name exactly the
+        files the plan's rows land, each with the size and SHA-256 of its bytes.
+
+        RED (base 80052cb): neither the plan nor the manifest has ``files``."""
+        import hashlib
+
+        plans = _capture_plans(monkeypatch)
+        folder = _copy_case01(tmp_path, "firmware.s19", "firmware.a2l")
+
+        async def _drive() -&gt; Path:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, folder / "firmware.s19")
+                app.load_a2l_from_path(folder / "firmware.a2l")
+                await _wait_for(pilot, lambda: app.current_a2l_path is not None, "the A2L load")
+                await _save(pilot, app, "P1")
+                await _wait_for(
+                    pilot, lambda: _status_text(app).startswith("Saved project to"), "the save"
+                )
+            return app.workarea / "P1"
+
+&gt;       project = asyncio.run(_drive())
+
+tests\test_b100_save_image.py:1241:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_save_image.py:1236: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark', 'nocolor'})&gt;
+predicate = &lt;function test_tc_b100_59_files_row.&lt;locals&gt;._drive.&lt;locals&gt;.&lt;lambda&gt; at 0x00000288121CD800&gt;
+description = 'the save', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -&gt; None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+&gt;       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the save
+
+tests\test_b100_save_image.py:158: AssertionError</failure></testcase><testcase classname="tests.test_b100_workers" name="test_at_b100_17_parse_half_case06_a2l_by_keys" time="368.227" /><testcase classname="tests.test_b100_save_image" name="test_tc_b100_59_own_a2l_by_name_and_bytes[True]" time="2.219" /><testcase classname="tests.test_b101_inplace_views" name="test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table" time="21.654" /><testcase classname="tests.test_tui_patch_history_strip" name="test_tc081_1_derived" time="10.341" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_2_prompt_hidden[guarded]" time="6.623" /><testcase classname="tests.test_b100_save_guards" name="test_at_b100_02_name_refusals_through_the_save_dialog[size1]" time="38.875" /><testcase classname="tests.test_b100_project_homes" name="test_tc_b100_31_copy_ceiling_2000_files" time="45.156" /><testcase classname="tests.test_b100_project_homes" name="test_tc_b100_32_unload_of_an_a2l_only_session_clears_the_a2l" time="4.914"><failure message="AssertionError: []&#10;assert ('Unloaded A2L.' in [])">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-functional/base/tmp/pytest-of-[ACCOUNT]/pytest-1/test_tc_b100_32_unload_of_an_a0')
+
+    def test_tc_b100_32_unload_of_an_a2l_only_session_clears_the_a2l(tmp_path: Path) -&gt; None:
+        """F3 (I-2, probe P-3): an A2L-only project P open (3 tags, no image);
+        the A2L slot's unload → ``current_a2l_path`` None, 0 tags, the status
+        "Unloaded A2L.", 0 lines "Nothing to unload.".
+
+        RED (pre snapshot): "Nothing to unload.", the A2L stays attached.
+        Mutant: no A2L-only branch → RED."""
+        base = tmp_path / "app"
+        _a2l_only_project(base)
+
+        async def _scenario(app, pilot, log):
+            app._handle_load_project("P")
+            await projects.wait_for(pilot, lambda: app.current_a2l_path is not None, "the A2L")
+            tags_before = _a2l_tags(app)
+            mark = len(log.messages)
+            app._apply_unload("a2l")
+            await pilot.pause()
+            return tags_before, app.current_a2l_path, _a2l_tags(app), log.since(mark)
+
+        tags_before, after, tags_after, lines = projects.run_app(base, _scenario)
+        assert tags_before == 3, tags_before
+        assert after is None and tags_after == 0, (after, tags_after, lines)
+&gt;       assert "Unloaded A2L." in lines and "Nothing to unload." not in lines, lines
+E       AssertionError: []
+E       assert ('Unloaded A2L.' in [])
+
+tests\test_b100_project_homes.py:2343: AssertionError</failure></testcase><testcase classname="tests.test_b97_patch_editor" name="test_tc_b97_39_strip_follows_the_highlight" time="7.502"><failure message="AssertionError: (1, '0xeb40', ['#c2c2c2', '#c2c2c2', '#c2c2c2', '#c2c2c2', '#9b9b9b', '#9b9b9b', ...])&#10;assert False is True&#10; +  where False = is_teal('#c2c2c2')">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-functional/base/tmp/pytest-of-[ACCOUNT]/pytest-1/test_tc_b97_39_strip_follows_t0')
+
+    def test_tc_b97_39_strip_follows_the_highlight(tmp_path: Path) -&gt; None:
+        """TC-B97-39 (LLR-144.8, D5): moving the ledger highlight down over three
+        rows repaints the strip for each: its ``now`` bytes are the entry's bytes,
+        its ``was`` bytes the image's at those addresses, every changed byte of
+        the span is bold on the ``now`` line, and no unchanged or context byte is
+        bold; rows are aligned to the row width (8 at 118 columns).
+
+        RED on main: no strip in an inspector. Mutation: the strip bound to row 0
+        (M11); bold on an unchanged byte (M12); bold on a context byte (M13).
+        """
+
+        async def body(app, pilot, panel):
+            await load_change_file(app, pilot, panel, calib_hotfix(tmp_path))
+            table = panel.query_one("#patch_doc_entries_table", DataTable)
+            table.focus()
+            await settle(pilot, 2)
+            mem = app.current_file.mem_map
+            readings = []
+            for _ in range(3):
+                await pilot.press("down")
+                await settle(pilot, 3)
+                readings.append((table.cursor_row, strip_reading(app, panel)))
+            return readings, mem
+
+        readings, mem = run(tmp_path, (118, 54), body)
+        assert [row for row, _r in readings] == [1, 2, 3]
+        for row, reading in readings:
+            address, run_bytes = CALIB_ENTRIES[row]
+            assert reading, f"row {row}: no strip painted"
+            span = range(address, address + len(run_bytes))
+            for byte_row in reading:
+                assert byte_row["address"] % 8 == 0 and len(byte_row["offsets"]) == 8, byte_row
+                for col in range(8):
+                    at = byte_row["address"] + col
+                    image = mem.get(at)
+                    was_token = "--" if image is None else f"{image:02X}"
+                    assert byte_row["was"][col] == was_token, (row, hex(at), byte_row)
+                    if at in span:
+                        write = run_bytes[at - address]
+                        assert byte_row["now"][col] == f"{write:02X}", (row, hex(at))
+                        changed = image is None or image != write
+                        assert byte_row["now_bold"][col] is changed, (row, hex(at), byte_row)
+                        # Inc-4 gate, operator decision 1: a changed ``now`` byte is
+                        # painted teal; an unchanged one is not.
+&gt;                       assert is_teal(byte_row["now_color"][col]) is changed, (row, hex(at), byte_row["now_color"])
+E                       AssertionError: (1, '0xeb40', ['#c2c2c2', '#c2c2c2', '#c2c2c2', '#c2c2c2', '#9b9b9b', '#9b9b9b', ...])
+E                       assert False is True
+E                        +  where False = is_teal('#c2c2c2')
+
+tests\test_b97_patch_editor.py:866: AssertionError</failure></testcase><testcase classname="tests.test_b97_patch_editor" name="test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size0]" time="4.881"><failure message="AssertionError: (('#232323', '#0e0e0e'), '#1b233a')&#10;assert '#232323' == '#1b233a'&#10;  &#10;  - #1b233a&#10;  + #232323">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-functional/base/tmp/pytest-of-[ACCOUNT]/pytest-1/test_tc_b97_40_labelled_form_a0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (118, 53)])
+    def test_tc_b97_40_labelled_form_and_chips_in_the_inspector(tmp_path: Path, size) -&gt; None:
+        """TC-B97-40 (LLR-144.9): the three entry inputs and the four entry chips
+        sit inside the Inspector pane, each input beside a label naming its field
+        on its own row, the four chips on one row.
+
+        RED on main: the inputs sit in ``#patch_doc_entry_inputs`` inside the JSON
+        window, outside any inspector pane.
+        """
+        from textual.widgets import Label
+
+        async def body(app, pilot, panel):
+            ancestors = {
+                wid: [a.id for a in panel.query_one(f"#{wid}").ancestors if getattr(a, "id", None)]
+                for wid, _l in FORM
+            }
+            # PC-11: the main-observable clause (the inputs' ancestry) is asserted
+            # before the NEW pane id is looked up, so the base tree fails there.
+            if not all("patch_pane_inspector" in a for a in ancestors.values()):
+                return ancestors, None, {}, {}
+            pane = need(panel, "#patch_pane_inspector")
+            regions = {wid: panel.query_one(f"#{wid}").region for wid in [w for w, _ in FORM] + list(CHIPS)}
+            labels = {}
+            for wid, _name in FORM:
+                region = regions[wid]
+                labels[wid] = [
+                    str(lab.render()).strip()
+                    for lab in panel.query(Label)
+                    if is_displayed(lab) and lab.region.y == region.y and lab.region.right &lt;= region.x
+                ]
+            address = regions["patch_entry_address_input"]
+            backgrounds = (
+                painted_style(app, address.x + address.width - 2, address.y).bgcolor.triplet.hex,
+                painted_style(app, pane.region.right - 2, pane.region.y).bgcolor.triplet.hex,
+            )
+            return ancestors, pane.region, regions, labels, backgrounds
+
+        ancestors, pane, regions, labels, backgrounds = run(tmp_path, size, body)
+        for wid, _name in FORM:
+            assert "patch_pane_inspector" in ancestors[wid], (wid, ancestors[wid])
+        for wid, region in regions.items():
+            assert pane.contains_region(region), (wid, region, pane)
+        for wid, name in FORM:
+            assert labels[wid] and labels[wid][-1] == name, (wid, labels[wid])
+        assert len({regions[c].y for c in CHIPS}) == 1
+        assert len({regions[w].y for w, _ in FORM}) == 3
+        # Inc-4 gate, operator decision 2: one spacer row between the three
+        # input rows, and the inputs on a background lighter than the pane's,
+        # the stylesheet's ``$rule`` token (RED pre-fold: consecutive rows, the
+        # theme's #1e1e1e — M45, M46).
+        ys = [regions[w].y for w, _ in FORM]
+        assert [b - a for a, b in zip(ys, ys[1:])] == [2, 2], ys
+        field_bg, pane_bg = backgrounds
+        assert _luminance(field_bg) &gt; _luminance(pane_bg), backgrounds
+&gt;       assert field_bg == _css_token("rule"), (backgrounds, _css_token("rule"))
+E       AssertionError: (('#232323', '#0e0e0e'), '#1b233a')
+E       assert '#232323' == '#1b233a'
+E
+E         - #1b233a
+E         + #232323
+
+tests\test_b97_patch_editor.py:1066: AssertionError</failure></testcase><testcase classname="tests.test_tui_patch_editor_v2" name="test_at057b_regroup_wiring_and_binding_regression" time="3.201" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at_batch41_escape_cancels_changeset_json_popup" time="3.096"><failure message="textual.css.query.NoMatches: No nodes match '#changeset_json_text' on ChangeSetJsonScreen()">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-functional/base/tmp/pytest-of-[ACCOUNT]/pytest-1/test_at_batch41_escape_cancels0')
+
+    def test_at_batch41_escape_cancels_changeset_json_popup(tmp_path: Path) -&gt; None:
+        """Escape dismisses the ChangeSetJsonScreen popup as a Cancel (batch-41).
+
+        Intent (AC-5.1, batch-37 fold): the full-size JSON popup previously
+        exposed only a Cancel BUTTON — ``Escape`` was unbound, so it could not
+        close the modal the way every sibling modal does. With the new
+        ``BINDINGS = [Binding("escape", "cancel", ...)]`` on
+        :class:`ChangeSetJsonScreen`, pressing ``Escape`` after editing the
+        TextArea pops the modal and leaves the change document UNCHANGED (a
+        Cancel, never an apply). Pre-fix RED: ``Escape`` is unbound → the modal
+        stays on screen (still a ``ChangeSetJsonScreen``).
+        """
+        from textual.widgets import Button, TextArea
+
+        from s19_app.tui.screens import ChangeSetJsonScreen
+
+        seed = _changeset_text(
+            [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}]
+        )
+        edited = _changeset_text(
+            [
+                {"type": "bytes", "address": "0x100", "bytes": "AA BB"},
+                {"type": "string", "address": "0x777", "value": "VIAPOPUP"},
+            ]
+        )
+
+        async def _escape() -&gt; dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                _seed_via_paste(app, seed)
+                await pilot.pause()
+
+                app.query_one("#patch_edit_json_button", Button).press()
+                await pilot.pause()
+                outcomes["popup_open_before_escape"] = isinstance(
+                    app.screen, ChangeSetJsonScreen
+                )
+                # Edit the JSON, then press Escape instead of clicking Cancel.
+                app.screen.query_one("#changeset_json_text", TextArea).text = edited
+                await pilot.press("escape")
+                await pilot.pause()
+                await pilot.pause()
+                outcomes["popup_still_open"] = isinstance(
+                    app.screen, ChangeSetJsonScreen
+                )
+                outcomes["after"] = _entry_addresses(app)
+            return outcomes
+
+&gt;       result = asyncio.run(_escape())
+
+tests\test_tui_patch_editor_v2.py:3325:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_tui_patch_editor_v2.py:3315: in _escape
+    app.screen.query_one("#changeset_json_text", TextArea).text = edited
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = ChangeSetJsonScreen(), selector = '#changeset_json_text'
+expect_type = &lt;class 'textual.widgets._text_area.TextArea'&gt;
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -&gt; QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+
+        base_node = self._get_dom_base()
+
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+&gt;           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#changeset_json_text' on ChangeSetJsonScreen()
+
+..\..\anaconda3\Lib\site-packages\textual\dom.py:1505: NoMatches</failure></testcase><testcase classname="tests.test_tui_patch_editor_v2" name="test_at068b_per_entry_json_popup_edits_only_selected_entry" time="4.515" /><testcase classname="tests.test_tui_patch_card" name="test_at080d_reachable_with_card[size0]" time="7.548" /><testcase classname="tests.test_b99_bytes_field" name="test_tc_b99_33_field_and_help_state_the_hex_rule" time="3.823" /></testsuite></testsuites>

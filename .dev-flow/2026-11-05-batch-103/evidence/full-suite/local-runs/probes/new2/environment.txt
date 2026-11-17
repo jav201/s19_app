@@ -1,0 +1,15 @@
+head_tree=[USER_HOME]/Github/s19_app-b103-g3-local-2
+head=795779add81875976ac3651f8862498426d45abf
+base_tree=[USER_HOME]/Github/s19_app-b103-g3-base
+base=0c3a6bd4674c3f2df90a7399898fc98429f5a200
+control_tree=[USER_HOME]/Github/s19_app-b103-g3-inc9b
+control=6a8cfb0a9bb64b95dd9969fb08e05ae85c1bd6b4
+python=[USER_HOME]/anaconda3/python.exe
+python_version=3.12.7
+pytest=8.3.4
+execution=serial; one process per tree; -I -B -n0; stdin closed; pytest cache and bytecode disabled
+color=TERM=xterm-256color COLORTERM=truecolor; NO_COLOR/CLICOLOR/CLICOLOR_FORCE unset
+ci_guards=CI/GITHUB_ACTIONS/RUNNER_ENVIRONMENT unset
+clipboard=real OS clipboard not used; suite autouse stand-ins active on non-isolated Windows
+isolation=HOME/XDG_CACHE_HOME/XDG_CONFIG_HOME/XDG_DATA_HOME/XDG_STATE_HOME/LOCALAPPDATA/APPDATA/TMPDIR/TMP/TEMP below each output tree
+comparator=base for 17 nodes; Inc9b control for the 3 nodes whose modules are absent from base

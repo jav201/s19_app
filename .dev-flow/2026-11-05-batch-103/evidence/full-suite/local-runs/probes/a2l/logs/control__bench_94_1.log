@@ -1,0 +1,48 @@
+[USER_HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0
+rootdir: [USER_HOME]\Github\s19_app-b103-g3-inc9b
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collected 1 item
+
+tests\test_b103_inc9b_at.py F                                            [100%]
+
+================================== FAILURES ===================================
+_ test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/control__bench_94_1/tmp/pytest-of-[ACCOUNT]/pytest-0/test_r_pe_bench_94_1_large_sel0')
+defc_dir = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/control__bench_94_1/tmp/pytest-of-[ACCOUNT]/pytest-0/b103_inc9_w_defc0')
+
+    @pytest.mark.serial_timing
+    @slow
+    def test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second(tmp_path, defc_dir):
+        """R-PE-BENCH.94/1. LARGE selected by a key (its real decode runs): the painted top border holds a busy title
+        with `decode LARGE` and the border corner is the busy colour #f5c26b, first painted 0.2-0.5 s after the key.
+        Operator need (P-127): while LARGE decodes the window must say it is working, or the user forces the app closed.
+        Negative control: no cue tick -> never shown (RED); grace 0 -> shown before 0.2 s (RED)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+
+        async def body(app, pilot, panel):
+            return await large_decode_window(pilot, app, sheet_of(panel), 0.0)
+
+        t_send, snaps, first = run(tmp_path, defc_dir, body, size=SIZE, a2l=a2l, image=s19)
+        last = snaps[-1]
+        assert first is not None, f"no `decode LARGE` busy title within 6 s of the key; last top row {last.row!r} ({load()})"
+        seen = next(s for s in snaps if s.t == first)
+>       assert seen.corner == BUSY_HEX, f"title shown but the painted corner is {seen.corner}, not {BUSY_HEX}: {seen.row!r}"
+E       AssertionError: title shown but the painted corner is #c7c7c7, not #f5c26b: '╭─ STAGING SHEET   ◓ BUSY · decode LARGE · 0.3 s · keys still work  ───────────────────────────────────────────╮'
+E       assert '#c7c7c7' == '#f5c26b'
+E
+E         - #f5c26b
+E         + #c7c7c7
+
+tests\test_b103_inc9b_at.py:240: AssertionError
+- generated xml file: [USER_HOME]\Github\s19_app-b103-g3-repro-a2l\junit\control__bench_94_1.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second
+============================= 1 failed in 44.49s ==============================

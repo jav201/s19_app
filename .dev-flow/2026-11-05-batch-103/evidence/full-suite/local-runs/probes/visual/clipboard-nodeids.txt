@@ -1,0 +1,1 @@
+tests/test_b103_clipboard_core.py::test_r_paste_35_4_right_click_paste_multi_line_strips

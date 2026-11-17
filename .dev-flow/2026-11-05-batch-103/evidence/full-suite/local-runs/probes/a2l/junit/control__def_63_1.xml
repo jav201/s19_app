@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="5.409" timestamp="2026-11-16T17:53:36.283769-06:00" hostname="[HOST]"><testcase classname="tests.test_b103_inc8_a2_app" name="test_r_pe_def_63_1_no_a2l_refuses_the_stage" time="5.200" /></testsuite></testsuites>

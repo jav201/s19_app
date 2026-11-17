@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="7.472" timestamp="2026-11-16T17:56:46.754728-06:00" hostname="[HOST]"><testcase classname="tests.test_b103_inc9b_at" name="test_r_pe_bench_94_3_a_gated_record_stage_shows_the_busy_title_within_half_a_second_of_alt_s" time="7.151"><failure message="AssertionError: title shown but the painted corner is #c7c7c7: '╭─ STAGING SHEET   ◐ BUSY · stage VAL_BLK_DEF_0001 · 0.2 s · keys still work  ─────────────────────────────────╮'&#10;assert '#c7c7c7' == '#f5c26b'&#10;  &#10;  - #f5c26b&#10;  + #c7c7c7">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/control__bench_94_3/tmp/pytest-of-[ACCOUNT]/pytest-0/test_r_pe_bench_94_3_a_gated_r0')
+defc_dir = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/control__bench_94_3/tmp/pytest-of-[ACCOUNT]/pytest-0/b103_inc9_w_defc0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000213B4272090&gt;
+
+    @pytest.mark.serial_timing
+    def test_r_pe_bench_94_3_a_gated_record_stage_shows_the_busy_title_within_half_a_second_of_alt_s(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.94/3. VAL_BLK_DEF_0001 with Set `10` previewed, then alt+s with the record's encode held by the
+        test: the painted top border holds `stage VAL_BLK_DEF_0001` with the busy corner within 0.5 s of alt+s.
+        Operator need (P-127): a record stage must show it is working from its first second. Negative control: a cue
+        that only covers decode and preview shows nothing (RED)."""
+        gate = Gate(monkeypatch, "encode_values")
+
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            try:
+                await vb_edit(pilot, sheet, "s", "10")
+                gate.hold.add(VB)
+                t_key = send(app, "alt+s")
+                snaps = await watch(app, lambda s, o: titled(s, "stage", VB), t_key + 1.0)
+                return t_key, snaps, gate.entered.is_set(), entries_of(app)
+            finally:
+                gate.release()
+
+        t_key, snaps, held, entries = run(tmp_path, defc_dir, body)
+        seen = next((s for s in snaps if titled(s, "stage", VB)), None)
+        assert held, "control: the record's encode never reached the gate, so no record stage was running"
+        assert entries == [], f"control: the record was written while its encode was held: {entries}"
+        assert seen is not None, f"no `stage {VB}` busy title within 1.0 s of alt+s; last top row {snaps[-1].row!r} ({load()})"
+&gt;       assert seen.corner == BUSY_HEX, f"title shown but the painted corner is {seen.corner}: {seen.row!r}"
+E       AssertionError: title shown but the painted corner is #c7c7c7: '╭─ STAGING SHEET   ◐ BUSY · stage VAL_BLK_DEF_0001 · 0.2 s · keys still work  ─────────────────────────────────╮'
+E       assert '#c7c7c7' == '#f5c26b'
+E
+E         - #f5c26b
+E         + #c7c7c7
+
+tests\test_b103_inc9b_at.py:307: AssertionError</failure></testcase></testsuite></testsuites>

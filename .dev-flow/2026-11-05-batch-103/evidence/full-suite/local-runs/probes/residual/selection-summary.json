@@ -1,0 +1,501 @@
+{
+  "source_junit": {
+    "main": "[USER_HOME]\\Github\\s19_app-b103-g3-local-out\\main-junit.xml",
+    "serial": "[USER_HOME]\\Github\\s19_app-b103-g3-local-out\\serial-junit.xml"
+  },
+  "probe_junit_files": {
+    "repro-functional": [
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-functional\\base\\junit.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-functional\\head\\junit.xml"
+    ],
+    "repro-a2l": [
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\base__r005_2.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\base__r011_2.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\base__r011_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\base__r022_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control__bench_100_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control__bench_101_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control__bench_101_4.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control__bench_94_1.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control__bench_94_2.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control__bench_94_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control__def_62_llr_081_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control__def_63_1.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control_color__bench_100_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control_color__bench_101_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control_color__bench_101_4.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control_color__bench_94_1.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control_color__bench_94_2.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\control_color__bench_94_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head__bench_100_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head__bench_101_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head__bench_101_4.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head__bench_94_1.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head__bench_94_2.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head__bench_94_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head__def_62_llr_081_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head__def_63_1.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head__r005_2.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head__r011_2.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head__r011_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head__r022_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head_color__bench_100_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head_color__bench_101_3.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head_color__bench_101_4.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head_color__bench_94_1.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head_color__bench_94_2.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-a2l\\junit\\head_color__bench_94_3.xml"
+    ],
+    "repro-visual": [
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-visual\\clipboard-base\\junit.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-visual\\clipboard-head\\junit.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-visual\\color-head\\junit.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-visual\\possible-base\\junit.xml",
+      "[USER_HOME]\\Github\\s19_app-b103-g3-repro-visual\\possible-head\\junit.xml"
+    ]
+  },
+  "probe_unique_nodeids": 79,
+  "lanes": {
+    "main": {
+      "failed_plus_error_occurrences": 428,
+      "clipboard_guard_excluded": 238,
+      "after_clipboard_guard": 190,
+      "already_probed_excluded": 73,
+      "residual": 117,
+      "residual_nodeids": [
+        "tests/test_b103_a2l_reader.py::test_r_a2l_read_1_crlf_cr_mixed_read_as_lf",
+        "tests/test_b103_a2l_reader_coverage.py::test_cov_read_1_line_end_variants_equal_lf",
+        "tests/test_b103_a2l_reader_coverage.py::test_cov_read_1_cr_cr_lf_full_equality",
+        "tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[raw-transcript-transport-crlf]",
+        "tests/test_b103_a2l_reader.py::test_r_a2l_read_1_cr_cr_lf_counts_two_ends",
+        "tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[raw-transcript-matrix-p2]",
+        "tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[raw-transcript-paste-payload]",
+        "tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[raw-junit-transport-crlf]",
+        "tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-transcript-xml-secret]",
+        "tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-transcript-transport-crlf]",
+        "tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-transcript-matrix-p2]",
+        "tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-transcript-paste-payload]",
+        "tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-junit-xml-secret]",
+        "tests/test_b103_winci_gate.py::test_artifact_scanner_known_bad_canary_forms[prefix-junit-transport-crlf]",
+        "tests/test_b103_inc8b_s1.py::test_r_pe_def_103_1_every_cue_survives_without_colour",
+        "tests/test_b100_document.py::test_tc_b100_29_forced_write_failure_saves_without_the_document",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_3_4_card_keeps_the_full_name",
+        "tests/test_b103_a2l_reader.py::test_at_b103_i11_2_commented_old_copy_changes_nothing",
+        "tests/test_b100_busy.py::test_tc_b100_50_project_raise_ends_the_action_first",
+        "tests/test_b100_busy.py::test_tc_b100_51_every_baseline_bar_site_maps_to_a_seam_event",
+        "tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project[size1]",
+        "tests/test_b100_busy.py::test_tc_b100_51_twelve_b_seam_sites_sit_in_the_workers_and_handlers",
+        "tests/test_b103_clipboard_core.py::test_r_tui_044_1_18_every_single_line_box_is_os_clipboard_input",
+        "tests/test_b103_clipboard_core.py::test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes",
+        "tests/test_b97_chips_help.py::test_tc_b97_32_patch_help_names_every_label",
+        "tests/test_b100_save_image.py::test_tc_b100_15_mac_and_a2l_stay_byte_copies",
+        "tests/test_b100_save_image.py::test_tc_b100_59_open_project_unchanged",
+        "tests/test_b97_flow_builder.py::test_tc_b97_18_crc_card_painted_in_the_crc_colour",
+        "tests/test_b100_save_image.py::test_tc_b100_70_refused_save_keeps_the_flag",
+        "tests/test_b100_save_image.py::test_tc_b100_70_written_document_clears_the_flag",
+        "tests/test_b100_save_image.py::test_tc_b100_70_failed_document_write_keeps_the_flag",
+        "tests/test_b100_save_image.py::test_tc_b100_70_file_backed_document_from_outside_keeps_the_flag",
+        "tests/test_b97_flow_builder.py::test_tc_b97_49_ribbon_paints_saved_then_unsaved",
+        "tests/test_b100_save_image.py::test_tc_b100_70_natural_path_load_edit_save_keeps_the_flag",
+        "tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size0]",
+        "tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[patch]",
+        "tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size1]",
+        "tests/test_tui_app.py::test_load_selected_file_attaches_mac_to_loaded_binary",
+        "tests/test_b100_load_question.py::test_tc_b100_44_project_load_asks_iff_a_flag_is_set",
+        "tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_1_name_without_display_identifier",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_2_display_identifier",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_3_description",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_4_unit",
+        "tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_9_deep_value_gives_the_reason_not_a_raise",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_5_conversion",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_6_limits",
+        "tests/test_changes_symbol_entries.py::test_tc718_battery_refused_encode_limbs_named[Drifty-210-limb_fragments3]",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_7_name_on_the_name_line",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_2_1_description_break_run",
+        "tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_10_operations_execute_survives_deep_value",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_2_2_unit_break_run",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_8_1_name_line_with_a_display_identifier",
+        "tests/test_tui_commandbar.py::test_tc007_palette_lists_every_bindings_action",
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_8_2_no_name_line_without_a_display_identifier",
+        "tests/test_b103_inc12_tag_table.py::test_at_b103_i12_1_no_glued_or_cut_values",
+        "tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched",
+        "tests/test_b100_load_question.py::test_tc_b100_12_cancelled_question_rehomes_the_focus",
+        "tests/test_b100_load_question.py::test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved",
+        "tests/test_b100_load_question.py::test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route",
+        "tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[map]",
+        "tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact",
+        "tests/test_b97_check_editor.py::test_tc_b97_12_hostile_names_render_literally",
+        "tests/test_b100_workers.py::test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install",
+        "tests/test_b97_patch_editor.py::test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size1]",
+        "tests/test_b97_check_editor.py::test_at_b97_05_hostile_parameter_reads_literally",
+        "tests/test_b100_save_dialog.py::test_at_b100_21_painted_plan_is_the_saved_tree[pending]",
+        "tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back",
+        "tests/test_b100_save_dialog.py::test_at_b100_21_painted_plan_is_the_saved_tree[document]",
+        "tests/test_b100_workers.py::test_tc_b100_53_quit_asks_only_while_a_session_action_runs",
+        "tests/test_tui_patch_card.py::test_at080d_reachable_with_card[size1]",
+        "tests/test_tui_patch_card.py::test_tc080_2_c7_purity_probe",
+        "tests/test_b99_export.py::test_tc_b99_29_hostile_set_writes_nothing_outside",
+        "tests/test_b99_export.py::test_tc_b99_41_collision_reason_is_scrubbed_clipped_and_indexed",
+        "tests/test_b99_export.py::test_at_b99_11_sanitised_mac_only_second_export_takes_suffix",
+        "tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors",
+        "tests/test_b100_workers.py::test_at_b100_18_worker_half_case06_project_load_by_keys",
+        "tests/test_b99_export.py::test_tc_b99_41_part_way_failure_status_names_the_first_file",
+        "tests/test_b100_session_reset.py::test_tc_b100_08_reset_runs_once_before_the_first_install",
+        "tests/test_b100_session_reset.py::test_tc_b100_09_domain_matches_the_live_source_census",
+        "tests/test_b101_inplace_views.py::test_r_a2l_048_3_save_back_shows_in_the_tag_table",
+        "tests/test_b101_reach_and_reports_escape.py::test_r_shell_keys_3_1_every_action_has_a_reach",
+        "tests/test_checks_engine.py::test_no_textual_in_static_import_graph",
+        "tests/test_a2l_inline_axis_length.py::test_tc136_post_axis_pass_ordering_and_precedence",
+        "tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface",
+        "tests/test_tui_patch_json.py::test_ac1_editor_fills_json_window_when_room_exists",
+        "tests/test_tui_patch_json.py::test_ac3_fill_does_not_leak_to_sibling_windows",
+        "tests/test_tui_patch_json.py::test_ac5_gauge_stays_above_editor",
+        "tests/test_b101_reach_and_reports_escape.py::test_at_i12_2_rail_keys_and_issue_peek_after_the_aliases_go",
+        "tests/test_b100_session_reset.py::test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag",
+        "tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_4_save_back_then_display",
+        "tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection",
+        "tests/test_synth_release_case.py::test_a2l_zero_issues",
+        "tests/test_synth_release_case.py::test_addresses_inside_image",
+        "tests/test_synth_release_case.py::test_a2l_issues_reported",
+        "tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once",
+        "tests/test_b101_inplace_views.py::test_r_tui_004_7_2_save_back_shows_in_the_a2l_hex_view",
+        "tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_5_save_project_then_display",
+        "tests/test_b99_a2l_encode.py::test_at_b99_09_a2l_window_physical_column",
+        "tests/test_tui_patch_history_strip.py::test_tc081_2_strip",
+        "tests/test_b99_s0.py::test_at_b99_02_save_back_excludes_s0",
+        "tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_7_blocked_save_back_still_refreshes",
+        "tests/test_tui_patch_checks_strip.py::test_tc078_2_aggregates_param",
+        "tests/test_b101_inc11_acceptance.py::test_at_i11_1_clean_demo_issues_without_standard_blocks",
+        "tests/test_tui_patch_chips.py::test_at076a_docked_buttons_are_grouped_chips",
+        "tests/test_b101_inc11_acceptance.py::test_at_i11_2_faulty_demo_errors_first",
+        "tests/test_a2l_f841_cleanup.py::test_tc094_no_f841_finding_in_a2l",
+        "tests/test_a2l_f841_cleanup.py::test_at094_demo_parse_stable_after_dead_store_removal",
+        "tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_8_zero_applied_restore_still_refreshes",
+        "tests/test_b101_designer_writes.py::test_r_crc_preview_002_1_6_save_project_commit_while_displayed_schedules_a_recompute",
+        "tests/test_b101_designer_writes.py::test_r_crc_preview_002_1_6_save_project_commit_while_displayed_recomputes_after_the_quiet_time",
+        "tests/test_b101_designer_writes.py::test_control_other_patch_actions_do_not_mark_the_coverage_stale",
+        "tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size]",
+        "tests/test_b101_designer_writes.py::test_r_chked_057_2_save_back_clears_the_validation_results",
+        "tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved",
+        "tests/test_b101_designer_writes.py::test_r_chked_057_3_save_project_commit_clears_the_validation_results",
+        "tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_9_save_back_raising_after_the_adopt_ends_the_app"
+      ],
+      "already_probed_by_nodeid": {
+        "tests/test_b100_recents.py::test_tc_b100_34_load_failing_before_its_copy_records_nothing": [
+          "repro-visual"
+        ],
+        "tests/test_b100_document.py::test_tc_b100_29_second_save_of_the_bound_document_writes_nothing": [
+          "repro-functional"
+        ],
+        "tests/test_b100_recents.py::test_tc_b100_34_twenty_five_outside_loads_keep_twenty_newest_first": [
+          "repro-visual"
+        ],
+        "tests/test_tui_map_big.py::test_b77_select_rerender_preserves_a_region_still_present[size1]": [
+          "repro-visual"
+        ],
+        "tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files": [
+          "repro-functional"
+        ],
+        "tests/test_tui_map_big.py::test_b77_style_selected_row_differs_from_every_unselected_row[size0]": [
+          "repro-visual"
+        ],
+        "tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project[size0]": [
+          "repro-functional"
+        ],
+        "tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/2]": [
+          "repro-a2l"
+        ],
+        "tests/test_b103_clipboard_core.py::test_r_paste_35_4_right_click_paste_multi_line_strips": [
+          "repro-visual"
+        ],
+        "tests/test_b97_flow_execution.py::test_tc_b97_23_three_lane_pause_waiting_lane_in_view_focus_kept[size0]": [
+          "repro-visual"
+        ],
+        "tests/test_b97_flow_execution.py::test_tc_b97_23_three_lane_pause_waiting_lane_in_view_focus_kept[size1]": [
+          "repro-visual"
+        ],
+        "tests/test_b100_save_image.py::test_tc_b100_59_files_row": [
+          "repro-functional"
+        ],
+        "tests/test_b97_flow_execution.py::test_tc_b97_52_waiting_colour_only_on_waiting_human_elements": [
+          "repro-visual"
+        ],
+        "tests/test_b97_flow_execution.py::test_tc_b97_52_crc_card_beside_the_waiting_card_keeps_its_colour": [
+          "repro-visual"
+        ],
+        "tests/test_b100_save_guards.py::test_at_b100_02_name_refusals_through_the_save_dialog[size1]": [
+          "repro-functional"
+        ],
+        "tests/test_b100_save_image.py::test_tc_b100_59_own_a2l_by_name_and_bytes[True]": [
+          "repro-functional"
+        ],
+        "tests/test_b100_project_homes.py::test_tc_b100_32_unload_of_an_a2l_only_session_clears_the_a2l": [
+          "repro-functional"
+        ],
+        "tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths": [
+          "repro-visual"
+        ],
+        "tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_7_save_project_commit_keeps_the_w_form": [
+          "repro-visual"
+        ],
+        "tests/test_b97_flow_execution.py::test_tc_b97_flow_execution_css_section_is_scoped": [
+          "repro-visual"
+        ],
+        "tests/test_b97_flow_execution.py::test_at_b97_09_three_lanes_run_paused_lane_in_view_english_log": [
+          "repro-visual"
+        ],
+        "tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression": [
+          "repro-functional"
+        ],
+        "tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded]": [
+          "repro-functional"
+        ],
+        "tests/test_tui_patch_editor_v2.py::test_at_batch41_escape_cancels_changeset_json_popup": [
+          "repro-functional"
+        ],
+        "tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry": [
+          "repro-functional"
+        ],
+        "tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential": [
+          "repro-visual"
+        ],
+        "tests/test_b97_key_bar.py::test_tc_b97_67_row_one_is_the_eight_globals_whatever_the_focus[118x54]": [
+          "repro-visual"
+        ],
+        "tests/test_b97_key_bar.py::test_tc_b97_67_row_one_is_the_eight_globals_whatever_the_focus[220x60]": [
+          "repro-visual"
+        ],
+        "tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/2]": [
+          "repro-a2l"
+        ],
+        "tests/test_b103_a2l_refresh.py::test_r011_hex_span_repaint[R-A2L-REFRESH.011/3]": [
+          "repro-a2l"
+        ],
+        "tests/test_b97_key_bar.py::test_tc_b97_68_row_two_tag_tokens_and_colours": [
+          "repro-visual"
+        ],
+        "tests/test_b97_patch_editor.py::test_tc_b97_39_strip_follows_the_highlight": [
+          "repro-functional"
+        ],
+        "tests/test_b97_patch_editor.py::test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size0]": [
+          "repro-functional"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-80x24]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-120x30]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-160x40]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-80x24]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-120x30]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-160x40]": [
+          "repro-visual"
+        ],
+        "tests/test_b97_key_bar.py::test_tc_b97_69_dimmed_entries_follow_their_condition": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-80x24]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-120x30]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-160x40]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-80x24]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-120x30]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-160x40]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-80x24]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-120x30]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-160x40]": [
+          "repro-visual"
+        ],
+        "tests/test_b97_key_bar.py::test_tc_b97_69_a_dimmed_token_paints_whole_in_one_colour": [
+          "repro-visual"
+        ],
+        "tests/test_b97_key_bar.py::test_tc_b97_69_owned_keys_dim_outside_their_window": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-80x24]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-120x30]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-160x40]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[map-comfortable-80x24]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[map-comfortable-120x30]": [
+          "repro-visual"
+        ],
+        "tests/test_tui_patch_card.py::test_at080d_reachable_with_card[size0]": [
+          "repro-functional"
+        ],
+        "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[diff-comfortable-120x30]": [
+          "repro-visual"
+        ],
+        "tests/test_b97_key_bar.py::test_tc_b97_69_diff_keys_follow_a_height_only_regime_switch[notice-to-wide]": [
+          "repro-visual"
+        ],
+        "tests/test_b97_key_bar.py::test_tc_b97_69_diff_keys_follow_a_height_only_regime_switch[notice-to-fallback]": [
+          "repro-visual"
+        ],
+        "tests/test_b101_inplace_views.py::test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table": [
+          "repro-functional"
+        ],
+        "tests/test_b97_key_bar.py::test_tc_b97_69_diff_keys_follow_a_height_only_regime_switch[width-only-wide-to-fallback]": [
+          "repro-visual"
+        ],
+        "tests/test_b103_inc8_a2_app.py::test_r_pe_def_63_1_no_a2l_refuses_the_stage": [
+          "repro-a2l"
+        ],
+        "tests/test_b103_a2l_refresh.py::test_r022_confirmation_identity[R-A2L-REFRESH.022/3]": [
+          "repro-a2l"
+        ],
+        "tests/test_b97_key_bar.py::test_at_b97_25_two_rows_on_every_window_and_clicks": [
+          "repro-visual"
+        ],
+        "tests/test_b97_key_bar.py::test_at_b97_26_keys_only_help_and_hidden_view": [
+          "repro-visual"
+        ],
+        "tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys": [
+          "repro-functional"
+        ],
+        "tests/test_tui_patch_history_strip.py::test_tc081_1_derived": [
+          "repro-functional"
+        ],
+        "tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call": [
+          "repro-a2l"
+        ],
+        "tests/test_b99_bytes_field.py::test_tc_b99_33_field_and_help_state_the_hex_rule": [
+          "repro-functional"
+        ],
+        "tests/test_b99_bytes_field.py::test_at_b99_12_typed_hex_run_saves_back": [
+          "repro-functional"
+        ],
+        "tests/test_b103_inc10_mu_survivors.py::test_r_s19_s0header_001_2_6_a_long_written_name_is_cut_to_252_bytes": [
+          "repro-functional"
+        ],
+        "tests/test_b101_designer_writes.py::test_at_i5_4_save_back_by_keys_then_display": [
+          "repro-functional"
+        ]
+      }
+    },
+    "serial": {
+      "failed_plus_error_occurrences": 94,
+      "clipboard_guard_excluded": 33,
+      "after_clipboard_guard": 61,
+      "already_probed_excluded": 6,
+      "residual": 55,
+      "residual_nodeids": [
+        "tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]",
+        "tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]",
+        "tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]",
+        "tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]",
+        "tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling",
+        "tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]",
+        "tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]",
+        "tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l",
+        "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_3_shared_layout_first_line_value",
+        "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_9_shared_range_table",
+        "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word",
+        "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_values",
+        "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_19_tab_through_own_method_val_blks",
+        "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_19_tab_through_own_method_values",
+        "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_1_shared_enum_table_decode",
+        "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk",
+        "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_6_long_matched_range_text_referenced",
+        "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_7_tab_intp_decode",
+        "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_10_element_decode_does_not_grow_with_name[enum]",
+        "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_10_element_decode_does_not_grow_with_name[number]",
+        "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_scaling_method",
+        "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table",
+        "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_scaling_range_table",
+        "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout",
+        "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object",
+        "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object",
+        "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object",
+        "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid",
+        "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object",
+        "tests/test_b103_a2l_list_view.py::test_r_a2l_list_035_1",
+        "tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_time",
+        "tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time",
+        "tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_time",
+        "tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_memory",
+        "tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_memory",
+        "tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_memory",
+        "tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_words_memory",
+        "tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_12_1_a_200_name_software_a_page_paints_within_half_a_second",
+        "tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_12_2_a_page_of_200_one_mebibyte_text_spans_paints_within_half_a_second",
+        "tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second",
+        "tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_82_1_a_key_is_handled_within_one_second_while_a_record_encode_runs",
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_95_0_control_a_decode_held_past_the_grace_does_paint_the_cue",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_96_1_the_busy_title_reads_spinner_busy_job_name_seconds_and_keys_still_work",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_96_2_the_pill_is_bold_dark_on_amber_and_the_title_keeps_its_colour",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_96_3_the_job_words_are_preview_and_stage",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_97_2_the_frames_follow_the_cycle_one_step_per_tick_none_skipped",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_102_1_leaving_the_row_for_a_scalar_returns_the_idle_look_while_the_worker_runs",
+        "tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s",
+        "tests/test_b103_label_list.py::test_r_a2l_list_078_3"
+      ],
+      "already_probed_by_nodeid": {
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second": [
+          "repro-a2l"
+        ],
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_94_2_a_gated_preview_shows_the_busy_title_within_half_a_second_of_enter": [
+          "repro-a2l"
+        ],
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_94_3_a_gated_record_stage_shows_the_busy_title_within_half_a_second_of_alt_s": [
+          "repro-a2l"
+        ],
+        "tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step": [
+          "repro-a2l"
+        ],
+        "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_3_a_record_stage_refused_at_its_write_with_the_a2l_unloaded_returns_to_the_idle_look": [
+          "repro-a2l"
+        ],
+        "tests/test_b103_inc9b_s.py::test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look": [
+          "repro-a2l"
+        ]
+      }
+    }
+  },
+  "totals": {
+    "failed_plus_error_occurrences": 522,
+    "clipboard_guard_excluded": 271,
+    "after_clipboard_guard": 251,
+    "already_probed_excluded": 79,
+    "residual": 172,
+    "clipboard_guard_unique_nodeids": 271,
+    "already_probed_unique_nodeids": 79,
+    "residual_unique_nodeids": 172
+  }
+}

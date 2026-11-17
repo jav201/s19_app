@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="44.803" timestamp="2026-11-16T17:54:05.490061-06:00" hostname="[HOST]"><testcase classname="tests.test_b103_inc9b_at" name="test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second" time="44.473"><failure message="AssertionError: title shown but the painted corner is #c7c7c7, not #f5c26b: '╭─ STAGING SHEET   ◑ BUSY · decode LARGE · 0.3 s · keys still work  ───────────────────────────────────────────╮'&#10;assert '#c7c7c7' == '#f5c26b'&#10;  &#10;  - #f5c26b&#10;  + #c7c7c7">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/head__bench_94_1/tmp/pytest-of-[ACCOUNT]/pytest-0/test_r_pe_bench_94_1_large_sel0')
+defc_dir = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/head__bench_94_1/tmp/pytest-of-[ACCOUNT]/pytest-0/b103_inc9_w_defc0')
+
+    @pytest.mark.serial_timing
+    @slow
+    def test_r_pe_bench_94_1_large_selected_shows_the_busy_border_and_title_within_half_a_second(tmp_path, defc_dir):
+        """R-PE-BENCH.94/1. LARGE selected by a key (its real decode runs): the painted top border holds a busy title
+        with `decode LARGE` and the border corner is the busy colour #f5c26b, first painted 0.2-0.5 s after the key.
+        Operator need (P-127): while LARGE decodes the window must say it is working, or the user forces the app closed.
+        Negative control: no cue tick -&gt; never shown (RED); grace 0 -&gt; shown before 0.2 s (RED)."""
+        a2l, s19 = big_case(tmp_path, LARGE_COUNT, rows=(LARGE,))
+
+        async def body(app, pilot, panel):
+            return await large_decode_window(pilot, app, sheet_of(panel), 0.0)
+
+        t_send, snaps, first = run(tmp_path, defc_dir, body, size=SIZE, a2l=a2l, image=s19)
+        last = snaps[-1]
+        assert first is not None, f"no `decode LARGE` busy title within 6 s of the key; last top row {last.row!r} ({load()})"
+        seen = next(s for s in snaps if s.t == first)
+&gt;       assert seen.corner == BUSY_HEX, f"title shown but the painted corner is {seen.corner}, not {BUSY_HEX}: {seen.row!r}"
+E       AssertionError: title shown but the painted corner is #c7c7c7, not #f5c26b: '╭─ STAGING SHEET   ◑ BUSY · decode LARGE · 0.3 s · keys still work  ───────────────────────────────────────────╮'
+E       assert '#c7c7c7' == '#f5c26b'
+E
+E         - #f5c26b
+E         + #c7c7c7
+
+tests\test_b103_inc9b_at.py:240: AssertionError</failure></testcase></testsuite></testsuites>

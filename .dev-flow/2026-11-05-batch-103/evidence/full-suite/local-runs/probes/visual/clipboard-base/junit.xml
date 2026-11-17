@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="3.413" timestamp="2026-11-16T18:02:41.274121-06:00" hostname="[HOST]"><testcase classname="tests.test_b103_clipboard_core" name="test_r_paste_35_4_right_click_paste_multi_line_strips" time="3.067"><failure message="Failed: OS clipboard not isolated: GITHUB_ACTIONS != 'true'; attempted ['ctypes-win32', 'powershell']">item = &lt;Function test_r_paste_35_4_right_click_paste_multi_line_strips&gt;
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_runtest_call(item):
+        """Fail the call phase (outcome ``failed``, never ``error``) when the
+        isolation stand-ins recorded an OS-boundary attempt for this item."""
+        _CLIP_ISOLATION_ATTEMPTS.pop(item.nodeid, None)
+        yield
+        attempts = _CLIP_ISOLATION_ATTEMPTS.get(item.nodeid)
+        if attempts:
+&gt;           pytest.fail(
+                f"OS clipboard not isolated: {_CLIP_ISOLATION_REASON}; "
+                f"attempted {sorted(set(attempts))}"
+            )
+E           Failed: OS clipboard not isolated: GITHUB_ACTIONS != 'true'; attempted ['ctypes-win32', 'powershell']
+
+tests\conftest.py:194: Failed</failure></testcase></testsuite></testsuites>

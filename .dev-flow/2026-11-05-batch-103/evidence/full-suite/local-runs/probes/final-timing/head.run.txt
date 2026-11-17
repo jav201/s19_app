@@ -1,0 +1,6 @@
+lane=head
+commit=795779add81875976ac3651f8862498426d45abf
+start=2026-11-17T02:34:44-06:00
+end=2026-11-17T02:40:56-06:00
+wall_seconds=371.696
+pytest_exit=1

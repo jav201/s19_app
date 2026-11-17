@@ -1,0 +1,6 @@
+lane=control
+commit=6a8cfb0a9bb64b95dd9969fb08e05ae85c1bd6b4
+start=2026-11-17T02:42:55-06:00
+end=2026-11-17T02:47:50-06:00
+wall_seconds=295.321
+pytest_exit=1

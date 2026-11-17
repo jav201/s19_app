@@ -1,0 +1,440 @@
+{
+  "main": {
+    "selected": 117,
+    "existing": 106,
+    "absent": 11,
+    "modules": {
+      "tests/test_b103_a2l_reader.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 3,
+        "collected_selected": 3,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\001-test_b103_a2l_reader.txt"
+      },
+      "tests/test_b103_a2l_reader_coverage.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\002-test_b103_a2l_reader_coverage.txt"
+      },
+      "tests/test_b103_winci_gate.py": {
+        "file_absent": true,
+        "selected": 10
+      },
+      "tests/test_b103_inc8b_s1.py": {
+        "file_absent": true,
+        "selected": 1
+      },
+      "tests/test_b100_document.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\005-test_b100_document.txt"
+      },
+      "tests/test_b103_inc12_tag_table.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 13,
+        "collected_selected": 13,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\006-test_b103_inc12_tag_table.txt"
+      },
+      "tests/test_b100_busy.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 3,
+        "collected_selected": 3,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\007-test_b100_busy.txt"
+      },
+      "tests/test_b103_clipboard_core.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\008-test_b103_clipboard_core.txt"
+      },
+      "tests/test_b97_chips_help.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\009-test_b97_chips_help.txt"
+      },
+      "tests/test_b100_save_image.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 9,
+        "collected_selected": 9,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\010-test_b100_save_image.txt"
+      },
+      "tests/test_b97_flow_builder.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\011-test_b97_flow_builder.txt"
+      },
+      "tests/test_tui_app.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\012-test_tui_app.txt"
+      },
+      "tests/test_b100_load_question.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 4,
+        "collected_selected": 4,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\013-test_b100_load_question.txt"
+      },
+      "tests/test_suite_hygiene.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\014-test_suite_hygiene.txt"
+      },
+      "tests/test_b101_crc_model_and_reasons.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\015-test_b101_crc_model_and_reasons.txt"
+      },
+      "tests/test_changes_symbol_entries.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\016-test_changes_symbol_entries.txt"
+      },
+      "tests/test_tui_commandbar.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\017-test_tui_commandbar.txt"
+      },
+      "tests/test_tui_diff_screen.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\018-test_tui_diff_screen.txt"
+      },
+      "tests/test_b100_focus.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\019-test_b100_focus.txt"
+      },
+      "tests/test_b97_check_editor.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\020-test_b97_check_editor.txt"
+      },
+      "tests/test_b100_workers.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 5,
+        "collected_selected": 5,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\021-test_b100_workers.txt"
+      },
+      "tests/test_b97_patch_editor.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\022-test_b97_patch_editor.txt"
+      },
+      "tests/test_b100_save_dialog.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\023-test_b100_save_dialog.txt"
+      },
+      "tests/test_b99_staging.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\024-test_b99_staging.txt"
+      },
+      "tests/test_tui_patch_card.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\025-test_tui_patch_card.txt"
+      },
+      "tests/test_b99_export.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 4,
+        "collected_selected": 4,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\026-test_b99_export.txt"
+      },
+      "tests/test_address_census.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\027-test_address_census.txt"
+      },
+      "tests/test_b100_session_reset.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 3,
+        "collected_selected": 3,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\028-test_b100_session_reset.txt"
+      },
+      "tests/test_b101_inplace_views.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\029-test_b101_inplace_views.txt"
+      },
+      "tests/test_b101_reach_and_reports_escape.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\030-test_b101_reach_and_reports_escape.txt"
+      },
+      "tests/test_checks_engine.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\031-test_checks_engine.txt"
+      },
+      "tests/test_a2l_inline_axis_length.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\032-test_a2l_inline_axis_length.txt"
+      },
+      "tests/test_tui_patch_editor_b94.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\033-test_tui_patch_editor_b94.txt"
+      },
+      "tests/test_tui_patch_json.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 3,
+        "collected_selected": 3,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\034-test_tui_patch_json.txt"
+      },
+      "tests/test_b101_designer_writes.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 10,
+        "collected_selected": 10,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\035-test_b101_designer_writes.txt"
+      },
+      "tests/test_tui_report_filter_surface.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\036-test_tui_report_filter_surface.txt"
+      },
+      "tests/test_synth_release_case.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 3,
+        "collected_selected": 3,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\037-test_synth_release_case.txt"
+      },
+      "tests/test_requirements_canon.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\038-test_requirements_canon.txt"
+      },
+      "tests/test_b99_a2l_encode.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\039-test_b99_a2l_encode.txt"
+      },
+      "tests/test_tui_patch_history_strip.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\040-test_tui_patch_history_strip.txt"
+      },
+      "tests/test_b99_s0.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\041-test_b99_s0.txt"
+      },
+      "tests/test_tui_patch_checks_strip.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\042-test_tui_patch_checks_strip.txt"
+      },
+      "tests/test_b101_inc11_acceptance.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\043-test_b101_inc11_acceptance.txt"
+      },
+      "tests/test_tui_patch_chips.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\044-test_tui_patch_chips.txt"
+      },
+      "tests/test_a2l_f841_cleanup.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 2,
+        "collected_selected": 2,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\collect-modules\\045-test_a2l_f841_cleanup.txt"
+      }
+    }
+  },
+  "serial": {
+    "selected": 55,
+    "existing": 36,
+    "absent": 19,
+    "modules": {
+      "tests/test_b100_active_variant.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 4,
+        "collected_selected": 4,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\serial\\collect-modules\\001-test_b100_active_variant.txt"
+      },
+      "tests/test_b100_project_check.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 3,
+        "collected_selected": 3,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\serial\\collect-modules\\002-test_b100_project_check.txt"
+      },
+      "tests/test_b101_inplace_views.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 1,
+        "collected_selected": 1,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\serial\\collect-modules\\003-test_b101_inplace_views.txt"
+      },
+      "tests/test_b103_a2l_definition_arrays_scale.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 12,
+        "collected_selected": 12,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\serial\\collect-modules\\004-test_b103_a2l_definition_arrays_scale.txt"
+      },
+      "tests/test_b103_a2l_definition_perf.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 9,
+        "collected_selected": 9,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\serial\\collect-modules\\005-test_b103_a2l_definition_perf.txt"
+      },
+      "tests/test_b103_a2l_list_view.py": {
+        "file_absent": true,
+        "selected": 1
+      },
+      "tests/test_b103_a2l_reader_perf.py": {
+        "file_absent": false,
+        "exit": 0,
+        "selected": 7,
+        "collected_selected": 7,
+        "absent": [],
+        "log": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\serial\\collect-modules\\007-test_b103_a2l_reader_perf.txt"
+      },
+      "tests/test_b103_inc8_s2_sheet_rows.py": {
+        "file_absent": true,
+        "selected": 2
+      },
+      "tests/test_b103_inc9_w_jobs.py": {
+        "file_absent": true,
+        "selected": 2
+      },
+      "tests/test_b103_inc9b_at.py": {
+        "file_absent": true,
+        "selected": 1
+      },
+      "tests/test_b103_inc9b_w.py": {
+        "file_absent": true,
+        "selected": 12
+      },
+      "tests/test_b103_label_list.py": {
+        "file_absent": true,
+        "selected": 1
+      }
+    }
+  }
+}

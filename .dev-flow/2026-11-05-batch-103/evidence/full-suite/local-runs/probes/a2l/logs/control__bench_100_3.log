@@ -1,0 +1,60 @@
+[USER_HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0
+rootdir: [USER_HOME]\Github\s19_app-b103-g3-inc9b
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collected 1 item
+
+tests\test_b103_inc9b_at.py F                                            [100%]
+
+================================== FAILURES ===================================
+_ test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/control__bench_100_3/tmp/pytest-of-[ACCOUNT]/pytest-0/test_r_pe_bench_100_3_a_writte0')
+defc_dir = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/control__bench_100_3/tmp/pytest-of-[ACCOUNT]/pytest-0/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000020409302F00>
+
+    @pytest.mark.serial_timing
+    def test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.100/3. VAL_BLK_DEF_0001 with Set `10` previewed, alt+s with its encode held past the grace (the
+        `stage VAL_BLK_DEF_0001` cue is painted), then released: the document gets its entry and the window is idle
+        (border not amber, title exactly `STAGING SHEET`) within 0.3 s of the last change the screen painted before it.
+        Operator need (P-127): a cue left on after the job ended says the window is still working.
+        Negative control: the inline border left or the last busy title left -> never idle (RED)."""
+        gate = Gate(monkeypatch, "encode_values")
+
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            try:
+                await vb_edit(pilot, sheet, "s", "10")
+                gate.hold.add(VB)
+                t_key = send(app, "alt+s")
+                cue = await watch(app, lambda s, o: titled(s, "stage", VB), t_key + 2.0)
+                held = gate.entered.is_set()
+                if not titled(cue[-1], "stage", VB):
+                    return cue, [], entries_of(app), held
+            finally:
+                gate.release()
+            done = await watch(app, lambda s, o: s.entries >= 1 and is_idle(s), time.monotonic() + 30.0, full=True)
+            return cue, done, entries_of(app), held
+
+        cue, done, entries, held = run(tmp_path, defc_dir, body)
+        assert held, "control: the record's encode never reached the gate, so no record stage was running"
+        assert titled(cue[-1], "stage", VB), f"precondition: no `stage {VB}` cue while held; last top row {cue[-1].row!r} ({load()})"
+>       assert cue[-1].corner == BUSY_HEX, f"precondition: cue title without the busy corner: {cue[-1].corner}"
+E       AssertionError: precondition: cue title without the busy corner: #c7c7c7
+E       assert '#c7c7c7' == '#f5c26b'
+E
+E         - #f5c26b
+E         + #c7c7c7
+
+tests\test_b103_inc9b_at.py:493: AssertionError
+- generated xml file: [USER_HOME]\Github\s19_app-b103-g3-repro-a2l\junit\control__bench_100_3.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step
+============================== 1 failed in 8.13s ==============================

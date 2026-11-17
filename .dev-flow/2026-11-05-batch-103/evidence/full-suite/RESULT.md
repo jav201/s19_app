@@ -1,8 +1,9 @@
 # Batch-103 full-suite gate
 
-**CURRENT STATE: BLOCKED — the final driver fixes are integrated; the final full-suite is pending and G3 is not PASS.**
+**CURRENT STATE: BLOCKED — the final full-suite is RUNNING on `33028542`; there is no verdict and G3 is not PASS.**
 
-- The central backup exists. The full-suite must still be repeated on the final integrated tree; no full-suite PASS or G3 closure is claimed.
+- The central backup exists. The third run on `3302854210a8a62637c37f9d59745d70ae8c8a2a` was INVALID/infra (`OSError: [Errno 22]` during pytest terminal flush) and partial; its JUnit is not used as final evidence. The fourth run is **RUNNING** on the same commit in a separate clone, writing directly to files. No full-suite PASS or G3 closure is claimed.
+- **Prior local evidence:** [local-runs/RULINGS.md](local-runs/RULINGS.md) reconciles the completed runs on `35fabb25` and `795779ad`, their fixed/persistent/new nodeids, probes, inherited RED, transformations and original/stored hashes. It does not anticipate the current run's outcome.
 - **Static fixes integrated:** reviewed GO lane `b103-g3-static-fixes` `85466c5db3cfb06dfbbfbbddaec490e5e3c93f18`, merged with provenance in `c6bdb13e6257364c5c6cf3e5b3cb8118c3e30507`. Its directed results and static runner self-test are recorded in `fix-g3-static/RESULT.md`; they do not change the RED full-suite state.
 - **Four final lanes integrated:** UI A `9960f78e` / merge `052abd14`: 603 passed, 3 inherited failed, 3 skipped, 1 xfailed; UI B `94f27be0` / merge `35d238ff`: 249 passed, 15 residual failed; recents `08f7db88` / merge `04665387`: 193 passed, 1 skipped; oracles `59e8e605` / merge `3124e163`: 231 passed. These are directed lane results, not a full-suite verdict.
 - **Four final driver fixes integrated:** `b103-g3-final-fixes` `8f979651` / merge `26bd4e4f` covers Inc15/TC-051, undo/redo real-key handling, Inc10 long written names and B100 project-load question synchronization. The four targets pass together; all 118 nodes in the four functional files pass. The five-file run has 180 passed and 5 unrelated hygiene failures, detailed in `final-fixes/RESULT.md`. The final full-suite remains pending.

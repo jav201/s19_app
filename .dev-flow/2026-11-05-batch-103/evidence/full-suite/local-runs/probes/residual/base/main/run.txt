@@ -1,0 +1,3391 @@
+[USER_HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0
+rootdir: [USER_HOME]\Github\s19_app-b103-g3-base
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collected 106 items
+
+tests\test_b103_a2l_reader.py F                                          [  0%]
+tests\test_b103_a2l_reader_coverage.py FF                                [  2%]
+tests\test_b103_a2l_reader.py F                                          [  3%]
+tests\test_b100_document.py .                                            [  4%]
+tests\test_b103_inc12_tag_table.py F                                     [  5%]
+tests\test_b103_a2l_reader.py F                                          [  6%]
+tests\test_b100_busy.py FF                                               [  8%]
+tests\test_b100_document.py .                                            [  9%]
+tests\test_b100_busy.py F                                                [ 10%]
+tests\test_b103_clipboard_core.py ..                                     [ 12%]
+tests\test_b97_chips_help.py F                                           [ 13%]
+tests\test_b100_save_image.py .F                                         [ 15%]
+tests\test_b97_flow_builder.py .                                         [ 16%]
+tests\test_b100_save_image.py ....                                       [ 19%]
+tests\test_b97_flow_builder.py .                                         [ 20%]
+tests\test_b100_save_image.py ..                                         [ 22%]
+tests\test_b97_chips_help.py F                                           [ 23%]
+tests\test_b100_save_image.py .                                          [ 24%]
+tests\test_tui_app.py F                                                  [ 25%]
+tests\test_b100_load_question.py .                                       [ 26%]
+tests\test_suite_hygiene.py .                                            [ 27%]
+tests\test_b103_inc12_tag_table.py FFFF                                  [ 31%]
+tests\test_b101_crc_model_and_reasons.py F                               [ 32%]
+tests\test_b103_inc12_tag_table.py FF                                    [ 33%]
+tests\test_changes_symbol_entries.py F                                   [ 34%]
+tests\test_b103_inc12_tag_table.py FF                                    [ 36%]
+tests\test_b101_crc_model_and_reasons.py F                               [ 37%]
+tests\test_b103_inc12_tag_table.py FF                                    [ 39%]
+tests\test_tui_commandbar.py .                                           [ 40%]
+tests\test_b103_inc12_tag_table.py FF                                    [ 42%]
+tests\test_tui_diff_screen.py .                                          [ 43%]
+tests\test_b100_load_question.py ...                                     [ 46%]
+tests\test_b100_focus.py F                                               [ 47%]
+tests\test_tui_commandbar.py F                                           [ 48%]
+tests\test_b97_check_editor.py F                                         [ 49%]
+tests\test_b100_workers.py F                                             [ 50%]
+tests\test_b97_patch_editor.py .                                         [ 50%]
+tests\test_b97_check_editor.py F                                         [ 51%]
+tests\test_b100_save_dialog.py .                                         [ 52%]
+tests\test_b99_staging.py .                                              [ 53%]
+tests\test_b100_save_dialog.py .                                         [ 54%]
+tests\test_b100_workers.py .                                             [ 55%]
+tests\test_tui_patch_card.py .F                                          [ 57%]
+tests\test_b99_export.py F..                                             [ 60%]
+tests\test_address_census.py F                                           [ 61%]
+tests\test_b100_workers.py F                                             [ 62%]
+tests\test_b99_export.py .                                               [ 63%]
+tests\test_b100_session_reset.py F.                                      [ 65%]
+tests\test_b101_inplace_views.py .                                       [ 66%]
+tests\test_b101_reach_and_reports_escape.py F                            [ 66%]
+tests\test_checks_engine.py .                                            [ 67%]
+tests\test_a2l_inline_axis_length.py F                                   [ 68%]
+tests\test_tui_patch_editor_b94.py .                                     [ 69%]
+tests\test_tui_patch_json.py ...                                         [ 72%]
+tests\test_b101_reach_and_reports_escape.py F                            [ 73%]
+tests\test_b100_session_reset.py .                                       [ 74%]
+tests\test_b101_designer_writes.py .                                     [ 75%]
+tests\test_tui_report_filter_surface.py F                                [ 76%]
+tests\test_synth_release_case.py FFF                                     [ 79%]
+tests\test_requirements_canon.py F                                       [ 80%]
+tests\test_b101_inplace_views.py .                                       [ 81%]
+tests\test_b101_designer_writes.py .                                     [ 82%]
+tests\test_b99_a2l_encode.py F                                           [ 83%]
+tests\test_tui_patch_history_strip.py F                                  [ 83%]
+tests\test_b99_s0.py .                                                   [ 84%]
+tests\test_b101_designer_writes.py .                                     [ 85%]
+tests\test_tui_patch_checks_strip.py F                                   [ 86%]
+tests\test_b101_inc11_acceptance.py F                                    [ 87%]
+tests\test_tui_patch_chips.py .                                          [ 88%]
+tests\test_b101_inc11_acceptance.py F                                    [ 89%]
+tests\test_a2l_f841_cleanup.py FF                                        [ 91%]
+tests\test_b101_designer_writes.py ....                                  [ 95%]
+tests\test_b100_workers.py F                                             [ 96%]
+tests\test_b101_designer_writes.py .                                     [ 97%]
+tests\test_b100_workers.py .                                             [ 98%]
+tests\test_b101_designer_writes.py ..                                    [100%]
+
+================================== FAILURES ===================================
+_________________ test_r_a2l_read_1_crlf_cr_mixed_read_as_lf __________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_a2l_read_1_crlf_cr_mixe0')
+
+    def test_r_a2l_read_1_crlf_cr_mixed_read_as_lf(tmp_path: Path) -> None:
+        """R-A2L-READ.1/1..3: CRLF, lone CR and mixed ends each read as LF (35/35)."""
+        for path in _tracked_a2l():
+            text = path.read_text(encoding="utf-8", errors="replace")
+            base = parse_a2l_file(path)
+            base_tags = {t["name"]: _six_fields(t) for t in base["tags"]}
+            for variant in ("crlf", "cr", "mixed"):
+                if variant == "crlf":
+                    body = text.replace("\n", "\r\n")
+                elif variant == "cr":
+                    body = text.replace("\n", "\r")
+                else:
+                    body = "".join(
+                        ln + ("\r\n" if i % 3 == 0 else "\r" if i % 3 == 1 else "\n")
+                        for i, ln in enumerate(text.split("\n"))
+                    )
+                data = _parse(tmp_path, body, name="line.a2l")
+                assert len(data["tags"]) == len(base["tags"]), path
+                for t in data["tags"]:
+                    assert _six_fields(t) == base_tags[t["name"]], (path, t["name"])
+>               assert data["errors"] == base["errors"], path
+E               AssertionError: WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-base/examples/case_00_public/merge_inc_test.a2l')
+E               assert ['Line 9: /in... is not read'] == ['Line 5: /in... is not read']
+E
+E                 At index 0 diff: 'Line 9: /include included.a2l is not read' != 'Line 5: /include included.a2l is not read'
+E                 Use -v to get more diff
+
+tests\test_b103_a2l_reader.py:206: AssertionError
+_________________ test_cov_read_1_line_end_variants_equal_lf __________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_cov_read_1_line_end_varia0')
+
+    def test_cov_read_1_line_end_variants_equal_lf(tmp_path: Path) -> None:
+        """R-A2L-READ.1/1..3: tags, sections (line numbers included) and errors
+        equal the LF reading, not just the six tag fields."""
+        for path in _tracked_a2l():
+            text = path.read_text(encoding="utf-8", errors="replace")
+            base = _parse(tmp_path, text, name="lf.a2l")
+            for variant in ("crlf", "cr", "mixed"):
+                if variant == "crlf":
+                    body = text.replace("\n", "\r\n")
+                elif variant == "cr":
+                    body = text.replace("\n", "\r")
+                else:
+                    parts = text.split("\n")
+                    mixed = []
+                    for i, line in enumerate(parts):
+                        mixed.append(line)
+                        if i + 1 < len(parts):
+                            mixed.append("\r" if not line else ("\r\n", "\r", "\n")[i % 3])
+                    body = "".join(mixed)
+                data = _parse(tmp_path, body, name="line.a2l")
+>               _assert_same_section_tree(data["sections"], base["sections"], (str(path), variant))
+
+tests\test_b103_a2l_reader_coverage.py:156:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+left = [{'children': [{'children': [], 'end_line': 13, 'line_numbers': [9, 11], 'lines': ['VERSION "V1.61"', 'PROJECT_NO MCD_.....], 'lines': ['', '', '', '', '', '', ...], ...}], 'end_line': 8169, 'line_numbers': [7, 17], 'lines': ['', ''], ...}]
+right = [{'children': [{'children': [], 'end_line': 7, 'line_numbers': [5, 6], 'lines': ['VERSION "V1.61"', 'PROJECT_NO MCD_P1......], 'lines': ['', '', '', '', '', '', ...], ...}], 'end_line': 4085, 'line_numbers': [4, 9], 'lines': ['', ''], ...}]
+context = ('[USER_HOME]\\Github\\s19_app-b103-g3-base\\examples\\case_00_public\\ASAP2_Demo_V161.a2l', 'crlf')
+
+    def _assert_same_section_tree(left: List[dict], right: List[dict], context: tuple) -> None:
+        """Assert equal section trees and identify any differing scalar field."""
+        assert len(left) == len(right), context
+        for index, (sec, bsec) in enumerate(zip(left, right)):
+            route = context + (index,)
+            differing = {
+                key: (value, bsec.get(key))
+                for key, value in sec.items()
+                if key != "children" and value != bsec.get(key)
+            }
+>           assert not differing, (route, differing)
+E           AssertionError: (('[USER_HOME]\\Github\\s19_app-b103-g3-base\\examples\\case_00_public\\ASAP2_Demo_V161.a2l', 'crlf', 0), {'end_line': (8169, 4085), 'line_numbers': ([7, 17], [4, 9]), 'meta_line': (3, 2), 'start_line': (3, 2)})
+E           assert not {'end_line': (8169, 4085), 'line_numbers': ([7, 17], [4, 9]), 'meta_line': (3, 2), 'start_line': (3, 2)}
+
+tests\test_b103_a2l_reader_coverage.py:127: AssertionError
+___________________ test_cov_read_1_cr_cr_lf_full_equality ____________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_cov_read_1_cr_cr_lf_full_0')
+
+    def test_cov_read_1_cr_cr_lf_full_equality(tmp_path: Path) -> None:
+        """R-A2L-READ.1/4: every tag and error equal the LF reading, and every
+        section line is 2*k-1 of the LF file's line."""
+        text = _body(meas("X", " ECU_ADDRESS 0x1234"))
+        base = _parse(tmp_path, text)
+        data = _parse(tmp_path, text.replace("\n", "\r\r\n"))
+        assert data["errors"] == base["errors"]
+        assert data["tags"] == base["tags"]
+        assert len(data["sections"]) == len(base["sections"])
+        pairs = list(zip(data["sections"], base["sections"]))
+        while pairs:
+            sec, bsec = pairs.pop()
+            assert sec["name"] == bsec["name"] and sec["meta"] == bsec["meta"]
+>           assert sec["start_line"] == 2 * bsec["start_line"] - 1
+E           assert 4 == ((2 * 2) - 1)
+
+tests\test_b103_a2l_reader_coverage.py:174: AssertionError
+_________________ test_r_a2l_read_1_cr_cr_lf_counts_two_ends __________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_a2l_read_1_cr_cr_lf_cou0')
+
+    def test_r_a2l_read_1_cr_cr_lf_counts_two_ends(tmp_path: Path) -> None:
+        """R-A2L-READ.1/4: CR CR LF counts two line ends (RP-A4)."""
+        text = _body(meas("X", " ECU_ADDRESS 0x1234"))
+        data = _parse(tmp_path, text.replace("\n", "\r\r\n"))
+        tag = _tag(data, "X")
+        assert tag["address"] == 0x1234
+        sec = data["sections"][0]
+>       assert sec["start_line"] == 3  # PROJECT's LF line 2 -> 2*2 - 1
+E       assert 4 == 3
+
+tests\test_b103_a2l_reader.py:216: AssertionError
+________________ test_r_tui_042a_3_4_card_keeps_the_full_name _________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_tui_042a_3_4_card_keeps0')
+
+    def test_r_tui_042a_3_4_card_keeps_the_full_name(tmp_path: Path) -> None:
+        """R-TUI-042a.3 case /4: LONGMAP(48) at 118�54 � the card's painted lines
+        hold the 48-character name whole and one line holds the address whole."""
+        async def _check(app, pilot, table):
+            card = _card(app)
+            lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+            joined = "".join(lines)
+            assert longname(48) in joined, (longname(48), joined)
+            assert any(ADDR_STR in ln for ln in lines), lines
+
+>       _explore(tmp_path, page_long(48), (118, 54), _check)
+
+tests\test_b103_inc12_tag_table.py:552:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:278: in _run
+    await result
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+table = A2LTagTable(id='a2l_tags_list')
+
+    async def _check(app, pilot, table):
+        card = _card(app)
+        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(lines)
+>       assert longname(48) in joined, (longname(48), joined)
+E       AssertionError: ('SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END', 'Highlight a tag to inspect its fields.')
+E       assert 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' in 'Highlight a tag to inspect its fields.'
+E        +  where 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' = longname(48)
+
+tests\test_b103_inc12_tag_table.py:549: AssertionError
+____________ test_at_b103_i11_2_commented_old_copy_changes_nothing ____________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_at_b103_i11_2_commented_o0')
+
+    def test_at_b103_i11_2_commented_old_copy_changes_nothing(tmp_path: Path) -> None:
+        """AT-B103-I11-2 (RP-B28) through the app: exactly one A2L Explorer row X
+        at 0x1234, no ``A2L_DUPLICATE_SYMBOL`` issue on the Issues screen, and a
+        Workspace A2L summary that names one tag X at 0x1234 (never 0x9999)."""
+        from textual.widgets import DataTable, Static
+
+        from s19_app.tui.app import S19TuiApp
+        from s19_app.tui.changes.io import emit_s19_from_mem_map
+        from s19_app.tui.issues_view import GroupedIssuesPanel, IssueRow
+
+        from tests.support import b100_projects as projects
+        from tests.support.b100_workers import settle_workers
+        from tests.support.timing import wait_until
+
+        image = tmp_path / "img.s19"
+        image.write_text(
+            emit_s19_from_mem_map({0x1234: 0xAA}, [(0x1234, 0x1235)]),
+            encoding="ascii",
+        )
+        a2l = tmp_path / "rp_b28.a2l"
+        a2l.write_text(
+            _body(
+                "/*\n" + meas("X", " ECU_ADDRESS 0x9999") + "\n*/\n"
+                + meas("X", " ECU_ADDRESS 0x1234")
+            ),
+            encoding="utf-8",
+        )
+
+        def _strip_glyph(cell: str) -> str:
+            for glyph in ("\u2713 ", "\xb7 "):
+                if cell.startswith(glyph):
+                    return cell[len(glyph):]
+            return cell
+
+        def _painted(widget) -> str:
+            rendered = widget.render()
+            return getattr(rendered, "plain", str(rendered))
+
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            # Load the image first, so the later A2L attach runs the real
+            # cross-artifact validation engine (the duplicate-symbol source).
+            app.load_selected_file(image)
+            await wait_until(
+                pilot,
+                lambda: app.current_file is not None
+                and app.current_file.path.name == image.name,
+                f"the image load of {image.name}",
+            )
+            await settle_workers(pilot)
+
+            # Drive the app's actual A2L attach action.
+            app.load_a2l_from_path(a2l)
+            await settle_workers(pilot)
+            await wait_until(
+                pilot,
+                lambda: app.current_a2l_path is not None,
+                "the A2L attach did not land",
+            )
+
+            # A2L Explorer: exactly one row X, at 0x1234.
+            app.action_show_screen("a2l")
+            for _ in range(6):
+                await pilot.pause()
+            table = app.query_one("#a2l_tags_list", DataTable)
+            rows = [table.get_row_at(i) for i in range(table.row_count)]
+            names = [_strip_glyph(str(row[0])) for row in rows]
+            assert names == ["X"], f"expected exactly one X row, got {names!r}"
+            assert str(rows[0][1]) == "0x00001234", (
+                f"expected X at 0x00001234, got {str(rows[0][1])!r}"
+            )
+
+            # Issues screen: no A2L_DUPLICATE_SYMBOL issue for X.
+            app.action_show_screen("issues")
+            for _ in range(6):
+                await pilot.pause()
+            panel = app.query_one("#validation_issues_groups", GroupedIssuesPanel)
+            duplicates = [
+                row.issue.code
+                for row in panel.query(IssueRow)
+                if row.issue.code == "A2L_DUPLICATE_SYMBOL"
+            ]
+            assert duplicates == [], f"unexpected duplicate-symbol issues: {duplicates!r}"
+
+            # Workspace A2L summary reports one tag X at 0x1234, never 0x9999.
+            app.action_show_screen("workspace")
+            for _ in range(6):
+                await pilot.pause()
+            summary = _painted(app.query_one("#a2l_view", Static))
+            assert "A2L Tags:" in summary
+            assert "- MEASUREMENT X: 0x00001234" in summary
+            assert "0x00009999" not in summary
+
+>       projects.run_app(tmp_path / "app", scenario, size=(160, 50))
+
+tests\test_b103_a2l_reader.py:1971:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x000001FD35EE57F0>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        # Load the image first, so the later A2L attach runs the real
+        # cross-artifact validation engine (the duplicate-symbol source).
+        app.load_selected_file(image)
+        await wait_until(
+            pilot,
+            lambda: app.current_file is not None
+            and app.current_file.path.name == image.name,
+            f"the image load of {image.name}",
+        )
+        await settle_workers(pilot)
+
+        # Drive the app's actual A2L attach action.
+        app.load_a2l_from_path(a2l)
+        await settle_workers(pilot)
+        await wait_until(
+            pilot,
+            lambda: app.current_a2l_path is not None,
+            "the A2L attach did not land",
+        )
+
+        # A2L Explorer: exactly one row X, at 0x1234.
+        app.action_show_screen("a2l")
+        for _ in range(6):
+            await pilot.pause()
+        table = app.query_one("#a2l_tags_list", DataTable)
+        rows = [table.get_row_at(i) for i in range(table.row_count)]
+        names = [_strip_glyph(str(row[0])) for row in rows]
+>       assert names == ["X"], f"expected exactly one X row, got {names!r}"
+E       AssertionError: expected exactly one X row, got ['0x00001234']
+E       assert ['0x00001234'] == ['X']
+E
+E         At index 0 diff: '0x00001234' != 'X'
+E         Use -v to get more diff
+
+tests\test_b103_a2l_reader.py:1945: AssertionError
+_____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_tc_b100_50_project_raise_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD353483E0>
+
+    def test_tc_b100_50_project_raise_ends_the_action_first(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """LLR-176.1l (A12-45), re-pinned at Inc 12b (P1-34, census P1-C9: the
+        12a target ``_install_project_image`` is retired): ``_apply_loaded_file``
+        \u2014 the main-thread install \u2014 raising \u2192 one effective end
+        ``("project_load", g, "Loading project P failed")`` with 0 timers left
+        at that end, and the ``RuntimeError`` still surfaces (loud, as the same
+        defect is on the base inside a synchronous load).
+
+        Why: a project load that crashes must not leave the indicator up.
+        Negative control: the install's guard removed \u2192 the run stays open with
+        its timer \u2192 RED."""
+        base = tmp_path / "app"
+        _project_p(base)
+        seam = Seam(monkeypatch)
+        monkeypatch.setattr(S19TuiApp, "_apply_loaded_file", _boom)
+
+        async def start(app, pilot):
+            app._handle_load_project("P")
+
+        surfaced = _worker_raise_scene(tmp_path, seam, start, "project_load")
+        ends = seam.effective("project_load")
+>       assert [e.outcome for e in ends] == ["Loading project P failed"], seam.ends
+E       AssertionError: [namespace(key='project_load', gen=1, outcome="Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p", result=True, timers=0, status="Loaded project 'P' -> firmware.s19")]
+E       assert ['Loaded proj...- details: p'] == ['Loading project P failed']
+E
+E         At index 0 diff: "Loaded project 'P' -> firmware.s19 - variant 1 of 1, 1 problem - details: p" != 'Loading project P failed'
+E         Use -v to get more diff
+
+tests\test_b100_busy.py:1497: AssertionError
+________ test_tc_b100_51_every_baseline_bar_site_maps_to_a_seam_event _________
+
+    def test_tc_b100_51_every_baseline_bar_site_maps_to_a_seam_event() -> None:
+        """LLR-176.2 (A12-28): the 24 baseline ``set_progress`` sites in 12
+        functions each map to one begin, step or end of the action table; the
+        AST of ``app.py`` holds, per function, at least as many seam calls of
+        each (event, key, step) as the baseline sites it replaces (24 in all).
+
+        Why: a site left on the raw bar escapes the indicator's rules (stale
+        100, no end). Negative control: the report step removed \u2192 the census
+        names ``_start_generate_report_worker`` step 2.
+        RED (base, P12a-1): 24 sites, no seam call."""
+        methods = _class_methods(ast.parse(APP_SOURCE.read_text(encoding="utf-8")))
+        missing = []
+        total = 0
+        for function, event, key, step, count in CENSUS:
+            total += count
+            node = methods.get(function)
+            found = 0 if node is None else _seam_events(node).count((event, key, step))
+            if found < count:
+                missing.append((function, event, key, step, f"{found}/{count}"))
+        assert total == 24
+>       assert missing == [], missing
+E       AssertionError: [('load_a2l_from_path', 'begin', 'a2l_load', None, '0/1'), ('_install_attached_a2l', 'end', 'a2l_load', None, '0/1'), ('_start_load_worker', 'end', 'file_load', None, '0/1')]
+E       assert [('load_a2l_f... None, '0/1')] == []
+E
+E         Left contains 3 more items, first extra item: ('load_a2l_from_path', 'begin', 'a2l_load', None, '0/1')
+E         Use -v to get more diff
+
+tests\test_b100_busy.py:1639: AssertionError
+_____ test_tc_b100_51_twelve_b_seam_sites_sit_in_the_workers_and_handlers _____
+
+    def test_tc_b100_51_twelve_b_seam_sites_sit_in_the_workers_and_handlers() -> None:
+        """LLR-176.2, LLR-176.2c, LLR-176.2d re-derived (X-13, X12b-14,
+        C12b-51): an AST walk of ``app.py`` finds each 12b seam call where the
+        design puts it � the three begins in the kickoffs; the project load's
+        steps 2 and 3 posted from the worker step and step 4 in
+        ``_on_project_loaded``; the Save's steps 2, 3, 4 posted from
+        ``_save_project_files``; the A2L parse step posted from the worker and
+        step 3 in ``_on_a2l_attached``; every end in a main-thread handler
+        (success, refusal and failure arms) (17 of 17).
+
+        Why: an end left out of one failure handler leaves a spinner running
+        forever after that failure. Negative control: the end removed from
+        ``_on_a2l_attach_failed`` \u2192 the census names it \u2192 RED; base: none of
+        these functions exist \u2192 RED."""
+        methods = _class_methods(ast.parse(APP_SOURCE.read_text(encoding="utf-8")))
+        missing = []
+        for function, event, key, step in TWELVE_B_SITES:
+            node = methods.get(function)
+            if node is None or (event, key, step) not in _seam_events(node):
+                missing.append((function, event, key, step))
+>       assert missing == [], missing
+E       AssertionError: [('load_a2l_from_path', 'begin', 'a2l_load', None), ('_install_attached_a2l', 'end', 'a2l_load', None)]
+E       assert [('load_a2l_f..._load', None)] == []
+E
+E         Left contains 2 more items, first extra item: ('load_a2l_from_path', 'begin', 'a2l_load', None)
+E         Use -v to get more diff
+
+tests\test_b100_busy.py:2635: AssertionError
+_________________ test_tc_b97_32_patch_help_names_every_label _________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_tc_b97_32_patch_help_name0')
+
+    def test_tc_b97_32_patch_help_names_every_label(tmp_path: Path) -> None:
+        """TC-B97-32 (LLR-148.6, Patch arm, D20): the ``patch`` help body holds one
+        ``label � effect`` line, effect non-empty, for every button, tab chip,
+        input and select label the screen renders over its driven states
+        (Inspector, JSON and Checks tabs; the save-back prompt and the
+        before/after report offered), every key it binds and every glyph of
+        ``PATCH_GLYPHS``. The floor is derived over ``PE_IDS_9C7BEAF`` by the type
+        tuple Button � Input � Select and equals 26; the count of covered control
+        WIDGETS is at least that floor; the one ``Edit JSON`` line names both tabs.
+
+        RED on main (P-21): 6 of 19 labels named. Mutation: a body line without
+        `` � effect``; coverage from one tab only; the ``TextArea`` put back in
+        the tuple (derived 27 \u2260 26).
+        """
+        from textual.widgets import Button, Input as _Input, Select as _Select
+
+        from s19_app.tui import screens_directionb as sdb
+        from tests.b97_fixtures import PE_IDS_9C7BEAF, calib_hotfix, load_change_file, open_patch_editor
+
+        async def _drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(118, 54)) as pilot:
+                panel = await open_patch_editor(app, pilot)
+                screen = app.query_one("#screen_patch")
+                derived = {
+                    i for i in PE_IDS_9C7BEAF
+                    if isinstance(app.query_one(f"#{i}"), (Button, _Input, _Select))
+                }
+                await load_change_file(app, pilot, panel, calib_hotfix(tmp_path))
+                seen = {}
+
+                def harvest():
+                    for widget in screen.query("*"):
+                        if not isinstance(widget, (Button, _Input, _Select)):
+                            continue
+                        if not widget.display or widget.region.width == 0:
+                            continue
+                        if any(not a.display for a in widget.ancestors if hasattr(a, "display")):
+                            continue
+                        seen[widget] = _control_label(screen, widget)
+
+                for tab in PATCH_TABS:
+                    if panel.query(f"#{tab}"):
+                        panel.query_one(f"#{tab}").press()
+                        await settle(pilot, 3)
+                    harvest()
+                if panel.query("#patch_tab_json"):
+                    panel.query_one("#patch_tab_json").press()
+                    await settle(pilot, 2)
+                panel.query_one("#patch_doc_apply_button").press()
+                await settle(pilot, 6)
+                harvest()
+                panel.query_one("#patch_saveback_confirm_button").press()
+                await settle(pilot, 8)
+                harvest()
+                in_panel = {w: label for w, label in seen.items() if panel in w.ancestors}
+                return derived, in_panel, set(seen.values()), window_keys_text(app, "patch")
+
+        derived, in_panel, labels, keys_text = asyncio.run(_drive())
+        from s19_app.tui import screens_directionb as sdb
+
+        lines = _help_lines("patch", keys_text)
+        # Inc-8 (D27): ^z / ^y are lines of the generated keys block, keyed by the
+        # key bar's display (`^z`), no longer the hand-typed `ctrl+z`.
+        keys = {"^z", "^y", "space", "enter", "?"}
+        glyphs = set(getattr(sdb, "PATCH_GLYPHS", {}) or {"(no PATCH_GLYPHS)"})
+        assert len(derived) == 26, sorted(derived)
+        missing = sorted((labels | keys | glyphs) - set(lines))
+>       assert missing == [], f"labels with no `label � effect` line: {missing}"
+E       AssertionError: labels with no `label � effect` line: ['', 'Add list', 'Pick']
+E       assert ['', 'Add list', 'Pick'] == []
+E
+E         Left contains 3 more items, first extra item: ''
+E         Use -v to get more diff
+
+tests\test_b97_chips_help.py:1112: AssertionError
+___________________ test_tc_b100_59_open_project_unchanged ____________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_tc_b100_59_open_project_u0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD3BEFB7D0>
+
+    def test_tc_b100_59_open_project_unchanged(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The open project saved again unchanged \u2192 image and MAC ``keep``,
+        ``project.json`` ``new`` (the seeded project had none);
+        nothing else is written."""
+        plans = _capture_plans(monkeypatch)
+>       before, after = _open_project_session(tmp_path, patch=False)
+
+tests\test_b100_save_image.py:1367:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_save_image.py:1357: in _open_project_session
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_save_image.py:1349: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function _open_project_session.<locals>._drive.<locals>.<lambda> at 0x000001FD3723DB20>
+description = 'the save into the open project', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the save into the open project
+
+tests\test_b100_save_image.py:158: AssertionError
+______ test_at_b97_14_help_chip_opens_a_body_covering_the_screen[patch] _______
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_at_b97_14_help_chip_opens0')
+screen_key = 'patch'
+
+    @pytest.mark.parametrize("screen_key", ["patch", "check_editor", "flow", "flow_execution"])
+    def test_at_b97_14_help_chip_opens_a_body_covering_the_screen(tmp_path: Path, screen_key: str) -> None:
+        """AT-B97-14 (US-138 / HLR-148, black-box): after each screen is driven
+        through its states, its ``?`` chip � clicked, then focused and pressed
+        with ``enter`` � opens the help modal; the modal body, read as painted,
+        parsed into ``label � effect`` lines covers every control label the
+        screen painted over those states (inputs included), with the control
+        guard 26 / 12 / 21 / 6.
+
+        RED on main (P-21): 6/19 � 0/6 � 2/13 � 0/4 covered.
+        """
+        from textual.widgets import Button, Input as _Input, Select as _Select
+
+        from tests.b97_fixtures import fx_project
+        from tests.b97_probes import painted_rows
+
+        screen_ids = {"patch": "screen_patch", "check_editor": "screen_check_editor", "flow": "screen_flow", "flow_execution": "screen_flow_execution"}
+
+        async def _drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await settle(pilot)
+                await fx_project(app)
+                screen = app.query_one(f"#{screen_ids[screen_key]}")
+                labels = {}
+
+                def harvest():
+                    for widget in screen.query("*"):
+                        if not isinstance(widget, (Button, _Input, _Select)):
+                            continue
+                        if not widget.display or widget.region.width == 0:
+                            continue
+                        if any(not a.display for a in widget.ancestors if hasattr(a, "display")):
+                            continue
+                        labels.setdefault(widget, set()).update(_fx_label(screen, widget))
+
+                await _drive_states(app, pilot, screen_key, harvest)
+                bodies = []
+                chip_id = f"window_help_{screen_key}"
+                for how in ("click", "enter"):
+                    chip = app.query_one(f"#{chip_id}")
+                    if how == "click":
+                        await pilot.click(f"#{chip_id}")
+                    else:
+                        chip.focus()
+                        await _poll(pilot, lambda: app.focused is chip and not chip.has_class("-active"), 120)
+                        await pilot.press("enter")
+                    opened = await _poll(pilot, lambda: type(app.screen).__name__ == "WindowHelpScreen", 120)
+                    if opened:
+                        await settle(pilot, 2)
+                        modal_text = "\n".join(
+                            str(w.render()) for w in app.screen.query("Static") if w.display
+                        )
+                        bodies.append(modal_text)
+                        app.screen.dismiss()
+                        await _poll(pilot, lambda: type(app.screen).__name__ != "WindowHelpScreen")
+                return labels, bodies
+
+        labels, bodies = asyncio.run(_drive())
+        assert len(bodies) == 2, "the ? chip opens the help by click and by enter"
+        lines = {}
+        for raw in bodies[0].split("\n"):
+            text = raw.strip()
+            text = text.split(". ", 1)[1] if text[:1].isdigit() and ". " in text else text
+            if " � " in text:
+                label, effect = text.split(" � ", 1)
+                lines[label.strip()] = effect.strip()
+        controls = {label for names in labels.values() for label in names if label}
+        covered = [w for w, names in labels.items() if names and names <= set(lines)]
+        # D20: the guard counts control WIDGETS whose labels the body covers.
+        assert len(covered) >= HELP_GUARD[screen_key], (screen_key, len(covered), sorted(controls))
+        missing = sorted(controls - set(lines))
+>       assert missing == [], f"{screen_key}: painted labels with no help line: {missing}"
+E       AssertionError: patch: painted labels with no help line: ['Add list', 'Pick']
+E       assert ['Add list', 'Pick'] == []
+E
+E         Left contains 2 more items, first extra item: 'Add list'
+E         Use -v to get more diff
+
+tests\test_b97_chips_help.py:2299: AssertionError
+____________ test_load_selected_file_attaches_mac_to_loaded_binary ____________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_load_selected_file_attach0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD34285250>
+
+    def test_load_selected_file_attaches_mac_to_loaded_binary(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+        app = S19TuiApp(base_dir=tmp_path)
+        app.current_file = LoadedFile(
+            path=tmp_path / "base.s19",
+            file_type="s19",
+            mem_map={0x1000: 0x11},
+            row_bases=[0x1000],
+            ranges=[(0x1000, 0x1001)],
+            range_validity=[True],
+            errors=[],
+            a2l_path=None,
+            a2l_data=None,
+        )
+
+        mac_loaded = LoadedFile(
+            path=tmp_path / "tags.mac",
+            file_type="mac",
+            mem_map={0x2000: 0},
+            row_bases=[0x2000],
+            ranges=[],
+            range_validity=[],
+            errors=[],
+            a2l_path=None,
+            a2l_data=None,
+            mac_path=tmp_path / "tags.mac",
+            mac_records=[{"parse_ok": True, "name": "RPM", "address": 0x2000}],
+            mac_diagnostics=[],
+        )
+
+        # Inc 12b census P1-C2: ``_load_mac_file`` takes its A2L inputs explicitly.
+        monkeypatch.setattr(app, "_load_mac_file", lambda path, *args, **kwargs: mac_loaded)
+        monkeypatch.setattr(app, "update_sections", lambda: None)
+        monkeypatch.setattr(app, "update_hex_view", lambda focus_address=None: None)
+        monkeypatch.setattr(app, "update_alt_hex_view", lambda focus_address=None: None)
+        monkeypatch.setattr(app, "update_mac_hex_view", lambda focus_address=None: None)
+        monkeypatch.setattr(app, "update_mac_view", lambda: None)
+        monkeypatch.setattr(app, "update_a2l_view", lambda: None)
+        monkeypatch.setattr(app, "update_project_labels", lambda: None)
+        monkeypatch.setattr(app, "set_file_status", lambda _: None)
+        monkeypatch.setattr(app, "_append_log_line", lambda _: None)
+
+>       app.load_selected_file(tmp_path / "tags.mac")
+
+tests\test_tui_app.py:252:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\tui\app.py:19020: in load_selected_file
+    self._apply_loaded_file(loaded, path, load_started)
+s19_app\tui\app.py:19094: in _apply_loaded_file
+    self._apply_prepared_load(PreparedLoad(loaded=loaded), path, load_started)
+s19_app\tui\app.py:19653: in _apply_prepared_load
+    self._refresh_a2l_dependent_views()
+s19_app\tui\app.py:21342: in _refresh_a2l_dependent_views
+    self.update_memory_map()
+s19_app\tui\app.py:20521: in update_memory_map
+    panel = self.query_one("#memory_map_panel", MemoryMapPanel)
+..\..\anaconda3\Lib\site-packages\textual\dom.py:1482: in query_one
+    base_node = self._get_dom_base()
+..\..\anaconda3\Lib\site-packages\textual\app.py:943: in _get_dom_base
+    return self.default_screen
+..\..\anaconda3\Lib\site-packages\textual\app.py:956: in default_screen
+    return self.screen if self._compose_screen is None else self._compose_screen
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    @property
+    def screen(self) -> Screen[object]:
+        """The current active screen.
+
+        Returns:
+            The currently active (visible) screen.
+
+        Raises:
+            ScreenStackError: If there are no screens on the stack.
+        """
+        try:
+            return self._screen_stack[-1]
+        except KeyError:
+            raise UnknownModeError(f"No known mode {self._current_mode!r}") from None
+        except IndexError:
+>           raise ScreenStackError("No screens on stack") from None
+E           textual.app.ScreenStackError: No screens on stack
+
+..\..\anaconda3\Lib\site-packages\textual\app.py:1641: ScreenStackError
+____________ test_r_tui_042a_7_1_1_name_without_display_identifier ____________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_tui_042a_7_1_1_name_wit0')
+
+    def test_r_tui_042a_7_1_1_name_without_display_identifier(tmp_path: Path) -> None:
+        """R-TUI-042a.7.1 case /1: a hostile name, no DISPLAY_IDENTIFIER, loaded
+        from a real A2L file � the projected name is painted in the card header
+        before the hostile introducers are asserted absent from the screen output."""
+        name, scrubbed = _hostile("SYN", "_END")
+        a2l = _card_measurement(name=name)
+
+        async def _observe(app, pilot, table):
+            await _assert_card_painted_then_safe(app, pilot, scrubbed)
+
+>       _explore_card(tmp_path, a2l, (118, 54), _observe)
+
+tests\test_b103_inc12_tag_table.py:1183:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc12_tag_table.py:1130: in _explore_card
+    projects.run_app(base, _run, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:1128: in _run
+    await scenario(app, pilot, table)
+tests\test_b103_inc12_tag_table.py:1181: in _observe
+    await _assert_card_painted_then_safe(app, pilot, scrubbed)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+projected = 'SYN]0;PWN31m0;xq_END'
+
+    async def _assert_card_painted_then_safe(
+        app, pilot, projected: str, *, scroll: bool = False
+    ) -> None:
+        """Positive-first (R-TUI-042a.7.1): prove ``projected`` � the value's
+        control-free projection � is actually painted (scrolling to the end with an
+        asserted nonzero effective scroll first when it lives below the card's
+        visible rows), then every card text line holds no control character and the
+        screen output holds none of the four hostile introducers."""
+        card = _card(app)
+        if scroll:
+            full = card.render().plain
+            assert "byteorder " in full, full
+            assert "limits " in full, full
+            assert card.max_scroll_y > 0, card.max_scroll_y
+            card.scroll_to(y=card.max_scroll_y, animate=False, force=True, immediate=True)
+            await _settle(pilot, 6)
+            assert card.scroll_y > 0, (card.scroll_y, card.max_scroll_y)
+            screen = _screen_output(app)
+            painted = Text.from_ansi(screen).plain
+            assert projected in painted, (projected, painted)
+            _assert_card_lines_clean(full)
+            _assert_no_introducers(screen)
+            return
+        painted = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(painted)
+>       assert projected in joined, (projected, joined)
+E       AssertionError: ('SYN]0;PWN31m0;xq_END', 'Highlight a tag to inspect its fields.')
+E       assert 'SYN]0;PWN31m0;xq_END' in 'Highlight a tag to inspect its fields.'
+
+tests\test_b103_inc12_tag_table.py:1163: AssertionError
+__________________ test_r_tui_042a_7_1_2_display_identifier ___________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_tui_042a_7_1_2_display_0')
+
+    def test_r_tui_042a_7_1_2_display_identifier(tmp_path: Path) -> None:
+        """R-TUI-042a.7.1 case /2: a hostile DISPLAY_IDENTIFIER word, from a real
+        A2L file."""
+        disp, scrubbed = _hostile("SYN", "_DISP")
+        a2l = _card_measurement(name="SYN_NAME", display_identifier=disp)
+
+        async def _observe(app, pilot, table):
+            await _assert_card_painted_then_safe(app, pilot, scrubbed)
+
+>       _explore_card(tmp_path, a2l, (118, 54), _observe)
+
+tests\test_b103_inc12_tag_table.py:1195:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc12_tag_table.py:1130: in _explore_card
+    projects.run_app(base, _run, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:1128: in _run
+    await scenario(app, pilot, table)
+tests\test_b103_inc12_tag_table.py:1193: in _observe
+    await _assert_card_painted_then_safe(app, pilot, scrubbed)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+projected = 'SYN]0;PWN31m0;xq_DISP'
+
+    async def _assert_card_painted_then_safe(
+        app, pilot, projected: str, *, scroll: bool = False
+    ) -> None:
+        """Positive-first (R-TUI-042a.7.1): prove ``projected`` � the value's
+        control-free projection � is actually painted (scrolling to the end with an
+        asserted nonzero effective scroll first when it lives below the card's
+        visible rows), then every card text line holds no control character and the
+        screen output holds none of the four hostile introducers."""
+        card = _card(app)
+        if scroll:
+            full = card.render().plain
+            assert "byteorder " in full, full
+            assert "limits " in full, full
+            assert card.max_scroll_y > 0, card.max_scroll_y
+            card.scroll_to(y=card.max_scroll_y, animate=False, force=True, immediate=True)
+            await _settle(pilot, 6)
+            assert card.scroll_y > 0, (card.scroll_y, card.max_scroll_y)
+            screen = _screen_output(app)
+            painted = Text.from_ansi(screen).plain
+            assert projected in painted, (projected, painted)
+            _assert_card_lines_clean(full)
+            _assert_no_introducers(screen)
+            return
+        painted = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(painted)
+>       assert projected in joined, (projected, joined)
+E       AssertionError: ('SYN]0;PWN31m0;xq_DISP', 'Highlight a tag to inspect its fields.')
+E       assert 'SYN]0;PWN31m0;xq_DISP' in 'Highlight a tag to inspect its fields.'
+
+tests\test_b103_inc12_tag_table.py:1163: AssertionError
+______________________ test_r_tui_042a_7_1_3_description ______________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_tui_042a_7_1_3_descript0')
+
+    def test_r_tui_042a_7_1_3_description(tmp_path: Path) -> None:
+        """R-TUI-042a.7.1 case /3: a hostile description (the long identifier),
+        from a real A2L file."""
+        desc, scrubbed = _hostile("DESC_", "_END")
+        a2l = _card_measurement(name="SYN_NAME", desc=desc)
+
+        async def _observe(app, pilot, table):
+            await _assert_card_painted_then_safe(app, pilot, scrubbed)
+
+>       _explore_card(tmp_path, a2l, (118, 54), _observe)
+
+tests\test_b103_inc12_tag_table.py:1207:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc12_tag_table.py:1130: in _explore_card
+    projects.run_app(base, _run, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:1128: in _run
+    await scenario(app, pilot, table)
+tests\test_b103_inc12_tag_table.py:1205: in _observe
+    await _assert_card_painted_then_safe(app, pilot, scrubbed)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+projected = 'DESC_]0;PWN31m0;xq_END'
+
+    async def _assert_card_painted_then_safe(
+        app, pilot, projected: str, *, scroll: bool = False
+    ) -> None:
+        """Positive-first (R-TUI-042a.7.1): prove ``projected`` � the value's
+        control-free projection � is actually painted (scrolling to the end with an
+        asserted nonzero effective scroll first when it lives below the card's
+        visible rows), then every card text line holds no control character and the
+        screen output holds none of the four hostile introducers."""
+        card = _card(app)
+        if scroll:
+            full = card.render().plain
+            assert "byteorder " in full, full
+            assert "limits " in full, full
+            assert card.max_scroll_y > 0, card.max_scroll_y
+            card.scroll_to(y=card.max_scroll_y, animate=False, force=True, immediate=True)
+            await _settle(pilot, 6)
+            assert card.scroll_y > 0, (card.scroll_y, card.max_scroll_y)
+            screen = _screen_output(app)
+            painted = Text.from_ansi(screen).plain
+            assert projected in painted, (projected, painted)
+            _assert_card_lines_clean(full)
+            _assert_no_introducers(screen)
+            return
+        painted = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(painted)
+>       assert projected in joined, (projected, joined)
+E       AssertionError: ('DESC_]0;PWN31m0;xq_END', 'Highlight a tag to inspect its fields.')
+E       assert 'DESC_]0;PWN31m0;xq_END' in 'Highlight a tag to inspect its fields.'
+
+tests\test_b103_inc12_tag_table.py:1163: AssertionError
+_________________________ test_r_tui_042a_7_1_4_unit __________________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_tui_042a_7_1_4_unit0')
+
+    def test_r_tui_042a_7_1_4_unit(tmp_path: Path) -> None:
+        """R-TUI-042a.7.1 case /4: a hostile unit (a quoted string), from a real
+        A2L file."""
+        unit, scrubbed = _hostile("m", "_u")
+        a2l = _card_measurement(name="SYN_NAME", unit=unit)
+
+        async def _observe(app, pilot, table):
+            await _assert_card_painted_then_safe(app, pilot, scrubbed)
+
+>       _explore_card(tmp_path, a2l, (118, 54), _observe)
+
+tests\test_b103_inc12_tag_table.py:1219:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc12_tag_table.py:1130: in _explore_card
+    projects.run_app(base, _run, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:1128: in _run
+    await scenario(app, pilot, table)
+tests\test_b103_inc12_tag_table.py:1217: in _observe
+    await _assert_card_painted_then_safe(app, pilot, scrubbed)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+projected = 'm]0;PWN31m0;xq_u'
+
+    async def _assert_card_painted_then_safe(
+        app, pilot, projected: str, *, scroll: bool = False
+    ) -> None:
+        """Positive-first (R-TUI-042a.7.1): prove ``projected`` � the value's
+        control-free projection � is actually painted (scrolling to the end with an
+        asserted nonzero effective scroll first when it lives below the card's
+        visible rows), then every card text line holds no control character and the
+        screen output holds none of the four hostile introducers."""
+        card = _card(app)
+        if scroll:
+            full = card.render().plain
+            assert "byteorder " in full, full
+            assert "limits " in full, full
+            assert card.max_scroll_y > 0, card.max_scroll_y
+            card.scroll_to(y=card.max_scroll_y, animate=False, force=True, immediate=True)
+            await _settle(pilot, 6)
+            assert card.scroll_y > 0, (card.scroll_y, card.max_scroll_y)
+            screen = _screen_output(app)
+            painted = Text.from_ansi(screen).plain
+            assert projected in painted, (projected, painted)
+            _assert_card_lines_clean(full)
+            _assert_no_introducers(screen)
+            return
+        painted = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(painted)
+>       assert projected in joined, (projected, joined)
+E       AssertionError: ('m]0;PWN31m0;xq_u', 'Highlight a tag to inspect its fields.')
+E       assert 'm]0;PWN31m0;xq_u' in 'Highlight a tag to inspect its fields.'
+
+tests\test_b103_inc12_tag_table.py:1163: AssertionError
+_____ test_r_crc_config_001_11_9_deep_value_gives_the_reason_not_a_raise ______
+
+    def test_r_crc_config_001_11_9_deep_value_gives_the_reason_not_a_raise() -> None:
+        """E5 F1: a number field holding a list that the JSON reader still
+        accepts, nested just under its limit, gives the R-CRC-CONFIG-001.11
+        reason � the echo of the value never recurses past the reader.
+
+        The reader's limit depends on the stack depth of the caller, so every
+        depth of a band around it is tried: each one gives exactly one of the two
+        reasons, and the band holds both (the number-field path is reached at
+        its deepest)."""
+        seen = set()
+        for depth in range(800, 1001):
+            parsed, errors = parse_crc_config(_deep_init_text(depth))
+            assert parsed is None, depth
+            assert errors in ([_DEEP_INIT_REASON], [_NESTING_REASON]), (depth, errors)
+            seen.add(errors[0])
+>       assert seen == {_DEEP_INIT_REASON, _NESTING_REASON}, seen
+E       AssertionError: {"CRC config is structurally invalid: field 'init' is not a number: [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[�"}
+E       assert {'CRC config ...[[[[[[[[[[[�'} == {'CRC config ...[[[[[[[[[[[�'}
+E
+E         Extra items in the right set:
+E         'CRC config is not valid JSON: nesting too deep'
+E         Use -v to get more diff
+
+tests\test_b101_crc_model_and_reasons.py:484: AssertionError
+______________________ test_r_tui_042a_7_1_5_conversion _______________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_tui_042a_7_1_5_conversi0')
+
+    def test_r_tui_042a_7_1_5_conversion(tmp_path: Path) -> None:
+        """R-TUI-042a.7.1 case /5: a hostile conversion word (``COMPU_METHOD``),
+        from a real A2L file."""
+        conv, scrubbed = _hostile("CV_", "_END")
+        a2l = _card_measurement(name="SYN_NAME", conversion=conv)
+
+        async def _observe(app, pilot, table):
+            await _assert_card_painted_then_safe(app, pilot, scrubbed)
+
+>       _explore_card(tmp_path, a2l, (118, 54), _observe)
+
+tests\test_b103_inc12_tag_table.py:1231:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc12_tag_table.py:1130: in _explore_card
+    projects.run_app(base, _run, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:1128: in _run
+    await scenario(app, pilot, table)
+tests\test_b103_inc12_tag_table.py:1229: in _observe
+    await _assert_card_painted_then_safe(app, pilot, scrubbed)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+projected = 'CV_]0;PWN31m0;xq_END'
+
+    async def _assert_card_painted_then_safe(
+        app, pilot, projected: str, *, scroll: bool = False
+    ) -> None:
+        """Positive-first (R-TUI-042a.7.1): prove ``projected`` � the value's
+        control-free projection � is actually painted (scrolling to the end with an
+        asserted nonzero effective scroll first when it lives below the card's
+        visible rows), then every card text line holds no control character and the
+        screen output holds none of the four hostile introducers."""
+        card = _card(app)
+        if scroll:
+            full = card.render().plain
+            assert "byteorder " in full, full
+            assert "limits " in full, full
+            assert card.max_scroll_y > 0, card.max_scroll_y
+            card.scroll_to(y=card.max_scroll_y, animate=False, force=True, immediate=True)
+            await _settle(pilot, 6)
+            assert card.scroll_y > 0, (card.scroll_y, card.max_scroll_y)
+            screen = _screen_output(app)
+            painted = Text.from_ansi(screen).plain
+            assert projected in painted, (projected, painted)
+            _assert_card_lines_clean(full)
+            _assert_no_introducers(screen)
+            return
+        painted = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(painted)
+>       assert projected in joined, (projected, joined)
+E       AssertionError: ('CV_]0;PWN31m0;xq_END', 'Highlight a tag to inspect its fields.')
+E       assert 'CV_]0;PWN31m0;xq_END' in 'Highlight a tag to inspect its fields.'
+
+tests\test_b103_inc12_tag_table.py:1163: AssertionError
+________________________ test_r_tui_042a_7_1_6_limits _________________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_tui_042a_7_1_6_limits0')
+
+    def test_r_tui_042a_7_1_6_limits(tmp_path: Path) -> None:
+        """R-TUI-042a.7.1 case /6: a hostile lower-limit word, then a hostile
+        upper-limit word � each loaded from a real A2L file; the limits line sits
+        below the card's 5 visible rows and is scrolled into view, proven painted,
+        before the hostile introducers are asserted absent."""
+        for field in ("lower_limit", "upper_limit"):
+            hostile, scrubbed = _hostile("LIM", "_END")
+            if field == "lower_limit":
+                a2l = _card_characteristic_limits(lower_limit=hostile, upper_limit="100")
+            else:
+                a2l = _card_characteristic_limits(lower_limit="0", upper_limit=hostile)
+
+            async def _observe(app, pilot, table, scrubbed=scrubbed):
+                await _assert_card_painted_then_safe(app, pilot, scrubbed, scroll=True)
+
+>           _explore_card(tmp_path, a2l, (118, 54), _observe)
+
+tests\test_b103_inc12_tag_table.py:1249:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc12_tag_table.py:1130: in _explore_card
+    projects.run_app(base, _run, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:1128: in _run
+    await scenario(app, pilot, table)
+tests\test_b103_inc12_tag_table.py:1247: in _observe
+    await _assert_card_painted_then_safe(app, pilot, scrubbed, scroll=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+projected = 'LIM]0;PWN31m0;xq_END'
+
+    async def _assert_card_painted_then_safe(
+        app, pilot, projected: str, *, scroll: bool = False
+    ) -> None:
+        """Positive-first (R-TUI-042a.7.1): prove ``projected`` � the value's
+        control-free projection � is actually painted (scrolling to the end with an
+        asserted nonzero effective scroll first when it lives below the card's
+        visible rows), then every card text line holds no control character and the
+        screen output holds none of the four hostile introducers."""
+        card = _card(app)
+        if scroll:
+            full = card.render().plain
+>           assert "byteorder " in full, full
+E           AssertionError: Highlight a tag to inspect its fields.
+E           assert 'byteorder ' in 'Highlight a tag to inspect its fields.'
+
+tests\test_b103_inc12_tag_table.py:1149: AssertionError
+__ test_tc718_battery_refused_encode_limbs_named[Drifty-210-limb_fragments3] __
+
+a2l_payload = {'compu_methods_by_name': {'CM_double': {'coeffs': None, 'coeffs_linear': [2.0, 10.0], 'compu_tab_ref': None, 'convers... 'name': 'CT1', ...}}, 'declared_spans': [], 'errors': ['Line 70: MEASUREMENT Drifty declares the sizes 2 and 4'], ...}
+symbol = 'Drifty', value = '210'
+limb_fragments = ('CHG-SYMBOL-VALUE', 'drifts')
+
+    @pytest.mark.parametrize(
+        ("symbol", "value", "limb_fragments"),
+        [
+            # non-numeric value
+            ("Speed", "abc", (CHG_SYMBOL_VALUE, "not a number")),
+            # non-integral raw: 10 / 3 is not representable
+            ("Trippy", "10", (CHG_SYMBOL_VALUE, "not integral")),
+            # raw out of range: (300 - 10) / 2 = 145 > SBYTE max 127
+            ("Gain", "300", (CHG_SYMBOL_VALUE, "outside the SBYTE range")),
+            # length drift: DATA_SIZE 4 vs UWORD size 2
+            ("Drifty", "210", (CHG_SYMBOL_VALUE, "drifts")),
+            # arrays: MATRIX_DIM 2
+            ("Arr", "210", (CHG_SYMBOL_VALUE, "array")),
+            # unsupported conversion: FORM
+            ("FormVal", "210", (CHG_SYMBOL_VALUE, "'FORM'")),
+            # unsupported datatype: FLOAT16_IEEE
+            ("Half", "1", (CHG_SYMBOL_VALUE, "FLOAT16")),
+            # tag without an address
+            ("NoAddr", "210", (CHG_SYMBOL_UNRESOLVED, "without an address")),
+        ],
+    )
+    def test_tc718_battery_refused_encode_limbs_named(
+        a2l_payload: dict, symbol: str, value: str, limb_fragments: tuple[str, ...]
+    ) -> None:
+        """TC-718 (battery arm): every refused encode/value limb names itself in
+        the CHG-SYMBOL-VALUE finding; the add lands 0 entries."""
+        result = resolve_symbol_entry(symbol, value, a2l_payload)
+        assert not result.ok
+        assert result.entry is None
+        issue = result.issues[0]
+>       assert issue.code == limb_fragments[0]
+E       AssertionError: assert 'CHG-SYMBOL-UNRESOLVED' == 'CHG-SYMBOL-VALUE'
+E
+E         - CHG-SYMBOL-VALUE
+E         + CHG-SYMBOL-UNRESOLVED
+
+tests\test_changes_symbol_entries.py:712: AssertionError
+_________________ test_r_tui_042a_7_1_7_name_on_the_name_line _________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_tui_042a_7_1_7_name_on_0')
+
+    def test_r_tui_042a_7_1_7_name_on_the_name_line(tmp_path: Path) -> None:
+        """R-TUI-042a.7.1 case /7: a clean display identifier, a hostile name � the
+        first line shows ``SYN_DISP_C``, the painted Name line and its continuations
+        hold the projected name, and the screen output holds none of the four
+        hostile introducers."""
+        name, scrubbed = _hostile("SYN", "_END")
+        a2l = _card_measurement(name=name, display_identifier="SYN_DISP_C")
+
+        async def _observe(app, pilot, table):
+            card = _card(app)
+            lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+            assert lines and lines[0].startswith("\u2713 SYN_DISP_C"), lines
+            start = next((i for i, ln in enumerate(lines) if ln == "name" or ln.startswith("name ")), None)
+            assert start is not None, lines
+            assert scrubbed in "".join(lines[start:]), (scrubbed, lines[start:])
+            _assert_card_lines_clean(card.render().plain)
+            _assert_no_introducers(_screen_output(app))
+
+>       _explore_card(tmp_path, a2l, (118, 54), _observe)
+
+tests\test_b103_inc12_tag_table.py:1270:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc12_tag_table.py:1130: in _explore_card
+    projects.run_app(base, _run, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:1128: in _run
+    await scenario(app, pilot, table)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+table = A2LTagTable(id='a2l_tags_list')
+
+    async def _observe(app, pilot, table):
+        card = _card(app)
+        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+>       assert lines and lines[0].startswith("\u2713 SYN_DISP_C"), lines
+E       AssertionError: ['Highlight a tag to inspect its fields.']
+E       assert (['Highlight a tag to inspect its fields.'] and False)
+E        +  where False = <built-in method startswith of str object at 0x000001FD3C7CDA20>('\u2713 SYN_DISP_C')
+E        +    where <built-in method startswith of str object at 0x000001FD3C7CDA20> = 'Highlight a tag to inspect its fields.'.startswith
+
+tests\test_b103_inc12_tag_table.py:1263: AssertionError
+_________________ test_r_tui_042a_7_2_1_description_break_run _________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_tui_042a_7_2_1_descript0')
+
+    def test_r_tui_042a_7_2_1_description_break_run(tmp_path: Path) -> None:
+        """R-TUI-042a.7.2 case /1: a long identifier written over two lines, the
+        second starting with a TAB � the painted desc line reads
+        ``desc SYN  desc part two`` and no TAB/LF/CR from the value is painted or
+        sent to the terminal."""
+        a2l = (
+            _CARD_HEAD
+            + '/begin MEASUREMENT SYN_NAME "SYN  desc\n\tpart two"\n'
+            + "  ECU_ADDRESS 0x1000\n"
+            + "  DATA_SIZE 2\n"
+            + "/end MEASUREMENT\n"
+            + _CARD_TAIL
+        )
+
+        async def _observe(app, pilot, table):
+            card = _card(app)
+            lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+            joined = "".join(lines)
+            assert "desc SYN  desc part two" in joined, joined
+            plain = card.render().plain
+            assert "\t" not in plain and "\r" not in plain, repr(plain)
+            _assert_no_introducers(_screen_output(app))
+            assert "\t" not in _screen_output(app)
+
+>       _explore_card(tmp_path, a2l, (118, 54), _observe)
+
+tests\test_b103_inc12_tag_table.py:1297:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc12_tag_table.py:1130: in _explore_card
+    projects.run_app(base, _run, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:1128: in _run
+    await scenario(app, pilot, table)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+table = A2LTagTable(id='a2l_tags_list')
+
+    async def _observe(app, pilot, table):
+        card = _card(app)
+        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(lines)
+>       assert "desc SYN  desc part two" in joined, joined
+E       AssertionError: Highlight a tag to inspect its fields.
+E       assert 'desc SYN  desc part two' in 'Highlight a tag to inspect its fields.'
+
+tests\test_b103_inc12_tag_table.py:1291: AssertionError
+_____ test_r_crc_config_001_11_10_operations_execute_survives_deep_value ______
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_crc_config_001_11_10_op0')
+
+    def test_r_crc_config_001_11_10_operations_execute_survives_deep_value(
+        tmp_path: Path,
+    ) -> None:
+        """E5 F1, through keys: a config whose `init` nests just under the JSON
+        reader's limit is loaded and executed in the Operations dialog. The app
+        stays up and shows the malformed-config reason for every depth tried.
+
+        The reader's limit inside the dialog depends on the handler's stack, so
+        the test searches it by bisection between a depth the reader accepts and
+        one it refuses: the search ends on the first depth the number-field path
+        does not answer, which on the defect is the first depth whose echo
+        raises (the app exits there)."""
+        config_path = tmp_path / "deep.json"
+        field_status = f"{OperationsScreen.NO_CONFIG_TEXT}\n{_DEEP_INIT_REASON}"
+        nesting_status = f"{OperationsScreen.NO_CONFIG_TEXT}\n{_NESTING_REASON}"
+
+        async def _drive() -> dict[int, str]:
+            s19_path = tmp_path / "k.s19"
+            s19_path.write_text(_kat_image_s19(), encoding="utf-8")
+            app = S19TuiApp(base_dir=tmp_path)
+            statuses: dict[int, str] = {}
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _load_file(app, pilot, s19_path)
+                screen = await _open_crc_screen_by_keys(app, pilot)
+                await _focus_by_tab(app, pilot, "operation_config_path")
+                await pilot.press(*config_path.name)
+
+                async def probe(depth: int) -> str:
+                    text = _deep_init_text(depth)
+                    config_path.write_text(text, encoding="utf-8")
+                    await _focus_by_tab(app, pilot, "operation_config_load")
+                    await pilot.press("enter")
+                    await _flush(pilot)
+                    assert screen.query_one("#operation_config", TextArea).text == text
+                    statuses[depth] = await _execute_by_keys(app, pilot, screen)
+                    return statuses[depth]
+
+                low, high = 500, 1000
+                assert await probe(low) == field_status
+                assert await probe(high) == nesting_status
+                while high - low > 1:
+                    middle = (low + high) // 2
+                    if await probe(middle) == field_status:
+                        low = middle
+                    else:
+                        high = middle
+                assert app.is_running
+            return statuses
+
+>       statuses = asyncio.run(_drive())
+
+tests\test_b101_crc_model_and_reasons.py:766:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> dict[int, str]:
+        s19_path = tmp_path / "k.s19"
+        s19_path.write_text(_kat_image_s19(), encoding="utf-8")
+        app = S19TuiApp(base_dir=tmp_path)
+        statuses: dict[int, str] = {}
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen_by_keys(app, pilot)
+            await _focus_by_tab(app, pilot, "operation_config_path")
+            await pilot.press(*config_path.name)
+
+            async def probe(depth: int) -> str:
+                text = _deep_init_text(depth)
+                config_path.write_text(text, encoding="utf-8")
+                await _focus_by_tab(app, pilot, "operation_config_load")
+                await pilot.press("enter")
+                await _flush(pilot)
+                assert screen.query_one("#operation_config", TextArea).text == text
+                statuses[depth] = await _execute_by_keys(app, pilot, screen)
+                return statuses[depth]
+
+            low, high = 500, 1000
+            assert await probe(low) == field_status
+>           assert await probe(high) == nesting_status
+E           AssertionError: assert 'CRC config e...[[[[[[[[[[[[�' == 'CRC config e...ting too deep'
+E
+E             Skipping 41 identical leading characters in diff, use -v to show
+E             - config is not valid JSON: nesting too deep
+E             + config is structurally invalid: field 'init' is not a number: [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[�
+
+tests\test_b101_crc_model_and_reasons.py:756: AssertionError
+____________________ test_r_tui_042a_7_2_2_unit_break_run _____________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_tui_042a_7_2_2_unit_bre0')
+
+    def test_r_tui_042a_7_2_2_unit_break_run(tmp_path: Path) -> None:
+        """R-TUI-042a.7.2 case /2: a unit ``m`` + TAB + TAB + ``s`` � the painted
+        unit line starts ``unit m s`` and no TAB from the value is painted or sent
+        to the terminal."""
+        a2l = _card_measurement(name="SYN_NAME", unit="m\t\ts")
+
+        async def _observe(app, pilot, table):
+            card = _card(app)
+            lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+            joined = "".join(lines)
+            assert "unit m s" in joined, joined
+            assert "\t" not in card.render().plain, repr(card.render().plain)
+            assert "\t" not in _screen_output(app)
+
+>       _explore_card(tmp_path, a2l, (118, 54), _observe)
+
+tests\test_b103_inc12_tag_table.py:1314:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc12_tag_table.py:1130: in _explore_card
+    projects.run_app(base, _run, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:1128: in _run
+    await scenario(app, pilot, table)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+table = A2LTagTable(id='a2l_tags_list')
+
+    async def _observe(app, pilot, table):
+        card = _card(app)
+        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(lines)
+>       assert "unit m s" in joined, joined
+E       AssertionError: Highlight a tag to inspect its fields.
+E       assert 'unit m s' in 'Highlight a tag to inspect its fields.'
+
+tests\test_b103_inc12_tag_table.py:1310: AssertionError
+___________ test_r_tui_042a_8_1_name_line_with_a_display_identifier ___________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_tui_042a_8_1_name_line_0')
+
+    def test_r_tui_042a_8_1_name_line_with_a_display_identifier(tmp_path: Path) -> None:
+        """R-TUI-042a.8 case /1: LONGMAP(48) with ``DISPLAY_IDENTIFIER SYN_DISP_W`` �
+        first line ``\u2713 SYN_DISP_W  0x1C2D3E00``; the painted Name line and its
+        painted continuations hold the full 48-character name (never read from
+        ``card.render().plain``)."""
+        async def _check(app, pilot, table):
+            card = _card(app)
+            lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+            assert lines and lines[0] == f"\u2713 SYN_DISP_W  {ADDR_STR}", lines
+            start = next((i for i, ln in enumerate(lines) if ln == "name" or ln.startswith("name ")), None)
+            assert start is not None, lines
+            assert longname(48) in "".join(lines[start:]), (longname(48), lines[start:])
+
+>       _explore(tmp_path, HEAD + map_block(longname(48), display_identifier="SYN_DISP_W") + TAIL,
+                 (118, 54), _check)
+
+tests\test_b103_inc12_tag_table.py:1330:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:278: in _run
+    await result
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+table = A2LTagTable(id='a2l_tags_list')
+
+    async def _check(app, pilot, table):
+        card = _card(app)
+        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+>       assert lines and lines[0] == f"\u2713 SYN_DISP_W  {ADDR_STR}", lines
+E       AssertionError: ['Highlight a tag to inspect its fields.']
+E       assert (['Highlight a tag to inspect its fields.'] and 'Highlight a ...t its fields.' == '\u2713 SYN_DISP_W  0x1C2D3E00'
+E
+E         - \u2713 SYN_DISP_W  0x1C2D3E00
+E         + Highlight a tag to inspect its fields.)
+
+tests\test_b103_inc12_tag_table.py:1325: AssertionError
+________ test_r_tui_042a_8_2_no_name_line_without_a_display_identifier ________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_r_tui_042a_8_2_no_name_li0')
+
+    def test_r_tui_042a_8_2_no_name_line_without_a_display_identifier(tmp_path: Path) -> None:
+        """R-TUI-042a.8 case /2: LONGMAP(48) with no display identifier � the header
+        holds the name across the wrap, and no line starts with ``name``."""
+        async def _check(app, pilot, table):
+            card = _card(app)
+            lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+            joined = "".join(lines)
+            assert longname(48) in joined, (longname(48), joined)
+            plain = card.render().plain
+            assert not any(ln.startswith("name ") for ln in plain.split("\n")), plain
+
+>       _explore(tmp_path, page_long(48), (118, 54), _check)
+
+tests\test_b103_inc12_tag_table.py:1345:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:278: in _run
+    await result
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+table = A2LTagTable(id='a2l_tags_list')
+
+    async def _check(app, pilot, table):
+        card = _card(app)
+        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(lines)
+>       assert longname(48) in joined, (longname(48), joined)
+E       AssertionError: ('SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END', 'Highlight a tag to inspect its fields.')
+E       assert 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' in 'Highlight a tag to inspect its fields.'
+E        +  where 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END' = longname(48)
+
+tests\test_b103_inc12_tag_table.py:1341: AssertionError
+__________________ test_at_b103_i12_1_no_glued_or_cut_values __________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_at_b103_i12_1_no_glued_or0')
+
+    def test_at_b103_i12_1_no_glued_or_cut_values(tmp_path: Path) -> None:
+        """AT-B103-I12-1: SYNMAP at 220/160/118/100/80; LONGMAP(48) at 118; PAGE64(48)
+        loaded while the Explorer is shown at 80 and 118 � every ``0x�`` run is a
+        declared address, every Length cell a declared length, every Tag cell ends
+        inside the visible width, and the SYNMAP card's first line is
+        ``\u2713 SYN_MAP_W  0x1C2D3E00``."""
+        syn_declared = {ADDR_STR}
+        syn_lengths = {"2266"}
+
+        for width in (220, 160, 118, 100, 80):
+            async def _syn(app, pilot, table):
+                _assert_at_invariants(app, table, syn_declared, syn_lengths)
+                lines = [ln.rstrip() for ln in _painted_lines(_card(app)) if ln.strip()]
+                assert lines and lines[0] == f"\u2713 SYN_MAP_W  {ADDR_STR}", lines
+
+>           _explore(tmp_path, page_syn(), (width, 50), _syn)
+
+tests\test_b103_inc12_tag_table.py:1386:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc12_tag_table.py:280: in _explore
+    projects.run_app(base, _run, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:278: in _run
+    await result
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+table = A2LTagTable(id='a2l_tags_list')
+
+    async def _syn(app, pilot, table):
+        _assert_at_invariants(app, table, syn_declared, syn_lengths)
+        lines = [ln.rstrip() for ln in _painted_lines(_card(app)) if ln.strip()]
+>       assert lines and lines[0] == f"\u2713 SYN_MAP_W  {ADDR_STR}", lines
+E       AssertionError: ['Highlight a tag to inspect its fields.']
+E       assert (['Highlight a tag to inspect its fields.'] and 'Highlight a ...t its fields.' == '\u2713 SYN_MAP_W  0x1C2D3E00'
+E
+E         - \u2713 SYN_MAP_W  0x1C2D3E00
+E         + Highlight a tag to inspect its fields.)
+
+tests\test_b103_inc12_tag_table.py:1384: AssertionError
+_________ test_tc_b100_12_every_window_load_lands_on_its_target[map] __________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_tc_b100_12_every_window_l0')
+window_key = 'map'
+
+    @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
+    def test_tc_b100_12_every_window_load_lands_on_its_target(
+        tmp_path: Path, window_key: str
+    ) -> None:
+        """EVERY window of the registry, not only the four the first pass
+        drove: with the window active, an image load re-homes the focus onto
+        the window's declared target (or the empty-state fallback) with a
+        non-zero region, and ``p`` reaches the Load project dialog. The Map
+        param pins LLR-116.5's landing instead (LED .58 (a)): the focus ends
+        on the auto-selected region row whose start is the panel's resolved
+        selection, and ``p`` reaches the dialog from there. The Diff and Map
+        windows fail this on the pre-fix-pass-1 tree (P-16 itself: the
+        hidden Split / Join table keeps the focus, or an unfocusable
+        container swallows it silently)."""
+
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                # The executed P-16 shape: the load's ``watch_current_file``
+                # steal re-focuses the hidden Split / Join table; the tail must
+                # re-home onto the ACTIVE window's target.
+                await _hide_split_join_window(app, pilot)
+                app.action_show_screen(window_key)
+                await _flush(pilot)
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                if window_key == "map":
+                    # LED .58 (a): on Map the landing is the LLR-116.5
+                    # auto-selected region row, not the declared target; the
+                    # panel stays the declared/empty-state target only.
+                    await _wait_for_map_row_landing(pilot, app)
+                else:
+                    target_id = S19TuiApp._FOCUS_TARGETS[window_key]
+                    await _wait_for_focus_on_target(pilot, app, target_id)
+                await _assert_p_opens_the_project_dialog(app, pilot)
+
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:536:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_focus.py:530: in _drive
+    await _wait_for_map_row_landing(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+
+    async def _wait_for_map_row_landing(pilot, app: S19TuiApp) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on LLR-116.5's auto-selected region row, then
+        assert it stays. The re-home tail may land on the declared target (the
+        panel) first; the panel's selection-follow hook runs AFTER the tail and
+        moves the focus onto the resolved row � the settled state is the only
+        oracle. The timeout names the last painted focus: on the fix-pass-1
+        tree it is `MemoryMapPanel#memory_map_panel` (the re-assertion the
+        reviewer's map arrow probe caught)."""
+        for _ in range(150):
+            if _focus_is_settled_on_map_row(app):
+                await _flush(pilot, 10)
+                assert _focus_is_settled_on_map_row(app), (
+                    "the LLR-116.5 landing must hold through the stays window"
+                )
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            "timed out waiting for the LLR-116.5 landing: the focus on the "
+            "auto-selected region row (region_start = the panel's resolved "
+            f"selection); last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the LLR-116.5 landing: the focus on the auto-selected region row (region_start = the panel's resolved selection); last painted focus: MemoryMapPanel#memory_map_panel, region Region(x=6, y=5, width=72, height=7)
+
+tests\test_b100_focus.py:218: AssertionError
+______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_at_b78_03_the_palette_act0')
+
+    def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
+        tmp_path: Path,
+    ) -> None:
+        """AT-B78-03 (GATE) -- the action set equals the Inc-0 ARTIFACT, not the producer.
+
+        \u26a0\ufe0f **This node was provably INERT before Inc-0 froze the artifact, and the
+        reason is worth carrying.** `CommandBar` is constructed as
+        `CommandBar(self._build_palette_entries())`, so an implementation comparing
+        the rendered palette against `_build_palette_entries()` compares a producer
+        with ITSELF: executed, the predicate stayed GREEN at `36 == 36` with a whole
+        `Binding` removed from `S19TuiApp.BINDINGS`.
+
+        What breaks the circularity is the TEMPORAL FREEZE -- a set captured before
+        the change and read back from disk. So this reads
+        `tests/goldens/batch78/at-b78-03-palette-actions.json` and **never
+        regenerates it**; a run that rebuilds it has restored the tautology.
+        """
+        import json
+
+        from s19_app.tui.command_bar import CommandBar
+
+        frozen = json.loads(
+            Path("tests/goldens/batch78/at-b78-03-palette-actions.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        expected = frozen if isinstance(frozen, list) else frozen.get("actions", frozen)
+
+        async def _drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                bar = app.query_one(CommandBar)
+                await pilot.press("ctrl+k")
+                await pilot.pause()
+                rows = list(bar.query_one("#palette_list").children)
+                return [item.data for item in rows]
+
+        observed = asyncio.run(_drive())
+
+        # Union of both lanes' amendments to the frozen artifact (RC-1 rebase #4):
+        # batch-95 change 4 (LLR-135.6, ruling Q6/7a) hand-appended ONE action �
+        # "open_split_join_export", the palette-first Split / Join / Export screen
+        # entry � so the freeze now carries the 37 Inc-0 rows plus that one
+        # reviewed amendment (a REGENERATION would restore the tautology this
+        # node exists to break). batch-94's two non-digit rail bindings are NOT
+        # in the freeze � each is pinned as a named live-only delta below
+        # (Inc-001's Check Editor `=`; Inc-003's Flow Execution `]`, US-007).
+        assert len(expected) == 38, (
+            f"the frozen artifact must still carry the 37 Inc-0 actions plus the "
+            f"one batch-95 amendment; it has {len(expected)} -- if this fails "
+            f"the artifact was REGENERATED, which restores the tautology"
+        )
+        live_deltas = ["show_screen('check_editor')", "show_screen('flow_execution')"]
+        for added in live_deltas:
+            assert added in observed, (
+                f"a non-digit rail binding must add exactly one palette action "
+                f"({added!r}); observed={observed!r}"
+            )
+        observed_pre_change = [
+            a for a in observed if a not in live_deltas
+        ]
+        assert len(observed_pre_change) == len(observed) - len(live_deltas), (
+            "each live-only delta must appear exactly once (no duplicates)"
+        )
+>       assert observed_pre_change == list(expected), (
+            f"the pre-change palette action set must equal the Inc-0 freeze.\n"
+            f"missing: {sorted(set(expected) - set(observed_pre_change))}\n"
+            f"unexpected: {sorted(set(observed_pre_change) - set(expected))}"
+        )
+E       AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E         missing: []
+E         unexpected: ['a2l_describe_tag', 'confirm_attention']
+E       assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E
+E         At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E         Left contains 2 more items, first extra item: 'open_settings_menu'
+E         Use -v to get more diff
+
+tests\test_tui_commandbar.py:2727: AssertionError
+________________ test_tc_b97_12_hostile_names_render_literally ________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_tc_b97_12_hostile_names_r0')
+
+    def test_tc_b97_12_hostile_names_render_literally(tmp_path: Path) -> None:
+        """TC-B97-12 (LLR-145.5): a markup-laden A2L name and a markup-laden spec
+        file name read literally on the four surfaces � ledger cell, REPORT FIELDS
+        line, JSON tab and spec row � with 0 spans from the payload and 0 control
+        characters painted.
+
+        RED: the mutation renders one surface with ``Text.from_markup``.
+        """
+
+        async def body(app, pilot, panel):
+            patches = app._patches_dir()
+            patches.mkdir(parents=True, exist_ok=True)
+            (patches / f"{HOSTILE_NAME}.chk.json").write_text("{}", encoding="utf-8")
+            app.action_show_screen("workspace")
+            await settle(pilot)
+            app.action_show_screen("check_editor")
+            await settle(pilot, 6)
+            table = panel.query_one("#check_param_table", DataTable)
+            index = panel._visible_params.index(HOSTILE_CONTENT)
+            ledger_cell = table.get_row_at(index)[1]
+            await include(panel, pilot, HOSTILE_CONTENT)
+            lines = need(panel, "#check_fields_lines").render()
+            await show_tab(panel, pilot, "check_tab_json")
+            json_painted = "\n".join(painted_rows(app, panel.query_one("#check_preview")))
+            doc = json_tab(panel)
+            select = panel.query_one("#check_spec_file_select", Select)
+            option = [label for label, _v in select._options if "b97" in str(getattr(label, "plain", label))]
+            return ledger_cell, lines, json_painted, doc, option
+
+        hostile = hostile_a2l(tmp_path)
+>       ledger_cell, lines, json_painted, doc, option = run(tmp_path, (118, 54), body, a2l=hostile)
+
+tests\test_b97_check_editor.py:478:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b97_check_editor.py:65: in run
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b97_check_editor.py:63: in _drive
+    return await body(app, pilot, panel)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+panel = CheckEditorPanel(id='check_editor_panel')
+
+    async def body(app, pilot, panel):
+        patches = app._patches_dir()
+        patches.mkdir(parents=True, exist_ok=True)
+        (patches / f"{HOSTILE_NAME}.chk.json").write_text("{}", encoding="utf-8")
+        app.action_show_screen("workspace")
+        await settle(pilot)
+        app.action_show_screen("check_editor")
+        await settle(pilot, 6)
+        table = panel.query_one("#check_param_table", DataTable)
+>       index = panel._visible_params.index(HOSTILE_CONTENT)
+E       ValueError: 'b97[bold]x[/]y[red]z[link=https://e.invalid]l[/link][@click=app.quit]q\x07' is not in list
+
+tests\test_b97_check_editor.py:466: ValueError
+__ test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install ___
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_tc_b100_53_reset_runs_aft0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD392C03B0>
+
+    def test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """LLR-177.1g, LLR-165.1 (P1-29): a call-order spy over the end of the
+        worker step (``_prepare_project_load``), ``_reset_project_session`` and
+        ``_apply_loaded_file`` \u2192 ``["worker_end", "reset@main", "install",
+        "install"]`` for ``P2``; a ``PermissionError`` forced into
+        ``read_project_manifest`` \u2192 0 resets and the session kept.
+
+        Why: a reset before the worker leaves an empty session when the worker
+        fails (LLR-177.2); a reset after the first install wipes it.
+        Negative control: a reset in ``_handle_load_project`` before the
+        worker \u2192 the failure arm leaves ``current_file is None`` \u2192 RED; the
+        base (no worker step) \u2192 no ``worker_end`` \u2192 RED."""
+        base = tmp_path / "app"
+        trio(W(base) / "P2")
+        trio(W(base) / "PF")
+        events: list = []
+        main_box = [threading.get_ident()]
+
+        def _end(*_a, **_k):
+            events.append("worker_end" if threading.get_ident() != main_box[0] else "worker_end@main")
+
+        def _reset(*_a, **_k):
+            events.append("reset@main" if threading.get_ident() == main_box[0] else "reset@worker")
+
+        Spy(monkeypatch, S19TuiApp, "_prepare_project_load", after=_end)
+        Spy(monkeypatch, S19TuiApp, "_reset_project_session", before=_reset)
+        Spy(monkeypatch, S19TuiApp, "_apply_loaded_file", before=lambda *_a, **_k: events.append("install"))
+        real_manifest = app_module.read_project_manifest
+
+        def _manifest(project_dir, *a, **k):
+            if Path(project_dir).name == "PF":
+                raise PermissionError("synthetic")
+            return real_manifest(project_dir, *a, **k)
+
+        monkeypatch.setattr(app_module, "read_project_manifest", _manifest)
+
+        async def scenario(app, pilot, log):
+            await open_trio_project(app, pilot, "P2")
+            ok = list(events)
+            events.clear()
+            try:
+                app._handle_load_project("PF")
+            except Exception:  # noqa: BLE001 � the base raises in the request frame
+                pass
+            await settle_workers(pilot)
+            return ok, list(events), app.current_project, app.current_file is not None
+
+        ok, failed, project, has_image = run(base, scenario)
+>       assert ok == ["worker_end", "reset@main", "install", "install"], ok
+E       AssertionError: ['worker_end', 'reset@main']
+E       assert ['worker_end', 'reset@main'] == ['worker_end'...l', 'install']
+E
+E         Right contains 2 more items, first extra item: 'install'
+E         Use -v to get more diff
+
+tests\test_b100_workers.py:1420: AssertionError
+______________ test_at_b97_05_hostile_parameter_reads_literally _______________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_at_b97_05_hostile_paramet0')
+
+    def test_at_b97_05_hostile_parameter_reads_literally(tmp_path: Path) -> None:
+        """AT-B97-05 (HLR-145): the engineer filters for the markup-laden parameter
+        of ``hostile.a2l``, includes it, and reads its name literally on the
+        ledger, the full-name line, the REPORT FIELDS card and the JSON tab � no
+        markup error, no styled span from the payload, no control character.
+
+        RED: the mutation renders the ledger cell with ``Text.from_markup``.
+        The filter wait is a real-delay pump-until (batch-102 Inc 3 debounce,
+        E3 ruling 7); on the synchronous base tree it returns at round one.
+        """
+
+        async def body(app, pilot, panel):
+            await pilot.press("equals_sign")
+            await settle(pilot, 4)
+            await _focus_by_tab(app, pilot, "check_param_filter")
+            await pilot.press(*"b97")
+            await _settled_delay(
+                pilot,
+                lambda: panel._visible_params == [HOSTILE_CONTENT],
+                "the filter isolates the hostile parameter",
+            )
+            await pilot.click("#check_param_include_button")
+            await settle(pilot, 3)
+            out = {
+                "ledger": painted_rows(app, panel.query_one("#check_param_table"))[1],
+                "full_name": painted_rows(app, need(panel, "#check_full_name_line"))[0],
+                "fields": "\n".join(painted_rows(app, need(panel, "#check_fields_lines"))),
+            }
+            await pilot.click("#check_tab_json")
+            await settle(pilot, 2)
+            out["json"] = "\n".join(painted_rows(app, panel.query_one("#check_preview")))
+            out["fields_spans"] = need(panel, "#check_fields_lines").render().spans
+            return out
+
+>       out = run(tmp_path, (118, 54), body, a2l=hostile_a2l(tmp_path))
+
+tests\test_b97_check_editor.py:1149:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b97_check_editor.py:65: in run
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b97_check_editor.py:63: in _drive
+    return await body(app, pilot, panel)
+tests\test_b97_check_editor.py:1131: in body
+    await _settled_delay(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_b97_05_hostile_parameter_reads_literally.<locals>.body.<locals>.<lambda> at 0x000001FD360D9DA0>
+description = 'the filter isolates the hostile parameter', attempts = 120
+delay = 0.02
+
+    async def _settled_delay(pilot, predicate, description: str, attempts: int = 120, delay: float = 0.02) -> None:
+        """Bounded REAL-delay pump-until (batch-102 Inc 3, E3 ruling 7): the shared
+        picker's 150 ms filter debounce elapses on the wall clock, so each round
+        carries a real delay; on the synchronous base tree the predicate already
+        holds at round one and no time passes."""
+        for _ in range(attempts):
+            await pilot.pause(delay)
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle: {description}")
+E       AssertionError: did not settle: the filter isolates the hostile parameter
+
+tests\test_b97_check_editor.py:166: AssertionError
+________________________ test_tc080_2_c7_purity_probe _________________________
+
+    def test_tc080_2_c7_purity_probe() -> None:
+        """TC-080.2 � the panel obtains ``mem_map`` from the PARAMETER alone.
+
+        Intent: LLR-080.2 / C-7 / risk R4 � "the card's data need is the exact
+        pressure that produces a ``self.app`` reach". The panel is presentational:
+        0 ``self.app``, 0 service imports. AST-walked over the real class source, so
+        it cannot be satisfied by a comment claiming purity.
+        """
+        source = inspect.getsource(PatchEditorPanel)
+        tree = ast.parse(source.lstrip())
+
+        app_reaches = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Attribute)
+            and node.attr == "app"
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "self"
+        ]
+>       assert app_reaches == [], (
+            f"PatchEditorPanel reaches self.app at {len(app_reaches)} site(s) � "
+            "the card must be fed by parameter, not by reaching for the app"
+        )
+E       AssertionError: PatchEditorPanel reaches self.app at 2 site(s) � the card must be fed by parameter, not by reaching for the app
+E       assert [<ast.Attribu...01FD3C924450>] == []
+E
+E         Left contains 2 more items, first extra item: <ast.Attribute object at 0x000001FD39F2FA90>
+E         Use -v to get more diff
+
+tests\test_tui_patch_card.py:760: AssertionError
+______________ test_tc_b99_29_hostile_set_writes_nothing_outside ______________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_tc_b99_29_hostile_set_wri0')
+
+    def test_tc_b99_29_hostile_set_writes_nothing_outside(tmp_path: Path) -> None:
+        """HLR-160's threshold: every hostile name exports INSIDE its destination
+        under an allowlist name; no byte appears anywhere else."""
+        from s19_app.tui import segment_split_view as ssv
+
+        for index, (raw, _expected) in enumerate(HOSTILE_CASES):
+            home = _home(tmp_path / f"case_{index:02d}")
+            before = _snapshot(tmp_path)
+>           written = ssv.write_split_join_export(
+                _island_map(),
+                [SegRow(raw, "a2l", 0x1000, 8)],
+                mode="split",
+                gap="skip",
+                pad_byte=0,
+                fmt="s19",
+                stem="t",
+                dest_dir=home,
+            )
+
+tests\test_b99_export.py:249:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+mem_map = {4096: 160, 4097: 161, 4098: 162, 4099: 163, ...}
+rows = [SegRow(name='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', kind='a2l', base=4096, size=8)]
+
+    def write_split_join_export(
+        mem_map: Dict[int, int],
+        rows: List[SegRow],
+        *,
+        mode: str,
+        gap: str,
+        pad_byte: int,
+        fmt: str,
+        stem: str,
+        dest_dir: Path,
+        zero_coverage_empty: bool = False,
+        declared_ranges: Optional[Sequence[Tuple[int, int]]] = None,
+        workarea_root: Optional[Path] = None,
+    ) -> List[PlacedExport]:
+        """Write the planned export (LLR-136) � the engine does the bytes.
+
+        Split: one file per row via :func:`segment_ops.fill_range` (``intra_gap``
+        policy inside the file's own span). Join: one ``�stem�_joined.�ext>`` via
+        :func:`segment_ops.join_concat` / :func:`segment_ops.join_fill` � the
+        latter raises :class:`GapConflictError` BEFORE a byte is emitted when a
+        pad would clobber source (the fixed ``on_gap_conflict="abort"`` law), so
+        a refused export writes nothing. S19/HEX ride the shipped mem_map
+        emitters through :func:`segment_ops.emit_image`; BIN is the flat bytes
+        plus the one-line ``.addr`` sidecar (LLR-137.2).
+
+        Every name is built by :func:`build_export_basename` (LLR-160.1) and
+        every file is PLACED � single files through
+        :func:`workspace.place_into_workarea`, a BIN and its ``.addr`` sidecar as
+        one group through :func:`workspace.place_group_into_workarea`
+        (B99-I2a, LLR-160.4): a changed re-export takes the next free ``_<N>``,
+        an identical one is reused, and each returned :class:`PlacedExport`
+        carries the action (``placed.action in {"wrote", "reused"}``) for the
+        status (UX-C11) � the word comes only from the placement's
+        ``PlacementResult`` (LLR-163.6).
+
+        Before any folder or file is created the destination home passes the
+        one shared workspace destination guard ``_guarded_destination`` with
+        ``dest_dir`` UNRESOLVED (LLR-160.2, LLR-171.4 as amended by LED .49) �
+        the work-area root is read off the textual path, so a junction home is
+        refused instead of resolved away � each final path resolves inside it,
+        and a link or reparse point at a final name refuses the whole export. The
+        plan-time pass (LLR-160.5) then checks every path length the bytes will
+        travel � each final name with the worst-case ``_<N>`` suffix the
+        basename cap reserves room for, and each private staging path, which is
+        longer than the final path � against the platform limit, and every
+        final name (sidecars included, case-folded) for collisions. The whole
+        export refuses, naming the colliding segments (sanitised, each raw name
+        through ``safe_text`` clipped to 80) or the refused name, before any
+        byte. When a write still fails part-way the raised
+        :class:`ExportWriteError` reports what already happened, split
+        truthfully between written and reused files.
+
+        ``zero_coverage_empty`` (the UI's LLR-136.6 limb, default off): a split
+        row whose span holds no source bytes exports as the EMPTY image at its
+        base (0-byte BIN + sidecar / header-only S19/HEX) instead of the
+        intra_gap fill's fabricated all-pad run. Off, this function is pure
+        engine composition (LLR-137.3's fill materializes every pad).
+
+        ``declared_ranges`` (LLR-160.3, optional): the loaded image's declared
+        ranges; when given, the bytes come ONLY from those ranges � a MAC-only
+        session's placeholder entries are never data, so its export is
+        header-only. ``None`` keeps the legacy whole-map behaviour (the engine
+        purity contract the shipped tests pin).
+
+        ``workarea_root`` (optional): the explicit work-area root this app's
+        caller passes (B100-I14, security finding SEC-1, LED .50) � threaded to
+        the guard and both placements so "this work area" is THIS app's work
+        area, never one the destination's own text names. ``None`` derives the
+        root from ``dest_dir``'s textual path (the pre-LED-.50 behaviour).
+        """
+        EXPORT_FORMATS = _engine_attr("EXPORT_FORMATS")
+        emit_image = _engine_attr("emit_image")
+        fill_range = _engine_attr("fill_range")
+        join_concat = _engine_attr("join_concat")
+        join_fill = _engine_attr("join_fill")
+        emit_bin_from_mem_map = _engine_attr("emit_bin_from_mem_map")
+        bin_addr_sidecar = _engine_attr("bin_addr_sidecar")
+        if fmt not in EXPORT_FORMATS:
+            raise ValueError(f"fmt must be one of {list(EXPORT_FORMATS)}, got {fmt!r}")
+        dest_dir = Path(dest_dir)
+        if declared_ranges is not None:
+            mem_map = _filter_declared_ranges(mem_map, declared_ranges)
+
+        # --- Phase A: the plan � every final name and every payload BEFORE any
+        # byte is written (LLR-160.5). The engine's abort law still lands here,
+        # before the placement, so a refused export writes nothing.
+        limbs: List[Tuple[str, str, List[Tuple[str, object]]]] = []
+
+        def _plan_limb(
+            raw: str, index: int, planned_map, planned_ranges
+        ) -> Tuple[str, str, List[Tuple[str, object]]]:
+            part = sanitize_export_segment(raw, index)
+            if fmt == "bin":
+                base = build_export_basename(stem, raw, ".addr", index)
+                members = [
+                    (
+                        f"{base}.bin",
+                        emit_bin_from_mem_map(planned_map, planned_ranges),
+                    ),
+                    (
+                        f"{base}.addr",
+                        bin_addr_sidecar(planned_ranges[0][0] if planned_ranges else 0),
+                    ),
+                ]
+                return (raw, part, members)
+            payload = emit_image(planned_map, planned_ranges, fmt)
+            base = build_export_basename(stem, raw, f".{fmt}", index)
+            return (raw, part, [(f"{base}.{fmt}", payload)])
+
+        if mode == "split":
+            for index, r in enumerate(rows):
+                if zero_coverage_empty and not any(
+                    r.base <= a < r.base + r.size for a in mem_map
+                ):
+                    # The UI's LLR-136.6 limb: a confirmed zero-coverage file
+                    # exports AT its base as the empty image � BIN 0 bytes + the
+                    # .addr sidecar, S19/HEX header-only (the emitters' shipped
+                    # semantics) � never a fabricated all-pad run. The default
+                    # False keeps this module pure engine composition (the
+                    # intra_gap fill materializes pads, LLR-137.3).
+                    planned_map, planned_ranges = {}, [(r.base, r.base)]
+                else:
+                    planned_map, planned_ranges = fill_range(
+                        mem_map, r.base, r.base + r.size, pad_byte, intra_gap=gap
+                    )
+                limbs.append(_plan_limb(r.name, index, planned_map, planned_ranges))
+        else:
+            ranges = [
+                (r.base, r.base + r.size) for r in sorted(rows, key=lambda r: r.base)
+            ]
+            if gap == "concat":
+                planned_map, planned_ranges = join_concat(mem_map, ranges)
+            else:
+                planned_map, planned_ranges = join_fill(mem_map, ranges, pad_byte)
+            limbs.append(_plan_limb("joined", 0, planned_map, planned_ranges))
+
+        # --- LLR-160.2 / LLR-171.4 (LED .49, review finding F1; LED .50,
+        # SEC-1): the destination home passes the ONE shared workspace guard
+        # BEFORE any folder or file is created, with dest_dir UNRESOLVED � the
+        # guard reads the work-area root off the textual path (or the explicit
+        # root the caller passes), so a junction home is caught here instead of
+        # being resolved away.  The guard returns the RESOLVED pair; the staging
+        # paths below ride the resolved root, while the placements in Phase B
+        # re-run the guard on the same unresolved dest_dir with the CALLER'S
+        # root kept distinct (review finding R3-1): rebinding the placements'
+        # root to the resolved root made every export refuse when the app's
+        # base folder is itself reached through a junction � the unresolved
+        # destination is not textually under the resolved root, so the guard's
+        # walk climbed past it to the drive root and refused on the base
+        # folder's own junction.
+        home, resolved_root = _guarded_destination(dest_dir, workarea_root)
+
+        # Resolve every final path inside the home; refuse a link or reparse
+        # point already sitting at a final name (sidecars included) � the write
+        # never goes through it.
+        final_names: List[Tuple[str, str, str]] = []  # (raw segment, part, name)
+        for raw, part, members in limbs:
+            for name, _payload in members:
+                if _is_reparse_point(home / name):
+                    raise ExportRefusedError(
+                        f'"{name}" already exists as a link or reparse point � '
+                        "refusing to write through it",
+                        [(raw, part)],
+                    )
+                final_names.append((raw, part, name))
+
+        # --- LLR-160.5: the full-path length pass, then the case-folded
+        # collision pass � each refuses the WHOLE export, naming the refused
+        # name or the colliding segments, BEFORE any byte is written. The
+        # length pass measures every path the bytes will travel: the final
+        # name carrying the worst-case ``_<N>`` suffix the basename cap
+        # reserves room for (the placement seam may claim ``_<N>``), and the
+        # private staging path, which is longer than the final path.
+        # ``_private_stage_dir`` names its per-write directory ``stage-`` plus
+        # the eight random characters ``tempfile.mkdtemp`` appends � the worst
+        # case is measured so a path that only fits unstaged is refused here.
+        stage_worst = (
+            resolved_root
+            / WORKAREA_TEMP
+            / WORKAREA_STAGING_DIRNAME
+            / ("stage-" + "9" * 8)
+        )
+        for raw, part, name in final_names:
+            suffix = Path(name).suffix
+            stem_part = name[: -len(suffix)] if suffix else name
+            worst_name = (
+                f"{stem_part}_{'9' * _EXPORT_SUFFIX_DIGITS}{suffix}"
+                if suffix
+                else f"{name}_{'9' * _EXPORT_SUFFIX_DIGITS}"
+            )
+            full = str(home / worst_name)
+            if len(full) > _MAX_FULL_PATH:
+                raise ExportRefusedError(
+                    f'"{name}" resolves to {len(full)} characters � over the '
+                    f"platform limit of {_MAX_FULL_PATH}",
+                    [(raw, part)],
+                )
+            staged_full = str(stage_worst / worst_name)
+            if len(staged_full) > _MAX_FULL_PATH:
+>               raise ExportRefusedError(
+                    f'"{name}" stages at {len(staged_full)} characters � over '
+                    f"the platform limit of {_MAX_FULL_PATH}",
+                    [(raw, part)],
+                )
+E               s19_app.tui.segment_split_view.ExportRefusedError: "t_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.s19" stages at 263 characters � over the platform limit of 260
+
+s19_app\tui\segment_split_view.py:942: ExportRefusedError
+______________ test_at_b83_08_tree_holds_no_assembled_selectors _______________
+
+    def test_at_b83_08_tree_holds_no_assembled_selectors() -> None:
+        """The premise that makes the detector cheap: no flow tracking is needed.
+
+        Meaningful only because the fixture above proves detection works. If this ever goes
+        red, 'recognise the site' has stopped being sufficient and the design needs revisiting
+        -- which is the point of the guard.
+        """
+        from pathlib import Path
+        from tools.address_census import census
+
+        root = Path(__file__).resolve().parent.parent
+        data = census(root)
+        odd = [s for s in data.sites if s.form.startswith("other:")]
+>       assert not odd, (
+            "address arguments outside {literal, name, fstring} appeared: "
+            + ", ".join(f"{s.file}:{s.line} {s.form}" for s in odd[:10])
+        )
+E       AssertionError: address arguments outside {literal, name, fstring} appeared: tests/test_b103_a2l_refresh.py:218 other:IfExp, tests/test_b103_a2l_refresh.py:282 other:IfExp, tests/test_b103_picker_model.py:94 other:IfExp, tests/test_b103_picker_model.py:185 other:Subscript, tests/test_b103_picker_model.py:196 other:Subscript, tests/test_b103_picker_model.py:190 other:Subscript, tests/test_b103_picker_model.py:636 other:IfExp, tests/test_b103_picker_model.py:703 other:IfExp
+E       assert not [AddressSite(file='tests/test_b103_a2l_refresh.py', line=218, api='query_one', form='other:IfExp', shape=None, interp=...ts/test_b103_picker_model.py', line=190, api='query_one', form='other:Subscript', shape=None, interp=[], note=''), ...]
+
+tests\test_address_census.py:309: AssertionError
+___________ test_at_b100_18_worker_half_case06_project_load_by_keys ___________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_at_b100_18_worker_half_ca0')
+
+    def test_at_b100_18_worker_half_case06_project_load_by_keys(tmp_path: Path) -> None:
+        """AT-B100-18 worker half, HLR-177 (P1-84): the engineer presses ``p``,
+        moves to the ``P6`` row (case_06 image, MAC and 37.7 MB A2L) and
+        presses ``enter`` \u2192 while the load runs, ``#status_text`` shows the
+        progress line and its elapsed time changes at least once; when it ends
+        the status log's last line starts ``Loaded project 'P6' ->
+        firmware.s19 + firmware.mac - variant 1 of 1`` and ``#status_text``
+        reads ``Loaded project 'P6' -> firmware.s19 + firmware.mac``.
+
+        Why: an elapsed time that moves is what tells the engineer the app is
+        working, not frozen. Negative control (P12b-5, executed): the load
+        blocks the loop for 5.81 s \u2192 no progress line is ever sampled \u2192 RED."""
+        base = tmp_path / "app"
+        trio(W(base) / "P6", CASE06)
+        pattern = re.compile(r"^[" + FRAMES + r"] Loading project P6  �  step [1-4]/4 .+  �  (\d\d:\d\d)$")
+
+        async def scenario(app, pilot, log):
+            await ld.open_project_through_dialog(pilot, app, "P6", confirm="enter", wait_closed=False)
+            elapsed = []
+            deadline = time.monotonic() + 300
+            while True:
+                text = status(app)
+                m = pattern.match(text)
+                if m:
+                    elapsed.append(m.group(1))
+                elif elapsed or text.startswith("Loaded project"):
+                    break
+                if time.monotonic() > deadline:
+                    raise AssertionError("the P6 load never ended")
+                await pilot.pause(0.05)
+            await wait(pilot, lambda: status(app).startswith("Loaded project"), "the end of the P6 load", 300)
+            for _ in range(4):
+                await pilot.pause()
+            return elapsed, painted_log(app)[-1], status(app)
+
+>       elapsed, last, final = run(base, scenario)
+
+tests\test_b100_workers.py:2979:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_workers.py:337: in run
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_workers.py:335: in _drive
+    return await scenario(app, pilot, log)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x000001FD3C22C440>
+
+    async def scenario(app, pilot, log):
+        await ld.open_project_through_dialog(pilot, app, "P6", confirm="enter", wait_closed=False)
+        elapsed = []
+        deadline = time.monotonic() + 300
+        while True:
+            text = status(app)
+            m = pattern.match(text)
+            if m:
+                elapsed.append(m.group(1))
+            elif elapsed or text.startswith("Loaded project"):
+                break
+            if time.monotonic() > deadline:
+>               raise AssertionError("the P6 load never ended")
+E               AssertionError: the P6 load never ended
+
+tests\test_b100_workers.py:2972: AssertionError
+__________ test_tc_b100_08_reset_runs_once_before_the_first_install ___________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_tc_b100_08_reset_runs_onc0')
+
+    def test_tc_b100_08_reset_runs_once_before_the_first_install(tmp_path: Path) -> None:
+        """One call per project load, ordered before the first install; P1's
+        two installs (S19 then MAC) both follow it. A load of the SAME project
+        again is a load-over � still exactly one reset."""
+
+        async def _drive() -> list[str]:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            events: list[str] = []
+            original_reset = getattr(app, "_reset_project_session", None)
+            # Inc 7 re-pin (LLR-169.6): the project variant now installs through
+            # ``_install_project_image`` (parse first, then apply), the MAC
+            # through ``load_selected_file``; both apply through
+            # ``_apply_loaded_file``, so that is the install marker.
+            original_apply = app._apply_loaded_file
+
+            def _recording_reset() -> int:
+                events.append("reset")
+                if original_reset is None:
+                    return 0
+                return original_reset()
+
+            def _recording_apply(loaded, path, load_started) -> None:
+                events.append("install")
+                original_apply(loaded, path, load_started)
+
+            app._reset_project_session = _recording_reset
+            app._apply_loaded_file = _recording_apply
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+            return events
+
+        events = asyncio.run(_drive())
+        assert events.count("reset") == 2, events
+        assert events[0] == "reset", events
+>       assert events.index("reset") < events.index("install"), events
+E       ValueError: 'install' is not in list
+
+tests\test_b100_session_reset.py:261: ValueError
+_______________ test_r_shell_keys_3_1_every_action_has_a_reach ________________
+
+tree = {'s19_app/__init__.py': '', 's19_app/cli.py': 'import argparse\nimport logging\nfrom pathlib import Path\nfrom .core i... + 1][0]\n                print(f"  [GAP]  0x{end:08X} - 0x{next_start - 1:08X} ({next_start - end} bytes)")\n\n', ...}
+tree_census = Census(dialogs={'ConfirmQuestionScreen', 'SaveFlowScreen', 'EntryJsonScreen', 'ConfirmDiscardScreen', 'LoadDialog', 'O...n_close_window_help': {'string'}, 'WindowSection.action_show_window_usage_help': {'string'}}, actions_without_reach=[])
+
+    def test_r_shell_keys_3_1_every_action_has_a_reach(tree: Dict[str, str], tree_census: Census) -> None:
+        """R-SHELL-KEYS.3/1: 0 actions without a reach; at least 80 actions censused;
+        the six clipboard overrides reached through the toolkit's bindings. Negative
+        controls (synthetic mutants of the base's shapes): a dead chain (an alias whose
+        only call lies in a function no reached function calls), a lone dead alias, an
+        unbound ``action_copy`` on a class that is not a toolkit widget, and an action
+        whose name is only a widget id and a comparison literal (E3A-R2-1)."""
+        assert len(tree_census.actions) >= 80, len(tree_census.actions)
+        assert tree_census.actions_without_reach == [], tree_census.actions_without_reach
+        clipboard = [
+            f"{cls}.action_{name}"
+            for cls in ("CappedTextArea", "OsClipboardInput")
+            for name in ("cut", "copy", "paste")
+        ]
+        for label in clipboard:
+            assert label in tree_census.actions, f"{label} is not in the census"
+            assert "toolkit" in tree_census.reasons(label), (label, tree_census.reasons(label))
+        # negative controls
+        dead = census_sources(_with(tree, _DEAD_ACTIONS))
+>       assert dead.actions_without_reach == [
+            "PlainCard.action_copy",
+            "_DeadAlone.action_dead_mac_alias",
+            "_DeadChain.action_dead_alias",
+            "_IdOnly.action_find_nxt_probe",
+        ]
+E       AssertionError: assert ['_DeadAlone....nd_nxt_probe'] == ['PlainCard.a...nd_nxt_probe']
+E
+E         At index 0 diff: '_DeadAlone.action_dead_mac_alias' != 'PlainCard.action_copy'
+E         Right contains one more item: '_IdOnly.action_find_nxt_probe'
+E         Use -v to get more diff
+
+tests\test_b101_reach_and_reports_escape.py:565: AssertionError
+______________ test_tc136_post_axis_pass_ordering_and_precedence ______________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_tc136_post_axis_pass_orde0')
+
+    def test_tc136_post_axis_pass_ordering_and_precedence(tmp_path: Path) -> None:
+        """The summer runs AFTER axis_meta is built, and never overrides a non-None length.
+
+        Intent: R2 ordering � ``_inline_axis_counts`` needs the populated
+        ``axis_meta`` (built late in the walk), so a CURVE with NO AXIS_DESCR stays
+        None (nothing to sum) while one WITH an inline axis derives; and an explicit
+        ``LENGTH`` keeps precedence (the ``length is None`` guard).
+        """
+        layout = ["NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 UBYTE", "FNC_VALUES 3 SWORD"]
+        # inline axis present \u2192 derives (1 + 4\xd71 + 4\xd72 = 13)
+        derived = _write_a2l(
+            tmp_path, cname="C_D", char_type="CURVE", deposit="RL_D",
+            layout_lines=layout, axes=[("STD_AXIS", 4)], name="d.a2l",
+        )
+        assert derived["length"] == 13
+        # no AXIS_DESCR \u2192 axis_meta empty \u2192 nothing to sum \u2192 stays None
+        no_axis = _write_a2l(
+            tmp_path, cname="C_NA", char_type="CURVE", deposit="RL_NA",
+            layout_lines=layout, axes=[], name="na.a2l",
+        )
+        assert no_axis["axis_meta"] == []
+        assert no_axis["length"] is None
+        # explicit LENGTH keeps precedence over the summer
+        explicit = _write_a2l(
+            tmp_path, cname="C_L", char_type="CURVE", deposit="RL_L",
+            layout_lines=layout, axes=[("STD_AXIS", 4)],
+            extra_char_lines="      LENGTH 999\n", name="l.a2l",
+        )
+>       assert explicit["length"] == 999
+E       assert None == 999
+
+tests\test_a2l_inline_axis_length.py:313: AssertionError
+_________ test_at_i12_2_rail_keys_and_issue_peek_after_the_aliases_go _________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_at_i12_2_rail_keys_and_is0')
+case08 = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/b101_i12_case080')
+
+    def test_at_i12_2_rail_keys_and_issue_peek_after_the_aliases_go(tmp_path: Path, case08: Path) -> None:
+        """AT-I12-2 (US-I12-1; rows R-SHELL-KEYS.3, R-TUI-021.3, R-ISSUES-HEXPANE-001.1):
+        keys ``2``, ``3``, ``1`` show the A2L Explorer, the MAC View and the Workspace;
+        Enter on the first Issues row whose address lies in the image keeps the Issues
+        window shown and paints that address's hex row in the peek."""
+
+        async def scenario(app, pilot) -> None:
+            image = case08 / "firmware.s19"
+            app.load_selected_file(image)
+            await wait_until(
+                pilot,
+                lambda: app.current_file is not None and app.current_file.path.name == image.name,
+                "the image load did not finish", timeout=LOAD_WAIT_S,
+            )
+            await settle_workers(pilot)
+            app.load_a2l_from_path(case08 / "firmware_issues.a2l")
+            await wait_until(
+                pilot, lambda: app.current_a2l_data is not None, "the A2L load did not finish", timeout=LOAD_WAIT_S
+            )
+            await settle_workers(pilot)
+            await wait_until(
+                pilot, lambda: len(app._validation_issues) > 0, "no validation issues after the loads",
+                timeout=LOAD_WAIT_S,
+            )
+            await settle(pilot)
+            for key, window in (("2", "a2l"), ("3", "mac"), ("1", "workspace")):
+                await pilot.press(key)
+                await settled(
+                    pilot, lambda: app._active_screen_key == window,
+                    f"key {key} shows {window}; shown {app._active_screen_key}", timeout=CLOSE_WAIT_S,
+                )
+            await pilot.press("5")
+            await settled(
+                pilot, lambda: app._active_screen_key == "issues" and bool(list(app.query(IssueRow))),
+                "the Issues window lists rows", timeout=CLOSE_WAIT_S,
+            )
+            mem_map = app.current_file.mem_map
+            rows = [r for r in app.query(IssueRow) if isinstance(r.issue.address, int) and r.issue.address in mem_map]
+            assert rows, "no listed issue has an address inside the image"
+            row = rows[0]
+            address = row.issue.address
+            pane = app.query_one("#issues_hex_pane")
+            before = str(pane.render())
+            wanted = f"{address - address % 16:08X}"
+            assert wanted not in before, before
+            row.focus()
+            await settle(pilot)
+            await pilot.press("enter")
+            await settled(
+                pilot, lambda: wanted in str(pane.render()),
+                f"the peek paints the row {wanted}; it shows {str(pane.render())!r}", timeout=CLOSE_WAIT_S,
+            )
+            assert app._active_screen_key == "issues"
+
+>       _run(tmp_path, scenario)
+
+tests\test_b101_reach_and_reports_escape.py:1131:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b101_reach_and_reports_escape.py:696: in _run
+    asyncio.run(_go())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b101_reach_and_reports_escape.py:694: in _go
+    await scenario(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def scenario(app, pilot) -> None:
+        image = case08 / "firmware.s19"
+        app.load_selected_file(image)
+        await wait_until(
+            pilot,
+            lambda: app.current_file is not None and app.current_file.path.name == image.name,
+            "the image load did not finish", timeout=LOAD_WAIT_S,
+        )
+        await settle_workers(pilot)
+        app.load_a2l_from_path(case08 / "firmware_issues.a2l")
+        await wait_until(
+            pilot, lambda: app.current_a2l_data is not None, "the A2L load did not finish", timeout=LOAD_WAIT_S
+        )
+        await settle_workers(pilot)
+        await wait_until(
+            pilot, lambda: len(app._validation_issues) > 0, "no validation issues after the loads",
+            timeout=LOAD_WAIT_S,
+        )
+        await settle(pilot)
+        for key, window in (("2", "a2l"), ("3", "mac"), ("1", "workspace")):
+            await pilot.press(key)
+            await settled(
+                pilot, lambda: app._active_screen_key == window,
+                f"key {key} shows {window}; shown {app._active_screen_key}", timeout=CLOSE_WAIT_S,
+            )
+        await pilot.press("5")
+        await settled(
+            pilot, lambda: app._active_screen_key == "issues" and bool(list(app.query(IssueRow))),
+            "the Issues window lists rows", timeout=CLOSE_WAIT_S,
+        )
+        mem_map = app.current_file.mem_map
+        rows = [r for r in app.query(IssueRow) if isinstance(r.issue.address, int) and r.issue.address in mem_map]
+>       assert rows, "no listed issue has an address inside the image"
+E       AssertionError: no listed issue has an address inside the image
+E       assert []
+
+tests\test_b101_reach_and_reports_escape.py:1115: AssertionError
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD34AC16D0>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin � the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+
+            return asyncio.run(_drive())
+
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.md'
+E         '20260710T120000Z-diff-report.html'
+E         Use -v to get more diff
+
+tests\test_tui_report_filter_surface.py:775: AssertionError
+____________________________ test_a2l_zero_issues _____________________________
+
+case_dir = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/synth_case0')
+
+    def test_a2l_zero_issues(case_dir: Path) -> None:
+        """A2L parses and validates with zero issues through the app's functions."""
+        s19, mem, _ranges, _overlap, a2l, checks, _mac = _load_clean(case_dir)
+
+>       assert a2l["errors"] == []
+E       AssertionError: assert ['Line 1235: ...and 256', ...] == []
+E
+E         Left contains 60 more items, first extra item: 'Line 1235: CHARACTERISTIC VAL_BLK_0001 declares the sizes 2 and 256'
+E         Use -v to get more diff
+
+tests\test_synth_release_case.py:113: AssertionError
+_________________________ test_addresses_inside_image _________________________
+
+case_dir = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/synth_case0')
+
+    def test_addresses_inside_image(case_dir: Path) -> None:
+        """Every A2L span and every MAC address lies inside the image."""
+        s19, mem, _ranges, _overlap, a2l, _checks, mac = _load_clean(case_dir)
+
+        a2l_names = {t["name"] for t in a2l["tags"]}
+        for tag in a2l["tags"]:
+            addr = tag["address"]
+            assert addr is not None, tag["name"]
+            length = tag["length"]
+>           assert length is not None, tag["name"]
+E           AssertionError: VAL_BLK_0001
+E           assert None is not None
+
+tests\test_synth_release_case.py:169: AssertionError
+__________________________ test_a2l_issues_reported ___________________________
+
+case_dir = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/synth_case0')
+
+    def test_a2l_issues_reported(case_dir: Path) -> None:
+        """Each injected A2L fault is reported by the app's own validators."""
+        _s19, mem, ranges, overlap, _a2l, _checks, mac = _load_clean(case_dir)
+        ia2l = parse_a2l_file(case_dir / "firmware_issues.a2l")
+>       assert ia2l["errors"] == []
+E       AssertionError: assert ['Line 1235: ...and 256', ...] == []
+E
+E         Left contains 60 more items, first extra item: 'Line 1235: CHARACTERISTIC VAL_BLK_0001 declares the sizes 2 and 256'
+E         Use -v to get more diff
+
+tests\test_synth_release_case.py:257: AssertionError
+________________ test_canon_rows_hold_the_obligation_word_once ________________
+
+    def test_canon_rows_hold_the_obligation_word_once() -> None:
+        """R-DOC-CANON.4 -- each sentence holds ``shall`` exactly once.
+
+        Why: one ``shall`` is one obligation is one test case. Two make a row that can be
+        half met; none makes a statement that obliges nothing.
+        """
+        rows = _rows()
+        offenders: List[str] = []
+        for r in rows:
+            n = len(re.findall(r"\bshall\b", r.sentence))
+            if n != 1:
+                offenders.append(f"line {r.line} {r.id}: 'shall' appears {n} times")
+>       _report("R-DOC-CANON.4 the obligation word is not used exactly once", offenders, len(rows))
+
+tests\test_requirements_canon.py:249:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+rule = 'R-DOC-CANON.4 the obligation word is not used exactly once'
+offenders = ["line 1321 R-A2L-DEF.153: 'shall' appears 2 times", "line 3926 R-PICKER-CORRECT.004: 'shall' appears 2 times", "line 3930 R-PICKER-CORRECT.008: 'shall' appears 2 times"]
+checked = 2988
+
+    def _report(rule: str, offenders: List[str], checked: int) -> None:
+        if not offenders:
+            return
+        shown = "\n  ".join(offenders[:SHOWN])
+        more = f"\n  ... and {len(offenders) - SHOWN} more" if len(offenders) > SHOWN else ""
+>       pytest.fail(f"{rule}: {len(offenders)} offending ({checked} checked)\n  {shown}{more}")
+E       Failed: R-DOC-CANON.4 the obligation word is not used exactly once: 3 offending (2988 checked)
+E         line 1321 R-A2L-DEF.153: 'shall' appears 2 times
+E         line 3926 R-PICKER-CORRECT.004: 'shall' appears 2 times
+E         line 3930 R-PICKER-CORRECT.008: 'shall' appears 2 times
+
+tests\test_requirements_canon.py:176: Failed
+__________________ test_at_b99_09_a2l_window_physical_column __________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_at_b99_09_a2l_window_phys0')
+
+    def test_at_b99_09_a2l_window_physical_column(tmp_path: Path) -> None:
+        """AT-B99-09 (US-147): through the shipped Load dialog, the A2L window
+        paints 30.0 for RAT_FUNC_SYM and 4113 for SYM_U16_MSB, ``40.0`` for the
+        sparse-table symbol and ``n/a`` for the undecodable symbol � distinct from
+        the blank cell of the no-bytes symbol � and the describe modal reads
+        ``Scalar value: n/a (rat_func_no_real_root)``: at 118x40 AND 80x24, all
+        from painted screen text (no clipping at either width)."""
+        s19_path, a2l_path = _undecodable_pair(tmp_path)
+        for size in _SIZES:
+>           asyncio.run(_run_at_09(s19_path, a2l_path, size))
+
+tests\test_b99_a2l_encode.py:652:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+s19_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_at_b99_09_a2l_window_phys0/case.s19')
+a2l_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_at_b99_09_a2l_window_phys0/case.a2l')
+size = (80, 24)
+
+    async def _run_at_09(s19_path: Path, a2l_path: Path, size: tuple[int, int]) -> None:
+        app = S19TuiApp(base_dir=s19_path.parent)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            await _load_through_dialog(
+                app, pilot, s19_path, "the S19 image loaded (log names case.s19)"
+            )
+            await _load_through_dialog(
+                app, pilot, a2l_path, "the A2L loaded (log names case.a2l)"
+            )
+            await pilot.press("escape")
+            await pilot.pause()
+            await pilot.press("2")
+            await settled(
+                pilot,
+                lambda: "A2L Explorer" in _screen_text(app),
+                "the A2L screen paints",
+            )
+
+            # The painted arms differ by width; the describe-modal arms (below)
+            # run at BOTH widths. Inc 12 (E2-6): the values are read from the cells
+            # by label, not from the painted row (the padding + new order push the
+            # Physical column past the pane edge at 118�40).
+            if size[0] >= 118:
+                table = app.query_one("#a2l_tags_list", DataTable)
+                raw_column = _column_index(table, "Raw")
+                phys_column = _column_index(table, "Physical")
+
+                def _phys(name: str) -> str:
+                    cells = _row_cells_by_name(app, table, name)
+                    assert cells is not None, f"{name} row not found"
+                    return str(getattr(cells[phys_column], "plain", cells[phys_column]))
+
+                def _raw(name: str) -> str:
+                    cells = _row_cells_by_name(app, table, name)
+                    assert cells is not None, f"{name} row not found"
+                    return str(getattr(cells[raw_column], "plain", cells[raw_column]))
+
+                assert _phys("RAT_FUNC_SYM") == "30.0", _phys("RAT_FUNC_SYM")
+                # IDENTICAL passes the raw int through: "4113" in BOTH the Raw and
+                # the Physical cell
+                assert _raw("SYM_U16_MSB") == "4113", _raw("SYM_U16_MSB")
+                assert _phys("SYM_U16_MSB") == "4113", _phys("SYM_U16_MSB")
+                assert _phys("TAB_INTP_SPARSE_SYM") == "40.0", _phys("TAB_INTP_SPARSE_SYM")
+                assert _phys("NO_ROOT_SYM") == "n/a", _phys("NO_ROOT_SYM")
+                assert _phys("OUTSIDE_SYM") == "", _phys("OUTSIDE_SYM")
+
+            # UX-C8 (modal) at BOTH widths: the values paint through the describe
+            # modal, never a stored table cell. Row order follows the corpus A2L
+            # document order: the injected NO_ROOT_SYM lands after the six corpus
+            # symbols, at row 6.
+            table = app.query_one("#a2l_tags_list", DataTable)
+            table.focus()
+            await pilot.pause()
+            cursor = 0
+            for target, name, expected in (
+                (0, "SYM_U16_MSB", "Scalar value: 4113"),
+                # the modal formats a whole physical tight: "30" (the table cell
+                # shows "30.0"; both paint)
+                (1, "RAT_FUNC_SYM", "Scalar value: 30 "),
+                (6, "NO_ROOT_SYM", "Scalar value: n/a (rat_func_no_real_root)"),
+            ):
+                while cursor < target:
+                    await pilot.press("down")
+                    await pilot.pause()
+                    cursor += 1
+                if size[0] < 118:
+                    # the narrow list paints the selected tag itself
+>                   assert name in _screen_text(app), (
+                        f"{name} does not paint at {size}: {_screen_text(app)!r}"
+                    )
+E                   AssertionError: SYM_U16_MSB does not paint at (80, 24): '                                                                                \\n  \u2b58                             Hex Edit Tool                                   \\n    \u2502                             A2L Explorer                               ?  \\n \u258f\u25eb \u2502                                                                           \\n \u258f\u2261 \u2502\u258a\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u258e\u258a\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u258e \\n \u258f\u25c9 \u2502\u258a                A2L Tags                \u258e\u258a                              \u258e \\n \u258f\u25a4 \u2502\u258a                                        \u258e\u258a  Highlight a tag to inspect  \u258e \\n \u258f! \u2502\u258a \u258a\u2594\u2594\u2594\u2594\u258e\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594\u2594 \u258e\u258a  its fields.                 \u258e \\n \u258f\u270e \u2502\u258a \u258a    \u258e  Field: name         All        \u258e\u258a \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 \u258e \\n \u258f\u2714 \u2502\u258a \u258a\u2581\u2581\u2581\u2581\u258e\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581 \u258e\u258a          Hex Viewer          \u258e \\n \u258f\u23da \u2502\u258a                                        \u258e\u258a                              \u258e \\n \u258f\u2726 \u2502\u258a          \u258f                             \u258e\u258a                              \u258e \\n    \u2502\u258a\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u258e\u258a\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u2581\u258e \\n \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 \\n  Loaded case.s19 (S19 only)                               (none)  |  case.a2l  \\n                                                                                \\n  \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501   0%                                         \\n                                                                                \\n  Loaded case.s19 (S19 only)                                                    \\n  Loaded case.s19                                                               \\n  A2L loaded: case.a2l                                                          \\n  ^k Palette  ^d Density  ^l Load  ^s Save project  x Operations  ? Help        \\n  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend     \\n                                                                                '
+E                   assert 'SYM_U16_MSB' in '                                                                                \\n  \u2b58                             Hex...Page-  d Describe tag  k Legend     \\n                                                                                '
+E                    +  where '                                                                                \\n  \u2b58                             Hex...Page-  d Describe tag  k Legend     \\n                                                                                ' = _screen_text(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}))
+
+tests\test_b99_a2l_encode.py:624: AssertionError
+_____________________________ test_tc081_2_strip ______________________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_tc081_2_strip0')
+
+    def test_tc081_2_strip(tmp_path: Path) -> None:
+        """The strip resolves once, above its buttons, fed by a defaulted parameter.
+
+        Intent (LLR-081.2, C-7): DOM order is asserted because "the strip labels
+        the Undo/Redo row" is a reading-order claim no functional AT can see (the
+        Inc-4 M-5 lesson). The panel is a VIEW: it must not import the service layer
+        nor reach ``self.app``, or the Patch screen stops being testable without a
+        full app.
+
+        The ``_nodes``/``_context`` arm is �2.4-10 � those names shadow Textual
+        ``Widget`` internals and produce a silent mount crash / idle boot deadlock
+        with NO traceback. The literal is BOUND to the class first (the Inc-4 F3
+        fix): a bare ``names & set(dir(Widget))`` check is constant-true and passes
+        without importing anything.
+        """
+
+        async def _drive() -> tuple[int, list[str]]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                strips = list(app.query("#patch_history_strip").results())
+                # batch-94 (the pe_b rework): the strip/controls moved OUT of
+                # ``#patch_win_script`` to the JSON window's docked rows
+                # (siblings of its body, never inside the scrolling body � the
+                # B2 invariant). The walk re-aims at the rework's home; the
+                # intent is unchanged: the strip exists, docked directly ABOVE
+                # the Undo/Redo row it describes, in DOM order.
+                window = app.query_one("#patch_win_json")
+                order = [
+                    child.id
+                    for child in window.children
+                    if child.id in ("patch_history_strip", "patch_history_controls")
+                ]
+                return len(strips), order
+
+        count, order = asyncio.run(_drive())
+
+        assert count == 1, f"the strip must resolve EXACTLY once; got {count} nodes"
+        assert order == ["patch_history_strip", "patch_history_controls"], (
+            "the strip must sit directly ABOVE the Undo/Redo row it describes, as "
+            f"a docked sibling (never inside the scrolling body); DOM order is {order!r}"
+        )
+
+        signature = inspect.signature(PatchEditorPanel.set_undo_redo_enabled)
+        parameter = signature.parameters.get("depths")
+        assert parameter is not None, (
+            "set_undo_redo_enabled must take a `depths` parameter � the strip and "
+            f"the buttons ride ONE seam (LLR-081.3); signature is {signature!r}"
+        )
+        assert parameter.default is None, (
+            "the parameter must be DEFAULTED so no existing caller breaks; its "
+            f"default is {parameter.default!r}"
+        )
+
+        # C-7 purity over the panel's own AST � 0 `self.app`, 0 service imports.
+        # AST, not `"self.app" not in source`: a substring probe matches the phrase
+        # inside this batch's own docstrings and reports on prose, not code (the
+        # Inc-4 finding, three oracles deep).
+        panel_tree = ast.parse(inspect.getsource(PatchEditorPanel))
+        self_app = [
+            node
+            for node in ast.walk(panel_tree)
+            if isinstance(node, ast.Attribute)
+            and node.attr == "app"
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "self"
+        ]
+>       assert not self_app, (
+            "the panel must not reach `self.app` � it is a view widget and its "
+            f"data is threaded in (C-7); found {len(self_app)} access(es)"
+        )
+E       AssertionError: the panel must not reach `self.app` � it is a view widget and its data is threaded in (C-7); found 2 access(es)
+E       assert not [<ast.Attribute object at 0x000001FD37C16D10>, <ast.Attribute object at 0x000001FD37FA5DD0>]
+
+tests\test_tui_patch_history_strip.py:537: AssertionError
+________________________ test_tc078_2_aggregates_param ________________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_tc078_2_aggregates_param0')
+
+    def test_tc078_2_aggregates_param(tmp_path: Path) -> None:
+        """The aggregates arrive as a defaulted parameter and the panel stays pure.
+
+        Intent (LLR-078.2, C-7): the panel is a VIEW � it must not import the
+        service layer nor reach ``self.app`` to fetch its own data, or the Patch
+        screen stops being testable without a full app. The counts are therefore
+        threaded IN (the ``MemoryMapPanel.render_ranges(�, mem_map=�)`` precedent),
+        duck-typed as a ``Mapping`` so no service type is imported.
+
+        The accessor's all-zero return shape is asserted HERE rather than through
+        the strip, because the strip cannot tell an all-zero mapping from ``{}``
+        (M-4, measured): both ``.get(key, 0)`` to 0. LLR-078.2 states the mapping,
+        so the contract needs its own oracle.
+
+        \u26a0 The purity probe walks the AST, NOT ``"self.app" not in source``. My
+        first draft did the substring check and FAILED on correct code � it was
+        matching the word ``self.app`` inside this very batch's docstrings. Three
+        separate oracles in this increment had that bug; a prose-matching probe
+        reports on documentation, not on code.
+        """
+        signature = inspect.signature(PatchEditorPanel.refresh_check_results)
+        parameter = signature.parameters.get("aggregates")
+
+        assert parameter is not None, (
+            "refresh_check_results must take an `aggregates` parameter; its "
+            f"signature is {signature!r}"
+        )
+        assert parameter.default is None, (
+            "the parameter must be DEFAULTED so no existing caller breaks; its "
+            f"default is {parameter.default!r}"
+        )
+
+        # C-7 purity probe over the panel's own AST � 0 `self.app`, 0 service
+        # imports. Scoped by inspect, not pinned line numbers (which drift: this
+        # batch's spec coordinates were ~160 lines stale).
+        panel_tree = ast.parse(inspect.getsource(PatchEditorPanel))
+        self_app = [
+            node
+            for node in ast.walk(panel_tree)
+            if isinstance(node, ast.Attribute)
+            and node.attr == "app"
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "self"
+        ]
+>       assert not self_app, (
+            "the panel must not reach `self.app` � it is a view widget and its "
+            f"data is threaded in (C-7); found {len(self_app)} access(es) at "
+            f"lines {[node.lineno for node in self_app]}"
+        )
+E       AssertionError: the panel must not reach `self.app` � it is a view widget and its data is threaded in (C-7); found 2 access(es) at lines [1020, 1108]
+E       assert not [<ast.Attribute object at 0x000001FD92FBE390>, <ast.Attribute object at 0x000001FD36469A90>]
+
+tests\test_tui_patch_checks_strip.py:567: AssertionError
+___________ test_at_i11_1_clean_demo_issues_without_standard_blocks ___________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_at_i11_1_clean_demo_issue0')
+demo_dir = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/b101_inc11_acceptance_demo0')
+
+    def test_at_i11_1_clean_demo_issues_without_standard_blocks(tmp_path: Path, demo_dir: Path) -> None:
+        """The clean demo's Issues report holds real findings only: one WARNINGS group, no INFO group
+        on any page, no unrecognized-block issue, no note about a triage (base: total=364, 102 INFO)."""
+
+        async def _go() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _load_demo(pilot, app, demo_dir, CLEAN, "demo_clean")
+                await _open_issues(pilot, app)
+                assert _summary(app) == (
+                    "total=262 | errors=0 | warnings=262 | info=0 | filter=all | page 1/7 rows 1-40/262"
+                )
+                strip = _plain(app.query_one("#issues_severity_strip", Static))
+                assert "Errors 0" in strip and "Warnings 262" in strip and "Info 0" in strip, strip
+                assert [i.code for i in app._validation_issues if i.code == UNRECOGNIZED] == []
+                async for n, headers, groups in _pages(pilot, app, 7):
+                    assert headers == ["\u26a0 WARNINGS  (262)"], (n, headers)
+                    codes = {r.issue.code for _, rows in groups for r in rows}
+                    assert UNRECOGNIZED not in codes, (n, codes)
+                    assert "Cambio4" not in _screen_text(app), n
+
+>       asyncio.run(_go())
+
+tests\test_b101_inc11_acceptance.py:246:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _go() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await _load_demo(pilot, app, demo_dir, CLEAN, "demo_clean")
+            await _open_issues(pilot, app)
+>           assert _summary(app) == (
+                "total=262 | errors=0 | warnings=262 | info=0 | filter=all | page 1/7 rows 1-40/262"
+            )
+E           AssertionError: assert 'total=322 | ...rows 1-40/322' == 'total=262 | ...rows 1-40/262'
+E
+E             - total=262 | errors=0 | warnings=262 | info=0 | filter=all | page 1/7 rows 1-40/262
+E             ?        -                                                           ^            -
+E             + total=322 | errors=60 | warnings=262 | info=0 | filter=all | page 1/9 rows 1-40/322
+E             ?       +            +                                                ^           +
+
+tests\test_b101_inc11_acceptance.py:234: AssertionError
+___________________ test_at_i11_2_faulty_demo_errors_first ____________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_at_i11_2_faulty_demo_erro0')
+demo_dir = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/b101_inc11_acceptance_demo1')
+
+    def test_at_i11_2_faulty_demo_errors_first(tmp_path: Path, demo_dir: Path) -> None:
+        """The faulty demo lists its 8 errors on page 1, before the warnings; no later page
+        shows an ERRORS group (base: 5 error rows on page 1, 3 on page 6)."""
+
+        async def _go() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _load_demo(pilot, app, demo_dir, FAULTY, "demo_faulty")
+                await _open_issues(pilot, app)
+                assert _summary(app) == (
+                    "total=285 | errors=8 | warnings=277 | info=0 | filter=all | page 1/8 rows 1-40/285"
+                )
+                async for n, headers, groups in _pages(pilot, app, 8):
+                    if n == 1:
+                        assert headers == ["\u2717 ERRORS  (8)", "\u26a0 WARNINGS  (277)"], headers
+                        assert [len(rows) for _, rows in groups] == [8, 32], [len(r) for _, r in groups]
+                    else:
+                        assert not any("ERRORS" in h for h in headers), (n, headers)
+
+>       asyncio.run(_go())
+
+tests\test_b101_inc11_acceptance.py:268:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _go() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await _load_demo(pilot, app, demo_dir, FAULTY, "demo_faulty")
+            await _open_issues(pilot, app)
+>           assert _summary(app) == (
+                "total=285 | errors=8 | warnings=277 | info=0 | filter=all | page 1/8 rows 1-40/285"
+            )
+E           AssertionError: assert 'total=345 | ...rows 1-40/345' == 'total=285 | ...rows 1-40/285'
+E
+E             - total=285 | errors=8 | warnings=277 | info=0 | filter=all | page 1/8 rows 1-40/285
+E             ?       ^^                                                           ^           ^^
+E             + total=345 | errors=68 | warnings=277 | info=0 | filter=all | page 1/9 rows 1-40/345
+E             ?       ^^           +                                                ^           ^^
+
+tests\test_b101_inc11_acceptance.py:258: AssertionError
+______________________ test_tc094_no_f841_finding_in_a2l ______________________
+
+    def test_tc094_no_f841_finding_in_a2l() -> None:
+        """``ruff --select F841`` reports zero findings on ``a2l.py``.
+
+        Intent: R-A2L-010's numeric threshold is ``0 errors`` (pre-state: 1). This
+        runs ruff over the whole module � so it catches BOTH the removed ``header``
+        store and any accidental new dead store the edit might introduce � and
+        asserts a clean exit. It **skips** (does not fail) when ruff is not
+        importable, so a runtime-only environment (e.g. the CI ``tui-ci`` job, which
+        installs no dev tooling) reports honest non-execution rather than a spurious
+        failure � ruff is exercised in dev / pre-commit where it is installed.
+        """
+        import importlib.util
+
+        import pytest
+
+        if importlib.util.find_spec("ruff") is None:
+            pytest.skip("ruff is not installed in this environment (runtime-only)")
+
+        completed = subprocess.run(
+            [sys.executable, "-m", "ruff", "check", "--select", "F841",
+             str(_REPO_ROOT / "s19_app" / "tui" / "a2l.py")],
+            cwd=_REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+>       assert completed.returncode == 0, (
+            "ruff --select F841 must report zero findings on a2l.py after the "
+            f"dead-store removal; got:\n{completed.stdout}\n{completed.stderr}"
+        )
+E       AssertionError: ruff --select F841 must report zero findings on a2l.py after the dead-store removal; got:
+E         s19_app\tui\a2l.py:674:5: F841 Local variable `n` is assigned to but never used
+E             |
+E         672 |     backslashes immediately before it (E3A-18: ``str.find``, no per-character
+E         673 |     alternation)."""
+E         674 |     n = len(body)
+E             |     ^ F841
+E         675 |     while True:
+E         676 |         j = body.find('"', i)
+E             |
+E             = help: Remove assignment to unused variable `n`
+E
+E         Found 1 error.
+E         No fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).
+E
+E
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['[USER_HOME]\\anaconda3\\python.exe', '-m', 'ruff', 'check', '--select', 'F841', 'C:\\User...n`\n\nFound 1 error.\nNo fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).\n', stderr='').returncode
+
+tests\test_a2l_f841_cleanup.py:63: AssertionError
+____________ test_at094_demo_parse_stable_after_dead_store_removal ____________
+
+    def test_at094_demo_parse_stable_after_dead_store_removal() -> None:
+        """Parsing the demo A2L is unchanged by removing the dead ``header`` local.
+
+        Intent: the deleted line sat between the ``header_meas``/``header_char``
+        binding and their direct use in the tag build. This drives the shipped
+        ``parse_a2l_file`` over the real demo fixture and pins invariants that flow
+        through exactly that neighbourhood � the total tag count, MEASUREMENT header
+        propagation (datatype + derived length), and CHARACTERISTIC parsing. A live
+        line caught by the delete would perturb at least one of these.
+
+        Batch-54 update: the old comment here claimed the demo "should parse only one
+        CHARACTERISTIC" (the pre-batch-54 multi-line-header limitation). That is now
+        FALSE � multi-line header assembly lands all 50 CHARACTERISTICs. The
+        structural counts below (75 tags, 25 MEAS, 50 CHAR) are unchanged; the
+        ``ASAM.C.VIRTUAL.ASCII`` char_type/length pins survive but are now a *genuine*
+        parse (pre-batch-54 they were a ``ASCII /* � */`` comment-token artifact �
+        char_type ASCII by luck, deposit garbage; now deposit resolves correctly).
+        The 1\u219250 delta assertion lives in ``tests/test_a2l_multiline_headers.py``.
+        These remain regression sentinels for the dead-store removal.
+        """
+        data = parse_a2l_file(_DEMO_A2L)
+        tags = data["tags"]
+
+        # Structural sentinel � the walk still emits every tag it did before.
+        assert len(tags) == 75
+
+        measurements = [t for t in tags if t.get("section") == "MEASUREMENT"]
+        characteristics = [t for t in tags if t.get("section") == "CHARACTERISTIC"]
+        assert len(measurements) == 25
+        assert len(characteristics) == 50
+
+        # header_meas propagation intact: MEASUREMENT length derivation still fires.
+        meas_with_length = [t for t in measurements if t.get("length") is not None]
+>       assert len(meas_with_length) == 24
+E       AssertionError: assert 25 == 24
+E        +  where 25 = len([{'access': None, 'address': 80384, 'axis_meta': [], 'bit_org': None, ...}, {'access': None, 'address': 80384, 'axis_m...'axis_meta': [], 'bit_org': None, ...}, {'access': None, 'address': 80384, 'axis_meta': [], 'bit_org': None, ...}, ...])
+
+tests\test_a2l_f841_cleanup.py:107: AssertionError
+_ test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size] _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/base/main/tmp/test_tc_b100_54_a2l_attach_ref0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD20C8FE60>
+gone = 'a2l_size'
+
+    @pytest.mark.parametrize("gone", ["project_folder", "a2l_size"])
+    def test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, gone: str
+    ) -> None:
+        """CR12b-2 / SE5-12b-2 (ruling E5, split by subject): before any busy
+        run begins, ``load_a2l_from_path`` reads the open project's folder
+        (``validate_project_files``) and the A2L's size (``stat``).
+        - ``project_folder``: the open project ``gone`` was removed outside the
+          app -> 1 line ``A2L NOT loaded: project 'gone' could not be read �
+          check that the folder can be opened, then load again.``;
+        - ``a2l_size``: the size ``stat`` raises ``OSError`` -> 1 line ``A2L
+          file not found: <typed>``.
+        Both: nothing raised out of the request, 0 begins, no run left, the app
+        running.
+
+        Why: from the Load dialog or a deferred callback the raise ends the app
+        and the unsaved session is lost; a size read as 0 would skip the
+        over-cap rule. Negative control (81ac4c0): both calls are unguarded ->
+        ``FileNotFoundError`` / ``OSError`` leaves the request -> RED."""
+        base = tmp_path / "app"
+        a2l = tmp_path / "src" / "firmware.a2l"
+        a2l.parent.mkdir(parents=True)
+        shutil.copyfile(CASE01 / "firmware.a2l", a2l)
+        begins = Spy(monkeypatch, S19TuiApp, "_busy_begin_action")
+        if gone == "a2l_size":
+            real_stat = pathlib.Path.stat
+
+            def _stat(self, *args, **kwargs):
+                if sys._getframe(1).f_code.co_name == "load_a2l_from_path":
+                    raise OSError(5, "synthetic size read failure")
+                return real_stat(self, *args, **kwargs)
+
+            monkeypatch.setattr(pathlib.Path, "stat", _stat)
+
+        async def scenario(app, pilot, log):
+            if gone == "project_folder":
+                app.current_project = "gone"
+                app.current_project_dir = app.workarea / "gone"
+            mark = len(log.messages)
+            try:
+                app.load_a2l_from_path(a2l)
+                raised = None
+            except BaseException as exc:  # noqa: BLE001 � the RED shape
+                raised = type(exc).__name__
+            for _ in range(3):
+                await pilot.pause()
+            return raised, log.since(mark), list(app._busy.runs), running(app)
+
+        raised, lines, runs, alive = run(base, scenario)
+        expected = (
+            "A2L NOT loaded: project 'gone' could not be read � check that the folder "
+            "can be opened, then load again."
+            if gone == "project_folder"
+            else f"A2L file not found: {a2l}"
+        )
+        assert raised is None, f"{raised} left load_a2l_from_path"
+>       assert lines == [expected], lines
+E       AssertionError: ['A2L loaded: firmware.a2l']
+E       assert ['A2L loaded: firmware.a2l'] == ['A2L file no...firmware.a2l']
+E
+E         At index 0 diff: 'A2L loaded: firmware.a2l' != 'A2L file not found: [USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\tmp\\test_tc_b100_54_a2l_attach_ref0\\src\\firmware.a2l'
+E         Use -v to get more diff
+
+tests\test_b100_workers.py:3273: AssertionError
+- generated xml file: [USER_HOME]\Github\s19_app-b103-g3-repro-residual\base\main\junit.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_1_crlf_cr_mixed_read_as_lf
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_1_line_end_variants_equal_lf
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_1_cr_cr_lf_full_equality
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_1_cr_cr_lf_counts_two_ends
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_3_4_card_keeps_the_full_name
+FAILED tests/test_b103_a2l_reader.py::test_at_b103_i11_2_commented_old_copy_changes_nothing
+FAILED tests/test_b100_busy.py::test_tc_b100_50_project_raise_ends_the_action_first
+FAILED tests/test_b100_busy.py::test_tc_b100_51_every_baseline_bar_site_maps_to_a_seam_event
+FAILED tests/test_b100_busy.py::test_tc_b100_51_twelve_b_seam_sites_sit_in_the_workers_and_handlers
+FAILED tests/test_b97_chips_help.py::test_tc_b97_32_patch_help_names_every_label
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_open_project_unchanged
+FAILED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[patch]
+FAILED tests/test_tui_app.py::test_load_selected_file_attaches_mac_to_loaded_binary
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_1_name_without_display_identifier
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_2_display_identifier
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_3_description
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_4_unit - Asser...
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_9_deep_value_gives_the_reason_not_a_raise
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_5_conversion
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_6_limits - Ass...
+FAILED tests/test_changes_symbol_entries.py::test_tc718_battery_refused_encode_limbs_named[Drifty-210-limb_fragments3]
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_7_name_on_the_name_line
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_2_1_description_break_run
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_10_operations_execute_survives_deep_value
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_2_2_unit_break_run
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_8_1_name_line_with_a_display_identifier
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_8_2_no_name_line_without_a_display_identifier
+FAILED tests/test_b103_inc12_tag_table.py::test_at_b103_i12_1_no_glued_or_cut_values
+FAILED tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[map]
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_b97_check_editor.py::test_tc_b97_12_hostile_names_render_literally
+FAILED tests/test_b100_workers.py::test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install
+FAILED tests/test_b97_check_editor.py::test_at_b97_05_hostile_parameter_reads_literally
+FAILED tests/test_tui_patch_card.py::test_tc080_2_c7_purity_probe - Assertion...
+FAILED tests/test_b99_export.py::test_tc_b99_29_hostile_set_writes_nothing_outside
+FAILED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+FAILED tests/test_b100_workers.py::test_at_b100_18_worker_half_case06_project_load_by_keys
+FAILED tests/test_b100_session_reset.py::test_tc_b100_08_reset_runs_once_before_the_first_install
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_shell_keys_3_1_every_action_has_a_reach
+FAILED tests/test_a2l_inline_axis_length.py::test_tc136_post_axis_pass_ordering_and_precedence
+FAILED tests/test_b101_reach_and_reports_escape.py::test_at_i12_2_rail_keys_and_issue_peek_after_the_aliases_go
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_synth_release_case.py::test_a2l_zero_issues - AssertionErro...
+FAILED tests/test_synth_release_case.py::test_addresses_inside_image - Assert...
+FAILED tests/test_synth_release_case.py::test_a2l_issues_reported - Assertion...
+FAILED tests/test_requirements_canon.py::test_canon_rows_hold_the_obligation_word_once
+FAILED tests/test_b99_a2l_encode.py::test_at_b99_09_a2l_window_physical_column
+FAILED tests/test_tui_patch_history_strip.py::test_tc081_2_strip - AssertionE...
+FAILED tests/test_tui_patch_checks_strip.py::test_tc078_2_aggregates_param - ...
+FAILED tests/test_b101_inc11_acceptance.py::test_at_i11_1_clean_demo_issues_without_standard_blocks
+FAILED tests/test_b101_inc11_acceptance.py::test_at_i11_2_faulty_demo_errors_first
+FAILED tests/test_a2l_f841_cleanup.py::test_tc094_no_f841_finding_in_a2l - As...
+FAILED tests/test_a2l_f841_cleanup.py::test_at094_demo_parse_stable_after_dead_store_removal
+FAILED tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size]
+================= 54 failed, 52 passed in 1958.56s (0:32:38) ==================

@@ -1,0 +1,293 @@
+{
+  "head": [
+    {
+      "nodeid": "tests/test_b100_document.py::test_tc_b100_29_second_save_of_the_bound_document_writes_nothing",
+      "status": "failure",
+      "message": "assert False",
+      "signature": "tests\\test_b100_document.py:132: AssertionError",
+      "time": "3.508"
+    },
+    {
+      "nodeid": "tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project[size0]",
+      "status": "failure",
+      "message": "AssertionError: click missed #patch_paste_text\nassert False",
+      "signature": "tests\\test_b100_document.py:1992: AssertionError",
+      "time": "13.353"
+    },
+    {
+      "nodeid": "tests/test_b99_bytes_field.py::test_at_b99_12_typed_hex_run_saves_back",
+      "status": "failure",
+      "message": "AssertionError: click missed #patch_entry_add_button\nassert False",
+      "signature": "tests\\test_b99_bytes_field.py:197: AssertionError",
+      "time": "12.355"
+    },
+    {
+      "nodeid": "tests/test_b101_designer_writes.py::test_at_i5_4_save_back_by_keys_then_display",
+      "status": "failure",
+      "message": "AssertionError: timed out waiting for #patch_entry_address_input after key '6'",
+      "signature": "tests\\support\\timing.py:66: AssertionError",
+      "time": "85.373"
+    },
+    {
+      "nodeid": "tests/test_b100_save_image.py::test_tc_b100_59_files_row",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "3.617"
+    },
+    {
+      "nodeid": "tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "380.407"
+    },
+    {
+      "nodeid": "tests/test_b100_save_image.py::test_tc_b100_59_own_a2l_by_name_and_bytes[True]",
+      "status": "failure",
+      "message": "AssertionError: ['busy: Loading firmware.a2l is running — wait for it to finish.', 'A2L loaded: firmware.a2l']\nassert False\n +  where False = any(<generator object test_tc_b100_59_own_a2l_by_name_and_bytes.<locals>.<genexpr> at 0x0000029DAEF2B1D0>)",
+      "signature": "tests\\test_b100_save_image.py:2502: AssertionError",
+      "time": "19.457"
+    },
+    {
+      "nodeid": "tests/test_b103_inc10_mu_survivors.py::test_r_s19_s0header_001_2_6_a_long_written_name_is_cut_to_252_bytes",
+      "status": "failure",
+      "message": "AssertionError: timed out waiting for the save-back status",
+      "signature": "tests\\support\\b103_inc10.py:127: AssertionError",
+      "time": "19.954"
+    },
+    {
+      "nodeid": "tests/test_b101_inplace_views.py::test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table",
+      "status": "failure",
+      "message": "AssertionError: #patch_entry_edit_button is not shown on the screen",
+      "signature": "tests\\support\\timing.py:66: AssertionError",
+      "time": "73.703"
+    },
+    {
+      "nodeid": "tests/test_tui_patch_history_strip.py::test_tc081_1_derived",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "12.597"
+    },
+    {
+      "nodeid": "tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded]",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "7.280"
+    },
+    {
+      "nodeid": "tests/test_b100_save_guards.py::test_at_b100_02_name_refusals_through_the_save_dialog[size1]",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "39.022"
+    },
+    {
+      "nodeid": "tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "48.021"
+    },
+    {
+      "nodeid": "tests/test_b100_project_homes.py::test_tc_b100_32_unload_of_an_a2l_only_session_clears_the_a2l",
+      "status": "failure",
+      "message": "AssertionError: [\"Loaded project 'P' -> (no image) - 0 variants, 0 problems - details: p\"]\nassert ('Unloaded A2L.' in [\"Loaded project 'P' -> (no image) - 0 variants, 0 problems - details: p\"])",
+      "signature": "tests\\test_b100_project_homes.py:2343: AssertionError",
+      "time": "4.891"
+    },
+    {
+      "nodeid": "tests/test_b97_patch_editor.py::test_tc_b97_39_strip_follows_the_highlight",
+      "status": "failure",
+      "message": "AssertionError: (1, '0xeb40', ['#c2c2c2', '#c2c2c2', '#c2c2c2', '#c2c2c2', '#9b9b9b', '#9b9b9b', ...])\nassert False is True\n +  where False = is_teal('#c2c2c2')",
+      "signature": "tests\\test_b97_patch_editor.py:940: AssertionError",
+      "time": "9.967"
+    },
+    {
+      "nodeid": "tests/test_b97_patch_editor.py::test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size0]",
+      "status": "failure",
+      "message": "AssertionError: (('#232323', '#0e0e0e'), '#1b233a')\nassert '#232323' == '#1b233a'\n  \n  - #1b233a\n  + #232323",
+      "signature": "tests\\test_b97_patch_editor.py:1156: AssertionError",
+      "time": "5.598"
+    },
+    {
+      "nodeid": "tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression",
+      "status": "failure",
+      "message": "AssertionError: Apply: line must post\nassert False is True",
+      "signature": "tests\\test_tui_patch_editor_v2.py:2633: AssertionError",
+      "time": "3.192"
+    },
+    {
+      "nodeid": "tests/test_tui_patch_editor_v2.py::test_at_batch41_escape_cancels_changeset_json_popup",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "2.677"
+    },
+    {
+      "nodeid": "tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "3.935"
+    },
+    {
+      "nodeid": "tests/test_tui_patch_card.py::test_at080d_reachable_with_card[size0]",
+      "status": "failure",
+      "message": "AssertionError: @(80, 24): B2 REGRESSION — buttons trapped inside a scrollable body: ['patch_saveback_format_button', 'patch_saveback_width_button', 'patch_saveback_confirm_button', 'patch_saveback_decline_button', 'patch_before_after_button']\nassert ['patch_saveb...after_button'] == []\n  \n  Left contains 5 more items, first extra item: 'patch_saveback_format_button'\n  Use -v to get more diff",
+      "signature": "tests\\test_tui_patch_card.py:566: AssertionError",
+      "time": "7.038"
+    },
+    {
+      "nodeid": "tests/test_b99_bytes_field.py::test_tc_b99_33_field_and_help_state_the_hex_rule",
+      "status": "failure",
+      "message": "AssertionError: placeholder 'hex bytes, e.g. DE AD BE EF' (27 chars) clips the compact input at width 118 (inner 0)\nassert 27 <= 0\n +  where 27 = len('hex bytes, e.g. DE AD BE EF')",
+      "signature": "tests\\test_b99_bytes_field.py:99: AssertionError",
+      "time": "3.018"
+    }
+  ],
+  "base": [
+    {
+      "nodeid": "tests/test_b100_document.py::test_tc_b100_29_second_save_of_the_bound_document_writes_nothing",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "9.931"
+    },
+    {
+      "nodeid": "tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project[size0]",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "19.911"
+    },
+    {
+      "nodeid": "tests/test_b99_bytes_field.py::test_at_b99_12_typed_hex_run_saves_back",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "13.196"
+    },
+    {
+      "nodeid": "tests/test_b101_designer_writes.py::test_at_i5_4_save_back_by_keys_then_display",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "101.467"
+    },
+    {
+      "nodeid": "tests/test_b100_save_image.py::test_tc_b100_59_files_row",
+      "status": "failure",
+      "message": "AssertionError: timed out waiting for the save",
+      "signature": "tests\\test_b100_save_image.py:158: AssertionError",
+      "time": "21.214"
+    },
+    {
+      "nodeid": "tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "368.227"
+    },
+    {
+      "nodeid": "tests/test_b100_save_image.py::test_tc_b100_59_own_a2l_by_name_and_bytes[True]",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "2.219"
+    },
+    {
+      "nodeid": "tests/test_b101_inplace_views.py::test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "21.654"
+    },
+    {
+      "nodeid": "tests/test_tui_patch_history_strip.py::test_tc081_1_derived",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "10.341"
+    },
+    {
+      "nodeid": "tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded]",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "6.623"
+    },
+    {
+      "nodeid": "tests/test_b100_save_guards.py::test_at_b100_02_name_refusals_through_the_save_dialog[size1]",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "38.875"
+    },
+    {
+      "nodeid": "tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "45.156"
+    },
+    {
+      "nodeid": "tests/test_b100_project_homes.py::test_tc_b100_32_unload_of_an_a2l_only_session_clears_the_a2l",
+      "status": "failure",
+      "message": "AssertionError: []\nassert ('Unloaded A2L.' in [])",
+      "signature": "tests\\test_b100_project_homes.py:2343: AssertionError",
+      "time": "4.914"
+    },
+    {
+      "nodeid": "tests/test_b97_patch_editor.py::test_tc_b97_39_strip_follows_the_highlight",
+      "status": "failure",
+      "message": "AssertionError: (1, '0xeb40', ['#c2c2c2', '#c2c2c2', '#c2c2c2', '#c2c2c2', '#9b9b9b', '#9b9b9b', ...])\nassert False is True\n +  where False = is_teal('#c2c2c2')",
+      "signature": "tests\\test_b97_patch_editor.py:866: AssertionError",
+      "time": "7.502"
+    },
+    {
+      "nodeid": "tests/test_b97_patch_editor.py::test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size0]",
+      "status": "failure",
+      "message": "AssertionError: (('#232323', '#0e0e0e'), '#1b233a')\nassert '#232323' == '#1b233a'\n  \n  - #1b233a\n  + #232323",
+      "signature": "tests\\test_b97_patch_editor.py:1066: AssertionError",
+      "time": "4.881"
+    },
+    {
+      "nodeid": "tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "3.201"
+    },
+    {
+      "nodeid": "tests/test_tui_patch_editor_v2.py::test_at_batch41_escape_cancels_changeset_json_popup",
+      "status": "failure",
+      "message": "textual.css.query.NoMatches: No nodes match '#changeset_json_text' on ChangeSetJsonScreen()",
+      "signature": "..\\..\\anaconda3\\Lib\\site-packages\\textual\\dom.py:1505: NoMatches",
+      "time": "3.096"
+    },
+    {
+      "nodeid": "tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "4.515"
+    },
+    {
+      "nodeid": "tests/test_tui_patch_card.py::test_at080d_reachable_with_card[size0]",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "7.548"
+    },
+    {
+      "nodeid": "tests/test_b99_bytes_field.py::test_tc_b99_33_field_and_help_state_the_hex_rule",
+      "status": "passed",
+      "message": "",
+      "signature": "",
+      "time": "3.823"
+    }
+  ]
+}

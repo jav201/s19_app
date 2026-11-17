@@ -1,0 +1,330 @@
+{
+  "counts": {
+    "main": {
+      "absent": 11,
+      "contexto_head_serial_pass": 8,
+      "heredado_firma_distinta": 25,
+      "heredado_misma_firma": 27,
+      "regresion_base_pass_head_fail": 46
+    },
+    "serial": {
+      "absent": 19,
+      "contexto_head_serial_pass": 14,
+      "heredado_misma_firma": 20,
+      "regresion_base_pass_head_fail": 2
+    },
+    "total": {
+      "absent": 30,
+      "contexto_head_serial_pass": 22,
+      "heredado_firma_distinta": 25,
+      "heredado_misma_firma": 47,
+      "regresion_base_pass_head_fail": 48
+    }
+  },
+  "regressions": [
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_document.py::test_tc_b100_29_forced_write_failure_saves_without_the_document",
+      "head_signature": "tests\\test_b100_document.py:132: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project[size1]",
+      "head_signature": "tests\\test_b100_document.py:1992: AssertionError",
+      "head_message": "AssertionError: click missed #patch_paste_text\nassert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b103_clipboard_core.py::test_r_tui_044_1_18_every_single_line_box_is_os_clipboard_input",
+      "head_signature": "tests\\test_b103_clipboard_core.py:1719: AssertionError",
+      "head_message": "AssertionError: {'CappedTextArea': 7, 'Input': 0, 'JsonHighlightTextArea': 1, 'OsClipboardInput': 42, ...}\nassert 42 == 41"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b103_clipboard_core.py::test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes",
+      "head_signature": "tests\\test_b103_clipboard_core.py:1733: AssertionError",
+      "head_message": "AssertionError: {'CappedTextArea': 7, 'Input': 0, 'JsonHighlightTextArea': 1, 'OsClipboardInput': 42, ...}\nassert 42 == 41"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_save_image.py::test_tc_b100_70_refused_save_keeps_the_flag",
+      "head_signature": "tests\\test_b100_save_image.py:1835: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_save_image.py::test_tc_b100_70_written_document_clears_the_flag",
+      "head_signature": "tests\\test_b100_save_image.py:1835: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_save_image.py::test_tc_b100_70_failed_document_write_keeps_the_flag",
+      "head_signature": "tests\\test_b100_save_image.py:1835: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_save_image.py::test_tc_b100_70_file_backed_document_from_outside_keeps_the_flag",
+      "head_signature": "tests\\test_b100_save_image.py:1835: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_save_image.py::test_tc_b100_70_natural_path_load_edit_save_keeps_the_flag",
+      "head_signature": "tests\\test_b100_save_image.py:1835: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size0]",
+      "head_signature": "tests\\test_b100_save_image.py:1835: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size1]",
+      "head_signature": "tests\\test_b100_save_image.py:1835: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_load_question.py::test_tc_b100_44_project_load_asks_iff_a_flag_is_set",
+      "head_signature": "tests\\test_b100_load_question.py:683: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses",
+      "head_signature": "tests\\test_suite_hygiene.py:2053: AssertionError",
+      "head_message": "AssertionError: unredacted batch records or evidence:\n  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]  evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]  inc-10/04-validation.md: pytest temp folder of an account: pytest-of-j\n  inc-8b/04-validation.md: posix home path outside the runner image: [HOME]  inc-8b/evidence/e5/runs/out-green/law-suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-8b/evidence/e5/runs/out-green/law-suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-8b/steps.log: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence/e5/runs/final/laws/final-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/extended/law-base-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/extended/law-tip-test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/evidence-e4/i9b/recheck/test_suite_hygiene.txt: posix home path outside the runner image: [HOME]  inc-9b/steps.log: posix home path outside the runner image: [HOME]  steps.log: posix home path outside the runner image: [HOME] not ['evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME] 'evidence/full-suit...ge: [HOME] 'evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME] ...]"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_tui_commandbar.py::test_tc007_palette_lists_every_bindings_action",
+      "head_signature": "tests\\test_tui_commandbar.py:110: AssertionError",
+      "head_message": "AssertionError: these BINDINGS actions have no palette entry: ['help_quit']\nassert not {'help_quit'}"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched",
+      "head_signature": "tests\\test_tui_diff_screen.py:3922: AssertionError",
+      "head_message": "AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('q', 'help_quit', 'Quit', True)]; removed: [('q', 'quit', 'Quit', True)]\nassert frozenset({('... False), ...}) == frozenset({('... False), ...})\n  \n  Extra items in the left set:\n  ('q', 'help_quit', 'Quit', True)\n  Extra items in the right set:\n  ('q', 'quit', 'Quit', True)\n  Use -v to get more diff"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_load_question.py::test_tc_b100_12_cancelled_question_rehomes_the_focus",
+      "head_signature": "tests\\test_b100_load_question.py:2743: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_load_question.py::test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved",
+      "head_signature": "tests\\test_b100_load_question.py:2791: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_load_question.py::test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route",
+      "head_signature": "tests\\test_b100_load_question.py:2933: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_save_dialog.py::test_at_b100_21_painted_plan_is_the_saved_tree[pending]",
+      "head_signature": "tests\\test_b100_save_dialog.py:272: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back",
+      "head_signature": "tests\\test_b99_staging.py:1364: AssertionError",
+      "head_message": "AssertionError: click missed #patch_entry_address_input\nassert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_save_dialog.py::test_at_b100_21_painted_plan_is_the_saved_tree[document]",
+      "head_signature": "tests\\test_b100_save_dialog.py:272: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_workers.py::test_tc_b100_53_quit_asks_only_while_a_session_action_runs",
+      "head_signature": "tests\\test_b100_workers.py:2362: AssertionError",
+      "head_message": "AssertionError: ('q', False, 1)\nassert (False, 1) == (True, 0)\n  \n  At index 0 diff: False != True\n  Use -v to get more diff"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_tui_patch_card.py::test_at080d_reachable_with_card[size1]",
+      "head_signature": "tests\\test_tui_patch_card.py:566: AssertionError",
+      "head_message": "AssertionError: @(120, 30): B2 REGRESSION — buttons trapped inside a scrollable body: ['patch_saveback_format_button', 'patch_saveback_width_button', 'patch_saveback_confirm_button', 'patch_saveback_decline_button', 'patch_before_after_button']\nassert ['patch_saveb...after_button'] == []\n  \n  Left contains 5 more items, first extra item: 'patch_saveback_format_button'\n  Use -v to get more diff"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b99_export.py::test_at_b99_11_sanitised_mac_only_second_export_takes_suffix",
+      "head_signature": "tests\\test_b99_export.py:1122: AssertionError",
+      "head_message": "AssertionError: click missed #patch_entry_address_input\nassert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_session_reset.py::test_tc_b100_09_domain_matches_the_live_source_census",
+      "head_signature": "tests\\test_b100_session_reset.py:347: AssertionError",
+      "head_message": "AssertionError: unclassified census names: ['_right_gesture']\nassert not {'_right_gesture'}"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b101_inplace_views.py::test_r_a2l_048_3_save_back_shows_in_the_tag_table",
+      "head_signature": "tests\\support\\timing.py:66: AssertionError",
+      "head_message": "AssertionError: #patch_entry_edit_button is not shown on the screen"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_checks_engine.py::test_no_textual_in_static_import_graph",
+      "head_signature": "tests\\test_checks_engine.py:405: AssertionError",
+      "head_message": "AssertionError: textual reached the headless check path: [('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.app'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.app.ComposeResult'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.binding'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.binding.Binding'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.containers'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.containers.Container'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.containers.Horizontal'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.containers.Vertical'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.events'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.message'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.message.Message'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.widgets'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.widgets.Input'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.widgets.Label'), ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual.widgets.Static'), ('s19_app.tui.os_clipboard_input', 'textual'), ('s19_app.tui.os_clipboard_input', 'textual.actions'), ('s19_app.tui.os_clipboard_input', 'textual.actions.SkipAction'), ('s19_app.tui.os_clipboard_input', 'textual.app'), ('s19_app.tui.os_clipboard_input', 'textual.app.App'), ('s19_app.tui.os_clipboard_input', 'textual.events'), ('s19_app.tui.os_clipboard_input', 'textual.widgets'), ('s19_app.tui.os_clipboard_input', 'textual.widgets.Input')]\nassert [('s19_app.tu...ainers'), ...] == []\n  \n  Left contains 24 more items, first extra item: ('s19_app.tui.screens_directionb.patch_editor.sheet', 'textual')\n  Use -v to get more diff"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface",
+      "head_signature": "tests\\test_tui_patch_editor_b94.py:254: AssertionError",
+      "head_message": "AssertionError: the table is visible at 120x30\nassert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_tui_patch_json.py::test_ac1_editor_fills_json_window_when_room_exists",
+      "head_signature": "tests\\test_tui_patch_json.py:1295: AssertionError",
+      "head_message": "AssertionError: the JSON editor must GROW past the old fixed cap of 8 when the window has free vertical space (120x50); painted region.height is 8\nassert 8 > 8"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_tui_patch_json.py::test_ac3_fill_does_not_leak_to_sibling_windows",
+      "head_signature": "tests\\test_tui_patch_json.py:1431: AssertionError",
+      "head_message": "AssertionError: (Region(x=7, y=35, width=108, height=3), Region(x=7, y=38, width=108, height=9))\nassert (3 >= 8)\n +  where 3 = Region(x=7, y=35, width=108, height=3).height"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_tui_patch_json.py::test_ac5_gauge_stays_above_editor",
+      "head_signature": "tests\\test_tui_patch_json.py:1504: AssertionError",
+      "head_message": "AssertionError: precondition: the editor must have grown at 120x50\nassert 8 > 8"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_session_reset.py::test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag",
+      "head_signature": "tests\\test_b100_session_reset.py:1178: AssertionError",
+      "head_message": "AssertionError: ['_a2l_label_ranker', '_a2l_list_resolution', '_quit_pending', '_right_gesture']\nassert {'_a2l_label_...ight_gesture'} == {'_quit_pending'}\n  \n  Extra items in the left set:\n  '_a2l_label_ranker'\n  '_a2l_list_resolution'\n  '_right_gesture'\n  Use -v to get more diff"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_4_save_back_then_display",
+      "head_signature": "tests\\support\\timing.py:66: AssertionError",
+      "head_message": "AssertionError: timed out waiting for #patch_entry_address_input after key '6'"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b101_inplace_views.py::test_r_tui_004_7_2_save_back_shows_in_the_a2l_hex_view",
+      "head_signature": "tests\\support\\timing.py:66: AssertionError",
+      "head_message": "AssertionError: #patch_entry_edit_button is not shown on the screen"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_5_save_project_then_display",
+      "head_signature": "tests\\support\\timing.py:66: AssertionError",
+      "head_message": "AssertionError: timed out waiting for #patch_entry_address_input after key '6'"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b99_s0.py::test_at_b99_02_save_back_excludes_s0",
+      "head_signature": "tests\\test_b99_s0.py:396: AssertionError",
+      "head_message": "AssertionError: click missed #patch_entry_address_input\nassert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_7_blocked_save_back_still_refreshes",
+      "head_signature": "tests\\support\\timing.py:66: AssertionError",
+      "head_message": "AssertionError: timed out waiting for #patch_entry_address_input after key '6'"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_tui_patch_chips.py::test_at076a_docked_buttons_are_grouped_chips",
+      "head_signature": "tests\\test_tui_patch_chips.py:246: AssertionError",
+      "head_message": "AssertionError: @(80, 24): the entry chip must render as a single row (Textual's default Button is 3); got height=0\nassert 0 == 1"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_8_zero_applied_restore_still_refreshes",
+      "head_signature": "tests\\support\\timing.py:66: AssertionError",
+      "head_message": "AssertionError: timed out waiting for #patch_entry_address_input after key '6'"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b101_designer_writes.py::test_r_crc_preview_002_1_6_save_project_commit_while_displayed_schedules_a_recompute",
+      "head_signature": "tests\\support\\timing.py:66: AssertionError",
+      "head_message": "AssertionError: timed out waiting for #patch_entry_address_input after key '6'"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b101_designer_writes.py::test_r_crc_preview_002_1_6_save_project_commit_while_displayed_recomputes_after_the_quiet_time",
+      "head_signature": "tests\\support\\timing.py:66: AssertionError",
+      "head_message": "AssertionError: timed out waiting for #patch_entry_address_input after key '6'"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b101_designer_writes.py::test_control_other_patch_actions_do_not_mark_the_coverage_stale",
+      "head_signature": "tests\\support\\timing.py:66: AssertionError",
+      "head_message": "AssertionError: timed out waiting for #patch_entry_address_input after key '6'"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b101_designer_writes.py::test_r_chked_057_2_save_back_clears_the_validation_results",
+      "head_signature": "tests\\support\\timing.py:66: AssertionError",
+      "head_message": "AssertionError: timed out waiting for #patch_entry_address_input after key '6'"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved",
+      "head_signature": "tests\\test_b100_document.py:132: AssertionError",
+      "head_message": "assert False"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b101_designer_writes.py::test_r_chked_057_3_save_project_commit_clears_the_validation_results",
+      "head_signature": "tests\\support\\timing.py:66: AssertionError",
+      "head_message": "AssertionError: timed out waiting for #patch_entry_address_input after key '6'"
+    },
+    {
+      "lane": "main",
+      "nodeid": "tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_9_save_back_raising_after_the_adopt_ends_the_app",
+      "head_signature": "tests\\support\\timing.py:66: AssertionError",
+      "head_message": "AssertionError: timed out waiting for #patch_entry_address_input after key '6'"
+    },
+    {
+      "lane": "serial",
+      "nodeid": "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_1_shared_enum_table_decode",
+      "head_signature": "tests\\test_b103_a2l_definition_arrays_scale.py:181: AssertionError",
+      "head_message": "AssertionError: {256: 0.015625, 512: 0.03125, 2048: 0.03125}\nassert 2.0 <= 1.5\n +  where 1.5 = report_margin('R-A2L-DEF.148 150/arr-1 enum table decode per-object part 2S/S', 2.0, 1.5)\n +    where 1.5 = timing_bound(1.5)"
+    },
+    {
+      "lane": "serial",
+      "nodeid": "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table",
+      "head_signature": "tests\\test_b103_a2l_definition_perf.py:231: AssertionError",
+      "head_message": "AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}\nassert 0.0 >= 0.002"
+    }
+  ],
+  "junit": {
+    "head_main": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\head\\main\\junit.xml",
+    "head_serial": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\head\\serial\\junit.xml",
+    "base_main": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\main\\junit.xml",
+    "base_serial": "[USER_HOME]\\Github\\s19_app-b103-g3-repro-residual\\base\\serial\\junit.xml"
+  },
+  "signature_rule": "last non-empty pytest terminal location line (path:line:exception), exact string comparison",
+  "category_precedence": [
+    "absent",
+    "contexto_head_serial_pass",
+    "regresion_base_pass_head_fail",
+    "heredado_misma_firma",
+    "heredado_firma_distinta",
+    "revision_adicional"
+  ],
+  "environment_portability": 0
+}

@@ -1,0 +1,1353 @@
+[USER_HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0
+rootdir: [USER_HOME]\Github\s19_app-b103-g3-local
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collected 55 items
+
+tests\test_b100_active_variant.py ....                                   [  7%]
+tests\test_b100_project_check.py ...                                     [ 12%]
+tests\test_b101_inplace_views.py QC-TM-10b-1 case_06: 220040 tags, 1.633 s
+F                                       [ 14%]
+tests\test_b103_a2l_definition_arrays_scale.py F..F..F...FF              [ 36%]
+tests\test_b103_a2l_definition_perf.py FFFFFFFFF                         [ 52%]
+tests\test_b103_a2l_list_view.py F                                       [ 54%]
+tests\test_b103_a2l_reader_perf.py FFFFFFF                               [ 67%]
+tests\test_b103_inc8_s2_sheet_rows.py FF                                 [ 70%]
+tests\test_b103_inc9_w_jobs.py ..                                        [ 74%]
+tests\test_b103_inc9b_at.py .                                            [ 76%]
+tests\test_b103_inc9b_w.py ............                                  [ 98%]
+tests\test_b103_label_list.py F                                          [100%]
+
+================================== FAILURES ===================================
+____________ test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l _____________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_qc_tm_10b_1_a2l_refresh_c0')
+
+    @pytest.mark.serial_timing
+    def test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l(tmp_path: Path) -> None:
+        """QC-TM-10b-1: the UI-thread time of one in-place write's A2L refresh
+        (``_refresh_a2l_values_after_write``) on the largest A2L the repo ships
+        (case_06, re-pointed at E5 R-1) stays under ``timing_bound(1.0)``; the tag
+        count is in the QC-TM label.
+
+        The refresh is timed where the write notice calls it (the method wrapped on
+        the app instance, one real apply of the complement of the byte at
+        ``0x80100005`` through the Patch Editor). After the bound, the enriched
+        tags must equal a full recompute over the written image (the partial
+        recompute of R-1 must describe the same bytes). Negative controls: the full refresh at
+        every write -> above the bound -> RED; a changed-byte test that reads only
+        a tag's first byte -> the tags covering ``0x80100005`` keep their old
+        values -> RED."""
+        from s19_app.tui.services.a2l_service import enrich_tags_and_render
+
+        async def scenario(app, pilot, log):
+            await load_image(pilot, app, CASE06 / "firmware.s19", timeout=240.0)
+            await load_a2l(pilot, app, CASE06 / "firmware.a2l", timeout=240.0)
+            await wait_until(
+                pilot,
+                lambda: app._a2l_enriched_key is not None and len(app._a2l_enriched_tags) > 0,
+                "the case_06 tags were never enriched",
+                timeout=240.0,
+            )
+            assert hasattr(app, "_refresh_a2l_values_after_write"), (
+                "the write notice has no A2L refresh to time"
+            )
+            real = app._refresh_a2l_values_after_write
+            spans: list = []
+
+            def timed(*args, **kwargs):
+                start = time.perf_counter()
+                try:
+                    return real(*args, **kwargs)
+                finally:
+                    spans.append(time.perf_counter() - start)
+
+            app._refresh_a2l_values_after_write = timed
+            tags = len(app._a2l_enriched_tags)
+            old = mem_at(app, CASE06_WRITE)
+            assert old is not None, "0x80100005 is not in the case_06 image"
+            await patch_apply(
+                pilot, app, log, tmp_path / "docs", "d.json", [(CASE06_WRITE, bytes([old ^ 0xFF]))]
+            )
+            assert mem_at(app, CASE06_WRITE) == old ^ 0xFF, "the apply did not write"
+            await wait_until(
+                pilot,
+                lambda: bool(spans),
+                "the write notice never ran the A2L refresh",
+                timeout=240.0,
+            )
+            elapsed = spans[0]
+            print(f"QC-TM-10b-1 case_06: {tags} tags, {elapsed:.3f} s")
+            assert elapsed < report_margin(
+                f"QC-TM-10b-1 A2L refresh {tags} tags", elapsed, timing_bound(1.0)
+            ), f"{tags} tags: {elapsed:.3f} s"
+            full, _lines = enrich_tags_and_render(
+                app.current_a2l_data, app.current_file.mem_map, max_tag_lines=500
+            )
+            differ = [
+                i for i, (got, want) in enumerate(zip(app._a2l_enriched_tags, full)) if got != want
+            ]
+            assert len(app._a2l_enriched_tags) == len(full) and not differ, (
+                f"{len(differ)} enriched tags differ from a full recompute "
+                f"(first {differ[:3]}; {len(app._a2l_enriched_tags)} vs {len(full)} tags)"
+            )
+
+>       drive(tmp_path, scenario)
+
+tests\test_b101_inplace_views.py:1667:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x00000197A7225F40>
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, CASE06 / "firmware.s19", timeout=240.0)
+        await load_a2l(pilot, app, CASE06 / "firmware.a2l", timeout=240.0)
+        await wait_until(
+            pilot,
+            lambda: app._a2l_enriched_key is not None and len(app._a2l_enriched_tags) > 0,
+            "the case_06 tags were never enriched",
+            timeout=240.0,
+        )
+        assert hasattr(app, "_refresh_a2l_values_after_write"), (
+            "the write notice has no A2L refresh to time"
+        )
+        real = app._refresh_a2l_values_after_write
+        spans: list = []
+
+        def timed(*args, **kwargs):
+            start = time.perf_counter()
+            try:
+                return real(*args, **kwargs)
+            finally:
+                spans.append(time.perf_counter() - start)
+
+        app._refresh_a2l_values_after_write = timed
+        tags = len(app._a2l_enriched_tags)
+        old = mem_at(app, CASE06_WRITE)
+        assert old is not None, "0x80100005 is not in the case_06 image"
+        await patch_apply(
+            pilot, app, log, tmp_path / "docs", "d.json", [(CASE06_WRITE, bytes([old ^ 0xFF]))]
+        )
+        assert mem_at(app, CASE06_WRITE) == old ^ 0xFF, "the apply did not write"
+        await wait_until(
+            pilot,
+            lambda: bool(spans),
+            "the write notice never ran the A2L refresh",
+            timeout=240.0,
+        )
+        elapsed = spans[0]
+        print(f"QC-TM-10b-1 case_06: {tags} tags, {elapsed:.3f} s")
+>       assert elapsed < report_margin(
+            f"QC-TM-10b-1 A2L refresh {tags} tags", elapsed, timing_bound(1.0)
+        ), f"{tags} tags: {elapsed:.3f} s"
+E       AssertionError: 220040 tags: 1.633 s
+E       assert 1.6330763000296429 < 1.0
+E        +  where 1.0 = report_margin('QC-TM-10b-1 A2L refresh 220040 tags', 1.6330763000296429, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests\test_b101_inplace_views.py:1653: AssertionError
+_____________ test_r_a2l_def_148_3_shared_layout_first_line_value _____________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_148_3_shared_la0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_148_3_shared_layout_first_line_value(tmp_path):
+        def check(kib, a2l_data):
+            defs = a2ldef.describe_definitions(_names("S"), a2l_data)
+            for d in defs.values():
+                assert d.kind == "number" and d.datatype == "UBYTE" and d.refusal is None
+>       _measure(tmp_path, "148/3 layout first line VALUE", lambda p, k: _b148_2(p, k, "VALUE"), check)
+
+tests\test_b103_a2l_definition_arrays_scale.py:402:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_148_3_shared_la0')
+case_label = '148/3 layout first line VALUE'
+build = <function test_r_a2l_def_148_3_shared_layout_first_line_value.<locals>.<lambda> at 0x00000197A609CC20>
+check = <function test_r_a2l_def_148_3_shared_layout_first_line_value.<locals>.check at 0x00000197A71B47C0>
+image_of = None
+
+    def _measure(tmp_path: Path, case_label: str, build: Callable[[Path, int], tuple[dict, list]],
+                 check: Callable[[int, dict], None],
+                 image_of: Optional[Callable[[str], dict]] = None) -> None:
+        """The E3S3-24 measure for one case: absolute bound at S (least of 15 runs)
+        then the interleaved least-of-15 per-object ratio at 2S and 8S."""
+        loaded = {kib: build(tmp_path, kib) for kib in SIZES_KIB}
+        names = loaded[S_KIB][1]
+
+        # Absolute: 400 names at S, process CPU time (E3S3-24), least of 15 runs.
+        runs = []
+        for _ in range(LEAST_OF):
+            seconds, _ = _timed(lambda: a2ldef.describe_definitions(names, loaded[S_KIB][0]), time.process_time)
+            runs.append(seconds)
+        assert min(runs) <= report_margin(f"R-A2L-DEF.148 {case_label} 400 names at 256 KiB",
+                                          min(runs), timing_bound(ABS_BOUND_S)), runs
+        check(S_KIB, loaded[S_KIB][0])
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(LEAST_OF):
+            for kib in SIZES_KIB:  # interleaved: S, 2S, 8S in turn within every round
+                a2l_data, nms = loaded[kib]
+                if image_of is None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(nms, a2l_data), time.process_time)
+                else:
+                    defs = a2ldef.describe_definitions(nms, a2l_data)
+                    t_outer, interval = _timed(lambda: _steady_decode(defs, nms, a2l_data, image_of), time.process_time)
+                    results[kib] = defs
+                part[kib] = min(part[kib], max(interval, 0.0))
+>       ratio_2s = part[2 * S_KIB] / part[S_KIB]
+E       ZeroDivisionError: float division by zero
+
+tests\test_b103_a2l_definition_arrays_scale.py:179: ZeroDivisionError
+_______________ test_r_a2l_def_148_18_long_tabref_empty_values ________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_148_18_long_tab0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_148_18_long_tabref_empty_values(tmp_path):
+        def check(kib, a2l_data):
+            defs = a2ldef.describe_definitions(_names("S"), a2l_data)
+            for name, d in defs.items():
+                assert d.refusal == a2ldef.Refusal("A2L-DEF-TABLE-EMPTY",
+                                                  f"{name}: the table {'E' * _ECHO}{_ELLIPSIS} has no entries")
+                assert len(d.refusal.message) <= MESSAGE_BOUND
+>       _measure(tmp_path, "148/18 long COMPU_TAB_REF empty (VALUEs)", lambda p, k: _b148_18(p, k, True), check)
+
+tests\test_b103_a2l_definition_arrays_scale.py:570:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_148_18_long_tab0')
+case_label = '148/18 long COMPU_TAB_REF empty (VALUEs)'
+build = <function test_r_a2l_def_148_18_long_tabref_empty_values.<locals>.<lambda> at 0x00000197A967FA60>
+check = <function test_r_a2l_def_148_18_long_tabref_empty_values.<locals>.check at 0x00000197A967F560>
+image_of = None
+
+    def _measure(tmp_path: Path, case_label: str, build: Callable[[Path, int], tuple[dict, list]],
+                 check: Callable[[int, dict], None],
+                 image_of: Optional[Callable[[str], dict]] = None) -> None:
+        """The E3S3-24 measure for one case: absolute bound at S (least of 15 runs)
+        then the interleaved least-of-15 per-object ratio at 2S and 8S."""
+        loaded = {kib: build(tmp_path, kib) for kib in SIZES_KIB}
+        names = loaded[S_KIB][1]
+
+        # Absolute: 400 names at S, process CPU time (E3S3-24), least of 15 runs.
+        runs = []
+        for _ in range(LEAST_OF):
+            seconds, _ = _timed(lambda: a2ldef.describe_definitions(names, loaded[S_KIB][0]), time.process_time)
+            runs.append(seconds)
+        assert min(runs) <= report_margin(f"R-A2L-DEF.148 {case_label} 400 names at 256 KiB",
+                                          min(runs), timing_bound(ABS_BOUND_S)), runs
+        check(S_KIB, loaded[S_KIB][0])
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(LEAST_OF):
+            for kib in SIZES_KIB:  # interleaved: S, 2S, 8S in turn within every round
+                a2l_data, nms = loaded[kib]
+                if image_of is None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(nms, a2l_data), time.process_time)
+                else:
+                    defs = a2ldef.describe_definitions(nms, a2l_data)
+                    t_outer, interval = _timed(lambda: _steady_decode(defs, nms, a2l_data, image_of), time.process_time)
+                    results[kib] = defs
+                part[kib] = min(part[kib], max(interval, 0.0))
+>       ratio_2s = part[2 * S_KIB] / part[S_KIB]
+E       ZeroDivisionError: float division by zero
+
+tests\test_b103_a2l_definition_arrays_scale.py:179: ZeroDivisionError
+______________ test_r_a2l_def_150_arr_1_shared_enum_table_decode ______________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_150_arr_1_share0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_150_arr_1_shared_enum_table_decode(tmp_path):
+        def check(kib, a2l_data):
+            defs = a2ldef.describe_definitions(_names("C"), a2l_data)
+            res = a2ldef.decode_values(defs["C00000"], a2l_data, {0x1000 + i: 250 for i in range(8)})
+            assert isinstance(res, DecodedValues)
+            for point in res.axes[0].points:
+                assert (point.stored, point.text) == (250, "250 (no text)")
+            for value in res.values:
+                assert (value.stored, value.text) == (250, "250 (no text)")
+>       _measure(tmp_path, "150/arr-1 enum table decode", lambda p, k: _b148_8(p, k, False), check, _decode_image_curve)
+
+tests\test_b103_a2l_definition_arrays_scale.py:624:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_150_arr_1_share0')
+case_label = '150/arr-1 enum table decode'
+build = <function test_r_a2l_def_150_arr_1_shared_enum_table_decode.<locals>.<lambda> at 0x00000197A949C720>
+check = <function test_r_a2l_def_150_arr_1_shared_enum_table_decode.<locals>.check at 0x00000197A949C4A0>
+image_of = <function _decode_image_curve at 0x00000197A601D620>
+
+    def _measure(tmp_path: Path, case_label: str, build: Callable[[Path, int], tuple[dict, list]],
+                 check: Callable[[int, dict], None],
+                 image_of: Optional[Callable[[str], dict]] = None) -> None:
+        """The E3S3-24 measure for one case: absolute bound at S (least of 15 runs)
+        then the interleaved least-of-15 per-object ratio at 2S and 8S."""
+        loaded = {kib: build(tmp_path, kib) for kib in SIZES_KIB}
+        names = loaded[S_KIB][1]
+
+        # Absolute: 400 names at S, process CPU time (E3S3-24), least of 15 runs.
+        runs = []
+        for _ in range(LEAST_OF):
+            seconds, _ = _timed(lambda: a2ldef.describe_definitions(names, loaded[S_KIB][0]), time.process_time)
+            runs.append(seconds)
+        assert min(runs) <= report_margin(f"R-A2L-DEF.148 {case_label} 400 names at 256 KiB",
+                                          min(runs), timing_bound(ABS_BOUND_S)), runs
+        check(S_KIB, loaded[S_KIB][0])
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(LEAST_OF):
+            for kib in SIZES_KIB:  # interleaved: S, 2S, 8S in turn within every round
+                a2l_data, nms = loaded[kib]
+                if image_of is None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(nms, a2l_data), time.process_time)
+                else:
+                    defs = a2ldef.describe_definitions(nms, a2l_data)
+                    t_outer, interval = _timed(lambda: _steady_decode(defs, nms, a2l_data, image_of), time.process_time)
+                    results[kib] = defs
+                part[kib] = min(part[kib], max(interval, 0.0))
+        ratio_2s = part[2 * S_KIB] / part[S_KIB]
+        ratio_8s = part[8 * S_KIB] / part[S_KIB]
+>       assert ratio_2s <= report_margin(f"R-A2L-DEF.148 {case_label} per-object part 2S/S",
+                                         ratio_2s, timing_bound(RATIO_BOUND_2S)), part
+E       AssertionError: {256: 0.015625, 512: 0.03125, 2048: 0.03125}
+E       assert 2.0 <= 1.5
+E        +  where 1.5 = report_margin('R-A2L-DEF.148 150/arr-1 enum table decode per-object part 2S/S', 2.0, 1.5)
+E        +    where 1.5 = timing_bound(1.5)
+
+tests\test_b103_a2l_definition_arrays_scale.py:181: AssertionError
+___ test_r_a2l_def_150_arr_10_element_decode_does_not_grow_with_name[enum] ____
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_150_arr_10_elem0')
+mode = 'enum'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("mode", ["enum", "number"])
+    def test_r_a2l_def_150_arr_10_element_decode_does_not_grow_with_name(tmp_path, mode):
+        """EN-1 (``enum``: TAB_INTP with an undeclared table, one refusal per element)
+        and EN-2 (``number``: NO_COMPU_METHOD): the decode time per element does not
+        grow with the object's name (S / 2S / 8S, interleaved, least of 15)."""
+        def build(p, kib):
+            name = "V" + "N" * (kib * 1024)
+            if mode == "enum":
+                body = _cm("CM_I", 'TAB_INTP "%.3" ""', "COMPU_TAB_REF NOT_DECLARED") + \
+                    _valblk(name, "0x1000", "RL_U8", "CM_I", "0", "255", "NUMBER 64")
+            else:
+                body = _valblk(name, "0x1000", "RL_U8", "NO_COMPU_METHOD", "0", "255", "NUMBER 64")
+            return _parse(p, body), [name]
+
+        loaded = {kib: build(tmp_path, kib) for kib in SIZES_KIB}
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        for _ in range(LEAST_OF):
+            for kib in SIZES_KIB:  # interleaved
+                a2l_data, names = loaded[kib]
+                defs = a2ldef.describe_definitions(names, a2l_data)
+                image = img(0x1000, bytes([250]) * 64)
+
+                def work():
+                    a2ldef.decode_values(defs[names[0]], a2l_data, image)
+
+                seconds, res = _timed(work, time.process_time)
+                part[kib] = min(part[kib], seconds / 64.0)
+>       ratio_2s = part[2 * S_KIB] / part[S_KIB]
+E       ZeroDivisionError: float division by zero
+
+tests\test_b103_a2l_definition_arrays_scale.py:782: ZeroDivisionError
+__ test_r_a2l_def_150_arr_10_element_decode_does_not_grow_with_name[number] ___
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_150_arr_10_elem1')
+mode = 'number'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("mode", ["enum", "number"])
+    def test_r_a2l_def_150_arr_10_element_decode_does_not_grow_with_name(tmp_path, mode):
+        """EN-1 (``enum``: TAB_INTP with an undeclared table, one refusal per element)
+        and EN-2 (``number``: NO_COMPU_METHOD): the decode time per element does not
+        grow with the object's name (S / 2S / 8S, interleaved, least of 15)."""
+        def build(p, kib):
+            name = "V" + "N" * (kib * 1024)
+            if mode == "enum":
+                body = _cm("CM_I", 'TAB_INTP "%.3" ""', "COMPU_TAB_REF NOT_DECLARED") + \
+                    _valblk(name, "0x1000", "RL_U8", "CM_I", "0", "255", "NUMBER 64")
+            else:
+                body = _valblk(name, "0x1000", "RL_U8", "NO_COMPU_METHOD", "0", "255", "NUMBER 64")
+            return _parse(p, body), [name]
+
+        loaded = {kib: build(tmp_path, kib) for kib in SIZES_KIB}
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        for _ in range(LEAST_OF):
+            for kib in SIZES_KIB:  # interleaved
+                a2l_data, names = loaded[kib]
+                defs = a2ldef.describe_definitions(names, a2l_data)
+                image = img(0x1000, bytes([250]) * 64)
+
+                def work():
+                    a2ldef.decode_values(defs[names[0]], a2l_data, image)
+
+                seconds, res = _timed(work, time.process_time)
+                part[kib] = min(part[kib], seconds / 64.0)
+>       ratio_2s = part[2 * S_KIB] / part[S_KIB]
+E       ZeroDivisionError: float division by zero
+
+tests\test_b103_a2l_definition_arrays_scale.py:782: ZeroDivisionError
+_____________________ test_r_a2l_def_149_1_scaling_method _____________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_1_scaling_m0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_1_scaling_method(tmp_path):
+        """R-A2L-DEF.149/1 scaling - per-object part at 512 KiB at most 1.3x and at 2048 KiB at most 2.0x that at 256 KiB (E3S3-24 measure)."""
+>       _scaling(tmp_path, "method", "/1 COMPU_METHOD")
+
+tests\test_b103_a2l_definition_perf.py:271:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_1_scaling_m0')
+case = 'method', label = '/1 COMPU_METHOD'
+
+    def _scaling(tmp_path: Path, case: str, label: str) -> None:
+        """E5-3 measure (inc-2/E5-code-review.md): the per-object part is the process CPU time of the 399 names after the
+        first, read inside one fresh walk (``_steady_describe``); S, 2S and 8S are interleaved round by round; each time
+        is the least of 31 rounds (one round once a run exceeds 2 s)."""
+        loaded = {kib: _load(tmp_path, case, kib) for kib in SIZES_KIB}
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                a2l, names = loaded[kib]
+                t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(names, a2l), time.process_time)
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer > SLOW_RUN_S
+            if slow:
+                break
+>       assert part[SIZE_S_KIB] >= NON_VACUITY_S, part
+E       AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+E       assert 0.0 >= 0.002
+
+tests\test_b103_a2l_definition_perf.py:231: AssertionError
+___________________ test_r_a2l_def_149_2_scaling_enum_table ___________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_2_scaling_e0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_2_scaling_enum_table(tmp_path):
+        """R-A2L-DEF.149/2 scaling - as /1 for a COMPU_VTAB."""
+>       _scaling(tmp_path, "vtab", "/2 COMPU_VTAB")
+
+tests\test_b103_a2l_definition_perf.py:277:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_2_scaling_e0')
+case = 'vtab', label = '/2 COMPU_VTAB'
+
+    def _scaling(tmp_path: Path, case: str, label: str) -> None:
+        """E5-3 measure (inc-2/E5-code-review.md): the per-object part is the process CPU time of the 399 names after the
+        first, read inside one fresh walk (``_steady_describe``); S, 2S and 8S are interleaved round by round; each time
+        is the least of 31 rounds (one round once a run exceeds 2 s)."""
+        loaded = {kib: _load(tmp_path, case, kib) for kib in SIZES_KIB}
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                a2l, names = loaded[kib]
+                t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(names, a2l), time.process_time)
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer > SLOW_RUN_S
+            if slow:
+                break
+>       assert part[SIZE_S_KIB] >= NON_VACUITY_S, part
+E       AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+E       assert 0.0 >= 0.002
+
+tests\test_b103_a2l_definition_perf.py:231: AssertionError
+__________________ test_r_a2l_def_149_3_scaling_range_table ___________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_3_scaling_r0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_3_scaling_range_table(tmp_path):
+        """R-A2L-DEF.149/3 scaling - as /1 for a COMPU_VTAB_RANGE."""
+>       _scaling(tmp_path, "range", "/3 COMPU_VTAB_RANGE")
+
+tests\test_b103_a2l_definition_perf.py:283:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_3_scaling_r0')
+case = 'range', label = '/3 COMPU_VTAB_RANGE'
+
+    def _scaling(tmp_path: Path, case: str, label: str) -> None:
+        """E5-3 measure (inc-2/E5-code-review.md): the per-object part is the process CPU time of the 399 names after the
+        first, read inside one fresh walk (``_steady_describe``); S, 2S and 8S are interleaved round by round; each time
+        is the least of 31 rounds (one round once a run exceeds 2 s)."""
+        loaded = {kib: _load(tmp_path, case, kib) for kib in SIZES_KIB}
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                a2l, names = loaded[kib]
+                t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(names, a2l), time.process_time)
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer > SLOW_RUN_S
+            if slow:
+                break
+>       assert part[SIZE_S_KIB] >= NON_VACUITY_S, part
+E       AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+E       assert 0.0 >= 0.002
+
+tests\test_b103_a2l_definition_perf.py:231: AssertionError
+_____________________ test_r_a2l_def_149_4_scaling_layout _____________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_4_scaling_l0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_4_scaling_layout(tmp_path):
+        """R-A2L-DEF.149/4 scaling - as /1 for a RECORD_LAYOUT whose first line is long."""
+>       _scaling(tmp_path, "layout", "/4 RECORD_LAYOUT")
+
+tests\test_b103_a2l_definition_perf.py:289:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_4_scaling_l0')
+case = 'layout', label = '/4 RECORD_LAYOUT'
+
+    def _scaling(tmp_path: Path, case: str, label: str) -> None:
+        """E5-3 measure (inc-2/E5-code-review.md): the per-object part is the process CPU time of the 399 names after the
+        first, read inside one fresh walk (``_steady_describe``); S, 2S and 8S are interleaved round by round; each time
+        is the least of 31 rounds (one round once a run exceeds 2 s)."""
+        loaded = {kib: _load(tmp_path, case, kib) for kib in SIZES_KIB}
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                a2l, names = loaded[kib]
+                t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(names, a2l), time.process_time)
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer > SLOW_RUN_S
+            if slow:
+                break
+>       assert part[SIZE_S_KIB] >= NON_VACUITY_S, part
+E       AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+E       assert 0.0 >= 0.002
+
+tests\test_b103_a2l_definition_perf.py:231: AssertionError
+_ test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_6_long_form0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object(tmp_path):
+        """R-A2L-DEF.149/6 - a FORMAT word of S / 2S / 8S nines is scanned once per walk; decimals 2; one display_format object."""
+        def check(kib, c, result):
+            _first_last_alone(c, result)
+            for d in result.values():
+                assert (d.kind, d.datatype, d.conversion_type, d.decimals, d.refusal) == ("number", "UBYTE", "LINEAR", 2, None)
+            assert _same_object(d.display_format for d in result.values())
+            assert result[c.names[0]].display_format == "%" + "9" * (kib * 1024) + ".2"
+
+>       _gp2_run(tmp_path, "fmt", "149/6 FORMAT word", _describe_all, check, steady=_describe_steady)
+
+tests\test_b103_a2l_definition_perf.py:509:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_6_long_form0')
+case = 'fmt', label = '149/6 FORMAT word'
+work = <function _describe_all at 0x00000197A6052D40>
+check = <function test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object.<locals>.check at 0x00000197A8CF8C20>
+image_byte = None, steady = <function _describe_steady at 0x00000197A6052DE0>
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+        assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+        check(SIZE_S_KIB, loaded[SIZE_S_KIB], result)
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                if steady is not None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: steady(loaded[kib]), time.process_time)
+                else:
+                    t_outer, results[kib] = _timed(lambda: work(loaded[kib]), time.process_time)
+                    interval = t_outer
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer > SLOW_RUN_S
+            if slow:
+                break
+        if steady is not None:
+>           assert part[SIZE_S_KIB] >= NON_VACUITY_S, part
+E           AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+E           assert 0.0 >= 0.002
+
+tests\test_b103_a2l_definition_perf.py:458: AssertionError
+___ test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object ___
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_7_long_conv0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object(tmp_path):
+        """R-A2L-DEF.149/7 - a type word of S ... 8S of Z is echoed once at reduction: 256 characters and an ellipsis, message <= 1,024."""
+        def check(kib, c, result):
+            _first_last_alone(c, result)
+            _messages_bounded(result)
+            for name, d in result.items():
+                assert (d.kind, d.datatype) == ("number", "UBYTE")
+                assert d.refusal == Refusal("A2L-DEF-CONVERSION",
+                                            f"{name}: the conversion type {'Z' * 256}� of CM_T is not supported")
+            assert _same_object(d.conversion_type for d in result.values())
+
+>       _gp2_run(tmp_path, "type", "149/7 conversion type word", _describe_all, check, steady=_describe_steady)
+
+tests\test_b103_a2l_definition_perf.py:524:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_7_long_conv0')
+case = 'type', label = '149/7 conversion type word'
+work = <function _describe_all at 0x00000197A6052D40>
+check = <function test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object.<locals>.check at 0x00000197A8CF8180>
+image_byte = None, steady = <function _describe_steady at 0x00000197A6052DE0>
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+        assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+        check(SIZE_S_KIB, loaded[SIZE_S_KIB], result)
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                if steady is not None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: steady(loaded[kib]), time.process_time)
+                else:
+                    t_outer, results[kib] = _timed(lambda: work(loaded[kib]), time.process_time)
+                    interval = t_outer
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer > SLOW_RUN_S
+            if slow:
+                break
+        if steady is not None:
+>           assert part[SIZE_S_KIB] >= NON_VACUITY_S, part
+E           AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+E           assert 0.0 >= 0.002
+
+tests\test_b103_a2l_definition_perf.py:458: AssertionError
+______ test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object ______
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_8_long_tabl0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object(tmp_path):
+        """R-A2L-DEF.149/8 - a COMPU_TAB_REF word of S ... 8S of G, declared nowhere: echoed once, found once per walk."""
+        def check(kib, c, result):
+            _first_last_alone(c, result)
+            _messages_bounded(result)
+            for name, d in result.items():
+                assert (d.kind, d.datatype) == ("enum", "UBYTE")
+                assert d.refusal == Refusal("A2L-DEF-TABLE",
+                                            f"{name}: the table {'G' * 256}� of CM_V is not declared in the A2L")
+            assert _same_object(d.enum_table for d in result.values())
+
+>       _gp2_run(tmp_path, "tabref", "149/8 COMPU_TAB_REF word", _describe_all, check, steady=_describe_steady)
+
+tests\test_b103_a2l_definition_perf.py:539:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_8_long_tabl0')
+case = 'tabref', label = '149/8 COMPU_TAB_REF word'
+work = <function _describe_all at 0x00000197A6052D40>
+check = <function test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object.<locals>.check at 0x00000197A8CF8CC0>
+image_byte = None, steady = <function _describe_steady at 0x00000197A6052DE0>
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+        assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+        check(SIZE_S_KIB, loaded[SIZE_S_KIB], result)
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                if steady is not None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: steady(loaded[kib]), time.process_time)
+                else:
+                    t_outer, results[kib] = _timed(lambda: work(loaded[kib]), time.process_time)
+                    interval = t_outer
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer > SLOW_RUN_S
+            if slow:
+                break
+        if steady is not None:
+>           assert part[SIZE_S_KIB] >= NON_VACUITY_S, part
+E           AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+E           assert 0.0 >= 0.002
+
+tests\test_b103_a2l_definition_perf.py:458: AssertionError
+___ test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid ____
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_9_shared_la0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid(tmp_path):
+        """R-A2L-DEF.149/9 - 400 CUBOIDs sharing a layout whose first line is S ... 8S: the layout step runs once per walk."""
+        def check(kib, c, result):
+            _first_last_alone(c, result)
+            _messages_bounded(result)
+            for name, d in result.items():
+                assert d.datatype == "UBYTE"
+                assert d.refusal == Refusal("A2L-DEF-KIND", f"{name}: the system has no definition for a CUBOID object")
+
+>       _gp2_run(tmp_path, "cuboid", "149/9 CUBOID layout", _describe_all, check, steady=_describe_steady)
+
+tests\test_b103_a2l_definition_perf.py:552:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_9_shared_la0')
+case = 'cuboid', label = '149/9 CUBOID layout'
+work = <function _describe_all at 0x00000197A6052D40>
+check = <function test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid.<locals>.check at 0x00000197A8CF9120>
+image_byte = None, steady = <function _describe_steady at 0x00000197A6052DE0>
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+        assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+        check(SIZE_S_KIB, loaded[SIZE_S_KIB], result)
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                if steady is not None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: steady(loaded[kib]), time.process_time)
+                else:
+                    t_outer, results[kib] = _timed(lambda: work(loaded[kib]), time.process_time)
+                    interval = t_outer
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer > SLOW_RUN_S
+            if slow:
+                break
+        if steady is not None:
+>           assert part[SIZE_S_KIB] >= NON_VACUITY_S, part
+E           AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+E           assert 0.0 >= 0.002
+
+tests\test_b103_a2l_definition_perf.py:458: AssertionError
+_ test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_10_long_nam0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object(tmp_path):
+        """R-A2L-DEF.149/10 - a table named by a word of S ... 8S of E and holding no entries: echoed and found once per walk."""
+        def check(kib, c, result):
+            _first_last_alone(c, result)
+            _messages_bounded(result)
+            for name, d in result.items():
+                assert d.kind == "enum" and d.datatype == "UBYTE"
+                assert d.refusal == Refusal("A2L-DEF-TABLE-EMPTY", f"{name}: the table {'E' * 256}� has no entries")
+
+>       _gp2_run(tmp_path, "emptyname", "149/10 empty table name", _describe_all, check, steady=_describe_steady)
+
+tests\test_b103_a2l_definition_perf.py:565:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_def_149_10_long_nam0')
+case = 'emptyname', label = '149/10 empty table name'
+work = <function _describe_all at 0x00000197A6052D40>
+check = <function test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object.<locals>.check at 0x00000197AAC52E80>
+image_byte = None, steady = <function _describe_steady at 0x00000197A6052DE0>
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+        assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+        check(SIZE_S_KIB, loaded[SIZE_S_KIB], result)
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                if steady is not None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: steady(loaded[kib]), time.process_time)
+                else:
+                    t_outer, results[kib] = _timed(lambda: work(loaded[kib]), time.process_time)
+                    interval = t_outer
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer > SLOW_RUN_S
+            if slow:
+                break
+        if steady is not None:
+>           assert part[SIZE_S_KIB] >= NON_VACUITY_S, part
+E           AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+E           assert 0.0 >= 0.002
+
+tests\test_b103_a2l_definition_perf.py:458: AssertionError
+____________________________ test_r_a2l_list_035_1 ____________________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/test_r_a2l_list_035_10')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_list_035_1(tmp_path) -> None:
+        """R-A2L-LIST.035/1: a 2,048-name list over 13,990 tags paints within 1.0 s of the debounce (median of 3)."""
+        import shutil
+
+        from tests.support.b103_label_list import build_paste, case_names
+
+        folder = tmp_path / "swa"
+        folder.mkdir()
+        shutil.copy(REPO_ROOT / "examples" / "case_00_public" / "software_a.a2l", folder / "firmware.a2l")
+        text = build_paste(case_names(folder)).replace("\n", ", ")
+
+        async def sc(app, pilot):
+            box = app.query_one("#a2l_tags_filter_input", Input)
+            times = []
+            for _ in range(3):
+                box.value = ""
+                await flush(app, pilot)
+                start = time.perf_counter()
+                box.value = text
+                await wait_until(
+                    pilot, lambda: chips(app)[0].startswith(" LIST ") and missing_text(app).startswith("Missing "),
+                    "the list-mode table, counts and missing lines", timeout=30,
+                )
+                times.append(time.perf_counter() - start - 0.15)
+            return statistics.median(times), len(app._a2l_enriched_tags)
+
+>       print("load average before:", os.getloadavg())
+E       AttributeError: module 'os' has no attribute 'getloadavg'
+
+tests\test_b103_a2l_list_view.py:760: AttributeError
+_______________________ test_r_a2l_read_52_case06_time ________________________
+
+big_files = {'case06': WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local/examples/case_06_large_nested_a2l/firmware.a2l'), ...ndowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/b103_a2l_reader_perf0/words.a2l'), ...}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_case06_time(big_files: dict) -> None:
+>       current = _median_metrics(REPO_ROOT, big_files["case06"])["elapsed"]
+
+tests\test_b103_a2l_reader_perf.py:202:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_reader_perf.py:173: in _median_metrics
+    runs = [_run_metrics(root, path) for _ in range(RUNS)]
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local')
+path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local/examples/case_06_large_nested_a2l/firmware.a2l')
+
+    def _run_metrics(root: Path, path: Path) -> dict:
+        """One parse in a fresh process; ``root`` on ``sys.path`` resolves ``s19_app``."""
+        completed = subprocess.run(
+            [sys.executable, "-c", _METRICS_SCRIPT, str(root), str(path)],
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+        )
+        if completed.returncode != 0:
+>           raise AssertionError(completed.stderr)
+E           AssertionError: Traceback (most recent call last):
+E             File "<string>", line 17, in <module>
+E             File "<string>", line 6, in _rss
+E           FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'
+
+tests\test_b103_a2l_reader_perf.py:162: AssertionError
+_____________________ test_r_a2l_read_52_software_a_time ______________________
+
+big_files = {'case06': WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local/examples/case_06_large_nested_a2l/firmware.a2l'), ...ndowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/b103_a2l_reader_perf0/words.a2l'), ...}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_software_a_time(big_files: dict) -> None:
+>       current = _median_metrics(REPO_ROOT, big_files["software_a"])["elapsed"]
+
+tests\test_b103_a2l_reader_perf.py:211:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_reader_perf.py:173: in _median_metrics
+    runs = [_run_metrics(root, path) for _ in range(RUNS)]
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local')
+path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local/examples/case_00_public/software_a.a2l')
+
+    def _run_metrics(root: Path, path: Path) -> dict:
+        """One parse in a fresh process; ``root`` on ``sys.path`` resolves ``s19_app``."""
+        completed = subprocess.run(
+            [sys.executable, "-c", _METRICS_SCRIPT, str(root), str(path)],
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+        )
+        if completed.returncode != 0:
+>           raise AssertionError(completed.stderr)
+E           AssertionError: Traceback (most recent call last):
+E             File "<string>", line 17, in <module>
+E             File "<string>", line 6, in _rss
+E           FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'
+
+tests\test_b103_a2l_reader_perf.py:162: AssertionError
+_______________________ test_r_a2l_read_52_string_time ________________________
+
+big_files = {'case06': WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local/examples/case_06_large_nested_a2l/firmware.a2l'), ...ndowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/b103_a2l_reader_perf0/words.a2l'), ...}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_string_time(big_files: dict) -> None:
+>       current = _median_metrics(REPO_ROOT, big_files["string"])["elapsed"]
+
+tests\test_b103_a2l_reader_perf.py:220:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_reader_perf.py:173: in _median_metrics
+    runs = [_run_metrics(root, path) for _ in range(RUNS)]
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local')
+path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/b103_a2l_reader_perf0/string.a2l')
+
+    def _run_metrics(root: Path, path: Path) -> dict:
+        """One parse in a fresh process; ``root`` on ``sys.path`` resolves ``s19_app``."""
+        completed = subprocess.run(
+            [sys.executable, "-c", _METRICS_SCRIPT, str(root), str(path)],
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+        )
+        if completed.returncode != 0:
+>           raise AssertionError(completed.stderr)
+E           AssertionError: Traceback (most recent call last):
+E             File "<string>", line 17, in <module>
+E             File "<string>", line 6, in _rss
+E           FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'
+
+tests\test_b103_a2l_reader_perf.py:162: AssertionError
+______________________ test_r_a2l_read_52_case06_memory _______________________
+
+big_files = {'case06': WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local/examples/case_06_large_nested_a2l/firmware.a2l'), ...ndowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/b103_a2l_reader_perf0/words.a2l'), ...}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_case06_memory(big_files: dict) -> None:
+>       current = _median_metrics(REPO_ROOT, big_files["case06"])
+
+tests\test_b103_a2l_reader_perf.py:229:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_reader_perf.py:173: in _median_metrics
+    runs = [_run_metrics(root, path) for _ in range(RUNS)]
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local')
+path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local/examples/case_06_large_nested_a2l/firmware.a2l')
+
+    def _run_metrics(root: Path, path: Path) -> dict:
+        """One parse in a fresh process; ``root`` on ``sys.path`` resolves ``s19_app``."""
+        completed = subprocess.run(
+            [sys.executable, "-c", _METRICS_SCRIPT, str(root), str(path)],
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+        )
+        if completed.returncode != 0:
+>           raise AssertionError(completed.stderr)
+E           AssertionError: Traceback (most recent call last):
+E             File "<string>", line 17, in <module>
+E             File "<string>", line 6, in _rss
+E           FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'
+
+tests\test_b103_a2l_reader_perf.py:162: AssertionError
+____________________ test_r_a2l_read_52_software_a_memory _____________________
+
+big_files = {'case06': WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local/examples/case_06_large_nested_a2l/firmware.a2l'), ...ndowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/b103_a2l_reader_perf0/words.a2l'), ...}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_software_a_memory(big_files: dict) -> None:
+>       current = _median_metrics(REPO_ROOT, big_files["software_a"])
+
+tests\test_b103_a2l_reader_perf.py:240:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_reader_perf.py:173: in _median_metrics
+    runs = [_run_metrics(root, path) for _ in range(RUNS)]
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local')
+path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local/examples/case_00_public/software_a.a2l')
+
+    def _run_metrics(root: Path, path: Path) -> dict:
+        """One parse in a fresh process; ``root`` on ``sys.path`` resolves ``s19_app``."""
+        completed = subprocess.run(
+            [sys.executable, "-c", _METRICS_SCRIPT, str(root), str(path)],
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+        )
+        if completed.returncode != 0:
+>           raise AssertionError(completed.stderr)
+E           AssertionError: Traceback (most recent call last):
+E             File "<string>", line 17, in <module>
+E             File "<string>", line 6, in _rss
+E           FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'
+
+tests\test_b103_a2l_reader_perf.py:162: AssertionError
+______________________ test_r_a2l_read_52_string_memory _______________________
+
+big_files = {'case06': WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local/examples/case_06_large_nested_a2l/firmware.a2l'), ...ndowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/b103_a2l_reader_perf0/words.a2l'), ...}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_string_memory(big_files: dict) -> None:
+>       current = _median_metrics(REPO_ROOT, big_files["string"])
+
+tests\test_b103_a2l_reader_perf.py:251:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_reader_perf.py:173: in _median_metrics
+    runs = [_run_metrics(root, path) for _ in range(RUNS)]
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local')
+path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/b103_a2l_reader_perf0/string.a2l')
+
+    def _run_metrics(root: Path, path: Path) -> dict:
+        """One parse in a fresh process; ``root`` on ``sys.path`` resolves ``s19_app``."""
+        completed = subprocess.run(
+            [sys.executable, "-c", _METRICS_SCRIPT, str(root), str(path)],
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+        )
+        if completed.returncode != 0:
+>           raise AssertionError(completed.stderr)
+E           AssertionError: Traceback (most recent call last):
+E             File "<string>", line 17, in <module>
+E             File "<string>", line 6, in _rss
+E           FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'
+
+tests\test_b103_a2l_reader_perf.py:162: AssertionError
+_______________________ test_r_a2l_read_52_words_memory _______________________
+
+big_files = {'case06': WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local/examples/case_06_large_nested_a2l/firmware.a2l'), ...ndowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/b103_a2l_reader_perf0/words.a2l'), ...}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_words_memory(big_files: dict) -> None:
+>       current = _median_metrics(REPO_ROOT, big_files["words"])
+
+tests\test_b103_a2l_reader_perf.py:262:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_reader_perf.py:173: in _median_metrics
+    runs = [_run_metrics(root, path) for _ in range(RUNS)]
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local')
+path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-residual/head/serial/tmp/b103_a2l_reader_perf0/words.a2l')
+
+    def _run_metrics(root: Path, path: Path) -> dict:
+        """One parse in a fresh process; ``root`` on ``sys.path`` resolves ``s19_app``."""
+        completed = subprocess.run(
+            [sys.executable, "-c", _METRICS_SCRIPT, str(root), str(path)],
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+        )
+        if completed.returncode != 0:
+>           raise AssertionError(completed.stderr)
+E           AssertionError: Traceback (most recent call last):
+E             File "<string>", line 17, in <module>
+E             File "<string>", line 6, in _rss
+E           FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/status'
+
+tests\test_b103_a2l_reader_perf.py:162: AssertionError
+__ test_r_pe_def_12_1_a_200_name_software_a_page_paints_within_half_a_second __
+
+softa_page = ({'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_lin..., element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=()), ...}, {0: 0, 1: 0, 2: 0, 3: 0, ...})
+
+    @pytest.mark.serial_timing  # R-TST-002: a timing arm runs serially (E4 integration)
+    def test_r_pe_def_12_1_a_200_name_software_a_page_paints_within_half_a_second(softa_page):
+        """load-sensitive: decide only on a quiet host; the load is printed beside the median."""
+        a2l, names, defs, image = softa_page
+        assert len(names) == 200
+
+        async def drive():
+            async with sheet_ctx(size=(118, 54)) as (app, pilot, sheet):
+                sheet.show_page(names, defs, a2l, image)
+                await pilot.pause()
+                median = _median_show(pilot, sheet, names, defs, a2l, image)
+                print(f"R-PE-DEF.12/1 median={median:.4f}s loadavg={os.getloadavg()}", flush=True)
+                assert median <= timing_bound(0.5)
+
+>       run(drive)
+
+tests\test_b103_inc8_s2_sheet_rows.py:195:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc8_s2_sheet_rows.py:62: in run
+    return asyncio.run(coro_fn())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54)) as (app, pilot, sheet):
+            sheet.show_page(names, defs, a2l, image)
+            await pilot.pause()
+            median = _median_show(pilot, sheet, names, defs, a2l, image)
+>           print(f"R-PE-DEF.12/1 median={median:.4f}s loadavg={os.getloadavg()}", flush=True)
+E           AttributeError: module 'os' has no attribute 'getloadavg'
+
+tests\test_b103_inc8_s2_sheet_rows.py:192: AttributeError
+_ test_r_pe_def_12_2_a_page_of_200_one_mebibyte_text_spans_paints_within_half_a_second _
+
+v171 = Case(a2l={'path': '[USER_HOME]\\Github\\s19_app-b103-g3-local\\examples\\case_00_public\\ASAP2_Demo_V171.a2l', 's...axes=())}, path=WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local/examples/case_00_public/ASAP2_Demo_V171.a2l'))
+
+    @pytest.mark.serial_timing  # R-TST-002: a timing arm runs serially (E4 integration)
+    def test_r_pe_def_12_2_a_page_of_200_one_mebibyte_text_spans_paints_within_half_a_second(v171):
+        """load-sensitive: decide only on a quiet host; the load is printed beside the median."""
+        base = v171.defs[V171_ASCII]
+        span = 1_048_576
+        names = [f"HOSTILE_{i:03d}" for i in range(200)]
+        defs = {n: dataclasses.replace(widened(base, span), name=n) for n in names}
+        image = {base.address + i: 0x41 for i in range(span)}
+        entries = [(base.address + 64, tuple(b"XYZ" + bytes(39)))]
+
+        async def drive():
+            async with sheet_ctx(size=(118, 54)) as (app, pilot, sheet):
+                sheet.show_page(names, defs, v171.a2l, image)
+                sheet.set_document(entries, image)
+                await pilot.pause()
+                median = _median_show(pilot, sheet, names, defs, v171.a2l, image)
+                print(f"R-PE-DEF.12/2 median={median:.4f}s loadavg={os.getloadavg()}", flush=True)
+                assert median <= timing_bound(0.5)
+                assert f"{span} B" in body_text(sheet)
+
+>       run(drive)
+
+tests\test_b103_inc8_s2_sheet_rows.py:218:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_inc8_s2_sheet_rows.py:62: in run
+    return asyncio.run(coro_fn())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def drive():
+        async with sheet_ctx(size=(118, 54)) as (app, pilot, sheet):
+            sheet.show_page(names, defs, v171.a2l, image)
+            sheet.set_document(entries, image)
+            await pilot.pause()
+            median = _median_show(pilot, sheet, names, defs, v171.a2l, image)
+>           print(f"R-PE-DEF.12/2 median={median:.4f}s loadavg={os.getloadavg()}", flush=True)
+E           AttributeError: module 'os' has no attribute 'getloadavg'
+
+tests\test_b103_inc8_s2_sheet_rows.py:214: AttributeError
+____________________________ test_r_a2l_list_078_3 ____________________________
+
+ll = <module 's19_app.tui.a2l_label_list' from '[USER_HOME]\\Github\\s19_app-b103-g3-local\\s19_app\\tui\\a2l_label_list.py'>
+names = ['VALUE_0001', 'VALUE_0002', 'VALUE_0003', 'VALUE_0004', 'MEASUREMENT_0001', 'MEASUREMENT_0002', ...]
+enriched = [{'access': None, 'address': 0, 'axis_meta': [], 'bit_org': None, ...}, {'access': None, 'address': 20, 'axis_meta': [..._meta': [], 'bit_org': None, ...}, {'access': 'read_only', 'address': 100, 'axis_meta': [], 'bit_org': None, ...}, ...]
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000197BB8C1A60>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_list_078_3(ll, names, enriched, monkeypatch) -> None:
+        """R-A2L-LIST.078/3 (E3S-01): one preview rebuild of 32,768 names <= 0.25 s (median of 3); load printed."""
+        import os
+        import statistics
+
+        async def sc(app, pilot, modal, seen):
+            await type_text(pilot, modal, "\n".join("a" for _ in range(32768)))
+            times = []
+            for _ in range(3):
+                start = time.perf_counter()
+                modal._preview()
+                times.append(time.perf_counter() - start)
+            return statistics.median(times)
+
+>       print("load average before:", os.getloadavg())
+E       AttributeError: module 'os' has no attribute 'getloadavg'
+
+tests\test_b103_label_list.py:1465: AttributeError
+- generated xml file: [USER_HOME]\Github\s19_app-b103-g3-repro-residual\head\serial\junit.xml -
+============================ QC-TM timing margins =============================
+LOW -63.3%  1.633 s / 1.000 s  QC-TM-10b-1 A2L refresh 220040 tags  tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l
+LOW -33.3%  2.000 s / 1.500 s  R-A2L-DEF.148 150/arr-1 enum table decode per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_1_shared_enum_table_decode
+LOW 0.1%  0.999 s / 1.000 s  TC-B100-20 mac-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+LOW 0.7%  0.993 s / 1.000 s  TC-B100-20 a2l-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+LOW 1.0%  0.990 s / 1.000 s  TC-B100-20 save-project  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+LOW 4.3%  0.957 s / 1.000 s  TC-B100-20 variant-append  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+LOW 12.0%  0.880 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+LOW 12.6%  0.437 s / 0.500 s  R-PE-BENCH.97/3 max gap  tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds
+LOW 17.5%  0.825 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+LOW 17.6%  0.824 s / 1.000 s  R-PE-BENCH.29/2 cursor key while the preview arrives  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_29_2_a_cursor_key_while_the_preview_result_arrives_is_handled_within_one_second
+23.3%  0.767 s / 1.000 s  R-PE-BENCH.82/1 key during a record encode  tests/test_b103_inc9_w_jobs.py::test_r_pe_bench_82_1_a_key_is_handled_within_one_second_while_a_record_encode_runs
+28.3%  0.717 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+28.8%  0.712 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_9_shared_range_table
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.148 148/19 COMPU_TAB through own methods (VALUEs) per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_19_tab_through_own_method_values
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.148 150/arr-6 long matched range text referenced per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_6_long_matched_range_text_referenced
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.148 150/arr-7 TAB_INTP decode per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_7_tab_intp_decode
+33.7%  0.133 s / 0.200 s  R-PE-BENCH.97/3 median gap  tests/test_b103_inc9b_at.py::test_r_pe_bench_97_3_the_gaps_between_changed_titles_stay_within_the_bounds
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE per-object part 8S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_9_shared_range_table
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.148 150/arr-6 long matched range text referenced per-object part 8S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_6_long_matched_range_text_referenced
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.148 150/arr-7 TAB_INTP decode per-object part 8S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_7_tab_intp_decode
+50.0%  0.250 s / 0.500 s  R-PE-BENCH.94/4 queued decode cue  tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs
+54.6%  0.454 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+55.0%  0.450 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+58.3%  0.125 s / 0.300 s  R-PE-BENCH.102/2 idle after the filter keystroke  tests/test_b103_inc9b_w.py::test_r_pe_bench_102_2_a_filter_that_drops_the_row_returns_the_idle_look_within_0_3_s
+59.1%  0.409 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+59.4%  0.203 s / 0.500 s  R-A2L-DEF.148 150/arr-1 enum table decode 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_1_shared_enum_table_decode
+62.5%  0.188 s / 0.500 s  R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk
+63.7%  0.109 s / 0.300 s  R-PE-BENCH idle after decode LARGE  tests/test_b103_inc9b_w.py::test_r_pe_bench_100_1_the_cue_leaves_within_0_3_s_of_a_decode_result_and_the_values_show
+66.7%  0.500 s / 1.500 s  R-A2L-DEF.148 148/13 long conversion type word per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word
+66.7%  0.500 s / 1.500 s  R-A2L-DEF.148 148/19 COMPU_TAB through own methods (VAL_BLKs) per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_19_tab_through_own_method_val_blks
+68.1%  0.319 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+68.3%  0.317 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+68.7%  0.094 s / 0.300 s  R-PE-BENCH idle after preview VAL_BLK_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_101_1_a_preview_refusal_returns_the_idle_look_within_0_3_s
+68.8%  0.156 s / 0.500 s  R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_9_shared_range_table
+74.0%  0.078 s / 0.300 s  R-PE-BENCH idle after preview VAL_BLK_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result
+74.0%  0.078 s / 0.300 s  R-PE-BENCH idle after decode MAP_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_101_6_a_decode_whose_worker_raises_returns_the_idle_look_within_0_3_s
+74.6%  0.254 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+75.0%  0.500 s / 2.000 s  R-A2L-DEF.148 148/13 long conversion type word per-object part 8S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word
+75.0%  0.500 s / 2.000 s  R-A2L-DEF.148 148/19 COMPU_TAB through own methods (VAL_BLKs) per-object part 8S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_19_tab_through_own_method_val_blks
+79.9%  0.101 s / 0.500 s  R-A2L-DEF.149/10 empty table name 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object
+81.2%  0.094 s / 0.500 s  R-A2L-DEF.148 148/13 long conversion type word 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word
+81.2%  0.094 s / 0.500 s  R-A2L-DEF.148 148/19 COMPU_TAB through own methods (VAL_BLKs) 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_19_tab_through_own_method_val_blks
+81.2%  0.094 s / 0.500 s  R-A2L-DEF.148 150/arr-6 long matched range text referenced 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_6_long_matched_range_text_referenced
+81.2%  0.094 s / 0.500 s  R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (VALUEs) 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_values
+83.3%  0.084 s / 0.500 s  R-A2L-DEF.149/7 conversion type word 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object
+84.4%  0.078 s / 0.500 s  R-A2L-DEF.148 148/19 COMPU_TAB through own methods (VALUEs) 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_19_tab_through_own_method_values
+84.4%  0.078 s / 0.500 s  R-A2L-DEF.148 150/arr-7 TAB_INTP decode 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_7_tab_intp_decode
+85.3%  0.074 s / 0.500 s  R-A2L-DEF.149/6 FORMAT word 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object
+87.5%  0.062 s / 0.500 s  R-A2L-DEF.148 148/3 layout first line VALUE 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_3_shared_layout_first_line_value
+88.1%  0.060 s / 0.500 s  R-A2L-DEF.149/8 COMPU_TAB_REF word 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object
+89.5%  0.053 s / 0.500 s  R-A2L-DEF.149/9 CUBOID layout 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid
+91.3%  0.437 s / 5.000 s  R-PE-BENCH idle after decode MAP_DEF_0001  tests/test_b103_inc9b_w.py::test_r_pe_bench_95_0_control_a_decode_held_past_the_grace_does_paint_the_cue
+100.0%  0.000 s / 2.000 s  R-A2L-DEF.148 148/19 COMPU_TAB through own methods (VALUEs) per-object part 8S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_19_tab_through_own_method_values
+100.0%  0.000 s / 2.000 s  R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK per-object part 8S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk
+QC-TM: 56 bounds, 10 under 20 % margin
+=========================== short test summary info ===========================
+FAILED tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l
+FAILED tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_3_shared_layout_first_line_value
+FAILED tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_values
+FAILED tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_1_shared_enum_table_decode
+FAILED tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_10_element_decode_does_not_grow_with_name[enum]
+FAILED tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_10_element_decode_does_not_grow_with_name[number]
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_scaling_method
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_scaling_range_table
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object
+FAILED tests/test_b103_a2l_list_view.py::test_r_a2l_list_035_1 - AttributeErr...
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_time - A...
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_time - A...
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_memory
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_memory
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_memory
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_words_memory - ...
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_12_1_a_200_name_software_a_page_paints_within_half_a_second
+FAILED tests/test_b103_inc8_s2_sheet_rows.py::test_r_pe_def_12_2_a_page_of_200_one_mebibyte_text_spans_paints_within_half_a_second
+FAILED tests/test_b103_label_list.py::test_r_a2l_list_078_3 - AttributeError:...
+================= 26 failed, 29 passed in 1172.97s (0:19:32) ==================

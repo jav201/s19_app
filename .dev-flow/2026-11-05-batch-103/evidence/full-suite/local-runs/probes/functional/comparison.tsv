@@ -1,0 +1,22 @@
+nodeid	base	head	classification	base_message	head_message
+tests/test_b100_document.py::test_at_b100_08_saved_document_reopens_with_the_project[size0]	passed	failure	regresion		AssertionError: click missed #patch_paste_text | assert False
+tests/test_b100_document.py::test_tc_b100_29_second_save_of_the_bound_document_writes_nothing	passed	failure	regresion		assert False
+tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files	passed	passed	ambos_pasan
+tests/test_b100_project_homes.py::test_tc_b100_32_unload_of_an_a2l_only_session_clears_the_a2l	failure	failure	heredado	AssertionError: [] | assert ('Unloaded A2L.' in [])	"AssertionError: [""Loaded project 'P' -> (no image) - 0 variants, 0 problems - details: p""] | assert ('Unloaded A2L.' in [""Loaded project 'P' -> (no image) - 0 variants, 0 problems - details: p""])"
+tests/test_b100_save_guards.py::test_at_b100_02_name_refusals_through_the_save_dialog[size1]	passed	passed	ambos_pasan
+tests/test_b100_save_image.py::test_tc_b100_59_files_row	failure	passed	contexto	AssertionError: timed out waiting for the save
+tests/test_b100_save_image.py::test_tc_b100_59_own_a2l_by_name_and_bytes[True]	passed	failure	regresion		AssertionError: ['busy: Loading firmware.a2l is running — wait for it to finish.', 'A2L loaded: firmware.a2l'] | assert False |  +  where False = any(<generator object test_tc_b100_59_own_a2l_by_name_and_bytes.<locals>.<genexpr> at 0x0000029DAEF2B1D0>)
+tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys	passed	passed	ambos_pasan
+tests/test_b101_designer_writes.py::test_at_i5_4_save_back_by_keys_then_display	passed	failure	regresion		AssertionError: timed out waiting for #patch_entry_address_input after key '6'
+tests/test_b101_inplace_views.py::test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table	passed	failure	regresion		AssertionError: #patch_entry_edit_button is not shown on the screen
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded]	passed	passed	ambos_pasan
+tests/test_b103_inc10_mu_survivors.py::test_r_s19_s0header_001_2_6_a_long_written_name_is_cut_to_252_bytes	absent	failure	sin_control_ausente_en_base		AssertionError: timed out waiting for the save-back status
+tests/test_b97_patch_editor.py::test_tc_b97_39_strip_follows_the_highlight	failure	failure	heredado	AssertionError: (1, '0xeb40', ['#c2c2c2', '#c2c2c2', '#c2c2c2', '#c2c2c2', '#9b9b9b', '#9b9b9b', ...]) | assert False is True |  +  where False = is_teal('#c2c2c2')	AssertionError: (1, '0xeb40', ['#c2c2c2', '#c2c2c2', '#c2c2c2', '#c2c2c2', '#9b9b9b', '#9b9b9b', ...]) | assert False is True |  +  where False = is_teal('#c2c2c2')
+tests/test_b97_patch_editor.py::test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size0]	failure	failure	heredado	AssertionError: (('#232323', '#0e0e0e'), '#1b233a') | assert '#232323' == '#1b233a' |    |   - #1b233a |   + #232323	AssertionError: (('#232323', '#0e0e0e'), '#1b233a') | assert '#232323' == '#1b233a' |    |   - #1b233a |   + #232323
+tests/test_b99_bytes_field.py::test_at_b99_12_typed_hex_run_saves_back	passed	failure	regresion		AssertionError: click missed #patch_entry_add_button | assert False
+tests/test_b99_bytes_field.py::test_tc_b99_33_field_and_help_state_the_hex_rule	passed	failure	regresion		AssertionError: placeholder 'hex bytes, e.g. DE AD BE EF' (27 chars) clips the compact input at width 118 (inner 0) | assert 27 <= 0 |  +  where 27 = len('hex bytes, e.g. DE AD BE EF')
+tests/test_tui_patch_card.py::test_at080d_reachable_with_card[size0]	passed	failure	regresion		AssertionError: @(80, 24): B2 REGRESSION — buttons trapped inside a scrollable body: ['patch_saveback_format_button', 'patch_saveback_width_button', 'patch_saveback_confirm_button', 'patch_saveback_decline_button', 'patch_before_after_button'] | assert ['patch_saveb...after_button'] == [] |    |   Left contains 5 more items, first extra item: 'patch_saveback_format_button' |   Use -v to get more diff
+tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression	passed	failure	regresion		AssertionError: Apply: line must post | assert False is True
+tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry	passed	passed	ambos_pasan
+tests/test_tui_patch_editor_v2.py::test_at_batch41_escape_cancels_changeset_json_popup	failure	passed	contexto	textual.css.query.NoMatches: No nodes match '#changeset_json_text' on ChangeSetJsonScreen()
+tests/test_tui_patch_history_strip.py::test_tc081_1_derived	passed	passed	ambos_pasan

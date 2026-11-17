@@ -1,0 +1,13 @@
+date=2026-11-16T15:33:21-06:00
+HEAD=35fabb25c42d752216433c095eb0d29024027294
+TREE=048519b1229500912c2a65dd2b4c4f21ef70aa5f
+MAIN=0c3a6bd4674c3f2df90a7399898fc98429f5a200
+ORIGIN_MAIN=0c3a6bd4674c3f2df90a7399898fc98429f5a200
+STATUS=clean
+Python 3.12.7
+exe=[USER_HOME]\anaconda3\python.exe
+cpu_count=16
+pytest=8.3.4
+textual=8.2.8
+xdist=3.8.0
+lanes=main(not serial_timing,-n16,loadfile)+serial(serial_timing,-n0); stdin=closed; bytecode=disabled; pytest_cache=disabled; clipboard_CI_guards=unset

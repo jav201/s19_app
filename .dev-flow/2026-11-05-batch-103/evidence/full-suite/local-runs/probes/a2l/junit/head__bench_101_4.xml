@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="12.439" timestamp="2026-11-16T17:55:37.257816-06:00" hostname="[HOST]"><testcase classname="tests.test_b103_inc9b_s" name="test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look" time="12.078"><failure message="AssertionError: did not settle within 5 s: the busy cue `stage VAL_BLK_DEF_0001` on the painted border">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/head__bench_101_4/tmp/pytest-of-[ACCOUNT]/pytest-0/test_r_pe_bench_101_4_a_record0')
+defc_dir = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/head__bench_101_4/tmp/pytest-of-[ACCOUNT]/pytest-0/b103_inc9_w_defc0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000028431E18CB0&gt;
+
+    @pytest.mark.serial_timing
+    def test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.101/4 (EX-BC9). Same as .101/3 with a session action started during the held encode (R-PE-BENCH.83): the
+        write is refused with the busy line, no entry, and the window is idle within 0.3 s of that status. Negative control: a
+        record hold released only by the stepped refresh's end is never released on this refusal -&gt; amber stays -&gt; RED."""
+        gate = Gate(monkeypatch, "encode_values")
+        statuses = stamped_statuses(monkeypatch)
+
+        async def body(app, pilot, panel):
+            def sabotage():
+                app._busy_begin_action("file_load", "x.s19")
+                return app._running_session_action().label
+
+            return await refused_at_the_write(pilot, app, panel, gate, sabotage, statuses, lambda label: _BUSY_LINE.format(label=label))
+
+&gt;       latency, entries, job = run(tmp_path, defc_dir, body)
+
+tests\test_b103_inc9b_s.py:234:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b103_inc9_w.py:44: in run
+    return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
+tests\support\b103_inc8_p.py:135: in drive
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b103_inc8_p.py:131: in _drive
+    return await body(app, pilot, app.query_one("#patch_editor_panel"))
+tests\test_b103_inc9b_s.py:232: in body
+    return await refused_at_the_write(pilot, app, panel, gate, sabotage, statuses, lambda label: _BUSY_LINE.format(label=label))
+tests\test_b103_inc9b_s.py:178: in refused_at_the_write
+    await wait_for(pilot, lambda: busy_look(app, win, VB), "the busy cue `stage VAL_BLK_DEF_0001` on the painted border", 5)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'nocolor', 'dark', 'focus'})&gt;
+predicate = &lt;function refused_at_the_write.&lt;locals&gt;.&lt;lambda&gt; at 0x0000028432927920&gt;
+what = 'the busy cue `stage VAL_BLK_DEF_0001` on the painted border'
+timeout = 5, delay = 0.02
+
+    async def wait_for(pilot, predicate, what: str, timeout: float = 30.0, delay: float = 0.02) -&gt; None:
+        """Bounded real-delay pump-until: jobs run on worker threads and need wall time."""
+        end = time.monotonic() + timeout
+        while time.monotonic() &lt; end:
+            await pilot.pause(delay)
+            if predicate():
+                return
+&gt;       raise AssertionError(f"did not settle within {timeout} s: {what}")
+E       AssertionError: did not settle within 5 s: the busy cue `stage VAL_BLK_DEF_0001` on the painted border
+
+tests\support\b103_inc9_w.py:92: AssertionError</failure></testcase></testsuite></testsuites>

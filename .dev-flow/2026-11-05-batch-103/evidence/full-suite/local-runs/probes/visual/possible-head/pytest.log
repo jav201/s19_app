@@ -1,0 +1,508 @@
+[USER_HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+FFFFF..F                                                                 [100%]
+================================== FAILURES ===================================
+________ test_tc_b100_34_load_failing_before_its_copy_records_nothing _________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-visual/possible-head/tmp/pytest-of-[ACCOUNT]/pytest-0/test_tc_b100_34_load_failing_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FAE3B23170>
+
+    @STORE_WRITE
+    def test_tc_b100_34_load_failing_before_its_copy_records_nothing(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """LLR-172.1d (4 arms): a store holding 1 entry, then a path that does
+        not exist, a file with an unsupported suffix, an outside source over the
+        placement's per-file cap (the cap lowered through
+        ``copy_into_workarea``'s default, finding F-3; ``Cannot load file:``) and
+        an outside A2L while the open project already holds an A2L (``Project
+        already has an A2L file.``) \u2192 the store's SHA-256 unchanged after each.
+        Control (proves the store is live, so "unchanged" means something): an
+        outside load that copies \u2192 2 entries, the new source first.
+
+        RED (base): the control records nothing. Negative control: recording
+        before the copy \u2192 the over-cap arm adds 1 entry \u2192 RED."""
+        base = tmp_path / "app"
+        projects.save_case01_project(base, "pa", files=("firmware.s19", "firmware.a2l"))
+        store = _store_of(_lad(tmp_path, monkeypatch))
+        seeded = tmp_path / "seed" / "old.s19"
+        digest = _seed(store, [_entry(seeded)])
+        missing = tmp_path / "src" / "missing.s19"
+        notes = tmp_path / "src" / "notes.txt"
+        notes.parent.mkdir(parents=True, exist_ok=True)
+        notes.write_text("not firmware", encoding="utf-8")
+        big = tmp_path / "src" / "big.s19"
+        big.write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes() * 8)
+        other_a2l = _outside(tmp_path, "y.a2l", source="firmware.a2l")
+        good = _outside(tmp_path, "good.s19")
+        copy = workspace_module.copy_into_workarea
+        real_defaults = copy.__defaults__
+
+        async def _scenario(app, pilot, log):
+            after = {}
+            app._load_path_from_user_input(missing)
+            for _ in range(10):
+                await pilot.pause()
+            after["missing"] = _sha(store)
+            app._load_path_from_user_input(notes)
+            for _ in range(10):
+                await pilot.pause()
+            after["unsupported"] = _sha(store)
+            monkeypatch.setattr(copy, "__defaults__", (1024,) + tuple(real_defaults[1:]))
+            mark = len(log.messages)
+            app.load_from_path(big)
+            for _ in range(20):
+                await pilot.pause()
+            monkeypatch.setattr(copy, "__defaults__", real_defaults)
+            after["over cap"] = (_sha(store), _with(log.since(mark), "Cannot load file:"))
+            await projects.load_project(pilot, app, "pa")
+            mark = len(log.messages)
+            app.load_a2l_from_path(other_a2l)
+            for _ in range(20):
+                await pilot.pause()
+            await settle_workers(pilot)  # Inc 12b R-4: the A2L attach is a worker
+            after["project has an A2L"] = (_sha(store), _with(log.since(mark), "Project already has an A2L file."))
+            app.load_from_path(good)
+            await _wait_image(pilot, app, good.name)
+            return after
+
+        after = projects.run_app(base, _scenario)
+        assert after["missing"] == digest and after["unsupported"] == digest, after
+        assert after["over cap"][0] == digest and len(after["over cap"][1]) == 1, after
+>       assert after["project has an A2L"][0] == digest and len(after["project has an A2L"][1]) == 1, after
+E       AssertionError: {'missing': 'e93db17505ae35d319de3a137d8dee5db0df110f5717805bd69898957740ff49', 'over cap': ('e93db17505ae35d319de3a13...f110f5717805bd69898957740ff49', []), 'unsupported': 'e93db17505ae35d319de3a137d8dee5db0df110f5717805bd69898957740ff49'}
+E       assert ('e93db17505ae...898957740ff49' == 'e93db17505ae...898957740ff49'
+E
+E         Skipping 53 identical leading characters in diff, use -v to show
+E           8957740ff49 and 0 == 1)
+E        +  where 0 = len([])
+
+tests\test_b100_recents.py:864: AssertionError
+_____ test_tc_b100_34_twenty_five_outside_loads_keep_twenty_newest_first ______
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-visual/possible-head/tmp/pytest-of-[ACCOUNT]/pytest-0/test_tc_b100_34_twenty_five_ou0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FAE40BBDD0>
+
+    @STORE_WRITE
+    def test_tc_b100_34_twenty_five_outside_loads_keep_twenty_newest_first(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """HLR-172: 25 distinct outside sources loaded through the shipped
+        dispatcher \u2192 20 entries, newest first (entry 1 = source 25, entry 20 =
+        source 6), in ``<LOCALAPPDATA>/s19_app/recent_sources.json``; 0 files
+        named ``recent_sources.json`` under the base folder.
+
+        RED (base, code read): ``grep LOCALAPPDATA s19_app`` \u2192 0 hits \u2192 no
+        store file."""
+        store = _store_of(_lad(tmp_path, monkeypatch))
+        sources = [_outside(tmp_path, f"s{n:02d}.s19") for n in range(1, 26)]
+        base = tmp_path / "app"
+
+        async def _scenario(app, pilot, log):
+            for source in sources:
+                app._load_path_from_user_input(source)
+                await _wait_image(pilot, app, source.name)
+
+>       projects.run_app(base, _scenario)
+
+tests\test_b100_recents.py:1360:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b100_recents.py:1358: in _scenario
+    await _wait_image(pilot, app, source.name)
+tests\test_b100_recents.py:338: in _wait_image
+    await projects.wait_for(
+tests\support\b100_projects.py:626: in wait_for
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _wait_image.<locals>.<lambda> at 0x000001FAE65D7D80>
+failure = 'timed out waiting for the image s25.s19 installed'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: timed out waiting for the image s25.s19 installed
+
+tests\support\timing.py:66: AssertionError
+__________ test_r_tui_042a_5_7_save_project_commit_keeps_the_w_form ___________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-visual/possible-head/tmp/pytest-of-[ACCOUNT]/pytest-0/test_r_tui_042a_5_7_save_proje0')
+
+    def test_r_tui_042a_5_7_save_project_commit_keeps_the_w_form(tmp_path: Path) -> None:
+        """R-TUI-042a.5 case /7: LONGMAP(48) at 80�54, one byte applied, the entry
+        edited, key 2, then the Save project commit � the repaint keeps 6 + ``�`` + 7."""
+        async def _run(app, pilot, log):
+            base = Path(app.base_dir)
+            a2l = _write_a2l(base, page_long(48))
+            await _load(app, pilot, base, a2l)
+            await _patch_apply(pilot, app, log, base / "docs", "d.json", [(ADDR, b"\xaa")])
+            await _edit_entry(pilot, app, log, f"0x{ADDR:08X}", "55")
+            table = await _show_a2l(app, pilot)
+            await wait_until(pilot, lambda: _all_rows_in_measured_form(app, table), "key 2 fit", timeout=30)
+            await _save_project_commit(pilot, app, log)
+            # the commit must have written the edited byte, so the repaint after
+            # the write is genuinely what is being asserted (not a stale fit).
+            assert app.current_file.mem_map.get(ADDR) == 0x55, app.current_file.mem_map.get(ADDR)
+            tag_idx = _tag_index(table)
+            await wait_until(
+                pilot,
+                lambda: table.get_row_at(0)[tag_idx].plain == "\u2713 SYN_MA\u2026LLL_END",
+                lambda: f"Tag cell {table.get_row_at(0)[tag_idx].plain!r}",
+                timeout=15,
+            )
+            geom = _geom(table)
+            _assert_painted_tag_cell(table, geom, 0, table.get_row_at(0)[tag_idx].plain)
+
+        base = tmp_path / "app"
+        base.mkdir(parents=True, exist_ok=True)
+        _write_image(base)
+>       projects.run_app(base, _run, size=(80, 54))
+
+tests\test_b103_inc12_tag_table.py:929:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b103_inc12_tag_table.py:909: in _run
+    await _edit_entry(pilot, app, log, f"0x{ADDR:08X}", "55")
+tests\test_b103_inc12_tag_table.py:873: in _edit_entry
+    await _press_shown(pilot, p.query_one("#patch_entry_edit_button", Button))
+tests\test_b103_inc12_tag_table.py:827: in _press_shown
+    await wait_until(pilot, lambda: button.region.width > 0, f"#{button.id} is not shown")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _press_shown.<locals>.<lambda> at 0x000001FAE72E4900>
+failure = '#patch_entry_edit_button is not shown'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: #patch_entry_edit_button is not shown
+
+tests\support\timing.py:66: AssertionError
+______________ test_tc_b97_flow_execution_css_section_is_scoped _______________
+
+    def test_tc_b97_flow_execution_css_section_is_scoped() -> None:
+        """D23 / design �6.1 Inc-6 (11): every rule of the ``/* batch-97
+        flow_execution */`` section is rooted at ``#fx_panel`` or
+        ``#screen_flow_execution``; the shared ``.flow-name-strip``, the
+        ``.sev-*`` rules, ``.modal-hint``, ``.patch-docked-row,
+        .patch-docked-group`` and the ``/* batch-97 flow_builder */`` section are
+        byte-equal to HEAD ``b514b07``.
+
+        RED on HEAD: no section. Mutation: an unscoped ``.flow-name-strip {
+        margin-bottom: 0; }``.
+        """
+        sheet = (REPO_ROOT / "s19_app/tui/styles.tcss").read_text(encoding="utf-8").replace("\r\n", "\n")
+        marker = "/* batch-97 flow_execution"
+        assert marker in sheet, "a scoped flow_execution section exists"
+        section = sheet[sheet.index(marker):]
+        # batch-97 Inc-8 (named supersession): the key bar's section is appended
+        # after this one, so this section ends at the next batch-97 section.
+        later = section.find("/* batch-97 ", len(marker))
+        section = section if later < 0 else section[:later]
+        section = re.sub(r"/\*.*?\*/", "", section, flags=re.S)
+        selectors = [s.strip() for block in re.findall(r"([^{}]+)\{", section) for s in block.split(",")]
+        assert selectors, "the section holds rules"
+        unscoped = [s for s in selectors if not s.startswith(("#fx_panel", "#screen_flow_execution"))]
+        assert unscoped == [], unscoped
+        try:
+            old = subprocess.run(
+                ["git", "show", "b514b07:s19_app/tui/styles.tcss"], cwd=REPO_ROOT, capture_output=True, check=True,
+            ).stdout.decode("utf-8").replace("\r\n", "\n")
+        except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+            pytest.skip(f"git or commit b514b07 unavailable � byte-equality arm cannot run: {exc}")
+
+        def block(text: str, head: str) -> str:
+            start = text.index(head)
+            return text[start:text.index("}", start) + 1]
+
+        # batch-97 Inc-8 gate fold (named supersession, operator decision at the
+        # Inc-8 gate 2026-10-23, LED-�97.37): the one shipped rule Inc-8 edits is
+        # `.map-region-scroll`'s floor (2 -> 1) and its comment; every other byte
+        # of the b514b07 sheet is still a prefix.
+        map_old = re.search(r" \* remaining height; the scrollbar renders.*?min-height: 2;\n\}", old, re.S)
+        map_new = re.search(r" \* remaining height; the scrollbar renders.*?min-height: 1;\n\}", sheet, re.S)
+        assert map_old and map_new, "the .map-region-scroll block is located in both sheets"
+        old = old.replace(map_old.group(0), map_new.group(0))
+
+        # batch-100 named supersessions (fix round 2, R-2): three later
+        # increments edit the b514b07 sheet mid-file. Each edit is applied to
+        # `old` and located exactly once, so every other b514b07 byte stays
+        # guarded. The product CSS is untouched.
+        def supersede(text: str, before: str, after: str, why: str) -> str:
+            assert text.count(before) == 1, why
+            return text.replace(before, after)
+
+        def inserted(head: str, last_rule: str, why: str) -> str:
+            found = re.findall(re.escape(head) + r".*?" + re.escape(last_rule) + r" \{[^}]*\}\n\n", sheet, re.S)
+            assert len(found) == 1, why
+            return found[0]
+
+        # 741cc07 (batch-100 Inc 9b, HLR-173, ruling Q9 � the unified Load
+        # dialog retires the Load-project screen): `#load_dialog` leaves the
+        # shared `.modal-dialog` rule, `#project_list` leaves the list rule, and
+        # two Load-dialog blocks are inserted.
+        old = supersede(old, ".modal-dialog,\n#load_dialog {", ".modal-dialog {", "741cc07 .modal-dialog")
+        old = supersede(old, "#project_list, #variant_list {", "#variant_list {", "741cc07 #variant_list")
+        box = inserted("/* Load dialog (batch-100 increment 9b, HLR-173)", "#load_box", "741cc07 #load_box block")
+        old = supersede(old, "\n.modal-title {", "\n" + box + ".modal-title {", "741cc07 #load_box anchor")
+        panes = inserted("/* --- Load dialog panes / list / preview (batch-100 increment 9b)", "#load_reason", "741cc07 panes block")
+        old = supersede(old, "/* --- Save-project per-variant", panes + "/* --- Save-project per-variant", "741cc07 panes anchor")
+        # 53d08d5 (batch-100 Inc 11, HLR-175): the Save project dialog block is
+        # inserted before the report viewer section.
+        save = inserted("/* --- Save project dialog (batch-100 increment 11, HLR-175)", "#save_summary Static", "53d08d5 save block")
+        old = supersede(old, "/* --- Report viewer modal", save + "/* --- Report viewer modal", "53d08d5 save anchor")
+        # d7b427d (batch-100 Inc 12a, LLR-176.1, ruling Q9 � at most one busy
+        # rule): the `#status_text.-busy` tint is inserted in the status bar.
+        busy = inserted("/* Inc 12a (S-g, ruling Q9)", "#workspace_status_bar #status_text.-busy", "d7b427d busy block")
+        old = supersede(old, "/* Right-aligned so the context reads", busy + "/* Right-aligned so the context reads", "d7b427d busy anchor")
+        # 7a3e536 (batch-102 Inc 4, US-102-04 � the bulk A2L include modal): the
+        # `#bulk_param_*` rules are inserted at the end of the Calm Dark modal
+        # block, between the changeset JSON editor and the Legend modal section.
+        # The E5 tc033 correction re-themed the two dim colours inside this
+        # inserted block to $fg-base; those bytes are not b514b07 bytes.
+        bulk = inserted("/* --- Bulk-add popup (batch-102 Inc 4", "#bulk_param_summary", "7a3e536 bulk block")
+        old = supersede(old, "/* --- Legend modal (batch-18, LLR-023.1)", bulk + "/* --- Legend modal (batch-18, LLR-023.1)", "7a3e536 bulk anchor")
+        # dc55e56 (batch-102 Inc 3, the shared A2L picker in the Check Editor):
+        # the picker's status line joins the check editor's nowrap/ellipsis
+        # selector list.
+        old = supersede(
+            old,
+            "#check_apply_hint,\n#check_editor_panel .ce-hint {",
+            "#check_apply_hint,\n#check_param_status,\n#check_editor_panel .ce-hint {",
+            "dc55e56 #check_param_status nowrap",
+        )
+        # dc55e56 (batch-102 Inc 3, cont.): the picker's count line and the
+        # pagination page read-out are inserted between #check_full_name_line
+        # and the controls row.
+        picker = inserted("/* The picker's separate count line", "#check_param_page_label", "dc55e56 picker blocks")
+        old = supersede(old, "#check_param_controls,\n#check_mem_controls,", picker + "#check_param_controls,\n#check_mem_controls,", "dc55e56 picker anchor")
+        # db1a8f7 (batch-102 Inc 5, US-102-05 � the Patch Editor A2L picker):
+        # #patch_win_a2l joins the tab-window height rule, and the patch-scoped
+        # picker rules block is inserted before the JSON/paste panes rule.
+        old = supersede(
+            old,
+            "#patch_editor_panel #patch_win_checks {\n    height: 100%;",
+            "#patch_editor_panel #patch_win_checks,\n#patch_editor_panel #patch_win_a2l {\n    height: 100%;",
+            "db1a8f7 #patch_win_a2l heights",
+        )
+        pe_picker = inserted("/* --- Patch A2L tab (batch-102 Inc 5", "#patch_editor_panel #patch_param_controls,\n#patch_editor_panel #patch_param_use_row", "db1a8f7 patch picker block")
+        old = supersede(old, "#patch_editor_panel #patch_json_view,", pe_picker + "#patch_editor_panel #patch_json_view,", "db1a8f7 patch picker anchor")
+        # 894bb3db (batch-103 Inc 8, group P: the staging sheet over LANDS IN; R-TUI-063.1, .3,
+        # R-PE-DEF.1.1, .2, .74, R-PE-041): one named supersession per in-place edit of a b514b07
+        # rule (E4 integration, ruling RR-5; reconciled with evidence-e4/impl-p/css_law_probe.py).
+        # Each `before` is the exact old text, located exactly once; the `startswith` assertion
+        # below is not edited. The `.ce-row` / `.ce-label` re-scope (#patch_win_a2l ->
+        # #patch_filter_row) lies inside db1a8f7's inserted block, read from the sheet: no entry.
+        old = supersede(
+            old,
+            "#patch_editor_panel #patch_main {\n    height: 1fr;\n    min-height: 12;\n}\n",
+            "/* batch-103 Inc 8: the STAGING SHEET window takes every row the other\n"
+            " * regions leave, never fewer than 12 (R-PE-DEF.1.1, .74); it scrolls with\n"
+            " * the panel below that. */\n"
+            "#patch_editor_panel #patch_sheet_win {\n    height: 1fr;\n    min-height: 12;\n    padding: 0;\n"
+            "    border: round $rule;\n    border-title-color: #969aad;      /* insight_style.DGRAY */\n"
+            "    border-subtitle-color: #969aad;   /* insight_style.DGRAY */\n}\n",
+            "894bb3db Inc 8 R-TUI-063.1 #patch_main -> #patch_sheet_win",
+        )
+        old = supersede(
+            old,
+            "#patch_editor_panel #patch_win_script {\n    width: 3fr;\n    height: 100%;\n    padding: 0;\n"
+            "    border: round $rule;\n    border-title-color: #969aad;      /* insight_style.DGRAY */\n"
+            "    border-subtitle-color: #969aad;   /* insight_style.DGRAY */\n}\n",
+            "/* batch-103 Inc 8: the ledger is the Patch script tab, with no border of\n"
+            " * its own; its subtitle rides the landing pane (R-PE-041). */\n"
+            "#patch_editor_panel #patch_win_script {\n    height: 100%;\n    padding: 0;\n}\n",
+            "894bb3db Inc 8 R-PE-041 borderless #patch_win_script",
+        )
+        old = supersede(
+            old,
+            "/* The 45-cell floor keeps the pane's 41 content cells, so the execute row\n"
+            " * and the strip's 8-byte rows fit at 120-133 columns too, where the rail\n"
+            " * widens; the ledger then pays (its table scrolls sideways there). */\n"
+            "#patch_editor_panel #patch_inspector {\n    width: 2fr;\n    min-width: 45;\n    height: 100%;\n"
+            "    padding: 0 1;\n    border: round $rule;\n    border-title-color: #969aad;      /* insight_style.DGRAY */\n}\n",
+            "/* batch-103 Inc 8: LANDS IN, the landing pane, spans the panel in 9 rows\n"
+            " * (R-PE-DEF.1.1): the chips and 6 content rows inside its border. */\n"
+            "#patch_editor_panel #patch_inspector {\n    width: 100%;\n    height: 9;\n    padding: 0 1;\n"
+            "    border: round $rule;\n    border-title-color: #969aad;      /* insight_style.DGRAY */\n"
+            "    border-subtitle-color: #969aad;   /* insight_style.DGRAY */\n}\n",
+            "894bb3db Inc 8 R-PE-DEF.1.1 #patch_inspector 9-row LANDS IN",
+        )
+        old = supersede(
+            old,
+            "#patch_editor_panel #patch_win_script:focus-within,\n",
+            "#patch_editor_panel #patch_sheet_win:focus-within,\n",
+            "894bb3db Inc 8 R-PE-DEF.4 focus rule follows the sheet window",
+        )
+        old = supersede(
+            old,
+            "#patch_editor_panel #patch_win_checks,\n#patch_editor_panel #patch_win_a2l {\n    height: 100%;",
+            "#patch_editor_panel #patch_win_checks {\n    height: 100%;",
+            "894bb3db Inc 8 R-TUI-063.3 #patch_win_a2l leaves the tab-window height rule",
+        )
+        inc8 = inserted("/* --- Filter row and bench state (batch-103 Inc 8", "#patch_editor_panel.-bench #patch_inspector", "894bb3db Inc 8 block")
+        old = supersede(old, "/* batch-97 flow_builder", inc8 + "/* batch-97 flow_builder", "894bb3db Inc 8 anchor")
+>       assert sheet.startswith(old.rstrip()), "every rule shipped at b514b07 is byte-equal; Inc-6 only appends"
+E       AssertionError: every rule shipped at b514b07 is byte-equal; Inc-6 only appends
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x000001FAE0F2FE60>('/* s19_app/tui/styles.tcss\n *\n * Direction B "Calm Dark" theme for the s19tui Textual app.\n *\n * Origin: extracte...#flow_panel #flow_legend {\n    height: 1;\n    padding: 0 1;\n    text-wrap: nowrap;\n    text-overflow: ellipsis;\n}')
+E        +    where <built-in method startswith of str object at 0x000001FAE0F2FE60> = '/* s19_app/tui/styles.tcss\n *\n * Direction B "Calm Dark" theme for the s19tui Textual app.\n *\n * Origin: extracte...$bg-panel;\n    color: $accent-calm;\n}\n\n#block_edit_dialog .flow-browse:focus {\n    text-style: bold reverse;\n}\n'.startswith
+E        +    and   '/* s19_app/tui/styles.tcss\n *\n * Direction B "Calm Dark" theme for the s19tui Textual app.\n *\n * Origin: extracte...#flow_panel #flow_legend {\n    height: 1;\n    padding: 0 1;\n    text-wrap: nowrap;\n    text-overflow: ellipsis;\n}' = <built-in method rstrip of str object at 0x000001FAE5A55020>()
+E        +      where <built-in method rstrip of str object at 0x000001FAE5A55020> = '/* s19_app/tui/styles.tcss\n *\n * Direction B "Calm Dark" theme for the s19tui Textual app.\n *\n * Origin: extracte...low_panel #flow_legend {\n    height: 1;\n    padding: 0 1;\n    text-wrap: nowrap;\n    text-overflow: ellipsis;\n}\n'.rstrip
+
+tests\test_b97_flow_execution.py:2153: AssertionError
+__________________ test_tc024_report_trigger_surfaces_paths ___________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-visual/possible-head/tmp/pytest-of-[ACCOUNT]/pytest-0/test_tc024_report_trigger_surf0')
+
+    def test_tc024_report_trigger_surfaces_paths(tmp_path: Path) -> None:
+        """A successful report trigger surfaces both written paths (LLR-005.4).
+
+        Intent: after a comparison, the Report button generates BOTH the Markdown
+        and HTML reports via the diff-report service and the status line shows a
+        filename matching each regex.
+        """
+        import s19_app.tui.app as app_mod
+        from s19_app.tui.services.diff_report_service import (
+            DIFF_REPORT_FILENAME_REGEX,
+            DIFF_REPORT_HTML_FILENAME_REGEX,
+            DiffReportResult,
+        )
+
+        fake = _diff_result([(0x10, 0x14, "changed")])
+        md_path = tmp_path / "20260101T000000Z-diff-report.md"
+        html_path = tmp_path / "20260101T000000Z-diff-report.html"
+
+        def _gen_md(*_a, **_k):
+            md_path.write_text("md", encoding="utf-8")
+            return DiffReportResult(path=md_path, written=True)
+
+        def _gen_html(*_a, **_k):
+            html_path.write_text("html", encoding="utf-8")
+            return DiffReportResult(path=html_path, written=True)
+
+        async def _drive() -> str:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("diff")
+                await pilot.pause()
+                await _b78_press_compare(app, pilot)
+                app.query_one("#diff_report_button").press()
+                # batch-68 N5: the two generators now run on a worker thread, so
+                # the status is written after this handler returns. A bare pause()
+                # passed only because the fake generators are instant � a race this
+                # suite must not depend on.
+                await app.workers.wait_for_complete()
+                await pilot.pause()
+                return str(app.query_one("#diff_status").render())
+
+        monkey = pytest.MonkeyPatch()
+        monkey.setattr(app_mod.deps, "compare_images", lambda *a, **k: fake)
+        monkey.setattr(app_mod.deps, "generate_diff_report", _gen_md)
+        monkey.setattr(app_mod.deps, "generate_diff_report_html", _gen_html)
+        try:
+            status = asyncio.run(_drive())
+        finally:
+            monkey.undo()
+
+        assert DIFF_REPORT_FILENAME_REGEX.search(md_path.name)
+        assert DIFF_REPORT_HTML_FILENAME_REGEX.search(html_path.name)
+>       assert md_path.name in status and html_path.name in status, (
+            f"the status must show both written report paths; status was {status!r}"
+        )
+E       AssertionError: the status must show both written report paths; status was 'Compared A.s19 vs B.s19: 1 runs.'
+E       assert ('20260101T000000Z-diff-report.md' in 'Compared A.s19 vs B.s19: 1 runs.')
+E        +  where '20260101T000000Z-diff-report.md' = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-visual/possible-head/tmp/pytest-of-[ACCOUNT]/pytest-0/test_tc024_report_trigger_surf0/20260101T000000Z-diff-report.md').name
+
+tests\test_tui_diff_screen.py:523: AssertionError
+__________________ test_tc707_numbering_generated_sequential __________________
+
+    def test_tc707_numbering_generated_sequential() -> None:
+        """TC-707 (R-WHELP.7/1, E3 A-3; node name kept, it no longer reads the
+        md): in all 12 sections (a) paragraph n of the rendered body equals
+        ``f"{n}. {steps[n-1]}"`` -- the numbering is generated at render so an
+        edit can never leave a gap; (b) no stored step starts with its own number;
+        (c) the step count equals the pinned count.
+
+        Negative controls: a stored step ``1. Checks run ...`` reddens (b); one
+        step dropped from any section reddens (c); a gap in a rendered body
+        reddens (a).
+        """
+>       assert _numbering_defects(WINDOW_HELP_SECTIONS) == []
+E       AssertionError: assert [('patch', 'c')] == []
+E
+E         Left contains one more item: ('patch', 'c')
+E         Use -v to get more diff
+
+tests\test_window_usage_help.py:317: AssertionError
+- generated xml file: [USER_HOME]\Github\s19_app-b103-g3-repro-visual\possible-head\junit.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_b100_recents.py::test_tc_b100_34_load_failing_before_its_copy_records_nothing
+FAILED tests/test_b100_recents.py::test_tc_b100_34_twenty_five_outside_loads_keep_twenty_newest_first
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_5_7_save_project_commit_keeps_the_w_form
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_flow_execution_css_section_is_scoped
+FAILED tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths
+FAILED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential
+6 failed, 2 passed in 168.84s (0:02:48)

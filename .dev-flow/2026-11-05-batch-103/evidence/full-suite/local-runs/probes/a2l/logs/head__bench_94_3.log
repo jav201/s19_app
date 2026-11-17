@@ -1,0 +1,57 @@
+[USER_HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0
+rootdir: [USER_HOME]\Github\s19_app-b103-g3-local
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collected 1 item
+
+tests\test_b103_inc9b_at.py F                                            [100%]
+
+================================== FAILURES ===================================
+_ test_r_pe_bench_94_3_a_gated_record_stage_shows_the_busy_title_within_half_a_second_of_alt_s _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/head__bench_94_3/tmp/pytest-of-[ACCOUNT]/pytest-0/test_r_pe_bench_94_3_a_gated_r0')
+defc_dir = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-a2l/env/head__bench_94_3/tmp/pytest-of-[ACCOUNT]/pytest-0/b103_inc9_w_defc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000013B57630AD0>
+
+    @pytest.mark.serial_timing
+    def test_r_pe_bench_94_3_a_gated_record_stage_shows_the_busy_title_within_half_a_second_of_alt_s(tmp_path, defc_dir, monkeypatch):
+        """R-PE-BENCH.94/3. VAL_BLK_DEF_0001 with Set `10` previewed, then alt+s with the record's encode held by the
+        test: the painted top border holds `stage VAL_BLK_DEF_0001` with the busy corner within 0.5 s of alt+s.
+        Operator need (P-127): a record stage must show it is working from its first second. Negative control: a cue
+        that only covers decode and preview shows nothing (RED)."""
+        gate = Gate(monkeypatch, "encode_values")
+
+        async def body(app, pilot, panel):
+            sheet = sheet_of(panel)
+            try:
+                await vb_edit(pilot, sheet, "s", "10")
+                gate.hold.add(VB)
+                t_key = send(app, "alt+s")
+                snaps = await watch(app, lambda s, o: titled(s, "stage", VB), t_key + 1.0)
+                return t_key, snaps, gate.entered.is_set(), entries_of(app)
+            finally:
+                gate.release()
+
+        t_key, snaps, held, entries = run(tmp_path, defc_dir, body)
+        seen = next((s for s in snaps if titled(s, "stage", VB)), None)
+        assert held, "control: the record's encode never reached the gate, so no record stage was running"
+        assert entries == [], f"control: the record was written while its encode was held: {entries}"
+        assert seen is not None, f"no `stage {VB}` busy title within 1.0 s of alt+s; last top row {snaps[-1].row!r} ({load()})"
+>       assert seen.corner == BUSY_HEX, f"title shown but the painted corner is {seen.corner}: {seen.row!r}"
+E       AssertionError: title shown but the painted corner is #c7c7c7: '╭─ STAGING SHEET   ◐ BUSY · stage VAL_BLK_DEF_0001 · 0.3 s · keys still work  ─────────────────────────────────╮'
+E       assert '#c7c7c7' == '#f5c26b'
+E
+E         - #f5c26b
+E         + #c7c7c7
+
+tests\test_b103_inc9b_at.py:307: AssertionError
+- generated xml file: [USER_HOME]\Github\s19_app-b103-g3-repro-a2l\junit\head__bench_94_3.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_b103_inc9b_at.py::test_r_pe_bench_94_3_a_gated_record_stage_shows_the_busy_title_within_half_a_second_of_alt_s
+============================== 1 failed in 7.96s ==============================

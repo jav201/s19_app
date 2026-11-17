@@ -1,0 +1,49 @@
+REPRO VISUAL/GENERAL
+Head: 35fabb25 (s19_app-b103-g3-local)
+Base: 0c3a6bd4 (s19_app-b103-g3-base)
+Source full suite: s19_app-b103-g3-local-out/main-junit.xml
+
+Common reproduction environment: Python 3.12.7, -I -B, pytest -n 0, cacheprovider disabled, stdin closed, PYTHONDONTWRITEBYTECODE=1, PYTHONUTF8=1, PYTHONIOENCODING=UTF-8; NO_COLOR, CLICOLOR, GITHUB_ACTIONS, RUNNER_ENVIRONMENT and CI unset; TERM=xterm-256color; COLORTERM=truecolor; HOME/XDG_*/LOCALAPPDATA/TMPDIR/TMP/TEMP isolated per run under this OUT. WinCI local probe was not forced.
+
+COLOR 37 (21 test_tui_snapshot + 11 test_b97_key_bar + 5 test_b97_flow_execution)
+Head: 37 passed, 0 failed; 21 snapshots passed; 361.54 s.
+Residual base: not run because head had no residual failures.
+JUnit: color-head/junit.xml
+Log: color-head/pytest.log
+Selection: color-37-nodeids.txt
+
+POSSIBLE 8: status main -> head -> base
+1. test_b100_34_load_failing_before_its_copy_records_nothing: FAIL -> FAIL -> FAIL.
+   Head/base assertion is the same after normalizing the per-run SHA-256: project-has-A2L message list is empty (len 0 != 1). Their over-cap message lists are also empty. Main had the same failing project-has-A2L arm but its over-cap list did contain Cannot load file, so the complete main signature differs.
+2. test_b100_34_twenty_five_outside_loads_keep_twenty_newest_first: FAIL -> FAIL -> PASS.
+   Main: timed out waiting for image s07.s19. Head: timed out waiting for image s25.s19.
+3. test_r_tui_042a_5_7_save_project_commit_keeps_the_w_form: FAIL -> FAIL -> PASS.
+   Main/head signature: AssertionError: #patch_entry_edit_button is not shown.
+4. test_tc_b97_flow_execution_css_section_is_scoped: FAIL -> FAIL -> PASS.
+   Main/head signature: AssertionError: every rule shipped at b514b07 is byte-equal; Inc-6 only appends.
+5. test_tc024_report_trigger_surfaces_paths: FAIL -> FAIL -> FAIL.
+   Identical signature in all three: AssertionError: the status must show both written report paths; status was 'Compared A.s19 vs B.s19: 1 runs.'
+6. test_b77_select_rerender_preserves_a_region_still_present[size1]: FAIL -> PASS -> PASS.
+   Main signature: AssertionError: first render never resolved.
+7. test_b77_style_selected_row_differs_from_every_unselected_row[size0]: FAIL -> PASS -> PASS.
+   Main signature: AttributeError: 'str' object has no attribute 'name'.
+8. test_tc707_numbering_generated_sequential: FAIL -> FAIL -> PASS.
+   Main/head signature: AssertionError: assert [('patch', 'c')] == [].
+
+Totals: head 6 failed / 2 passed; base 2 failed / 6 passed.
+Head-only failures relative to base: recents 25 loads, tag table, flow CSS, window help numbering.
+Shared failures: recents failing-before-copy and diff report paths.
+JUnit: possible-head/junit.xml and possible-base/junit.xml
+Logs: possible-head/pytest.log and possible-base/pytest.log
+Selection: possible-8-nodeids.txt
+
+CLIPBOARD EXCEPTION
+Main: FAIL, AssertionError: assert [''] == ['A[13DB\x00C\tD', 'E'].
+Head: FAIL, 1 warning; base: FAIL, 1 warning.
+Identical head/base signature: Failed: OS clipboard not isolated: GITHUB_ACTIONS != 'true'; attempted ['ctypes-win32', 'powershell'].
+The isolation stand-ins intercepted both attempted OS-boundary strategies; no real clipboard access was enabled and WinCI was not forced.
+JUnit: clipboard-head/junit.xml and clipboard-base/junit.xml
+Logs: clipboard-head/pytest.log and clipboard-base/pytest.log
+Selection: clipboard-nodeids.txt
+
+Final git status was empty in both clones; HEADs remained 35fabb25 and 0c3a6bd4. No source files were edited.
