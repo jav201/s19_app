@@ -1,0 +1,2140 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="20" skipped="0" tests="20" time="202.358" timestamp="2026-11-16T20:24:00.370055-06:00" hostname="REDACTED_HOST"><testcase classname="tests.test_b100_document" name="test_tc_b100_29_forced_write_failure_saves_without_the_document" time="3.157"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_tc_b100_29_forced_write_f0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001EF1333B140&gt;
+
+    def test_tc_b100_29_forced_write_failure_saves_without_the_document(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        """HLR-170 error arm: a forced document-write failure into a fresh
+        ``P`` → the project is saved, no ``active_document``, 1 status line
+        holding "not saved" and "changes.json", the panel flag still set, no
+        internal code or class name painted."""
+        _forced_write_failure(monkeypatch)
+        src = _source(tmp_path)
+    
+        async def scenario(app, pilot, log):
+            await projects.load_image(pilot, app, src)
+            await _add_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1)
+            messages = await projects.save_project(pilot, app, log, "P")
+            return messages, app.workarea / "P", _panel(app)._dirty
+    
+&gt;       messages, project_dir, dirty = projects.run_app(tmp_path / "app", scenario, size=(220, 60))
+
+tests\test_b100_document.py:792: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b100_document.py:788: in scenario
+    await _add_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C', run = 'DE AD BE EF', entries_after = 1
+
+    async def _add_through_the_panel(pilot, app, address: str, run: str, entries_after: int) -&gt; None:
+        """Add one entry through the Patch Editor's own inputs (sets the
+        panel's dirty flag the way the user does)."""
+        await pilot.press("6")
+        await projects.wait_for(
+            pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor panel"
+        )
+        from textual.widgets import Input
+    
+        # Clear both inputs first: a second add keeps the first add's text and
+        # ctrl+a does not always select it (the inputs are the panel's own).
+        app.query_one("#patch_entry_address_input", Input).value = ""
+        app.query_one("#patch_entry_bytes_input", Input).value = ""
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_document.py:132: AssertionError</failure></testcase><testcase classname="tests.test_b100_document" name="test_at_b100_08_saved_document_reopens_with_the_project[size1]" time="13.581"><failure message="AssertionError: click missed #patch_paste_text&#10;assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_at_b100_08_saved_document0')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", AT_SIZES)
+    def test_at_b100_08_saved_document_reopens_with_the_project(
+        tmp_path: Path, size: tuple
+    ) -&gt; None:
+        """HLR-170's acceptance scene by keys, clicks and a paste: Load file
+        ``case_01`` ``firmware.s19`` (``l``); in the Patch Editor (``6``) paste
+        a change document holding one entry ``0x8000007C DE AD BE EF`` and
+        click Parse pasted (the entry is NOT applied); Save project P
+        (``ctrl+s``) → ``P/patches/changes.json`` holds that entry and
+        ``project.json`` records ``active_document`` "patches/changes.json".
+        Then a FRESH app opens P through the Load project dialog (``p``): the
+        Load-result panel lists no problem, the Patch Editor ledger paints
+        ``8000007C``, the SCRIPT window paints ``1 entr...`` with no unsaved
+        marker, the image bytes at the entry's 4 addresses equal the saved
+        ``P/firmware.s19`` (independent reader) and the reopen's full
+        ``set_status`` log holds the ``0 problems`` summary and no apply
+        outcome — the reopen lists the entry, it never re-applies it. Both
+        reference sizes.
+    
+        RED (base dc3b314, P-8): the save writes no ``patches/changes.json``
+        and records no ``active_document``; a reopen lists 0 entries."""
+        import asyncio
+    
+        src = _source(tmp_path)
+        base = tmp_path / "app"
+        project_dir = _workarea(base) / "P"
+        pasted = projects.change_document_bytes(
+            [projects.address_entry(PATCH_ADDRESS, PATCH_BYTES)]
+        ).decode("utf-8")
+        addresses = [PATCH_ADDRESS + offset for offset in range(len(PATCH_BYTES))]
+        dirty_marker = "●"
+    
+        async def _save_scene() -&gt; tuple:
+            from s19_app.tui.app import S19TuiApp
+    
+            app = S19TuiApp(base_dir=base)
+            log = projects.StatusLog(app)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _at_load_file_through_dialog(pilot, app, src)
+                await _at_paste_and_parse(pilot, app, pasted)
+                border = _at_script_border(app)
+                messages = await _at_save_project_through_dialog(pilot, app, log, "P")
+                return border, messages
+    
+        async def _reopen_scene() -&gt; tuple:
+            from s19_app.tui.app import S19TuiApp
+    
+            app = S19TuiApp(base_dir=base)
+            log = projects.StatusLog(app)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                panel = await _at_open_project_through_dialog(pilot, app, "P")
+                await pilot.press("6")
+                await projects.wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_doc_entries_table")) &gt; 0
+                    and f"{PATCH_ADDRESS:08X}" in _at_ledger(app).upper(),
+                    "the reopened entry painted in the ledger",
+                )
+                image = {a: app.current_file.mem_map.get(a) for a in addresses}
+                return panel, _at_ledger(app), _at_script_border(app), image, log.messages
+    
+&gt;       border_before, messages = asyncio.run(_save_scene())
+
+tests\test_b100_document.py:2119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_document.py:2096: in _save_scene
+    await _at_paste_and_parse(pilot, app, pasted)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+text = '{\n  "format": "s19app-changeset",\n  "version": "2.0",\n  "kind": "change",\n  "encoding": "utf-8",\n  "value_mode":...ntries": [\n    {\n      "type": "bytes",\n      "address": "0x8000007C",\n      "bytes": "DE AD BE EF"\n    }\n  ]\n}'
+
+    async def _at_paste_and_parse(pilot, app, text: str) -&gt; None:
+        """Open the Patch Editor (``6``), pick its JSON tab by its chip, select
+        the paste buffer's text (``f7``) and paste ``text`` over it the way a terminal
+        delivers a paste (bracketed paste: ``events.Paste`` to the app, which
+        forwards it to the focused buffer), then click Parse pasted."""
+        from textual import events
+        from textual.widgets import TextArea
+    
+        await pilot.press("6")
+        await projects.wait_for(
+            pilot, lambda: len(app.query("#patch_paste_parse_button")) &gt; 0, "the Patch Editor"
+        )
+        assert await pilot.click("#patch_tab_json"), "click missed #patch_tab_json"
+        await projects.wait_for(
+            pilot,
+            lambda: app.query_one("#patch_paste_text").region.area &gt; 0,
+            "the painted paste buffer",
+        )
+&gt;       assert await pilot.click("#patch_paste_text"), "click missed #patch_paste_text"
+E       AssertionError: click missed #patch_paste_text
+E       assert False
+
+tests\test_b100_document.py:1992: AssertionError</failure></testcase><testcase classname="tests.test_b100_save_image" name="test_tc_b100_70_refused_save_keeps_the_flag" time="3.550"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_tc_b100_70_refused_save_k0')
+
+    def test_tc_b100_70_refused_save_keeps_the_flag(tmp_path: Path) -&gt; None:
+        """A refused Save project (a blocked document) → the flag is still set
+        (1 assertion after the vacuity guard)."""
+&gt;       dirty_before, dirty_after, status = _dirty_after_save(tmp_path, blocked=True)
+
+tests\test_b100_save_image.py:1887: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_save_image.py:1881: in _dirty_after_save
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_save_image.py:1861: in _drive
+    await _add_entry_through_the_panel(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -&gt; None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) &gt; 0,
+            "the Patch Editor panel",
+        )
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase classname="tests.test_b100_save_image" name="test_tc_b100_70_written_document_clears_the_flag" time="3.421"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_tc_b100_70_written_docume0')
+
+    def test_tc_b100_70_written_document_clears_the_flag(tmp_path: Path) -&gt; None:
+        """LLR-167.8 positive arm (Inc 8a re-pin of Inc 5's
+        ``test_tc_b100_70_unwritten_document_keeps_the_flag``, C5): the typed
+        document is now written into the project by Save project (LLR-170.2),
+        so a file holds every entry -&gt; the flag is cleared, and a following
+        Patch Editor Load raises 0 ``LoadGuardScreen``. The skip-``mark_saved``
+        mutant leaves the flag set and the Load asks -&gt; RED."""
+        from textual.widgets import Button, Input
+    
+        from s19_app.tui.screens_directionb import LoadGuardScreen
+    
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        other = tmp_path / "other.json"
+        other.write_bytes(b100_projects.change_document_bytes())
+    
+        async def _drive() -&gt; tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            log = b100_projects.StatusLog(app)
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, src)
+                await _add_entry_through_the_panel(
+                    pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1
+                )
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                dirty_before = panel._dirty
+                messages = await b100_projects.save_project(pilot, app, log, "P1")
+                dirty_after = panel._dirty
+                panel.query_one("#patch_doc_path_input", Input).value = str(other)
+                panel.query_one("#patch_doc_load_button", Button).press()
+                asked = False
+                for _ in range(12):
+                    await pilot.pause()
+                    asked = asked or isinstance(app.screen, LoadGuardScreen)
+                return dirty_before, dirty_after, messages, asked, app.workarea / "P1"
+    
+&gt;       dirty_before, dirty_after, messages, asked, project = asyncio.run(_drive())
+
+tests\test_b100_save_image.py:1929: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_save_image.py:1914: in _drive
+    await _add_entry_through_the_panel(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -&gt; None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) &gt; 0,
+            "the Patch Editor panel",
+        )
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase classname="tests.test_b100_save_image" name="test_tc_b100_70_failed_document_write_keeps_the_flag" time="3.615"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_tc_b100_70_failed_documen0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001EF181CB4D0&gt;
+
+    def test_tc_b100_70_failed_document_write_keeps_the_flag(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        """A forced document-write failure -&gt; the project is saved, 1 line names
+        the unsaved document, the flag stays set (no file holds the edits)."""
+        from s19_app.tui.changes import io as changes_io
+        from s19_app.validation.model import ValidationIssue, ValidationSeverity
+    
+        def _refuse(*args, **kwargs):
+            return None, [ValidationIssue(code="MF-WRITE-CONTAINMENT", message="forced",
+                                          severity=ValidationSeverity.ERROR, artifact="change")]
+    
+        monkeypatch.setattr(changes_io, "write_change_document", _refuse)
+        monkeypatch.setattr(app_module.deps, "write_change_document", _refuse, raising=False)
+        src = _copy_case01(tmp_path) / "firmware.s19"
+    
+        async def _drive() -&gt; tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            log = b100_projects.StatusLog(app)
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, src)
+                await _add_entry_through_the_panel(
+                    pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1
+                )
+                messages = await b100_projects.save_project(pilot, app, log, "P1")
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                return messages, panel._dirty
+    
+&gt;       messages, dirty = asyncio.run(_drive())
+
+tests\test_b100_save_image.py:1966: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_save_image.py:1959: in _drive
+    await _add_entry_through_the_panel(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -&gt; None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) &gt; 0,
+            "the Patch Editor panel",
+        )
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase classname="tests.test_b100_save_image" name="test_tc_b100_70_file_backed_document_from_outside_keeps_the_flag" time="3.628"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_tc_b100_70_file_backed_do0')
+
+    def test_tc_b100_70_file_backed_document_from_outside_keeps_the_flag(tmp_path: Path) -&gt; None:
+        """A file-backed ``boost.json`` loaded from the common folder, 1 entry
+        added through the panel, Save project -&gt; the copy holds the file's
+        bytes, not the edit -&gt; the flag stays set (the copy landed and was
+        recorded: vacuity guard). The call-``mark_saved``-after-every-save
+        mutant -&gt; False -&gt; RED."""
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        body = b100_projects.change_document_bytes()
+    
+        async def _drive() -&gt; tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            log = b100_projects.StatusLog(app)
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, src)
+                common = app.workarea / "patches"
+                common.mkdir(parents=True, exist_ok=True)
+                (common / "boost.json").write_bytes(body)
+                assert app._change_service.load(str(common / "boost.json"), app.base_dir).ok
+                await _add_entry_through_the_panel(
+                    pilot, app, "0x8000007C", "DE AD BE EF", entries_after=2
+                )
+                messages = await b100_projects.save_project(pilot, app, log, "P1")
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                return messages, panel._dirty, app.workarea / "P1"
+    
+&gt;       messages, dirty, project = asyncio.run(_drive())
+
+tests\test_b100_save_image.py:1998: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_save_image.py:1991: in _drive
+    await _add_entry_through_the_panel(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -&gt; None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) &gt; 0,
+            "the Patch Editor panel",
+        )
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase classname="tests.test_b100_save_image" name="test_tc_b100_70_natural_path_load_edit_save_keeps_the_flag" time="4.869"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_tc_b100_70_natural_path_l0')
+
+    def test_tc_b100_70_natural_path_load_edit_save_keeps_the_flag(tmp_path: Path) -&gt; None:
+        """E3 R1 natural path: Load ``P`` (the reopen binds
+        ``P/patches/boost.json``, 1 entry), add 1 entry, Save project into
+        ``P`` -&gt; the flag stays set, the file's bytes unchanged, still
+        recorded, 1 status line naming the Patch Editor save."""
+        base = tmp_path / "app"
+        project = b100_projects.seed_document_project(_workarea(base))
+        before = (project / "patches" / "boost.json").read_bytes()
+    
+        async def _drive() -&gt; tuple:
+            app = S19TuiApp(base_dir=base)
+            log = b100_projects.StatusLog(app)
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await b100_projects.load_project(pilot, app, "P")
+                reopened = len(app._change_service.document.entries)
+                if reopened != 1:
+                    return reopened, [], None
+                await _add_entry_through_the_panel(
+                    pilot, app, "0x8000007C", "DE AD BE EF", entries_after=2
+                )
+                messages = await b100_projects.save_project(pilot, app, log, "P")
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                return reopened, messages, panel._dirty
+    
+&gt;       reopened, messages, dirty = asyncio.run(_drive())
+
+tests\test_b100_save_image.py:2032: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_save_image.py:2025: in _drive
+    await _add_entry_through_the_panel(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -&gt; None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) &gt; 0,
+            "the Patch Editor panel",
+        )
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase classname="tests.test_b100_save_image" name="test_at_b100_05_save_project_saves_the_patched_image[size0]" time="13.608"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_at_b100_05_save_project_s0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_05_save_project_saves_the_patched_image(
+        tmp_path: Path, size: tuple
+    ) -&gt; None:
+        """HLR-167's acceptance scene, by keys and clicks: load ``case_01``
+        ``firmware.s19`` through the Load file dialog, add and apply
+        ``0x8000007C DE AD BE EF`` in the Patch Editor (no save-back), Save
+        project P1 through the current dialog (``ctrl+s``), then open P1 in a
+        FRESH app through the Load project dialog (``p``). The project image,
+        read by the independent reader, equals source + patch (0 differing
+        addresses); the save status names 1 entry; the reopened Loaded panel
+        names ``firmware.s19``. Both reference sizes, notifications on.
+    
+        RED (executed on 1d677ba, P-1): ``project firmware.s19 == in-memory
+        patched image? False`` — the save copied the unpatched work copy."""
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        base = tmp_path / "app"
+    
+        statuses: list = []
+    
+        async def _save_scene() -&gt; str:
+            app = S19TuiApp(base_dir=base)
+            real_set_status = app.set_status
+    
+            def _capture(message, *args, **kwargs):
+                statuses.append(str(message))
+                return real_set_status(message, *args, **kwargs)
+    
+            app.set_status = _capture
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _wait_for(
+                    pilot, lambda: "Apply:" in _status_text(app), "the painted apply line"
+                )
+                await pilot.press("ctrl+s")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, SaveProjectScreen),
+                    "the Save project dialog",
+                )
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                # Inc 11 re-pin (census D / F, LLR-175.3h / .4b): clear the prefilled
+                # name, type it, and wait for its painted summary before Save.
+                await sd.type_and_await_summary(pilot, app, "P1")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the painted Save project success line",
+                )
+                return _painted_log(app)
+    
+        async def _reopen_scene() -&gt; str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P1")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P1'" in " ".join(
+                        str(app.query_one(f"#log_line_{i}", Label).render())
+                        for i in (1, 2, 3, 4)
+                    ),
+                    "the painted line naming the reopened project",
+                )
+                # Inc 6 (HLR-178): the dialog route opens the Load-result
+                # panel; it is the oracle of what opened and why, then its
+                # shown key ``esc`` closes it.
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) &gt; 0,
+                    "the Load-result panel",
+                )
+                panel = await b100_projects.read_load_result_panel(pilot, app)
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) == 0,
+                    "the Load-result panel closed",
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "firmware.s19"
+                    in " ".join(
+                        str(static.render()) for static in app.query("#loaded_slots Static")
+                    ),
+                    "the Loaded panel naming firmware.s19",
+                )
+                reopened_panels.append(panel)
+                return " ".join(
+                    str(static.render()) for static in app.query("#loaded_slots Static")
+                )
+    
+&gt;       painted = asyncio.run(_save_scene())
+
+tests\test_b100_save_image.py:2218: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_save_image.py:2152: in _save_scene
+    await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -&gt; None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) &gt; 0,
+            "the Patch Editor panel",
+        )
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase classname="tests.test_b100_save_image" name="test_at_b100_05_save_project_saves_the_patched_image[size1]" time="13.292"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_at_b100_05_save_project_s1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_05_save_project_saves_the_patched_image(
+        tmp_path: Path, size: tuple
+    ) -&gt; None:
+        """HLR-167's acceptance scene, by keys and clicks: load ``case_01``
+        ``firmware.s19`` through the Load file dialog, add and apply
+        ``0x8000007C DE AD BE EF`` in the Patch Editor (no save-back), Save
+        project P1 through the current dialog (``ctrl+s``), then open P1 in a
+        FRESH app through the Load project dialog (``p``). The project image,
+        read by the independent reader, equals source + patch (0 differing
+        addresses); the save status names 1 entry; the reopened Loaded panel
+        names ``firmware.s19``. Both reference sizes, notifications on.
+    
+        RED (executed on 1d677ba, P-1): ``project firmware.s19 == in-memory
+        patched image? False`` — the save copied the unpatched work copy."""
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        base = tmp_path / "app"
+    
+        statuses: list = []
+    
+        async def _save_scene() -&gt; str:
+            app = S19TuiApp(base_dir=base)
+            real_set_status = app.set_status
+    
+            def _capture(message, *args, **kwargs):
+                statuses.append(str(message))
+                return real_set_status(message, *args, **kwargs)
+    
+            app.set_status = _capture
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _wait_for(
+                    pilot, lambda: "Apply:" in _status_text(app), "the painted apply line"
+                )
+                await pilot.press("ctrl+s")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, SaveProjectScreen),
+                    "the Save project dialog",
+                )
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                # Inc 11 re-pin (census D / F, LLR-175.3h / .4b): clear the prefilled
+                # name, type it, and wait for its painted summary before Save.
+                await sd.type_and_await_summary(pilot, app, "P1")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the painted Save project success line",
+                )
+                return _painted_log(app)
+    
+        async def _reopen_scene() -&gt; str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P1")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P1'" in " ".join(
+                        str(app.query_one(f"#log_line_{i}", Label).render())
+                        for i in (1, 2, 3, 4)
+                    ),
+                    "the painted line naming the reopened project",
+                )
+                # Inc 6 (HLR-178): the dialog route opens the Load-result
+                # panel; it is the oracle of what opened and why, then its
+                # shown key ``esc`` closes it.
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) &gt; 0,
+                    "the Load-result panel",
+                )
+                panel = await b100_projects.read_load_result_panel(pilot, app)
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) == 0,
+                    "the Load-result panel closed",
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "firmware.s19"
+                    in " ".join(
+                        str(static.render()) for static in app.query("#loaded_slots Static")
+                    ),
+                    "the Loaded panel naming firmware.s19",
+                )
+                reopened_panels.append(panel)
+                return " ".join(
+                    str(static.render()) for static in app.query("#loaded_slots Static")
+                )
+    
+&gt;       painted = asyncio.run(_save_scene())
+
+tests\test_b100_save_image.py:2218: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_save_image.py:2152: in _save_scene
+    await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_through_the_panel(
+        pilot, app: S19TuiApp, address: str, run: str, *, entries_after: int = 0
+    ) -&gt; None:
+        """Add one entry through the panel's own inputs. ``entries_after``
+        (white-box nodes only) waits for that document size, so a second add
+        is not satisfied by the first add's painted line."""
+        await pilot.press("6")
+        await _wait_for(
+            pilot,
+            lambda: len(app.query("#patch_entry_add_button")) &gt; 0,
+            "the Patch Editor panel",
+        )
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase classname="tests.test_b100_load_question" name="test_tc_b100_44_project_load_asks_iff_a_flag_is_set" time="7.700"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_tc_b100_44_project_load_a0')
+
+    def test_tc_b100_44_project_load_asks_iff_a_flag_is_set(tmp_path: Path) -&gt; None:
+        """LLR-174.1b, HLR-174a: project P open and nothing unsaved → a project
+        load of Q asks 0 questions and opens Q; a patch plus a Patch Editor
+        entry (through the panel's inputs) → Save project → a project load asks
+        0; with D only, W only and F only → 1 question each (5 of 5).
+    
+        Why: a project load replaces the image and resets the Patch Editor, so
+        any of the three unsaved flags must be asked about, and an open project
+        alone must not be (the ``pb_A`` prototype asked whenever a project was
+        open).
+        Negative control: the ``pb_A`` rule → the first arm asks → RED;
+        dropping F or W → that arm loads silently → RED. RED (base): the
+        single-flag arms ask nothing."""
+        scene = _scene(tmp_path)
+    
+        async def scenario(app, pilot, log):
+            out = {}
+            await _open_project(pilot, app, "P")
+            spy = PushSpy(app)
+            app._handle_load_dialog(LC("project", "Q"))
+            await ld.wait_for(pilot, lambda: app.current_project == "Q" or is_question(app.screen), "Q or the question")
+            await _settle(pilot, 6)
+            out["open, nothing unsaved"] = (spy.questions(), app.current_project)
+            if is_question(app.screen):
+                await _answer(pilot, app, "n")
+            else:
+                await _close_result_panel(pilot, app)
+            await _patch(pilot, app)
+            await pilot.press("6")
+            await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor")
+            await _settle(pilot, 4)
+            assert await pilot.click("#patch_entry_address_input")
+            await pilot.press("ctrl+a", "delete", *"0x80000010")
+            assert await pilot.click("#patch_entry_bytes_input")
+            await pilot.press("ctrl+a", "delete", *"AB")
+            assert await pilot.click("#patch_entry_add_button")
+            await ld.wait_for(pilot, lambda: _panel(app)._dirty, "the panel flag")
+            messages = await projects.save_project(pilot, app, log, "S1")
+            assert any(m.startswith("Saved project to") for m in messages), messages
+            assert not _D(app) and not _panel(app)._dirty, "setup: Save project left a flag set"
+            mark = spy.questions()
+            app._handle_load_dialog(LC("project", "P"))
+            await ld.wait_for(pilot, lambda: app.current_project == "P" or is_question(app.screen), "P or the question")
+            await _settle(pilot, 6)
+            out["saved"] = (spy.questions() - mark, app.current_project)
+            if is_question(app.screen):
+                await _answer(pilot, app, "n")
+            else:
+                await _close_result_panel(pilot, app)
+            for flag in ("D", "W", "F"):
+                if flag == "D":
+                    await _patch(pilot, app)
+                elif flag == "W":
+                    await _set_w(pilot, app)
+                else:
+                    await _set_f(pilot, app)
+                mark = spy.questions()
+                app._handle_load_dialog(LC("project", "Q"))
+                await _wait_question(pilot, app)
+                out[flag] = spy.questions() - mark
+                await _answer(pilot, app, "n")
+                # back to nothing unsaved for the next single-flag arm
+                if flag == "D":
+                    app._change_service.mark_saved(app.current_file.mem_map)
+                elif flag == "W":
+                    _panel(app).mark_saved()
+                else:
+                    _flow(app).mark_saved("flow")
+                await _settle(pilot, 2)
+            return out
+    
+&gt;       out = _run(scene.base, scenario)
+
+tests\test_b100_load_question.py:723: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_load_question.py:203: in _run
+    return projects.run_app(base, scenario, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+log = &lt;tests.support.b100_projects.StatusLog object at 0x000001EF18341BE0&gt;
+
+    async def scenario(app, pilot, log):
+        out = {}
+        await _open_project(pilot, app, "P")
+        spy = PushSpy(app)
+        app._handle_load_dialog(LC("project", "Q"))
+        await ld.wait_for(pilot, lambda: app.current_project == "Q" or is_question(app.screen), "Q or the question")
+        await _settle(pilot, 6)
+        out["open, nothing unsaved"] = (spy.questions(), app.current_project)
+        if is_question(app.screen):
+            await _answer(pilot, app, "n")
+        else:
+            await _close_result_panel(pilot, app)
+        await _patch(pilot, app)
+        await pilot.press("6")
+        await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor")
+        await _settle(pilot, 4)
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_load_question.py:683: AssertionError</failure></testcase><testcase classname="tests.test_b100_load_question" name="test_tc_b100_12_cancelled_question_rehomes_the_focus" time="5.581"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_tc_b100_12_cancelled_ques0')
+
+    def test_tc_b100_12_cancelled_question_rehomes_the_focus(tmp_path: Path) -&gt; None:
+        """LLR-166.1 Inc 10 arm (C08, §C.2, corrected by orchestrator ruling 7):
+        after a cancelled question the focus follows ``_rehome_focus_after_load``
+        — a visible, healthy focus is kept. Patch window with the focus on the
+        visible ``#patch_entry_address_input`` and D set; ``ctrl+l``, a typed
+        data file, ``enter`` → the question → ``n`` → the re-home rule ran once
+        and the focus is still on ``patch_entry_address_input``. Workspace with
+        the focus on ``#files_list`` and D set; a pick of ``x.s19`` → the
+        question → ``escape`` → the re-home rule ran once and the focus is still
+        on ``files_list`` (2 of 2).
+    
+        Why: after a cancelled question the engineer must keep working where
+        they were; LLR-166.1 keeps a visible input in the active window and
+        moves only a stale focus.
+        Negative control: the cancel branch skips ``_rehome_focus_after_load`` →
+        the re-home count is 0 → RED. A cancel that moves a healthy input onto
+        the window target → the first arm lands on ``patch_editor_panel`` →
+        RED. RED (base): no question."""
+        scene = _scene(tmp_path)
+    
+        def spy_rehome(app, calls: list) -&gt; None:
+            real = app._rehome_focus_after_load
+    
+            def spy():
+                calls.append(1)
+                return real()
+    
+            app._rehome_focus_after_load = spy
+    
+        async def patch_window(app, pilot, log):
+            await _load(pilot, app, scene.src / "fw.s19")
+            await _patch(pilot, app)
+            await pilot.press("6")
+            await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_address_input")) &gt; 0, "the Patch Editor")
+            await _settle(pilot, 4)
+            assert await pilot.click("#patch_entry_address_input")
+            assert _focused_id(app) == "patch_entry_address_input"
+            await pilot.press("ctrl+l")
+            await ld.wait_for_dialog(pilot, app)
+            await ld.type_into_path(pilot, app, str(scene.src / "b.s19"))
+            await pilot.press("enter")
+            await _wait_question(pilot, app)
+            calls: list = []
+            spy_rehome(app, calls)
+            await _answer(pilot, app, "n")
+            await _settle(pilot, 6)
+            return len(calls), _focused_id(app)
+    
+        async def workspace(app, pilot, log):
+            await _load(pilot, app, scene.src / "fw.s19")
+            await _patch(pilot, app)
+            await _pick_in_files_list(pilot, app, "x.s19")
+            await _wait_question(pilot, app)
+            calls: list = []
+            spy_rehome(app, calls)
+            await _answer(pilot, app, "escape")
+            await _settle(pilot, 6)
+            return len(calls), _focused_id(app)
+    
+&gt;       assert _run(scene.base, patch_window) == (1, "patch_entry_address_input")
+
+tests\test_b100_load_question.py:2767: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_load_question.py:203: in _run
+    return projects.run_app(base, scenario, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+log = &lt;tests.support.b100_projects.StatusLog object at 0x000001EF16908AD0&gt;
+
+    async def patch_window(app, pilot, log):
+        await _load(pilot, app, scene.src / "fw.s19")
+        await _patch(pilot, app)
+        await pilot.press("6")
+        await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_address_input")) &gt; 0, "the Patch Editor")
+        await _settle(pilot, 4)
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_load_question.py:2743: AssertionError</failure></testcase><testcase classname="tests.test_b100_load_question" name="test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved" time="5.390"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_tc_b100_70_project_load_a0')
+
+    def test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved(tmp_path: Path) -&gt; None:
+        """LLR-167.8 Inc 10 arm (C31, §C.3): an entry added through the panel,
+        Save project (the file holds every entry) → a project load asks 0
+        questions; an entry added again and a refused Save project (empty name,
+        the flag stays set) → a project load asks 1 question naming ``Patch
+        Editor entries`` (2 of 2).
+    
+        Why: Save project is the way to make Patch Editor work safe; the
+        question must believe it, and must not believe a refused save.
+        Negative control: Save project skips the panel's ``mark_saved`` → the
+        first arm asks → RED. RED (base): the second arm asks nothing."""
+        from s19_app.tui.screens import SaveProjectPayload
+    
+        scene = _scene(tmp_path)
+    
+        async def add_entry(pilot, app, address: str) -&gt; None:
+            await pilot.press("6")
+            await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor")
+            await _settle(pilot, 4)
+            assert await pilot.click("#patch_entry_address_input")
+            await pilot.press("ctrl+a", "delete", *address)
+            assert await pilot.click("#patch_entry_bytes_input")
+            await pilot.press("ctrl+a", "delete", *"DE AD")
+            assert await pilot.click("#patch_entry_add_button")
+            await ld.wait_for(pilot, lambda: _panel(app)._dirty, "the panel flag")
+    
+        async def scenario(app, pilot, log):
+            await _load(pilot, app, scene.src / "fw.s19")
+            await add_entry(pilot, app, "0x8000007C")
+            messages = await projects.save_project(pilot, app, log, "S1")
+            assert any(m.startswith("Saved project to") for m in messages), messages
+            assert not _panel(app)._dirty, "setup: Save project left the flag set"
+            spy = PushSpy(app)
+            app._handle_load_dialog(LC("project", "Q"))
+            await ld.wait_for(pilot, lambda: app.current_project == "Q" or is_question(app.screen), "Q or the question")
+            await _settle(pilot, 6)
+            saved = spy.questions()
+            if is_question(app.screen):
+                await _answer(pilot, app, "n")
+            else:
+                await _close_result_panel(pilot, app)
+            await add_entry(pilot, app, "0x80000010")
+            mark = len(log.messages)
+            app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name=""))
+            await _settle(pilot, 4)
+            refused = [m for m in log.since(mark) if "NOT saved" in m]
+            assert refused and _panel(app)._dirty, (refused, _panel(app)._dirty)
+            mark = spy.questions()
+            await _ask(pilot, app, lambda: app._handle_load_dialog(LC("project", "P")))
+            body = q_body(app)
+            await _answer(pilot, app, "n")
+            return saved, spy.questions() - mark, body
+    
+&gt;       saved, refused_asks, body = _run(scene.base, scenario)
+
+tests\test_b100_load_question.py:2825: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_load_question.py:203: in _run
+    return projects.run_app(base, scenario, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b100_load_question.py:2800: in scenario
+    await add_entry(pilot, app, "0x8000007C")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C'
+
+    async def add_entry(pilot, app, address: str) -&gt; None:
+        await pilot.press("6")
+        await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor")
+        await _settle(pilot, 4)
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_load_question.py:2791: AssertionError</failure></testcase><testcase classname="tests.test_b100_load_question" name="test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route" time="13.150"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_at_b100_15_load_over_unsa0')
+
+    def test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route(tmp_path: Path) -&gt; None:
+        """AT-B100-15 (HLR-174, HLR-174a, HLR-174b, HLR-174c, HLR-174d), by keys
+        and widget ids only, in a scratch work area at 118x54:
+    
+          - question + keep halves: Load ``fw.s19``; a patch added and applied
+            in the Patch Editor; Load ``b.s19`` → one question titled
+            ``Replace fw.s19?`` naming the image, the focus on Cancel; ``enter``
+            keeps the patched image (the Loaded panel still names ``fw.s19``,
+            the patched byte still in the session image). A Workarea Files pick
+            of ``x.s19`` asks the same; ``escape`` keeps it.
+          - replace half: Load ``b.s19`` again, ``y`` → ``b.s19`` loads.
+          - after-save half: Apply on ``b.s19`` → Load ``fw.s19`` asks (``n``);
+            Save project ``PA`` → the same Load asks nothing and loads.
+          - ``v`` route: open ``PV``, patch, ``v`` to ``firmware_b`` → the
+            question naming ``firmware_b.s19``; ``n`` keeps ``firmware_a``.
+          - items half: Flow Builder edits plus the patched image, then a
+            project pick → one question naming the image and ``flow flow``.
+    
+        The panel's ``v`` is TC-B100-72's forced-state arm (ruling Q5).
+        Declared: the hex view does not repaint the applied bytes on the base
+        either (probe in the tester notes), so the kept patch is read from the
+        session image and the painted Loaded panel, not the hex view.
+    
+        Negative control: the base tree → Load over the patched image loads
+        with no question (P-17) → RED at the first question."""
+        from textual.widgets import Label
+    
+        from s19_app.tui.screens import SaveProjectScreen
+    
+        scene = _scene(tmp_path)
+    
+        def status(app) -&gt; str:
+            return str(app.query_one("#log_line_4", Label).render())
+    
+        def loaded_names(app) -&gt; str:
+            panel = app.screen_stack[0].query_one("#loaded_panel")
+            return " ".join(str(getattr(c.render(), "plain", c.render())) for c in panel.query(".loaded-detail"))
+    
+        async def load_by_keys(pilot, app, path: Path) -&gt; None:
+            await pilot.press("l")
+            await ld.wait_for_dialog(pilot, app)
+            await ld.type_into_path(pilot, app, str(path))
+            assert await pilot.click("#load_ok"), "click missed #load_ok"
+            await ld.wait_for_dialog_closed(pilot, app)
+    
+        async def add_and_apply(pilot, app, add: bool = True) -&gt; None:
+            await pilot.press("6")
+            await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor")
+            await _settle(pilot, 4)
+            if add:
+                # A second add keeps the first add's text, and ``ctrl+a`` moves to
+                # the start rather than selecting it: clear both inputs first
+                # (the ``test_b100_document.py`` helper's pattern).
+                from textual.widgets import Input
+    
+                app.query_one("#patch_entry_address_input", Input).value = ""
+                app.query_one("#patch_entry_bytes_input", Input).value = ""
+                assert await pilot.click("#patch_entry_address_input")
+                await pilot.press("ctrl+a", "delete", *"0x8000007C")
+                assert await pilot.click("#patch_entry_bytes_input")
+                await pilot.press("ctrl+a", "delete", *"DE AD BE EF")
+                assert await pilot.click("#patch_entry_add_button")
+                await ld.wait_for(pilot, lambda: "entry added" in status(app), "the entry added")
+            assert await pilot.click("#patch_doc_apply_button")
+            await ld.wait_for(pilot, lambda: "1 applied" in status(app), "the apply")
+            await _settle(pilot, 4)
+    
+        async def scenario(app, pilot, log):
+            spy = PushSpy(app)
+            out = {}
+            # Load fw.s19 and patch it by keys.
+            await load_by_keys(pilot, app, scene.src / "fw.s19")
+            await ld.wait_for(pilot, lambda: app.current_file is not None, "the load of fw.s19")
+            await add_and_apply(pilot, app)
+            # Question + keep (Load route, enter).
+            await load_by_keys(pilot, app, scene.src / "b.s19")
+            await _wait_question(pilot, app)
+            out["load question"] = (q_title(app), q_body(app), _focused_id(app))
+            await _answer(pilot, app, "enter")
+            await _settle(pilot, 6)
+            out["kept"] = (
+                Path(app.current_file.path).name,
+                app.current_file.mem_map.get(PATCH_ADDRESS),
+                "fw.s19" in loaded_names(app),
+            )
+            # Workarea Files pick (escape).
+            await _pick_in_files_list(pilot, app, "x.s19")
+            await _wait_question(pilot, app)
+            out["workarea question"] = q_body(app)
+            await _answer(pilot, app, "escape")
+            await _settle(pilot, 6)
+            out["kept after workarea"] = Path(app.current_file.path).name
+            # Replace (y).
+            await load_by_keys(pilot, app, scene.src / "b.s19")
+            await _wait_question(pilot, app)
+            await pilot.press("y")
+            await ld.wait_for(pilot, lambda: Path(app.current_file.path).name == "b.s19", "the load of b.s19")
+            await _settle(pilot, 6)
+            out["replaced"] = ("b.s19" in loaded_names(app), is_question(app.screen))
+            # After-save: asks before the save, not after.
+            await add_and_apply(pilot, app, add=False)
+            await load_by_keys(pilot, app, scene.src / "fw.s19")
+            await _wait_question(pilot, app)
+            await _answer(pilot, app, "n")
+            await pilot.press("ctrl+s")
+            await ld.wait_for(pilot, lambda: isinstance(app.screen, SaveProjectScreen), "the Save project dialog")
+            assert await pilot.click("#project_name")
+            # Inc 11 re-pin (census D / F, LLR-175.3h / .4b): clear the prefilled
+            # name, type it, and wait for its painted summary before Save.
+            await sd.type_and_await_summary(pilot, app, "PA")
+            assert await pilot.click("#save_ok")
+            await ld.wait_for(pilot, lambda: "Saved project" in status(app), "the save")
+            mark = spy.questions()
+            await load_by_keys(pilot, app, scene.src / "fw.s19")
+            await ld.wait_for(
+                pilot,
+                lambda: is_question(app.screen) or Path(app.current_file.path).name == "fw.s19",
+                "the load of fw.s19 after the save",
+            )
+            await _settle(pilot, 6)
+            out["after save"] = (spy.questions() - mark, Path(app.current_file.path).name)
+            if is_question(app.screen):
+                await _answer(pilot, app, "n")
+            # v route.
+            await pilot.press("1")
+            await _settle(pilot, 4)
+            await ld.open_project_through_dialog(pilot, app, "PV")
+            await projects.dismiss_load_result_panel(pilot, app)
+            await add_and_apply(pilot, app)
+            await pilot.press("1")
+            await _settle(pilot, 4)
+            await _switch_variant_by_keys(pilot, app)
+            await _wait_question(pilot, app)
+            out["v question"] = (q_title(app), q_body(app))
+            await _answer(pilot, app, "n")
+            await _settle(pilot, 6)
+            out["v kept"] = (app._variant_set.active_id, Path(app.current_file.path).name)
+            # Items: Flow Builder edits + the patched image, then a project pick.
+            await pilot.press("8")
+            await _settle(pilot, 6)
+            assert await pilot.click("#flow_ref")
+            await pilot.press(*"fw.s19")
+            assert await pilot.click("#flow_add")
+            await ld.wait_for(
+                pilot, lambda: "sev-warning" in app.query_one("#flow_name_strip").classes, "the flow marked unsaved"
+            )
+            await pilot.press("1")
+            await _settle(pilot, 4)
+            mark = spy.questions()
+            await ld.open_project_through_dialog(pilot, app, "PA")
+            await _wait_question(pilot, app)
+            out["items question"] = (spy.questions() - mark, q_body(app))
+            await _answer(pilot, app, "n")
+            return out
+    
+&gt;       out = _run(scene.base, scenario)
+
+tests\test_b100_load_question.py:3031: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_load_question.py:203: in _run
+    return projects.run_app(base, scenario, size=size)
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b100_load_question.py:2949: in scenario
+    await add_and_apply(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+add = True
+
+    async def add_and_apply(pilot, app, add: bool = True) -&gt; None:
+        await pilot.press("6")
+        await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor")
+        await _settle(pilot, 4)
+        if add:
+            # A second add keeps the first add's text, and ``ctrl+a`` moves to
+            # the start rather than selecting it: clear both inputs first
+            # (the ``test_b100_document.py`` helper's pattern).
+            from textual.widgets import Input
+    
+            app.query_one("#patch_entry_address_input", Input).value = ""
+            app.query_one("#patch_entry_bytes_input", Input).value = ""
+&gt;           assert await pilot.click("#patch_entry_address_input")
+E           assert False
+
+tests\test_b100_load_question.py:2933: AssertionError</failure></testcase><testcase classname="tests.test_b100_save_dialog" name="test_at_b100_21_painted_plan_is_the_saved_tree[pending]" time="10.214"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_at_b100_21_painted_plan_i0')
+key = 'pending'
+
+    @pytest.mark.parametrize("key", SCENARIOS)
+    def test_at_b100_21_painted_plan_is_the_saved_tree(tmp_path: Path, key: str) -&gt; None:
+        """AT-B100-21, both halves, per scenario (fresh, pending patch, refused,
+        ``files``, document, merge, save-as), driven by keys and the dialog's
+        widget ids (projects built by real saves; files loaded and projects
+        opened through the Load dialog; the patch added and applied in the
+        Patch Editor), at 220 columns:
+    
+          - painted half (HLR-175): each painted summary row that names a file,
+            a folder or ``project.json`` matches its row of the dialog's plan
+            (read from ``SaveProjectScreen.plan``, the declared exception) by
+            landing name and action word, one for one (0 differences);
+          - executed half (HLR-175a): ``alt+s``; then that same plan — never
+            recomputed by the test — equals the tree written under its target
+            by full path and action (the gather homes excluded by name); the
+            refused scenario keeps the dialog open and writes 0 new paths.
+    
+        Why: R-PC — one plan, painted and executed; the operator's P-C note.
+        Negative control: a handler that places a file the plan did not name →
+        1 tree row without a plan row → RED; on the 9a tree the dialog paints
+        no summary and holds no plan (P11-2) → RED."""
+&gt;       out = _scenario_paint(tmp_path, key, by_keys=True, save=True)
+
+tests\test_b100_save_dialog.py:4269: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_save_dialog.py:2694: in _scenario_paint
+    return _run(base, scenario, size=size)
+tests\test_b100_save_dialog.py:144: in _run
+    return sd.run(base, scenario, size=size, notifications=notifications)
+tests\support\b100_save_dialog.py:311: in run
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_save_dialog.py:309: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b100_save_dialog.py:2656: in scenario
+    await _scenario_setup(key, app, pilot, ctx, by_keys)
+tests\test_b100_save_dialog.py:2635: in _scenario_setup
+    await _add_entry_by_keys(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_by_keys(pilot, app, address: str = "0x8000007C", run: str = "DE AD BE EF") -&gt; None:
+        """Add one Patch Editor entry through the panel's own inputs (rail key
+        ``6``)."""
+        await pilot.press("6")
+        await sd.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor panel")
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_save_dialog.py:272: AssertionError</failure></testcase><testcase classname="tests.test_b100_save_dialog" name="test_at_b100_21_painted_plan_is_the_saved_tree[document]" time="15.488"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_at_b100_21_painted_plan_i1')
+key = 'document'
+
+    @pytest.mark.parametrize("key", SCENARIOS)
+    def test_at_b100_21_painted_plan_is_the_saved_tree(tmp_path: Path, key: str) -&gt; None:
+        """AT-B100-21, both halves, per scenario (fresh, pending patch, refused,
+        ``files``, document, merge, save-as), driven by keys and the dialog's
+        widget ids (projects built by real saves; files loaded and projects
+        opened through the Load dialog; the patch added and applied in the
+        Patch Editor), at 220 columns:
+    
+          - painted half (HLR-175): each painted summary row that names a file,
+            a folder or ``project.json`` matches its row of the dialog's plan
+            (read from ``SaveProjectScreen.plan``, the declared exception) by
+            landing name and action word, one for one (0 differences);
+          - executed half (HLR-175a): ``alt+s``; then that same plan — never
+            recomputed by the test — equals the tree written under its target
+            by full path and action (the gather homes excluded by name); the
+            refused scenario keeps the dialog open and writes 0 new paths.
+    
+        Why: R-PC — one plan, painted and executed; the operator's P-C note.
+        Negative control: a handler that places a file the plan did not name →
+        1 tree row without a plan row → RED; on the 9a tree the dialog paints
+        no summary and holds no plan (P11-2) → RED."""
+&gt;       out = _scenario_paint(tmp_path, key, by_keys=True, save=True)
+
+tests\test_b100_save_dialog.py:4269: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_save_dialog.py:2694: in _scenario_paint
+    return _run(base, scenario, size=size)
+tests\test_b100_save_dialog.py:144: in _run
+    return sd.run(base, scenario, size=size, notifications=notifications)
+tests\support\b100_save_dialog.py:311: in run
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_save_dialog.py:309: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b100_save_dialog.py:2656: in scenario
+    await _scenario_setup(key, app, pilot, ctx, by_keys)
+tests\test_b100_save_dialog.py:2628: in _scenario_setup
+    await _add_entry_by_keys(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C', run = 'DE AD BE EF'
+
+    async def _add_entry_by_keys(pilot, app, address: str = "0x8000007C", run: str = "DE AD BE EF") -&gt; None:
+        """Add one Patch Editor entry through the panel's own inputs (rail key
+        ``6``)."""
+        await pilot.press("6")
+        await sd.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor panel")
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_save_dialog.py:272: AssertionError</failure></testcase><testcase classname="tests.test_b99_staging" name="test_at_b99_05_save_project_after_same_name_save_back" time="13.316"><failure message="AssertionError: click missed #patch_entry_address_input&#10;assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_at_b99_05_save_project_af0')
+
+    def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -&gt; None:
+        """Load -&gt; patch -&gt; save back as firmware.s19 -&gt; Save project: the app is
+        running, the project folder holds the image and the status names it.
+        Driven entirely by keys and clicks through the real Load file dialog,
+        the Patch Editor (rail key ``6``) and the real ``SaveProjectScreen``
+        (review finding F5) — inputs are clicked and typed, buttons are clicked,
+        and every wait observes the painted status line (``#log_line_4``) or the
+        painted screen; assertions read the painted status and the files on disk.
+    
+        RED at HEAD (P-15): the save-back deletes the work copy and the next Save
+        project exits the app with code 1.
+        """
+        from textual.widgets import Label
+    
+        image = tmp_path / "firmware.s19"
+        image.write_text(_emit_two(0x11, 0x00), encoding="ascii")
+    
+        async def _drive() -&gt; dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            outcomes: dict = {}
+            # 260x54: the Patch Editor's docked save-back row sits at the foot
+            # of the JSON pane and is only clickable/painted at the taller
+            # viewport (the b97 ATs and AT-B99-02 drive the panel at 120x54);
+            # the extra width keeps the "Saved project to …" success line
+            # unpainted-clipped in the four-line log strip (review finding
+            # LOW-2).
+            async with app.run_test(size=(260, 54)) as pilot:
+                await pilot.pause()
+                # 1. Load through the Load file dialog (rail key ``l``).
+                await pilot.press("l")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#load_path"), "click missed #load_path"
+                await pilot.press(*str(image))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                await _poll(
+                    pilot, lambda: "Loaded firmware.s19" in _painted_status(app)
+                )
+                work_copy = tmp_path / ".s19tool" / "workarea" / "temp" / "firmware.s19"
+                outcomes["pre_save_bytes"] = work_copy.read_bytes()
+                # 2. Patch Editor (rail key ``6``): one entry at 0x2000.
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#patch_entry_address_input"), (
+                    "click missed #patch_entry_address_input"
+                )
+                await pilot.press(*"0x2000")
+                assert await pilot.click("#patch_entry_bytes_input"), (
+                    "click missed #patch_entry_bytes_input"
+                )
+                await pilot.press(*"AA")
+                assert await pilot.click("#patch_entry_add_button"), (
+                    "click missed #patch_entry_add_button"
+                )
+                await _poll(pilot, lambda: "entry added" in _painted_status(app))
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _poll(pilot, lambda: "Apply:" in _painted_status(app))
+                # 3. Save-back under the loaded image's own name: the prompt
+                #    renders in the editor's JSON pane — pick that tab by
+                #    clicking its chip, then wait for the prompt to be PAINTED.
+                assert await pilot.click("#patch_tab_json"), (
+                    "click missed #patch_tab_json"
+                )
+                await _poll(pilot, lambda: "patched" in _painted_text(app))
+                assert await pilot.click("#patch_saveback_name_input"), (
+                    "click missed #patch_saveback_name_input"
+                )
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*"firmware.s19")
+                assert await pilot.click("#patch_saveback_confirm_button"), (
+                    "click missed #patch_saveback_confirm_button"
+                )
+                await _poll(
+                    pilot,
+                    lambda: (
+                        tmp_path / ".s19tool" / "workarea" / "firmware.s19"
+                    ).is_file(),
+                )
+                outcomes["work_copy_exists"] = work_copy.is_file()
+                outcomes["work_copy_bytes"] = (
+                    work_copy.read_bytes() if work_copy.is_file() else None
+                )
+                # 4. Save project through the real dialog (key ``s``).
+                await pilot.press("s")
+                for _ in range(6):
+                    await pilot.pause()
+                # Inc 11 re-pin (census B, LLR-175.2 / .4b): no parent field;
+                # the summary of ``proj`` is painted before Save.
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"proj")
+                await sd.wait_for(
+                    pilot, lambda: "proj" in sd.where_text(app.screen), "the summary of proj"
+                )
+                for _ in range(4):
+                    await pilot.pause()
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                # the manifest line paints FIRST and the save's success —
+                # "Saved project to … (variant 'firmware')" — is the NEWEST
+                # line (batch-100 Inc 2 fix pass 1, F1 / LED .52(b): a save
+                # that can still fail must not have said "Saved"), so the
+                # success line survives as the newest line. Wait for the final
+                # line, then read the PAINTED log lines (review finding LOW-2:
+                # the wait and the assertion are consistent, and the painted
+                # status names the image file).
+                await _poll(
+                    pilot, lambda: _painted_status(app).startswith("Saved project to")
+                )
+                outcomes["status"] = _painted_status(app)
+                outcomes["log_lines"] = [
+                    str(app.query_one(f"#log_line_{i}", Label).render())
+                    for i in (1, 2, 3, 4)
+                ]
+                outcomes["app_running"] = bool(
+                    app.query_one("#status_text", Label).render()
+                )
+            return outcomes
+    
+&gt;       outcomes = asyncio.run(_drive())
+
+tests\test_b99_staging.py:1440: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -&gt; dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        outcomes: dict = {}
+        # 260x54: the Patch Editor's docked save-back row sits at the foot
+        # of the JSON pane and is only clickable/painted at the taller
+        # viewport (the b97 ATs and AT-B99-02 drive the panel at 120x54);
+        # the extra width keeps the "Saved project to …" success line
+        # unpainted-clipped in the four-line log strip (review finding
+        # LOW-2).
+        async with app.run_test(size=(260, 54)) as pilot:
+            await pilot.pause()
+            # 1. Load through the Load file dialog (rail key ``l``).
+            await pilot.press("l")
+            for _ in range(6):
+                await pilot.pause()
+            assert await pilot.click("#load_path"), "click missed #load_path"
+            await pilot.press(*str(image))
+            assert await pilot.click("#load_ok"), "click missed #load_ok"
+            await _poll(
+                pilot, lambda: "Loaded firmware.s19" in _painted_status(app)
+            )
+            work_copy = tmp_path / ".s19tool" / "workarea" / "temp" / "firmware.s19"
+            outcomes["pre_save_bytes"] = work_copy.read_bytes()
+            # 2. Patch Editor (rail key ``6``): one entry at 0x2000.
+            await pilot.press("6")
+            for _ in range(6):
+                await pilot.pause()
+&gt;           assert await pilot.click("#patch_entry_address_input"), (
+                "click missed #patch_entry_address_input"
+            )
+E           AssertionError: click missed #patch_entry_address_input
+E           assert False
+
+tests\test_b99_staging.py:1364: AssertionError</failure></testcase><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_quit_asks_only_while_a_session_action_runs" time="18.029"><failure message="AssertionError: ('q', False, 1)&#10;assert (False, 1) == (True, 0)&#10;  &#10;  At index 0 diff: False != True&#10;  Use -v to get more diff">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_tc_b100_53_quit_asks_only0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001EF1650A510&gt;
+
+    def test_tc_b100_53_quit_asks_only_while_a_session_action_runs(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        """HLR-177b, LLR-177.4, LLR-177.4a, LLR-177.4d, Q-c2 (C12b-18, C12b-19,
+        C12b-20, C12b-27): idle ``q`` and idle ``ctrl+q`` exit at once with no
+        question; a report held alone does not make ``q`` ask. During a held
+        Save of ``P1``: ``q``, ``ctrl+q`` and the palette entry ``quit`` each
+        open the quit question — title ``Quit?``, text ``still working: Saving
+        project P1 — wait, or quit after it finishes``, buttons ``Quit (y)`` /
+        ``Stay (n)``, the focus on ``#confirm_no``, the app running, no
+        ``Replace`` and no decision id; a second ``ctrl+q`` while it is open
+        stacks nothing.
+    
+        Why: quitting mid-save leaves a partial project; idle quit must stay
+        one key. Negative control (code read, base): no ``action_quit``
+        override → ``q`` exits at once during the save → RED."""
+    
+        for key in ("q", "ctrl+q"):
+            exited, questions = run(tmp_path / f"idle-{key}", _idle_scene(key))
+&gt;           assert (exited, questions) == (True, 0), (key, exited, questions)
+E           AssertionError: ('q', False, 1)
+E           assert (False, 1) == (True, 0)
+E             
+E             At index 0 diff: False != True
+E             Use -v to get more diff
+
+tests\test_b100_workers.py:2362: AssertionError</failure></testcase><testcase classname="tests.test_b99_export" name="test_at_b99_11_sanitised_mac_only_second_export_takes_suffix" time="31.259"><failure message="AssertionError: click missed #patch_entry_address_input&#10;assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_at_b99_11_sanitised_mac_o0')
+
+    def test_at_b99_11_sanitised_mac_only_second_export_takes_suffix(
+        tmp_path: Path,
+    ) -&gt; None:
+        """AT-B99-11 (HLR-160) end to end in ONE pilot session, all three
+        clauses in sequence through the shipped Split / Join / Export window
+        (SegmentSplitView) export action.
+    
+        HLR-160's Observable outcome: "with an A2L whose segment is named
+        `x/../../../ESCAPED`, the export writes its file inside the
+        destination under a sanitised name, and nothing appears outside it. A
+        MAC-only export writes a file holding no data record. A second export
+        after a patch writes `&lt;name&gt;_1`, the status names it, and the first
+        file is intact."
+    
+        Clause (a) — the hostile-segment A2L project exports INSIDE the
+        destination under ``prg_x__________ESCAPED.s19`` and nothing appears
+        outside it. Clause (b) — every artifact is unloaded and
+        ``firmware.mac`` is loaded on its own, so the session is genuinely
+        MAC-only: a manual-range export writes ``firmware_locality_00.s19``
+        holding NO data record (independent reader). Clause (c) — the project
+        is reloaded, one byte is patched through the Patch Editor, and the
+        second export lands as ``_&lt;N&gt;``, named in the painted status
+        (wrote/reused), while the first file's bytes stay intact.
+        """
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = app.workarea / "proj1"
+        project_dir.mkdir(parents=True)
+        shutil.copyfile(PRG_S19, project_dir / "prg.s19")
+        _write_hostile_segment_a2l(project_dir, "x/../../../ESCAPED")
+        mac_src = tmp_path / "firmware.mac"
+        shutil.copyfile(FIRMWARE_MAC, mac_src)
+        oracle = read_s19(PRG_S19)
+        patch_addr = min(oracle.data)
+        patch_value = 0x5A if oracle.data[patch_addr] != 0x5A else 0xC3
+        dest = project_dir / "splits"
+    
+        async def _drive():
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                await _load_project_pilot(app, pilot, "proj1")
+    
+                # ---- Clause (a): hostile A2L segment name stays inside dest.
+                await _open_split_join_window(app, pilot)
+                before_a = _snapshot(tmp_path)
+                # Entering the manual tab hands focus to its TextArea (by
+                # design) — click the table back so the window bindings, not
+                # the box, take the letters.
+                await pilot.press("t")  # ranges -&gt; manual (focus -&gt; TextArea)
+                assert await pilot.click("#sje_table"), "click missed #sje_table"
+                await pilot.press("t")  # manual -&gt; a2l (focus -&gt; table)
+                await pilot.press("a")  # select all (2 A2L segments, 0 coverage)
+                await pilot.press("e")  # arm: empty files behind the confirm
+                await pilot.press("e")  # confirm
+                await _wait_for(
+                    pilot,
+                    lambda: "xported" in _status_text(app).lower(),
+                    "the clause-a export status line",
+                    attempts=200,
+                )
+                status_a = _status_text(app)
+                after_a = _snapshot(tmp_path)
+                created_a = sorted(
+                    str(p.relative_to(tmp_path)) for p in after_a - before_a
+                )
+    
+                # ---- Clause (b): a MAC-only export writes no data record.
+                # Unload every artifact first — loading the MAC beside prg.s19
+                # would merely attach it (the coexistence model) and the clause
+                # would not be a MAC-ONLY session. Focus is on the table (the
+                # a2l tab), so the rail keys below bubble to the app.
+                await pilot.press("escape")  # close the window
+                await pilot.press("U")  # unload all artifacts
+                await _wait_for(
+                    pilot,
+                    lambda: "nloaded" in _status_text(app),
+                    "the unload-all status line",
+                )
+                await pilot.press("l")
+                await _wait_for(
+                    pilot,
+                    lambda: is_load_dialog(app.screen)
+                    and len(app.screen.query("#load_path")) &gt; 0,
+                    "the Load dialog",
+                )
+                assert await pilot.click("#load_path"), "click missed #load_path"
+                await pilot.press(*str(mac_src))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                # Inc 6 (LLR-168.3): the MAC sync into the open project rewrites
+                # project.json, and the seam's verify line is painted after the
+                # load line, so the load line is read from the painted log.
+                await _wait_for(
+                    pilot,
+                    lambda: any(
+                        "firmware.mac" in str(app.query_one(f"#log_line_{i}").render())
+                        for i in (1, 2, 3, 4)
+                    ),
+                    "the MAC load status line",
+                    attempts=200,
+                )
+                await _open_split_join_window(app, pilot)
+                await pilot.press("t")  # a2l -&gt; ranges (focus -&gt; table)
+                await pilot.press("t")  # ranges -&gt; manual (focus -&gt; TextArea)
+                await pilot.press(*"0x80000000-0x8000000F")
+                assert await pilot.click("#sje_table"), "click missed #sje_table"
+                await pilot.press("a")  # select all (parses the manual box)
+                await pilot.press("e")  # arm: the session holds 0 declared bytes
+                await pilot.press("e")  # confirm
+                await _wait_for(
+                    pilot,
+                    lambda: "xported" in _status_text(app).lower(),
+                    "the clause-b export status line",
+                    attempts=200,
+                )
+    
+                # ---- Clause (c): patch, export again -&gt; &lt;name&gt;_1, first intact.
+                # Leave the window on a table-focused tab BEFORE closing it: a
+                # hidden manual TextArea keeps focus and would swallow the next
+                # key (it is the one widget that eats letters).
+                await pilot.press("t")  # manual -&gt; a2l (focus -&gt; table)
+                await pilot.press("escape")  # close the window
+                await _load_project_pilot(app, pilot, "proj1")
+                await _open_split_join_window(app, pilot)
+                await pilot.press("t")  # a2l -&gt; ranges (focus -&gt; table)
+                assert await pilot.click("#sje_table"), "click missed #sje_table"
+                await pilot.press("a")  # ranges tab: all rows
+                await pilot.press("e")
+                await _wait_for(
+                    pilot,
+                    lambda: "xported" in _status_text(app).lower(),
+                    "the first (clause-c) export status line",
+                    attempts=200,
+                )
+                before_c = {p.name: p.read_bytes() for p in dest.iterdir()}
+    
+                # Patch one byte through the Patch Editor (rail key ``6``).
+                await pilot.press("escape")  # close the window
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_editor_panel")) &gt; 0,
+                    "the Patch Editor",
+                )
+                assert await pilot.click(
+                    "#patch_entry_address_input"
+                ), "click missed #patch_entry_address_input"
+                await pilot.press(*f"0x{patch_addr:X}")
+                assert await pilot.click(
+                    "#patch_entry_bytes_input"
+                ), "click missed #patch_entry_bytes_input"
+                await pilot.press(*f"0x{patch_value:02X}")
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "the add status line",
+                )
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "Apply:" in _status_text(app),
+                    "the apply status line",
+                )
+    
+                await _open_split_join_window(app, pilot)
+                assert await pilot.click("#sje_table"), "click missed #sje_table"
+                await pilot.press("a")
+                await pilot.press("e")
+                # Wait for the SECOND export's status: it names the `_1` write
+                # and the reused siblings (UX-C11).
+                status_c = ""
+                for _ in range(200):
+                    await pilot.pause()
+                    status_c = _status_text(app)
+                    if "xported" in status_c.lower() and "reused" in status_c:
+                        break
+                after_c = {p.name: p.read_bytes() for p in dest.iterdir()}
+                return status_a, created_a, before_c, after_c, status_c
+    
+&gt;       status_a, created_a, before_c, after_c, status_c = asyncio.run(_drive())
+
+tests\test_b99_export.py:1162: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive():
+        async with app.run_test(size=(120, 54)) as pilot:
+            await pilot.pause()
+            await _load_project_pilot(app, pilot, "proj1")
+    
+            # ---- Clause (a): hostile A2L segment name stays inside dest.
+            await _open_split_join_window(app, pilot)
+            before_a = _snapshot(tmp_path)
+            # Entering the manual tab hands focus to its TextArea (by
+            # design) — click the table back so the window bindings, not
+            # the box, take the letters.
+            await pilot.press("t")  # ranges -&gt; manual (focus -&gt; TextArea)
+            assert await pilot.click("#sje_table"), "click missed #sje_table"
+            await pilot.press("t")  # manual -&gt; a2l (focus -&gt; table)
+            await pilot.press("a")  # select all (2 A2L segments, 0 coverage)
+            await pilot.press("e")  # arm: empty files behind the confirm
+            await pilot.press("e")  # confirm
+            await _wait_for(
+                pilot,
+                lambda: "xported" in _status_text(app).lower(),
+                "the clause-a export status line",
+                attempts=200,
+            )
+            status_a = _status_text(app)
+            after_a = _snapshot(tmp_path)
+            created_a = sorted(
+                str(p.relative_to(tmp_path)) for p in after_a - before_a
+            )
+    
+            # ---- Clause (b): a MAC-only export writes no data record.
+            # Unload every artifact first — loading the MAC beside prg.s19
+            # would merely attach it (the coexistence model) and the clause
+            # would not be a MAC-ONLY session. Focus is on the table (the
+            # a2l tab), so the rail keys below bubble to the app.
+            await pilot.press("escape")  # close the window
+            await pilot.press("U")  # unload all artifacts
+            await _wait_for(
+                pilot,
+                lambda: "nloaded" in _status_text(app),
+                "the unload-all status line",
+            )
+            await pilot.press("l")
+            await _wait_for(
+                pilot,
+                lambda: is_load_dialog(app.screen)
+                and len(app.screen.query("#load_path")) &gt; 0,
+                "the Load dialog",
+            )
+            assert await pilot.click("#load_path"), "click missed #load_path"
+            await pilot.press(*str(mac_src))
+            assert await pilot.click("#load_ok"), "click missed #load_ok"
+            # Inc 6 (LLR-168.3): the MAC sync into the open project rewrites
+            # project.json, and the seam's verify line is painted after the
+            # load line, so the load line is read from the painted log.
+            await _wait_for(
+                pilot,
+                lambda: any(
+                    "firmware.mac" in str(app.query_one(f"#log_line_{i}").render())
+                    for i in (1, 2, 3, 4)
+                ),
+                "the MAC load status line",
+                attempts=200,
+            )
+            await _open_split_join_window(app, pilot)
+            await pilot.press("t")  # a2l -&gt; ranges (focus -&gt; table)
+            await pilot.press("t")  # ranges -&gt; manual (focus -&gt; TextArea)
+            await pilot.press(*"0x80000000-0x8000000F")
+            assert await pilot.click("#sje_table"), "click missed #sje_table"
+            await pilot.press("a")  # select all (parses the manual box)
+            await pilot.press("e")  # arm: the session holds 0 declared bytes
+            await pilot.press("e")  # confirm
+            await _wait_for(
+                pilot,
+                lambda: "xported" in _status_text(app).lower(),
+                "the clause-b export status line",
+                attempts=200,
+            )
+    
+            # ---- Clause (c): patch, export again -&gt; &lt;name&gt;_1, first intact.
+            # Leave the window on a table-focused tab BEFORE closing it: a
+            # hidden manual TextArea keeps focus and would swallow the next
+            # key (it is the one widget that eats letters).
+            await pilot.press("t")  # manual -&gt; a2l (focus -&gt; table)
+            await pilot.press("escape")  # close the window
+            await _load_project_pilot(app, pilot, "proj1")
+            await _open_split_join_window(app, pilot)
+            await pilot.press("t")  # a2l -&gt; ranges (focus -&gt; table)
+            assert await pilot.click("#sje_table"), "click missed #sje_table"
+            await pilot.press("a")  # ranges tab: all rows
+            await pilot.press("e")
+            await _wait_for(
+                pilot,
+                lambda: "xported" in _status_text(app).lower(),
+                "the first (clause-c) export status line",
+                attempts=200,
+            )
+            before_c = {p.name: p.read_bytes() for p in dest.iterdir()}
+    
+            # Patch one byte through the Patch Editor (rail key ``6``).
+            await pilot.press("escape")  # close the window
+            await pilot.press("6")
+            await _wait_for(
+                pilot,
+                lambda: len(app.query("#patch_editor_panel")) &gt; 0,
+                "the Patch Editor",
+            )
+&gt;           assert await pilot.click(
+                "#patch_entry_address_input"
+            ), "click missed #patch_entry_address_input"
+E           AssertionError: click missed #patch_entry_address_input
+E           assert False
+
+tests\test_b99_export.py:1122: AssertionError</failure></testcase><testcase classname="tests.test_b99_s0" name="test_at_b99_02_save_back_excludes_s0" time="11.981"><failure message="AssertionError: click missed #patch_entry_address_input&#10;assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_at_b99_02_save_back_exclu0')
+
+    def test_at_b99_02_save_back_excludes_s0(tmp_path):
+        """Load case_01 through the dialog, rewrite in-image bytes, save back:
+        the independent reader sees no byte at 0x0..0xB and identical data;
+        the Memory Map lists no row carrying 0x00000000; a document whose only
+        entry is at 0x0 shows that entry as skipped in the status line.
+    
+        The whole drive is keys and clicks (review finding F2): inputs are
+        focused with ``pilot.click`` and typed with ``pilot.press``, buttons are
+        clicked, and every wait observes the painted status line or the painted
+        screen (``export_screenshot``) — never an internal attribute.
+        """
+        from textual.widgets import Button, Input
+    
+        src = tmp_path / "firmware.s19"
+        shutil.copy(CASE01, src)
+        oracle = read_s19(src)
+    
+        app = S19TuiApp(base_dir=tmp_path)
+    
+        async def _drive():
+            # 54 rows: the Patch Editor's docked save-back row sits at the foot
+            # of the JSON pane and is only clickable/painted at the taller
+            # viewport (the b97 ATs drive the panel at 118x54 for the same row).
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+    
+                async def _type(input_id: str, text: str) -&gt; None:
+                    assert await pilot.click(f"#{input_id}"), (
+                        f"click missed #{input_id}"
+                    )
+                    await pilot.press(*text)
+                # 1. Load through the Load file dialog (rail key ``l``).
+                await pilot.press("l")
+                for _ in range(6):
+                    await pilot.pause()
+                # The dialog is a pushed screen: click/type inside ``app.screen``.
+                await _type("load_path", str(src))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded firmware.s19" in _status_text(app),
+                    "load status line",
+                )
+    
+                # 2. Patch Editor (rail key ``6``): one entry rewriting the two
+                #    bytes already at the first data address (identity rewrite).
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                addr = min(oracle.data)
+                rewritten = [oracle.data[addr], oracle.data[addr + 1]]
+                await _type("patch_entry_address_input", f"0x{addr:X}")
+                await _type(
+                    "patch_entry_bytes_input",
+                    " ".join(f"0x{b:02X}" for b in rewritten),
+                )
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "add status line",
+                )
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "Apply:" in _status_text(app),
+                    "apply status line",
+                )
+                assert "1 applied, 0 skipped, 0 blocked" in _status_text(app)
+    
+                # 3. Save-back (offered after the applied entry, premise P-23).
+                #    The prompt renders in the editor's JSON pane: pick that tab
+                #    by clicking its chip, then wait for the prompt's label to be
+                #    PAINTED on the screen (the row reveal), instead of reading
+                #    a CSS class.
+                assert await pilot.click("#patch_tab_json"), (
+                    "click missed #patch_tab_json"
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "patched" in _painted_text(app),
+                    "save-back prompt painted",
+                )
+                # The prompt pre-fills the name: select all, replace by typing.
+                assert await pilot.click(
+                    "#patch_saveback_name_input"
+                ), "click missed #patch_saveback_name_input"
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*"at_b99_02.s19")
+                assert await pilot.click(
+                    "#patch_saveback_confirm_button"
+                ), "click missed #patch_saveback_confirm_button"
+                target = None
+                for _ in range(100):
+                    candidates = sorted(tmp_path.rglob("at_b99_02.s19"))
+                    if candidates:
+                        target = candidates[0]
+                        break
+                    await pilot.pause(0.05)
+                assert target is not None, "save-back wrote no file"
+    
+                written = read_s19(target)
+                assert not any(a &lt;= 0xB for a in written.data), (
+                    f"bytes at 0x0..0xB: {sorted(a for a in written.data if a &lt;= 0xB)}"
+                )
+                assert written.data == oracle.data
+                assert written.header == oracle.header
+    
+                # 4. Memory Map (rail key ``4``): no row carries 0x00000000.
+                #    Every row starts with a band glyph (``░ 0x00000000 …``), so
+                #    a startswith probe can never fire (review finding F1) — the
+                #    address must be matched as a word anywhere in the row.  The
+                #    rows fill without an explicit ``update_memory_map()`` call.
+                await pilot.press("4")
+                rows = []
+                for _ in range(100):
+                    await pilot.pause()
+                    rows = [
+                        str(r.render()).strip()
+                        for r in app.query(".map-region-row")
+                    ]
+                    if rows:
+                        break
+                assert rows, "Memory Map lists no regions"
+                assert not any(
+                    re.search(r"\b0x00000000\b", r) for r in rows
+                ), rows
+    
+                # 5. A document whose only entry is at 0x0: skipped in the
+                #    status line.  Reload the Patch Editor and replace the
+                #    document with the 0x0-only one through the doc-load path.
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                doc_path = tmp_path / "only_s0_entry.json"
+                doc_path.write_text(
+                    json.dumps(
+                        {
+                            "format": "s19app-changeset",
+                            "version": "2.0",
+                            "kind": "change",
+                            "encoding": "utf-8",
+                            "value_mode": "text",
+                            "entries": [
+                                {
+                                    "type": "bytes",
+                                    "address": "0x0",
+                                    "bytes": "AA BB",
+                                }
+                            ],
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+                await _type("patch_doc_path_input", str(doc_path))
+                assert await pilot.click(
+                    "#patch_doc_load_button"
+                ), "click missed #patch_doc_load_button"
+                # The added entry left the draft dirty (LLR-005.1 w1): Load asks
+                # first — the operator accepts the loss on the guard modal.
+                for _ in range(20):
+                    await pilot.pause()
+                    if type(app.screen).__name__ == "LoadGuardScreen":
+                        break
+                assert type(app.screen).__name__ == "LoadGuardScreen"
+                # The modal is pushed before it is composed; wait for its accept
+                # button to be painted, then click it.
+                await _wait_for(
+                    pilot,
+                    lambda: "loss" in _painted_text(app),
+                    "guard modal painted",
+                )
+                assert await pilot.click(
+                    "#load_guard_accept"
+                ), "click missed #load_guard_accept"
+                await _wait_for(
+                    pilot,
+                    lambda: "1 entry" in _status_text(app),
+                    "document load status line",
+                )
+                previous = _status_text(app)
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app) != previous,
+                    "second apply status line",
+                )
+                status = _status_text(app)
+                assert "0 applied, 1 skipped, 0 blocked" in status, status
+    
+&gt;       asyncio.run(_drive())
+
+tests\test_b99_s0.py:565: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b99_s0.py:420: in _drive
+    await _type("patch_entry_address_input", f"0x{addr:X}")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input_id = 'patch_entry_address_input', text = '0x80000000'
+
+    async def _type(input_id: str, text: str) -&gt; None:
+&gt;       assert await pilot.click(f"#{input_id}"), (
+            f"click missed #{input_id}"
+        )
+E       AssertionError: click missed #patch_entry_address_input
+E       assert False
+
+tests\test_b99_s0.py:396: AssertionError</failure></testcase><testcase classname="tests.test_b100_workers" name="test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved" time="2.996"><failure message="assert False">tmp_path = WindowsPath('REDACTED_OUT/env/tmp/pytest-of-REDACTED_ACCOUNT/pytest-0/test_tc_b100_53_confirmed_quit0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001EF19FAD940&gt;
+
+    def test_tc_b100_53_confirmed_quit_is_withdrawn_when_editor_edits_stay_unsaved(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        """SE5-12b-1 scenario A: the editor document is bound to
+        ``P/patches/changes.json`` by a first Save project; a second entry is
+        added through the Patch Editor (unsaved edits); ``quit`` then ``y``
+        while the second Save of ``P`` is held -&gt; the save commits, the last
+        line names the unsaved edits and the Patch Editor save, the app KEEPS
+        running, the panel is still dirty, both entries are kept and the quit
+        is no longer pending.
+    
+        Why: the project records the file as it is on disk; the second entry
+        lives only in the editor, and an exit loses it unseen. Negative control
+        (81ac4c0): the committed arm keeps the pending quit -&gt; exit -&gt; RED."""
+        from tests.test_b100_document import _add_through_the_panel, _panel
+    
+        base = tmp_path / "app"
+        src = projects.copy_sources(tmp_path / "sources", projects.CASE01_DIR, "firmware.s19") / "firmware.s19"
+    
+        async def scenario(app, pilot, log):
+            await projects.load_image(pilot, app, src)
+            await _add_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1)
+            await projects.save_project(pilot, app, log, "P")
+            await _add_through_the_panel(pilot, app, "0x80000060", "AA", entries_after=2)
+            hold = Hold(monkeypatch, S19TuiApp, "_write_manifest_for_save")
+            save(app, "P")
+            try:
+                await reached(pilot, hold, "Save project P")
+                asked = await confirm_quit(app, pilot)
+            finally:
+                hold.release.set()
+            exited = await ended_or_exited(app, "save_project")
+            if exited:
+                return asked, True, None, None, None, None
+            return (asked, False, log.messages[-1], _panel(app)._dirty, len(entries(app)),
+                    getattr(app, "_quit_pending", None))
+    
+&gt;       asked, exited, last, dirty, kept, pending = run(base, scenario, size=(220, 60))
+
+tests\test_b100_workers.py:3494: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_workers.py:337: in run
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_b100_workers.py:335: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b100_workers.py:3478: in scenario
+    await _add_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+address = '0x8000007C', run = 'DE AD BE EF', entries_after = 1
+
+    async def _add_through_the_panel(pilot, app, address: str, run: str, entries_after: int) -&gt; None:
+        """Add one entry through the Patch Editor's own inputs (sets the
+        panel's dirty flag the way the user does)."""
+        await pilot.press("6")
+        await projects.wait_for(
+            pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor panel"
+        )
+        from textual.widgets import Input
+    
+        # Clear both inputs first: a second add keeps the first add's text and
+        # ctrl+a does not always select it (the inputs are the panel's own).
+        app.query_one("#patch_entry_address_input", Input).value = ""
+        app.query_one("#patch_entry_bytes_input", Input).value = ""
+&gt;       assert await pilot.click("#patch_entry_address_input")
+E       assert False
+
+tests\test_b100_document.py:132: AssertionError</failure></testcase></testsuite></testsuites>

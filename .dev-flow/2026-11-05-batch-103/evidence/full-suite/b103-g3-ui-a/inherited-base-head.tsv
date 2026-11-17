@@ -1,0 +1,4 @@
+nodeid	category	base_status	head_status	base_signature	head_signature	base_time	head_time
+tests/test_b100_workers.py::test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install	heredado_firma_distinta	failure	failure	tests\test_b100_workers.py:1420: AssertionError	tests\test_b100_workers.py:1416: AssertionError	3.745	3.476
+tests/test_b100_workers.py::test_at_b100_18_worker_half_case06_project_load_by_keys	heredado_firma_distinta	failure	failure	tests\test_b100_workers.py:2972: AssertionError	tests\test_b100_workers.py:2968: AssertionError	314.871	318.482
+tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size]	heredado_firma_distinta	failure	failure	tests\test_b100_workers.py:3273: AssertionError	tests\test_b100_workers.py:3269: AssertionError	3.312	2.433
