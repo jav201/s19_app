@@ -10,4 +10,5 @@ pytest isolation: -I -B -n0; stdin closed; bytecode/cache off; HOME/XDG/LOCALAPP
 JUnit/logs retained outside clone; committed RESULT is redacted
 auxiliary ruff: pre-existing F401 at tests/test_b100_recents.py:2867 (highlight_row), unrelated and unchanged
 2026-11-16T20:38:24-06:00 git diff --check: PASS
-commit and final clean-worktree verification: pending at initial log write
+2026-11-16T20:40:05-06:00 commit=7ea4bee9caf874bca8f8b360ff9ddaac70f57284; git status --short empty (worktree clean); committed diff check PASS
+this steps.log completion is committed separately as the lane HEAD; final clean-worktree check follows that commit
