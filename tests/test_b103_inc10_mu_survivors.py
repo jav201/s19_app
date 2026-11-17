@@ -15,6 +15,9 @@ Each test is RED on the mutant it names and GREEN on the tree; the control is in
 """
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
 from tests.support import b103_inc10 as t
 
 import pytest
@@ -47,14 +50,18 @@ def test_the_largest_dock_is_four_rows_high_with_one_chip_row(tmp_path, case, si
 def test_r_s19_s0header_001_2_6_a_long_written_name_is_cut_to_252_bytes(tmp_path):
     """R-S19-S0HEADER-001.2/6: an Intel HEX source written as S19 under a 254-character name (the longest a
     file system takes) gets header data of exactly the first 252 bytes of the written name.
-    Negative control: the header cut at 253 bytes (MU26d) -> RED."""
+    Negative control: the header cut at 253 bytes (MU26d) -> RED. Windows uses an extended-length base so the
+    staging path's legacy MAX_PATH limit cannot refuse the 254-character name before the contract is exercised."""
     name = "n" * 250 + ".s19"
+    base = tmp_path
+    if sys.platform == "win32" and not str(base).startswith("\\\\?\\"):
+        base = Path("\\\\?\\" + str(base))
 
     async def body(app, pilot):
         await t.post_decision(app, pilot, name, "s19", 32)
         return t.s0_data(t.written(app, name))
 
-    data = t.run_loaded(tmp_path, t.SIZE, "firmware.hex", body)
+    data = t.run_loaded(base, t.SIZE, "firmware.hex", body)
     assert data == name.encode("ascii")[:252], len(data)
 
 

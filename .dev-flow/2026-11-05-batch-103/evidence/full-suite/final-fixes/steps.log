@@ -1,0 +1,9 @@
+2026-11-17T02:33:16-06:00 red-before on 26edef4a: 4 collected; hygiene Inc15 and Inc10 long-name failed, undo/redo and B100 passed this local run; red-before.junit.xml.
+2026-11-17T02:39:32-06:00 settled fix: Inc15 guard plus TC-051 real arm, 2 passed; green-settled.junit.xml.
+2026-11-17T02:40:27-06:00 undo/redo driver fix: 1 passed; green-undo.junit.xml.
+2026-11-17T02:41:19-06:00 Inc10 Windows extended-base fix: 1 passed with the 254-character name and 252-byte oracle unchanged; green-inc10.junit.xml.
+2026-11-17T02:41:48-06:00 B100 Save project flag synchronization: 1 passed; green-b100.junit.xml.
+2026-11-17T02:42:54-06:00 combined four-target run: 4 passed in 27.61s; green-targeted.junit.xml.
+2026-11-17T02:43:37-06:00 five complete files started; completed with 180 passed and 5 unrelated hygiene failures in 1065.92s; full-files.junit.xml.
+2026-11-17T03:27:24-06:00 An intermediate full-hygiene rerun exceeded the external runner limit and was discarded as incomplete. Five affected hygiene nodes were then rerun with short external scratch: the archive/MAX_PATH node passed; three Windows QC-TM nodeid-form guards and the global historical-evidence redaction guard remained RED. The follow-up transcript quoted pre-existing unredacted global evidence and was excluded from this redacted package; no unrelated source was changed.
+2026-11-17T03:27:24-06:00 Removed all local scratch and the temporary Inc10 probe. Redacted logs/JUnit, normalized JUnit host to &lt;HOST&gt;, parsed every XML successfully and ran the project redaction scanner over final-fixes: PASS.

@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="4" time="44.420" timestamp="2026-11-17T02:33:16.091210-06:00" hostname="&lt;HOST&gt;"><testcase classname="tests.test_suite_hygiene" name="test_r_tst_154_155_inc15_arms_wait_through_settled" time="0.191"><failure message="AssertionError: test_save_back_prompt › _apply: the statement after &quot;panel.request_action('apply_doc')&quot; must be an `await settled` passing 'TC-051: the apply showed the save-back prompt'&#10;assert None == 'TC-051: the apply showed the save-back prompt'&#10; +  where None = _settled_description(&lt;ast.Expr object at 0x00000193D2128E10&gt;)">def test_r_tst_154_155_inc15_arms_wait_through_settled() -&gt; None:
+
+
+
+        """R-TST-154, R-TST-155, R-TST-163: the nine table-D wait sites of the
+
+
+
+        four Inc 15 arms go through ``tests.b97_probes.settled``, pass their
+
+
+
+        table-D descriptions verbatim and their pinned predicates, and sit as the
+
+
+
+        statement directly after their trigger in the same block (a trigger that
+
+
+
+        repeats in the block is keyed on its last occurrence, which the reads
+
+
+
+        follow); each arm holds exactly its table-D count of ``settled`` calls
+
+
+
+        and no ``range``-counted pause loop and no call of a module-local wait
+
+
+
+        helper (``_settled``, ``_wait_for``)."""
+
+
+
+        expected = Counter(
+
+
+
+            (module, arm) for (module, arm, _h, _t, _d, _p) in _INC15_WAIT_SITES
+
+
+
+        )
+
+
+
+
+
+
+
+        # R-TST-155: the name ``settled`` the sites call is the shared wait.
+
+
+
+        for module_rel in sorted({module for (module, *_rest) in _INC15_WAIT_SITES}):
+
+
+
+            tree = ast.parse((REPO_ROOT / module_rel).read_text(encoding="utf-8"))
+
+
+
+            assert _settled_bindings(tree) == ["from tests.b97_probes import settled"], (
+
+
+
+                f"{module_rel}: `settled` must be bound only by the import from "
+
+
+
+                f"tests.b97_probes, found {_settled_bindings(tree)}"
+
+
+
+            )
+
+
+
+
+
+
+
+        for module_rel, arm_name, helper, trigger, description, predicate in _INC15_WAIT_SITES:
+
+
+
+            module_path = REPO_ROOT / module_rel
+
+
+
+            arm = _arm_function(module_path, arm_name)
+
+
+
+            drive = _nested_def(arm, "_drive")
+
+
+
+            assert drive is not None, f"{arm_name}: nested _drive coroutine missing"
+
+
+
+            if helper is None:
+
+
+
+                body = _drive_body(drive)
+
+
+
+            else:
+
+
+
+                helper_def = _nested_def(drive, helper)
+
+
+
+                assert helper_def is not None, f"{arm_name}: nested {helper} missing"
+
+
+
+                body = helper_def.body
+
+
+
+            index = max(
+
+
+
+                (i for i, stmt in enumerate(body) if ast.unparse(stmt) == trigger),
+
+
+
+                default=None,
+
+
+
+            )
+
+
+
+            assert index is not None, (
+
+
+
+                f"{arm_name} › {helper or '_drive'}: trigger {trigger!r} not found"
+
+
+
+            )
+
+
+
+            following = body[index + 1] if index + 1 &lt; len(body) else None
+
+
+
+&gt;           assert _settled_description(following) == description, (
+
+
+
+                f"{arm_name} › {helper or '_drive'}: the statement after "
+
+
+
+                f"{trigger!r} must be an `await settled` passing {description!r}"
+
+
+
+            )
+
+
+
+E           AssertionError: test_save_back_prompt › _apply: the statement after "panel.request_action('apply_doc')" must be an `await settled` passing 'TC-051: the apply showed the save-back prompt'
+
+
+
+E           assert None == 'TC-051: the apply showed the save-back prompt'
+
+
+
+E            +  where None = _settled_description(&lt;ast.Expr object at 0x00000193D2128E10&gt;)
+
+
+
+
+
+
+
+tests\test_suite_hygiene.py:2392: AssertionError</failure></testcase><testcase classname="tests.test_undo_redo_ux" name="test_ac2_1_ctrl_z_y_undo_redo_via_real_key" time="3.017" /><testcase classname="tests.test_b103_inc10_mu_survivors" name="test_r_s19_s0header_001_2_6_a_long_written_name_is_cut_to_252_bytes" time="22.360"><failure message="AssertionError: timed out waiting for the save-back status">tmp_path = WindowsPath('REDACTED_WORKTREE/.dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/red-tmp/test_r_s19_s0header_001_2_6_a_0')
+
+
+
+
+
+
+
+    def test_r_s19_s0header_001_2_6_a_long_written_name_is_cut_to_252_bytes(tmp_path):
+
+
+
+        """R-S19-S0HEADER-001.2/6: an Intel HEX source written as S19 under a 254-character name (the longest a
+
+
+
+        file system takes) gets header data of exactly the first 252 bytes of the written name.
+
+
+
+        Negative control: the header cut at 253 bytes (MU26d) -&gt; RED."""
+
+
+
+        name = "n" * 250 + ".s19"
+
+
+
+
+
+
+
+        async def body(app, pilot):
+
+
+
+            await t.post_decision(app, pilot, name, "s19", 32)
+
+
+
+            return t.s0_data(t.written(app, name))
+
+
+
+
+
+
+
+&gt;       data = t.run_loaded(tmp_path, t.SIZE, "firmware.hex", body)
+
+
+
+
+
+
+
+tests\test_b103_inc10_mu_survivors.py:57:
+
+
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+
+
+tests\support\b103_inc10.py:453: in run_loaded
+
+
+
+    return run_scene(tmp_path, size, scene, **kw)
+
+
+
+tests\support\b103_inc10.py:119: in run_scene
+
+
+
+    return asyncio.run(_drive())
+
+
+
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+
+
+
+    return runner.run(main)
+
+
+
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+
+
+
+    return self._loop.run_until_complete(task)
+
+
+
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+
+
+
+    return future.result()
+
+
+
+tests\support\b103_inc10.py:117: in _drive
+
+
+
+    return await body(app, pilot)
+
+
+
+tests\support\b103_inc10.py:451: in scene
+
+
+
+    return await body(app, pilot)
+
+
+
+tests\test_b103_inc10_mu_survivors.py:54: in body
+
+
+
+    await t.post_decision(app, pilot, name, "s19", 32)
+
+
+
+tests\support\b103_inc10.py:469: in post_decision
+
+
+
+    await wait_for(pilot, lambda: any(s.startswith(("Saved", "Verify", "Patch Editor:", "Save"))
+
+
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+
+
+
+
+
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+
+
+
+predicate = &lt;function post_decision.&lt;locals&gt;.&lt;lambda&gt; at 0x00000193D41F9300&gt;
+
+
+
+description = 'the save-back status', attempts = 200
+
+
+
+
+
+
+
+    async def wait_for(pilot, predicate, description: str, attempts: int = 200) -&gt; None:
+
+
+
+        for _ in range(attempts):
+
+
+
+            if predicate():
+
+
+
+                return
+
+
+
+            await pilot.pause()
+
+
+
+&gt;       raise AssertionError(f"timed out waiting for {description}")
+
+
+
+E       AssertionError: timed out waiting for the save-back status
+
+
+
+
+
+
+
+tests\support\b103_inc10.py:127: AssertionError</failure></testcase><testcase classname="tests.test_b100_load_question" name="test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved" time="17.931" /></testsuite></testsuites>

@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="2.946" timestamp="2026-11-17T02:40:27.860579-06:00" hostname="&lt;HOST&gt;"><testcase classname="tests.test_undo_redo_ux" name="test_ac2_1_ctrl_z_y_undo_redo_via_real_key" time="2.652" /></testsuite></testsuites>

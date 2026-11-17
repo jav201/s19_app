@@ -571,12 +571,12 @@ def test_save_back_prompt(tmp_path: Path) -> None:
 
             async def _apply() -> None:
                 panel.request_action("apply_doc")
-                await settle_workers(pilot)
                 await settled(
                     pilot,
-                    lambda: shown_widget(prompt),
+                    lambda: not prompt.has_class("hidden"),
                     "TC-051: the apply showed the save-back prompt",
                 )
+                await settle_workers(pilot)
 
             prompt = app.query_one("#patch_saveback_row", Container)
             name_input = app.query_one("#patch_saveback_name_input", Input)

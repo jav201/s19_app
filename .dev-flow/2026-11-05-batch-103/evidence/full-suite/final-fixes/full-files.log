@@ -1,0 +1,850 @@
+REDACTED_HOME\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+
+
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+
+
+
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+
+
+============================= test session starts =============================
+
+
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0
+
+
+rootdir: REDACTED_WORKTREE
+
+
+configfile: pyproject.toml
+
+
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+
+
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+
+
+collected 185 items
+
+
+
+
+
+tests\test_suite_hygiene.py ............................................ [ 23%]
+
+
+.....F....F.FF...F.....                                                  [ 36%]
+
+
+tests\test_tui_patch_editor_v2.py ...................................... [ 56%]
+
+
+..............                                                           [ 64%]
+
+
+tests\test_undo_redo_ux.py ...                                           [ 65%]
+
+
+tests\test_b103_inc10_mu_survivors.py ....                               [ 68%]
+
+
+tests\test_b100_load_question.py ....................................... [ 89%]
+
+
+....................                                                     [100%]
+
+
+
+
+
+================================== FAILURES ===================================
+
+
+______________ test_r_tst_040_1_base_tree_reports_its_37_bounds _______________
+
+
+
+
+
+tmp_path = WindowsPath('REDACTED_WORKTREE/.dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_040_1_base_tree_rep0')
+
+
+
+
+
+    def test_r_tst_040_1_base_tree_reports_its_37_bounds(tmp_path) -> None:
+
+
+        """R-TST-040/1, 040/3, 040/4 base halves: the census of the b3bf42e tree
+
+
+        reports exactly its 37 upper bounds, the 3 list-appended reads among them,
+
+
+        and none of the count or lower-bound comparisons."""
+
+
+>       root = _extract_tests_tree(_BOUND_BASE_COMMIT, tmp_path)
+
+
+
+
+
+tests\test_suite_hygiene.py:1460:
+
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+
+tests\test_suite_hygiene.py:322: in _extract_tests_tree
+
+
+    archive.extractall(dest)
+
+
+..\..\anaconda3\Lib\zipfile\__init__.py:1744: in extractall
+
+
+    self._extract_member(zipinfo, path, pwd)
+
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+
+
+
+
+self = <zipfile.ZipFile [closed]>
+
+
+member = <ZipInfo filename='tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[a2l-comfortable-120x30].svg' compress_type=deflate file_size=75356 compress_size=6274>
+
+
+targetpath = 'REDACTED_WORKTREE\\.dev-flow\\2026-11-05-batch-103\\evidence\\full-suite\\final-f...se_tree_rep0\\tests\\__snapshots__\\test_tui_snapshot\\test_tc016s_density_layout_snapshot[a2l-comfortable-120x30].svg'
+
+
+pwd = None
+
+
+
+
+
+    def _extract_member(self, member, targetpath, pwd):
+
+
+        """Extract the ZipInfo object 'member' to a physical
+
+
+           file on the path targetpath.
+
+
+        """
+
+
+        if not isinstance(member, ZipInfo):
+
+
+            member = self.getinfo(member)
+
+
+
+
+
+        # build the destination pathname, replacing
+
+
+        # forward slashes to platform specific separators.
+
+
+        arcname = member.filename.replace('/', os.path.sep)
+
+
+
+
+
+        if os.path.altsep:
+
+
+            arcname = arcname.replace(os.path.altsep, os.path.sep)
+
+
+        # interpret absolute pathname as relative, remove drive letter or
+
+
+        # UNC path, redundant separators, "." and ".." components.
+
+
+        arcname = os.path.splitdrive(arcname)[1]
+
+
+        invalid_path_parts = ('', os.path.curdir, os.path.pardir)
+
+
+        arcname = os.path.sep.join(x for x in arcname.split(os.path.sep)
+
+
+                                   if x not in invalid_path_parts)
+
+
+        if os.path.sep == '\\':
+
+
+            # filter illegal characters on Windows
+
+
+            arcname = self._sanitize_windows_name(arcname, os.path.sep)
+
+
+
+
+
+        if not arcname and not member.is_dir():
+
+
+            raise ValueError("Empty filename.")
+
+
+
+
+
+        targetpath = os.path.join(targetpath, arcname)
+
+
+        targetpath = os.path.normpath(targetpath)
+
+
+
+
+
+        # Create all upper directories if necessary.
+
+
+        upperdirs = os.path.dirname(targetpath)
+
+
+        if upperdirs and not os.path.exists(upperdirs):
+
+
+            os.makedirs(upperdirs)
+
+
+
+
+
+        if member.is_dir():
+
+
+            if not os.path.isdir(targetpath):
+
+
+                os.mkdir(targetpath)
+
+
+            return targetpath
+
+
+
+
+
+        with self.open(member, pwd=pwd) as source, \
+
+
+>            open(targetpath, "wb") as target:
+
+
+E            FileNotFoundError: [Errno 2] No such file or directory: 'REDACTED_WORKTREE\\.dev-flow\\2026-11-05-batch-103\\evidence\\full-suite\\final-fixes\\full-files-tmp\\test_r_tst_040_1_base_tree_rep0\\tests\\__snapshots__\\test_tui_snapshot\\test_tc016s_density_layout_snapshot[a2l-comfortable-120x30].svg'
+
+
+
+
+
+..\..\anaconda3\Lib\zipfile\__init__.py:1801: FileNotFoundError
+
+
+_______________ test_r_tst_043_045_qc_tm_section_rows_and_count _______________
+
+
+
+
+
+pytester = <Pytester WindowsPath('REDACTED_WORKTREE/.dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_043_045_qc_tm_section_rows_and_count0')>
+
+
+
+
+
+    def test_r_tst_043_045_qc_tm_section_rows_and_count(pytester) -> None:
+
+
+        result = _inner_run(pytester, {"test_qc_tm_rows.py": _PLANTED_THREE_ARMS})
+
+
+        assert result.ret == 0, result.stdout.str()
+
+
+        rows, count_line = _qc_tm_rows(result.stdout.str())
+
+
+>       assert rows == [
+
+
+            "LOW 15.0%  0.850 s / 1.000 s  b  test_qc_tm_rows.py::test_b",
+
+
+            "25.0%  0.750 s / 1.000 s  c  test_qc_tm_rows.py::test_c",
+
+
+            "40.0%  0.600 s / 1.000 s  a  test_qc_tm_rows.py::test_a",
+
+
+        ], rows
+
+
+E       AssertionError: ['LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_...nce/full-suite/final-fixes/full-files-tmp/test_r_tst_043_045_qc_tm_section_rows_and_count0/test_qc_tm_rows.py::test_a']
+
+
+E       assert ['LOW 15.0%  ...s.py::test_a'] == ['LOW 15.0%  ...s.py::test_a']
+
+
+E
+
+
+E         At index 0 diff: 'LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_043_045_qc_tm_section_rows_and_count0/test_qc_tm_rows.py::test_b' != 'LOW 15.0%  0.850 s / 1.000 s  b  test_qc_tm_rows.py::test_b'
+
+
+E         Use -v to get more diff
+
+
+
+
+
+REDACTED_WORKTREE\tests\test_suite_hygiene.py:1708: AssertionError
+
+
+---------------------------- Captured stdout call -----------------------------
+
+
+running: REDACTED_HOME\anaconda3\python.exe -mpytest --basetemp=REDACTED_WORKTREE\.dev-flow\2026-11-05-batch-103\evidence\full-suite\final-fixes\full-files-tmp\test_r_tst_043_045_qc_tm_section_rows_and_count0\runpytest-0 -p no:cacheprovider
+
+
+     in: REDACTED_WORKTREE\.dev-flow\2026-11-05-batch-103\evidence\full-suite\final-fixes\full-files-tmp\test_r_tst_043_045_qc_tm_section_rows_and_count0
+
+
+============================= test session starts =============================
+
+
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0
+
+
+rootdir: REDACTED_WORKTREE
+
+
+configfile: pyproject.toml
+
+
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+
+
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+
+
+collected 3 items
+
+
+
+
+
+test_qc_tm_rows.py ...                                                   [100%]
+
+
+============================ QC-TM timing margins =============================
+
+
+LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_043_045_qc_tm_section_rows_and_count0/test_qc_tm_rows.py::test_b
+
+
+25.0%  0.750 s / 1.000 s  c  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_043_045_qc_tm_section_rows_and_count0/test_qc_tm_rows.py::test_c
+
+
+40.0%  0.600 s / 1.000 s  a  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_043_045_qc_tm_section_rows_and_count0/test_qc_tm_rows.py::test_a
+
+
+QC-TM: 3 bounds, 1 under 20 % margin
+
+
+
+
+
+============================== 3 passed in 0.13s ==============================
+
+
+---------------------------- Captured stderr call -----------------------------
+
+
+REDACTED_HOME\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+
+
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+
+
+
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+
+
+______________________ test_r_tst_044_low_margin_prefix _______________________
+
+
+
+
+
+pytester = <Pytester WindowsPath('REDACTED_WORKTREE/.dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_044_low_margin_prefix0')>
+
+
+
+
+
+    def test_r_tst_044_low_margin_prefix(pytester) -> None:
+
+
+        result = _inner_run(pytester, {"test_low_prefix.py": _PLANTED_LOW_PREFIX})
+
+
+        assert result.ret == 0, result.stdout.str()
+
+
+        rows, count_line = _qc_tm_rows(result.stdout.str())
+
+
+>       assert rows == [
+
+
+            "LOW 15.0%  0.850 s / 1.000 s  b  test_low_prefix.py::test_b",
+
+
+            "20.0%  0.800 s / 1.000 s  d  test_low_prefix.py::test_d",
+
+
+        ], rows
+
+
+E       AssertionError: ['LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_...batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_044_low_margin_prefix0/test_low_prefix.py::test_d']
+
+
+E       assert ['LOW 15.0%  ...x.py::test_d'] == ['LOW 15.0%  ...x.py::test_d']
+
+
+E
+
+
+E         At index 0 diff: 'LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_044_low_margin_prefix0/test_low_prefix.py::test_b' != 'LOW 15.0%  0.850 s / 1.000 s  b  test_low_prefix.py::test_b'
+
+
+E         Use -v to get more diff
+
+
+
+
+
+REDACTED_WORKTREE\tests\test_suite_hygiene.py:1758: AssertionError
+
+
+---------------------------- Captured stdout call -----------------------------
+
+
+running: REDACTED_HOME\anaconda3\python.exe -mpytest --basetemp=REDACTED_WORKTREE\.dev-flow\2026-11-05-batch-103\evidence\full-suite\final-fixes\full-files-tmp\test_r_tst_044_low_margin_prefix0\runpytest-0 -p no:cacheprovider
+
+
+     in: REDACTED_WORKTREE\.dev-flow\2026-11-05-batch-103\evidence\full-suite\final-fixes\full-files-tmp\test_r_tst_044_low_margin_prefix0
+
+
+============================= test session starts =============================
+
+
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0
+
+
+rootdir: REDACTED_WORKTREE
+
+
+configfile: pyproject.toml
+
+
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+
+
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+
+
+collected 2 items
+
+
+
+
+
+test_low_prefix.py ..                                                    [100%]
+
+
+============================ QC-TM timing margins =============================
+
+
+LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_044_low_margin_prefix0/test_low_prefix.py::test_b
+
+
+20.0%  0.800 s / 1.000 s  d  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_044_low_margin_prefix0/test_low_prefix.py::test_d
+
+
+QC-TM: 2 bounds, 1 under 20 % margin
+
+
+
+
+
+============================== 2 passed in 0.14s ==============================
+
+
+---------------------------- Captured stderr call -----------------------------
+
+
+REDACTED_HOME\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+
+
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+
+
+
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+
+
+_________________ test_r_tst_046_over_bound_arm_still_reports _________________
+
+
+
+
+
+pytester = <Pytester WindowsPath('REDACTED_WORKTREE/.dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_046_over_bound_arm_still_reports0')>
+
+
+
+
+
+    def test_r_tst_046_over_bound_arm_still_reports(pytester) -> None:
+
+
+        result = _inner_run(pytester, {"test_over_bound.py": _PLANTED_OVER_BOUND})
+
+
+        assert result.ret != 0, "the planted over-bound arm must fail"
+
+
+        rows, count_line = _qc_tm_rows(result.stdout.str())
+
+
+>       assert rows == [
+
+
+            "LOW -20.0%  1.200 s / 1.000 s  o  test_over_bound.py::test_over"
+
+
+        ], rows
+
+
+E       AssertionError: ['LOW -20.0%  1.200 s / 1.000 s  o  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_046_over_bound_arm_still_reports0/test_over_bound.py::test_over']
+
+
+E       assert ['LOW -20.0% ...y::test_over'] == ['LOW -20.0% ...y::test_over']
+
+
+E
+
+
+E         At index 0 diff: 'LOW -20.0%  1.200 s / 1.000 s  o  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_046_over_bound_arm_still_reports0/test_over_bound.py::test_over' != 'LOW -20.0%  1.200 s / 1.000 s  o  test_over_bound.py::test_over'
+
+
+E         Use -v to get more diff
+
+
+
+
+
+REDACTED_WORKTREE\tests\test_suite_hygiene.py:1777: AssertionError
+
+
+---------------------------- Captured stdout call -----------------------------
+
+
+running: REDACTED_HOME\anaconda3\python.exe -mpytest --basetemp=REDACTED_WORKTREE\.dev-flow\2026-11-05-batch-103\evidence\full-suite\final-fixes\full-files-tmp\test_r_tst_046_over_bound_arm_still_reports0\runpytest-0 -p no:cacheprovider
+
+
+     in: REDACTED_WORKTREE\.dev-flow\2026-11-05-batch-103\evidence\full-suite\final-fixes\full-files-tmp\test_r_tst_046_over_bound_arm_still_reports0
+
+
+============================= test session starts =============================
+
+
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0
+
+
+rootdir: REDACTED_WORKTREE
+
+
+configfile: pyproject.toml
+
+
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+
+
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+
+
+collected 1 item
+
+
+
+
+
+test_over_bound.py F                                                     [100%]
+
+
+
+
+
+================================== FAILURES ===================================
+
+
+__________________________________ test_over __________________________________
+
+
+
+
+
+    def test_over():
+
+
+        from tests.support.timing import report_margin
+
+
+>       assert 1.2 < report_margin("o", 1.2, 1.0)
+
+
+E       AssertionError: assert 1.2 < 1.0
+
+
+E        +  where 1.0 = <function report_margin at 0x000001F4229C4220>('o', 1.2, 1.0)
+
+
+
+
+
+test_over_bound.py:3: AssertionError
+
+
+============================ QC-TM timing margins =============================
+
+
+LOW -20.0%  1.200 s / 1.000 s  o  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_046_over_bound_arm_still_reports0/test_over_bound.py::test_over
+
+
+QC-TM: 1 bounds, 1 under 20 % margin
+
+
+=========================== short test summary info ===========================
+
+
+FAILED test_over_bound.py::test_over - AssertionError: assert 1.2 < 1.0
+
+
+============================== 1 failed in 0.21s ==============================
+
+
+---------------------------- Captured stderr call -----------------------------
+
+
+REDACTED_HOME\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+
+
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+
+
+
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+
+
+___ test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses ____
+
+
+
+
+
+    def test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses() -> None:
+
+
+        """E3S-2 / E5S-1 / R-PASTE.36: every text file of both batch folders
+
+
+        (records and evidence, not git-ignored) holds no home path, account or
+
+
+        host name, junit host attribute, shell prompt, UNC host path or LAN
+
+
+        address. A root missing from the checkout fails the test."""
+
+
+        inc2_dir = EVIDENCE_ROOT / "inc-2"
+
+
+        if not inc2_dir.is_dir():
+
+
+            pytest.fail(
+
+
+                "the increment's evidence folder is missing from this checkout; "
+
+
+                "the redaction gate has nothing it is responsible for"
+
+
+            )
+
+
+        all_hits = []
+
+
+        for root in _redaction_roots(REPO_ROOT):
+
+
+            if not root.is_dir():
+
+
+                pytest.fail(
+
+
+                    f"the redaction root {root} is missing from this checkout; "
+
+
+                    "the gate has nothing it is responsible for"
+
+
+                )
+
+
+>           all_hits.extend(_redaction_hits(root, _local_identity_names(), _git_ignored(root)))
+
+
+
+
+
+tests\test_suite_hygiene.py:2052:
+
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+
+tests\test_suite_hygiene.py:1992: in _redaction_hits
+
+
+    data = path.read_bytes()
+
+
+..\..\anaconda3\Lib\pathlib.py:1019: in read_bytes
+
+
+    with self.open(mode='rb') as f:
+
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+
+
+
+
+self = WindowsPath('REDACTED_WORKTREE/.dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/tmp/tmp2szyy0vl')
+
+
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+
+
+
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+
+
+             errors=None, newline=None):
+
+
+        """
+
+
+        Open the file pointed to by this path and return a file object, as
+
+
+        the built-in open() function does.
+
+
+        """
+
+
+        if "b" not in mode:
+
+
+            encoding = io.text_encoding(encoding)
+
+
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+
+
+E       PermissionError: [Errno 13] Permission denied: 'REDACTED_WORKTREE\\.dev-flow\\2026-11-05-batch-103\\evidence\\full-suite\\final-fixes\\tmp\\tmp2szyy0vl'
+
+
+
+
+
+..\..\anaconda3\Lib\pathlib.py:1013: PermissionError
+
+
+- generated xml file: REDACTED_WORKTREE\.dev-flow\2026-11-05-batch-103\evidence\full-suite\final-fixes\full-files.junit.xml -
+
+
+============================ QC-TM timing margins =============================
+
+
+48.7%  0.205 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+
+
+65.9%  0.511 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+
+
+QC-TM: 2 bounds, 0 under 20 % margin
+
+
+=========================== short test summary info ===========================
+
+
+FAILED tests/test_suite_hygiene.py::test_r_tst_040_1_base_tree_reports_its_37_bounds
+
+
+FAILED tests/test_suite_hygiene.py::test_r_tst_043_045_qc_tm_section_rows_and_count
+
+
+FAILED tests/test_suite_hygiene.py::test_r_tst_044_low_margin_prefix - Assert...
+
+
+FAILED tests/test_suite_hygiene.py::test_r_tst_046_over_bound_arm_still_reports
+
+
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+
+
+================= 5 failed, 180 passed in 1065.92s (0:17:45) ==================

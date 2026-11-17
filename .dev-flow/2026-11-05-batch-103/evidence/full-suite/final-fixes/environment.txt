@@ -1,0 +1,10 @@
+branch=b103-g3-final-fixes
+base=26edef4afff576160a550797b5f9cf3dd3743af0
+platform=Windows local; Python 3.12.7; pytest 8.3.4
+command=$HOME/anaconda3/python.exe -I -B -m pytest -n 0 -p no:cacheprovider --junitxml=<artifact>
+stdin=closed
+bytecode=PYTHONDONTWRITEBYTECODE=1 and -B; pytest cacheprovider disabled
+isolation=HOME,XDG_CONFIG_HOME,XDG_DATA_HOME,XDG_CACHE_HOME,LOCALAPPDATA,TMPDIR,TMP,TEMP under REDACTED_WORKTREE evidence scratch
+clipboard=CI,GITHUB_ACTIONS,RUNNER_ENVIRONMENT,B103_HOST_PLATFORM,DISPLAY unset; no real clipboard used
+colour=NO_COLOR,CLICOLOR,CLICOLOR_FORCE unset; TERM=xterm-256color; COLORTERM=truecolor
+hygiene-rerun=same isolation under REDACTED_TEMP outside the repository; avoids MAX_PATH, prefixed inner nodeids and evidence-guard scans of live scratch

@@ -2804,6 +2804,11 @@ def test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved(tmp_pat
         await add_entry(pilot, app, "0x8000007C")
         messages = await projects.save_project(pilot, app, log, "S1")
         assert any(m.startswith("Saved project to") for m in messages), messages
+        await ld.wait_for(
+            pilot,
+            lambda: not _panel(app)._dirty,
+            "Save project cleared the panel flag",
+        )
         assert not _panel(app)._dirty, "setup: Save project left the flag set"
         spy = PushSpy(app)
         app._handle_load_dialog(LC("project", "Q"))

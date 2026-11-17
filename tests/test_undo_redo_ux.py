@@ -165,6 +165,8 @@ def test_ac2_1_ctrl_z_y_undo_redo_via_real_key(tmp_path: Path) -> None:
     """
     from textual.widgets import Button
 
+    from tests.b97_probes import settled
+
     paste = _changeset_text(
         [{"type": "string", "address": "0x200", "value": "REV_A"}]
     )
@@ -182,18 +184,30 @@ def test_ac2_1_ctrl_z_y_undo_redo_via_real_key(tmp_path: Path) -> None:
 
             _set_entry_inputs(app, address="0x300", bytes_text="DE AD")
             app.query_one("#patch_entry_add_button", Button).press()
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: _entry_addresses(app) == ["0x200", "0x300"],
+                "TC-632: the real Add appended 0x300",
+            )
             outcomes["after_add"] = _entry_addresses(app)
 
             # Drop focus so the app-level binding (not a focused Input) handles
             # the key, then drive the REAL ctrl+z / ctrl+y.
             app.set_focus(None)
             await pilot.press("ctrl+z")
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: _entry_addresses(app) == ["0x200"],
+                "TC-632: ctrl+z restored 0x200 only",
+            )
             outcomes["after_ctrl_z"] = _entry_addresses(app)
 
             await pilot.press("ctrl+y")
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: _entry_addresses(app) == ["0x200", "0x300"],
+                "TC-632: ctrl+y restored 0x300",
+            )
             outcomes["after_ctrl_y"] = _entry_addresses(app)
         return outcomes
 
