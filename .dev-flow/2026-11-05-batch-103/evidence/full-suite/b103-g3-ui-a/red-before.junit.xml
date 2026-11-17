@@ -10,16 +10,16 @@ monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001EF1333B140&g
         internal code or class name painted."""
         _forced_write_failure(monkeypatch)
         src = _source(tmp_path)
-    
+
         async def scenario(app, pilot, log):
             await projects.load_image(pilot, app, src)
             await _add_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1)
             messages = await projects.save_project(pilot, app, log, "P")
             return messages, app.workarea / "P", _panel(app)._dirty
-    
+
 &gt;       messages, project_dir, dirty = projects.run_app(tmp_path / "app", scenario, size=(220, 60))
 
-tests\test_b100_document.py:792: 
+tests\test_b100_document.py:792:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\support\b100_projects.py:615: in run_app
     return asyncio.run(_drive())
@@ -47,7 +47,7 @@ address = '0x8000007C', run = 'DE AD BE EF', entries_after = 1
             pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor panel"
         )
         from textual.widgets import Input
-    
+
         # Clear both inputs first: a second add keeps the first add's text and
         # ctrl+a does not always select it (the inputs are the panel's own).
         app.query_one("#patch_entry_address_input", Input).value = ""
@@ -76,11 +76,11 @@ size = (220, 60)
         ``set_status`` log holds the ``0 problems`` summary and no apply
         outcome — the reopen lists the entry, it never re-applies it. Both
         reference sizes.
-    
+
         RED (base dc3b314, P-8): the save writes no ``patches/changes.json``
         and records no ``active_document``; a reopen lists 0 entries."""
         import asyncio
-    
+
         src = _source(tmp_path)
         base = tmp_path / "app"
         project_dir = _workarea(base) / "P"
@@ -89,10 +89,10 @@ size = (220, 60)
         ).decode("utf-8")
         addresses = [PATCH_ADDRESS + offset for offset in range(len(PATCH_BYTES))]
         dirty_marker = "●"
-    
+
         async def _save_scene() -&gt; tuple:
             from s19_app.tui.app import S19TuiApp
-    
+
             app = S19TuiApp(base_dir=base)
             log = projects.StatusLog(app)
             async with app.run_test(size=size, notifications=True) as pilot:
@@ -102,10 +102,10 @@ size = (220, 60)
                 border = _at_script_border(app)
                 messages = await _at_save_project_through_dialog(pilot, app, log, "P")
                 return border, messages
-    
+
         async def _reopen_scene() -&gt; tuple:
             from s19_app.tui.app import S19TuiApp
-    
+
             app = S19TuiApp(base_dir=base)
             log = projects.StatusLog(app)
             async with app.run_test(size=size, notifications=True) as pilot:
@@ -120,10 +120,10 @@ size = (220, 60)
                 )
                 image = {a: app.current_file.mem_map.get(a) for a in addresses}
                 return panel, _at_ledger(app), _at_script_border(app), image, log.messages
-    
+
 &gt;       border_before, messages = asyncio.run(_save_scene())
 
-tests\test_b100_document.py:2119: 
+tests\test_b100_document.py:2119:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 ..\..\anaconda3\Lib\asyncio\runners.py:194: in run
     return runner.run(main)
@@ -146,7 +146,7 @@ text = '{\n  "format": "s19app-changeset",\n  "version": "2.0",\n  "kind": "chan
         forwards it to the focused buffer), then click Parse pasted."""
         from textual import events
         from textual.widgets import TextArea
-    
+
         await pilot.press("6")
         await projects.wait_for(
             pilot, lambda: len(app.query("#patch_paste_parse_button")) &gt; 0, "the Patch Editor"
@@ -168,7 +168,7 @@ tests\test_b100_document.py:1992: AssertionError</failure></testcase><testcase c
         (1 assertion after the vacuity guard)."""
 &gt;       dirty_before, dirty_after, status = _dirty_after_save(tmp_path, blocked=True)
 
-tests\test_b100_save_image.py:1887: 
+tests\test_b100_save_image.py:1887:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_save_image.py:1881: in _dirty_after_save
     return asyncio.run(_drive())
@@ -211,13 +211,13 @@ tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase
         Patch Editor Load raises 0 ``LoadGuardScreen``. The skip-``mark_saved``
         mutant leaves the flag set and the Load asks -&gt; RED."""
         from textual.widgets import Button, Input
-    
+
         from s19_app.tui.screens_directionb import LoadGuardScreen
-    
+
         src = _copy_case01(tmp_path) / "firmware.s19"
         other = tmp_path / "other.json"
         other.write_bytes(b100_projects.change_document_bytes())
-    
+
         async def _drive() -&gt; tuple:
             app = S19TuiApp(base_dir=tmp_path / "app")
             log = b100_projects.StatusLog(app)
@@ -238,10 +238,10 @@ tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase
                     await pilot.pause()
                     asked = asked or isinstance(app.screen, LoadGuardScreen)
                 return dirty_before, dirty_after, messages, asked, app.workarea / "P1"
-    
+
 &gt;       dirty_before, dirty_after, messages, asked, project = asyncio.run(_drive())
 
-tests\test_b100_save_image.py:1929: 
+tests\test_b100_save_image.py:1929:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 ..\..\anaconda3\Lib\asyncio\runners.py:194: in run
     return runner.run(main)
@@ -282,15 +282,15 @@ monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001EF181CB4D0&g
         the unsaved document, the flag stays set (no file holds the edits)."""
         from s19_app.tui.changes import io as changes_io
         from s19_app.validation.model import ValidationIssue, ValidationSeverity
-    
+
         def _refuse(*args, **kwargs):
             return None, [ValidationIssue(code="MF-WRITE-CONTAINMENT", message="forced",
                                           severity=ValidationSeverity.ERROR, artifact="change")]
-    
+
         monkeypatch.setattr(changes_io, "write_change_document", _refuse)
         monkeypatch.setattr(app_module.deps, "write_change_document", _refuse, raising=False)
         src = _copy_case01(tmp_path) / "firmware.s19"
-    
+
         async def _drive() -&gt; tuple:
             app = S19TuiApp(base_dir=tmp_path / "app")
             log = b100_projects.StatusLog(app)
@@ -303,10 +303,10 @@ monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001EF181CB4D0&g
                 messages = await b100_projects.save_project(pilot, app, log, "P1")
                 panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
                 return messages, panel._dirty
-    
+
 &gt;       messages, dirty = asyncio.run(_drive())
 
-tests\test_b100_save_image.py:1966: 
+tests\test_b100_save_image.py:1966:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 ..\..\anaconda3\Lib\asyncio\runners.py:194: in run
     return runner.run(main)
@@ -347,7 +347,7 @@ tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase
         mutant -&gt; False -&gt; RED."""
         src = _copy_case01(tmp_path) / "firmware.s19"
         body = b100_projects.change_document_bytes()
-    
+
         async def _drive() -&gt; tuple:
             app = S19TuiApp(base_dir=tmp_path / "app")
             log = b100_projects.StatusLog(app)
@@ -364,10 +364,10 @@ tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase
                 messages = await b100_projects.save_project(pilot, app, log, "P1")
                 panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
                 return messages, panel._dirty, app.workarea / "P1"
-    
+
 &gt;       messages, dirty, project = asyncio.run(_drive())
 
-tests\test_b100_save_image.py:1998: 
+tests\test_b100_save_image.py:1998:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 ..\..\anaconda3\Lib\asyncio\runners.py:194: in run
     return runner.run(main)
@@ -408,7 +408,7 @@ tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase
         base = tmp_path / "app"
         project = b100_projects.seed_document_project(_workarea(base))
         before = (project / "patches" / "boost.json").read_bytes()
-    
+
         async def _drive() -&gt; tuple:
             app = S19TuiApp(base_dir=base)
             log = b100_projects.StatusLog(app)
@@ -424,10 +424,10 @@ tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase
                 messages = await b100_projects.save_project(pilot, app, log, "P")
                 panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
                 return reopened, messages, panel._dirty
-    
+
 &gt;       reopened, messages, dirty = asyncio.run(_drive())
 
-tests\test_b100_save_image.py:2032: 
+tests\test_b100_save_image.py:2032:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 ..\..\anaconda3\Lib\asyncio\runners.py:194: in run
     return runner.run(main)
@@ -473,22 +473,22 @@ size = (118, 54)
         read by the independent reader, equals source + patch (0 differing
         addresses); the save status names 1 entry; the reopened Loaded panel
         names ``firmware.s19``. Both reference sizes, notifications on.
-    
+
         RED (executed on 1d677ba, P-1): ``project firmware.s19 == in-memory
         patched image? False`` — the save copied the unpatched work copy."""
         src = _copy_case01(tmp_path) / "firmware.s19"
         base = tmp_path / "app"
-    
+
         statuses: list = []
-    
+
         async def _save_scene() -&gt; str:
             app = S19TuiApp(base_dir=base)
             real_set_status = app.set_status
-    
+
             def _capture(message, *args, **kwargs):
                 statuses.append(str(message))
                 return real_set_status(message, *args, **kwargs)
-    
+
             app.set_status = _capture
             async with app.run_test(size=size, notifications=True) as pilot:
                 await pilot.pause()
@@ -517,7 +517,7 @@ size = (118, 54)
                     "the painted Save project success line",
                 )
                 return _painted_log(app)
-    
+
         async def _reopen_scene() -&gt; str:
             app = S19TuiApp(base_dir=base)
             async with app.run_test(size=size, notifications=True) as pilot:
@@ -558,10 +558,10 @@ size = (118, 54)
                 return " ".join(
                     str(static.render()) for static in app.query("#loaded_slots Static")
                 )
-    
+
 &gt;       painted = asyncio.run(_save_scene())
 
-tests\test_b100_save_image.py:2218: 
+tests\test_b100_save_image.py:2218:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 ..\..\anaconda3\Lib\asyncio\runners.py:194: in run
     return runner.run(main)
@@ -607,22 +607,22 @@ size = (220, 60)
         read by the independent reader, equals source + patch (0 differing
         addresses); the save status names 1 entry; the reopened Loaded panel
         names ``firmware.s19``. Both reference sizes, notifications on.
-    
+
         RED (executed on 1d677ba, P-1): ``project firmware.s19 == in-memory
         patched image? False`` — the save copied the unpatched work copy."""
         src = _copy_case01(tmp_path) / "firmware.s19"
         base = tmp_path / "app"
-    
+
         statuses: list = []
-    
+
         async def _save_scene() -&gt; str:
             app = S19TuiApp(base_dir=base)
             real_set_status = app.set_status
-    
+
             def _capture(message, *args, **kwargs):
                 statuses.append(str(message))
                 return real_set_status(message, *args, **kwargs)
-    
+
             app.set_status = _capture
             async with app.run_test(size=size, notifications=True) as pilot:
                 await pilot.pause()
@@ -651,7 +651,7 @@ size = (220, 60)
                     "the painted Save project success line",
                 )
                 return _painted_log(app)
-    
+
         async def _reopen_scene() -&gt; str:
             app = S19TuiApp(base_dir=base)
             async with app.run_test(size=size, notifications=True) as pilot:
@@ -692,10 +692,10 @@ size = (220, 60)
                 return " ".join(
                     str(static.render()) for static in app.query("#loaded_slots Static")
                 )
-    
+
 &gt;       painted = asyncio.run(_save_scene())
 
-tests\test_b100_save_image.py:2218: 
+tests\test_b100_save_image.py:2218:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 ..\..\anaconda3\Lib\asyncio\runners.py:194: in run
     return runner.run(main)
@@ -733,7 +733,7 @@ tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase
         load of Q asks 0 questions and opens Q; a patch plus a Patch Editor
         entry (through the panel's inputs) → Save project → a project load asks
         0; with D only, W only and F only → 1 question each (5 of 5).
-    
+
         Why: a project load replaces the image and resets the Patch Editor, so
         any of the three unsaved flags must be asked about, and an open project
         alone must not be (the ``pb_A`` prototype asked whenever a project was
@@ -742,7 +742,7 @@ tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase
         dropping F or W → that arm loads silently → RED. RED (base): the
         single-flag arms ask nothing."""
         scene = _scene(tmp_path)
-    
+
         async def scenario(app, pilot, log):
             out = {}
             await _open_project(pilot, app, "P")
@@ -798,10 +798,10 @@ tests\test_b100_save_image.py:1835: AssertionError</failure></testcase><testcase
                     _flow(app).mark_saved("flow")
                 await _settle(pilot, 2)
             return out
-    
+
 &gt;       out = _run(scene.base, scenario)
 
-tests\test_b100_load_question.py:723: 
+tests\test_b100_load_question.py:723:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_load_question.py:203: in _run
     return projects.run_app(base, scenario, size=size)
@@ -852,7 +852,7 @@ tests\test_b100_load_question.py:683: AssertionError</failure></testcase><testca
         the focus on ``#files_list`` and D set; a pick of ``x.s19`` → the
         question → ``escape`` → the re-home rule ran once and the focus is still
         on ``files_list`` (2 of 2).
-    
+
         Why: after a cancelled question the engineer must keep working where
         they were; LLR-166.1 keeps a visible input in the active window and
         moves only a stale focus.
@@ -861,16 +861,16 @@ tests\test_b100_load_question.py:683: AssertionError</failure></testcase><testca
         the window target → the first arm lands on ``patch_editor_panel`` →
         RED. RED (base): no question."""
         scene = _scene(tmp_path)
-    
+
         def spy_rehome(app, calls: list) -&gt; None:
             real = app._rehome_focus_after_load
-    
+
             def spy():
                 calls.append(1)
                 return real()
-    
+
             app._rehome_focus_after_load = spy
-    
+
         async def patch_window(app, pilot, log):
             await _load(pilot, app, scene.src / "fw.s19")
             await _patch(pilot, app)
@@ -889,7 +889,7 @@ tests\test_b100_load_question.py:683: AssertionError</failure></testcase><testca
             await _answer(pilot, app, "n")
             await _settle(pilot, 6)
             return len(calls), _focused_id(app)
-    
+
         async def workspace(app, pilot, log):
             await _load(pilot, app, scene.src / "fw.s19")
             await _patch(pilot, app)
@@ -900,10 +900,10 @@ tests\test_b100_load_question.py:683: AssertionError</failure></testcase><testca
             await _answer(pilot, app, "escape")
             await _settle(pilot, 6)
             return len(calls), _focused_id(app)
-    
+
 &gt;       assert _run(scene.base, patch_window) == (1, "patch_entry_address_input")
 
-tests\test_b100_load_question.py:2767: 
+tests\test_b100_load_question.py:2767:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_load_question.py:203: in _run
     return projects.run_app(base, scenario, size=size)
@@ -940,15 +940,15 @@ tests\test_b100_load_question.py:2743: AssertionError</failure></testcase><testc
         questions; an entry added again and a refused Save project (empty name,
         the flag stays set) → a project load asks 1 question naming ``Patch
         Editor entries`` (2 of 2).
-    
+
         Why: Save project is the way to make Patch Editor work safe; the
         question must believe it, and must not believe a refused save.
         Negative control: Save project skips the panel's ``mark_saved`` → the
         first arm asks → RED. RED (base): the second arm asks nothing."""
         from s19_app.tui.screens import SaveProjectPayload
-    
+
         scene = _scene(tmp_path)
-    
+
         async def add_entry(pilot, app, address: str) -&gt; None:
             await pilot.press("6")
             await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor")
@@ -959,7 +959,7 @@ tests\test_b100_load_question.py:2743: AssertionError</failure></testcase><testc
             await pilot.press("ctrl+a", "delete", *"DE AD")
             assert await pilot.click("#patch_entry_add_button")
             await ld.wait_for(pilot, lambda: _panel(app)._dirty, "the panel flag")
-    
+
         async def scenario(app, pilot, log):
             await _load(pilot, app, scene.src / "fw.s19")
             await add_entry(pilot, app, "0x8000007C")
@@ -986,10 +986,10 @@ tests\test_b100_load_question.py:2743: AssertionError</failure></testcase><testc
             body = q_body(app)
             await _answer(pilot, app, "n")
             return saved, spy.questions() - mark, body
-    
+
 &gt;       saved, refused_asks, body = _run(scene.base, scenario)
 
-tests\test_b100_load_question.py:2825: 
+tests\test_b100_load_question.py:2825:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_load_question.py:203: in _run
     return projects.run_app(base, scenario, size=size)
@@ -1023,7 +1023,7 @@ tests\test_b100_load_question.py:2791: AssertionError</failure></testcase><testc
     def test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route(tmp_path: Path) -&gt; None:
         """AT-B100-15 (HLR-174, HLR-174a, HLR-174b, HLR-174c, HLR-174d), by keys
         and widget ids only, in a scratch work area at 118x54:
-    
+
           - question + keep halves: Load ``fw.s19``; a patch added and applied
             in the Patch Editor; Load ``b.s19`` → one question titled
             ``Replace fw.s19?`` naming the image, the focus on Cancel; ``enter``
@@ -1037,34 +1037,34 @@ tests\test_b100_load_question.py:2791: AssertionError</failure></testcase><testc
             question naming ``firmware_b.s19``; ``n`` keeps ``firmware_a``.
           - items half: Flow Builder edits plus the patched image, then a
             project pick → one question naming the image and ``flow flow``.
-    
+
         The panel's ``v`` is TC-B100-72's forced-state arm (ruling Q5).
         Declared: the hex view does not repaint the applied bytes on the base
         either (probe in the tester notes), so the kept patch is read from the
         session image and the painted Loaded panel, not the hex view.
-    
+
         Negative control: the base tree → Load over the patched image loads
         with no question (P-17) → RED at the first question."""
         from textual.widgets import Label
-    
+
         from s19_app.tui.screens import SaveProjectScreen
-    
+
         scene = _scene(tmp_path)
-    
+
         def status(app) -&gt; str:
             return str(app.query_one("#log_line_4", Label).render())
-    
+
         def loaded_names(app) -&gt; str:
             panel = app.screen_stack[0].query_one("#loaded_panel")
             return " ".join(str(getattr(c.render(), "plain", c.render())) for c in panel.query(".loaded-detail"))
-    
+
         async def load_by_keys(pilot, app, path: Path) -&gt; None:
             await pilot.press("l")
             await ld.wait_for_dialog(pilot, app)
             await ld.type_into_path(pilot, app, str(path))
             assert await pilot.click("#load_ok"), "click missed #load_ok"
             await ld.wait_for_dialog_closed(pilot, app)
-    
+
         async def add_and_apply(pilot, app, add: bool = True) -&gt; None:
             await pilot.press("6")
             await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor")
@@ -1074,7 +1074,7 @@ tests\test_b100_load_question.py:2791: AssertionError</failure></testcase><testc
                 # the start rather than selecting it: clear both inputs first
                 # (the ``test_b100_document.py`` helper's pattern).
                 from textual.widgets import Input
-    
+
                 app.query_one("#patch_entry_address_input", Input).value = ""
                 app.query_one("#patch_entry_bytes_input", Input).value = ""
                 assert await pilot.click("#patch_entry_address_input")
@@ -1086,7 +1086,7 @@ tests\test_b100_load_question.py:2791: AssertionError</failure></testcase><testc
             assert await pilot.click("#patch_doc_apply_button")
             await ld.wait_for(pilot, lambda: "1 applied" in status(app), "the apply")
             await _settle(pilot, 4)
-    
+
         async def scenario(app, pilot, log):
             spy = PushSpy(app)
             out = {}
@@ -1174,10 +1174,10 @@ tests\test_b100_load_question.py:2791: AssertionError</failure></testcase><testc
             out["items question"] = (spy.questions() - mark, q_body(app))
             await _answer(pilot, app, "n")
             return out
-    
+
 &gt;       out = _run(scene.base, scenario)
 
-tests\test_b100_load_question.py:3031: 
+tests\test_b100_load_question.py:3031:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_load_question.py:203: in _run
     return projects.run_app(base, scenario, size=size)
@@ -1208,7 +1208,7 @@ add = True
             # the start rather than selecting it: clear both inputs first
             # (the ``test_b100_document.py`` helper's pattern).
             from textual.widgets import Input
-    
+
             app.query_one("#patch_entry_address_input", Input).value = ""
             app.query_one("#patch_entry_bytes_input", Input).value = ""
 &gt;           assert await pilot.click("#patch_entry_address_input")
@@ -1224,7 +1224,7 @@ key = 'pending'
         widget ids (projects built by real saves; files loaded and projects
         opened through the Load dialog; the patch added and applied in the
         Patch Editor), at 220 columns:
-    
+
           - painted half (HLR-175): each painted summary row that names a file,
             a folder or ``project.json`` matches its row of the dialog's plan
             (read from ``SaveProjectScreen.plan``, the declared exception) by
@@ -1233,14 +1233,14 @@ key = 'pending'
             recomputed by the test — equals the tree written under its target
             by full path and action (the gather homes excluded by name); the
             refused scenario keeps the dialog open and writes 0 new paths.
-    
+
         Why: R-PC — one plan, painted and executed; the operator's P-C note.
         Negative control: a handler that places a file the plan did not name →
         1 tree row without a plan row → RED; on the 9a tree the dialog paints
         no summary and holds no plan (P11-2) → RED."""
 &gt;       out = _scenario_paint(tmp_path, key, by_keys=True, save=True)
 
-tests\test_b100_save_dialog.py:4269: 
+tests\test_b100_save_dialog.py:4269:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_save_dialog.py:2694: in _scenario_paint
     return _run(base, scenario, size=size)
@@ -1284,7 +1284,7 @@ key = 'document'
         widget ids (projects built by real saves; files loaded and projects
         opened through the Load dialog; the patch added and applied in the
         Patch Editor), at 220 columns:
-    
+
           - painted half (HLR-175): each painted summary row that names a file,
             a folder or ``project.json`` matches its row of the dialog's plan
             (read from ``SaveProjectScreen.plan``, the declared exception) by
@@ -1293,14 +1293,14 @@ key = 'document'
             recomputed by the test — equals the tree written under its target
             by full path and action (the gather homes excluded by name); the
             refused scenario keeps the dialog open and writes 0 new paths.
-    
+
         Why: R-PC — one plan, painted and executed; the operator's P-C note.
         Negative control: a handler that places a file the plan did not name →
         1 tree row without a plan row → RED; on the 9a tree the dialog paints
         no summary and holds no plan (P11-2) → RED."""
 &gt;       out = _scenario_paint(tmp_path, key, by_keys=True, save=True)
 
-tests\test_b100_save_dialog.py:4269: 
+tests\test_b100_save_dialog.py:4269:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_save_dialog.py:2694: in _scenario_paint
     return _run(base, scenario, size=size)
@@ -1344,15 +1344,15 @@ tests\test_b100_save_dialog.py:272: AssertionError</failure></testcase><testcase
         (review finding F5) — inputs are clicked and typed, buttons are clicked,
         and every wait observes the painted status line (``#log_line_4``) or the
         painted screen; assertions read the painted status and the files on disk.
-    
+
         RED at HEAD (P-15): the save-back deletes the work copy and the next Save
         project exits the app with code 1.
         """
         from textual.widgets import Label
-    
+
         image = tmp_path / "firmware.s19"
         image.write_text(_emit_two(0x11, 0x00), encoding="ascii")
-    
+
         async def _drive() -&gt; dict:
             app = S19TuiApp(base_dir=tmp_path)
             outcomes: dict = {}
@@ -1455,10 +1455,10 @@ tests\test_b100_save_dialog.py:272: AssertionError</failure></testcase><testcase
                     app.query_one("#status_text", Label).render()
                 )
             return outcomes
-    
+
 &gt;       outcomes = asyncio.run(_drive())
 
-tests\test_b99_staging.py:1440: 
+tests\test_b99_staging.py:1440:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 ..\..\anaconda3\Lib\asyncio\runners.py:194: in run
     return runner.run(main)
@@ -1516,17 +1516,17 @@ monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001EF1650A510&g
         ``Stay (n)``, the focus on ``#confirm_no``, the app running, no
         ``Replace`` and no decision id; a second ``ctrl+q`` while it is open
         stacks nothing.
-    
+
         Why: quitting mid-save leaves a partial project; idle quit must stay
         one key. Negative control (code read, base): no ``action_quit``
         override → ``q`` exits at once during the save → RED."""
-    
+
         for key in ("q", "ctrl+q"):
             exited, questions = run(tmp_path / f"idle-{key}", _idle_scene(key))
 &gt;           assert (exited, questions) == (True, 0), (key, exited, questions)
 E           AssertionError: ('q', False, 1)
 E           assert (False, 1) == (True, 0)
-E             
+E
 E             At index 0 diff: False != True
 E             Use -v to get more diff
 
@@ -1538,14 +1538,14 @@ tests\test_b100_workers.py:2362: AssertionError</failure></testcase><testcase cl
         """AT-B99-11 (HLR-160) end to end in ONE pilot session, all three
         clauses in sequence through the shipped Split / Join / Export window
         (SegmentSplitView) export action.
-    
+
         HLR-160's Observable outcome: "with an A2L whose segment is named
         `x/../../../ESCAPED`, the export writes its file inside the
         destination under a sanitised name, and nothing appears outside it. A
         MAC-only export writes a file holding no data record. A second export
         after a patch writes `&lt;name&gt;_1`, the status names it, and the first
         file is intact."
-    
+
         Clause (a) — the hostile-segment A2L project exports INSIDE the
         destination under ``prg_x__________ESCAPED.s19`` and nothing appears
         outside it. Clause (b) — every artifact is unloaded and
@@ -1567,12 +1567,12 @@ tests\test_b100_workers.py:2362: AssertionError</failure></testcase><testcase cl
         patch_addr = min(oracle.data)
         patch_value = 0x5A if oracle.data[patch_addr] != 0x5A else 0xC3
         dest = project_dir / "splits"
-    
+
         async def _drive():
             async with app.run_test(size=(120, 54)) as pilot:
                 await pilot.pause()
                 await _load_project_pilot(app, pilot, "proj1")
-    
+
                 # ---- Clause (a): hostile A2L segment name stays inside dest.
                 await _open_split_join_window(app, pilot)
                 before_a = _snapshot(tmp_path)
@@ -1596,7 +1596,7 @@ tests\test_b100_workers.py:2362: AssertionError</failure></testcase><testcase cl
                 created_a = sorted(
                     str(p.relative_to(tmp_path)) for p in after_a - before_a
                 )
-    
+
                 # ---- Clause (b): a MAC-only export writes no data record.
                 # Unload every artifact first — loading the MAC beside prg.s19
                 # would merely attach it (the coexistence model) and the clause
@@ -1645,7 +1645,7 @@ tests\test_b100_workers.py:2362: AssertionError</failure></testcase><testcase cl
                     "the clause-b export status line",
                     attempts=200,
                 )
-    
+
                 # ---- Clause (c): patch, export again -&gt; &lt;name&gt;_1, first intact.
                 # Leave the window on a table-focused tab BEFORE closing it: a
                 # hidden manual TextArea keeps focus and would swallow the next
@@ -1665,7 +1665,7 @@ tests\test_b100_workers.py:2362: AssertionError</failure></testcase><testcase cl
                     attempts=200,
                 )
                 before_c = {p.name: p.read_bytes() for p in dest.iterdir()}
-    
+
                 # Patch one byte through the Patch Editor (rail key ``6``).
                 await pilot.press("escape")  # close the window
                 await pilot.press("6")
@@ -1698,7 +1698,7 @@ tests\test_b100_workers.py:2362: AssertionError</failure></testcase><testcase cl
                     lambda: "Apply:" in _status_text(app),
                     "the apply status line",
                 )
-    
+
                 await _open_split_join_window(app, pilot)
                 assert await pilot.click("#sje_table"), "click missed #sje_table"
                 await pilot.press("a")
@@ -1713,10 +1713,10 @@ tests\test_b100_workers.py:2362: AssertionError</failure></testcase><testcase cl
                         break
                 after_c = {p.name: p.read_bytes() for p in dest.iterdir()}
                 return status_a, created_a, before_c, after_c, status_c
-    
+
 &gt;       status_a, created_a, before_c, after_c, status_c = asyncio.run(_drive())
 
-tests\test_b99_export.py:1162: 
+tests\test_b99_export.py:1162:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 ..\..\anaconda3\Lib\asyncio\runners.py:194: in run
     return runner.run(main)
@@ -1730,7 +1730,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
         async with app.run_test(size=(120, 54)) as pilot:
             await pilot.pause()
             await _load_project_pilot(app, pilot, "proj1")
-    
+
             # ---- Clause (a): hostile A2L segment name stays inside dest.
             await _open_split_join_window(app, pilot)
             before_a = _snapshot(tmp_path)
@@ -1754,7 +1754,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
             created_a = sorted(
                 str(p.relative_to(tmp_path)) for p in after_a - before_a
             )
-    
+
             # ---- Clause (b): a MAC-only export writes no data record.
             # Unload every artifact first — loading the MAC beside prg.s19
             # would merely attach it (the coexistence model) and the clause
@@ -1803,7 +1803,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
                 "the clause-b export status line",
                 attempts=200,
             )
-    
+
             # ---- Clause (c): patch, export again -&gt; &lt;name&gt;_1, first intact.
             # Leave the window on a table-focused tab BEFORE closing it: a
             # hidden manual TextArea keeps focus and would swallow the next
@@ -1823,7 +1823,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
                 attempts=200,
             )
             before_c = {p.name: p.read_bytes() for p in dest.iterdir()}
-    
+
             # Patch one byte through the Patch Editor (rail key ``6``).
             await pilot.press("escape")  # close the window
             await pilot.press("6")
@@ -1845,27 +1845,27 @@ tests\test_b99_export.py:1122: AssertionError</failure></testcase><testcase clas
         the independent reader sees no byte at 0x0..0xB and identical data;
         the Memory Map lists no row carrying 0x00000000; a document whose only
         entry is at 0x0 shows that entry as skipped in the status line.
-    
+
         The whole drive is keys and clicks (review finding F2): inputs are
         focused with ``pilot.click`` and typed with ``pilot.press``, buttons are
         clicked, and every wait observes the painted status line or the painted
         screen (``export_screenshot``) — never an internal attribute.
         """
         from textual.widgets import Button, Input
-    
+
         src = tmp_path / "firmware.s19"
         shutil.copy(CASE01, src)
         oracle = read_s19(src)
-    
+
         app = S19TuiApp(base_dir=tmp_path)
-    
+
         async def _drive():
             # 54 rows: the Patch Editor's docked save-back row sits at the foot
             # of the JSON pane and is only clickable/painted at the taller
             # viewport (the b97 ATs drive the panel at 118x54 for the same row).
             async with app.run_test(size=(120, 54)) as pilot:
                 await pilot.pause()
-    
+
                 async def _type(input_id: str, text: str) -&gt; None:
                     assert await pilot.click(f"#{input_id}"), (
                         f"click missed #{input_id}"
@@ -1883,7 +1883,7 @@ tests\test_b99_export.py:1122: AssertionError</failure></testcase><testcase clas
                     lambda: "Loaded firmware.s19" in _status_text(app),
                     "load status line",
                 )
-    
+
                 # 2. Patch Editor (rail key ``6``): one entry rewriting the two
                 #    bytes already at the first data address (identity rewrite).
                 await pilot.press("6")
@@ -1913,7 +1913,7 @@ tests\test_b99_export.py:1122: AssertionError</failure></testcase><testcase clas
                     "apply status line",
                 )
                 assert "1 applied, 0 skipped, 0 blocked" in _status_text(app)
-    
+
                 # 3. Save-back (offered after the applied entry, premise P-23).
                 #    The prompt renders in the editor's JSON pane: pick that tab
                 #    by clicking its chip, then wait for the prompt's label to be
@@ -1944,14 +1944,14 @@ tests\test_b99_export.py:1122: AssertionError</failure></testcase><testcase clas
                         break
                     await pilot.pause(0.05)
                 assert target is not None, "save-back wrote no file"
-    
+
                 written = read_s19(target)
                 assert not any(a &lt;= 0xB for a in written.data), (
                     f"bytes at 0x0..0xB: {sorted(a for a in written.data if a &lt;= 0xB)}"
                 )
                 assert written.data == oracle.data
                 assert written.header == oracle.header
-    
+
                 # 4. Memory Map (rail key ``4``): no row carries 0x00000000.
                 #    Every row starts with a band glyph (``░ 0x00000000 …``), so
                 #    a startswith probe can never fire (review finding F1) — the
@@ -1971,7 +1971,7 @@ tests\test_b99_export.py:1122: AssertionError</failure></testcase><testcase clas
                 assert not any(
                     re.search(r"\b0x00000000\b", r) for r in rows
                 ), rows
-    
+
                 # 5. A document whose only entry is at 0x0: skipped in the
                 #    status line.  Reload the Patch Editor and replace the
                 #    document with the 0x0-only one through the doc-load path.
@@ -2035,10 +2035,10 @@ tests\test_b99_export.py:1122: AssertionError</failure></testcase><testcase clas
                 )
                 status = _status_text(app)
                 assert "0 applied, 1 skipped, 0 blocked" in status, status
-    
+
 &gt;       asyncio.run(_drive())
 
-tests\test_b99_s0.py:565: 
+tests\test_b99_s0.py:565:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 ..\..\anaconda3\Lib\asyncio\runners.py:194: in run
     return runner.run(main)
@@ -2072,15 +2072,15 @@ monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001EF19FAD940&g
         line names the unsaved edits and the Patch Editor save, the app KEEPS
         running, the panel is still dirty, both entries are kept and the quit
         is no longer pending.
-    
+
         Why: the project records the file as it is on disk; the second entry
         lives only in the editor, and an exit loses it unseen. Negative control
         (81ac4c0): the committed arm keeps the pending quit -&gt; exit -&gt; RED."""
         from tests.test_b100_document import _add_through_the_panel, _panel
-    
+
         base = tmp_path / "app"
         src = projects.copy_sources(tmp_path / "sources", projects.CASE01_DIR, "firmware.s19") / "firmware.s19"
-    
+
         async def scenario(app, pilot, log):
             await projects.load_image(pilot, app, src)
             await _add_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF", entries_after=1)
@@ -2098,10 +2098,10 @@ monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001EF19FAD940&g
                 return asked, True, None, None, None, None
             return (asked, False, log.messages[-1], _panel(app)._dirty, len(entries(app)),
                     getattr(app, "_quit_pending", None))
-    
+
 &gt;       asked, exited, last, dirty, kept, pending = run(base, scenario, size=(220, 60))
 
-tests\test_b100_workers.py:3494: 
+tests\test_b100_workers.py:3494:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\test_b100_workers.py:337: in run
     return asyncio.run(_drive())
@@ -2129,7 +2129,7 @@ address = '0x8000007C', run = 'DE AD BE EF', entries_after = 1
             pilot, lambda: len(app.query("#patch_entry_add_button")) &gt; 0, "the Patch Editor panel"
         )
         from textual.widgets import Input
-    
+
         # Clear both inputs first: a second add keeps the first add's text and
         # ctrl+a does not always select it (the inputs are the panel's own).
         app.query_one("#patch_entry_address_input", Input).value = ""
