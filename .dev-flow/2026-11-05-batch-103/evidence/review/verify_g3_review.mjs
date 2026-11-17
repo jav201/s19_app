@@ -23,13 +23,13 @@ export default async function run(page, ui) {
   await page.reload({ waitUntil: 'load' });
   const snapshot = await ui.snapshot();
   check('controles accesibles presentes', snapshot.includes('Exportar decisión JSON') && snapshot.includes('Solicitar cambios'));
-  check('title', (await page.title()) === 'Batch 103 · Revisión G3 — BLOCKED');
+  check('title', (await page.title()) === 'Batch 103 · Revisión G3 — PASS-WITH-NOTES');
   const bodyChars = await page.locator('body').innerText().then(text => text.length);
   check('body renderizado', bodyChars > 8000, { bodyChars });
   const headerText = await page.locator('#resumen').innerText();
-  check('cabecera BLOCKED y aprobación provisional', await page.locator('[data-gate-status]').innerText() === 'BLOCKED · no cerrada' && headerText.includes('APROBACIÓN PROVISIONAL') && headerText.includes('Por ahora todo está aprobado. Durante el uso y priebas de usuario espero ver si se sostienen las decisiones tomadas.'));
-  check('commit completo', await page.locator('body').innerText().then(text => text.includes('35fabb25c42d752216433c095eb0d29024027294')));
-  check('sin declaración de release', await page.locator('body').innerText().then(text => text.includes('NO autorizado') && text.includes('no declara G3 PASS')));
+  check('cabecera PASS-WITH-NOTES y cero regresiones', await page.locator('[data-gate-status]').innerText() === 'PASS-WITH-NOTES · aceptada con notas' && headerText.includes('0 regresiones reales abiertas') && headerText.includes('Por ahora todo está aprobado. Durante el uso y priebas de usuario espero ver si se sostienen las decisiones tomadas.'));
+  check('commit completo', await page.locator('body').innerText().then(text => text.includes('bcc97d2b5a11c74c0ce30655e98684ab55c06307')));
+  check('aceptación con notas sin GREEN', await page.locator('body').innerText().then(text => text.includes('no declara full-suite GREEN') && text.includes('listo para promoción')));
 
   const images = page.locator('img[data-capture]');
   check('ocho capturas', await images.count() === 8);
@@ -70,9 +70,9 @@ export default async function run(page, ui) {
   check('checklist de seis pasos', await page.locator('[data-at-step]').count() === 6);
   for (const checkbox of await page.locator('[data-at-step]').all()) await checkbox.check();
   check('checklist no altera AT', await page.locator('[data-at-status]').innerText() === 'deferred-to-user-validation · not_run · 0/6 ejecutados');
-  check('approve deshabilitado', await page.locator('#approve').isDisabled());
+  check('approve habilitado', !(await page.locator('#approve').isDisabled()));
   const blockReason = await page.locator('#approve-reason').innerText();
-  check('bloqueo exige suite GREEN y difiere AT', blockReason.includes('full-suite') && blockReason.includes('GREEN') && blockReason.includes('deferred-to-user-validation / not_run') && blockReason.includes('no se exige como ejecución previa'), { blockReason });
+  check('regla completa clasificada y AT diferida', blockReason.includes('completa y clasificada') && blockReason.includes('0 regresiones abiertas') && blockReason.includes('deferred-to-user-validation / not_run') && blockReason.includes('no se exige como ejecución previa'), { blockReason });
 
   const desktopOverflow = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, innerWidth: window.innerWidth }));
   check('sin overflow horizontal desktop', desktopOverflow.scrollWidth <= desktopOverflow.innerWidth, desktopOverflow);
@@ -82,22 +82,22 @@ export default async function run(page, ui) {
   check('galería móvil en una columna', await page.locator('.capture-grid').first().evaluate(item => getComputedStyle(item).gridTemplateColumns.split(' ').length === 1));
   await page.setViewportSize({ width: 1440, height: 1100 });
 
-  const note = 'Solicito confirmar full-suite GREEN; AT-I1b-8 permanece diferida a validación de usuario.';
-  await page.locator('#request-changes').check();
+  const note = 'Acepto G3 con notas: full-suite completa clasificada, sin regresiones abiertas; AT-I1b-8 permanece diferida.';
+  await page.locator('#approve').check();
   await page.locator('#notes').fill(note);
   const downloadPromise = page.waitForEvent('download');
   await page.locator('#export-json').click();
   const download = await downloadPromise;
-  check('nombre de descarga JSON', download.suggestedFilename() === 'g3-decision-35fabb25.json');
+  check('nombre de descarga JSON', download.suggestedFilename() === 'g3-decision-bcc97d2b.json');
   const exported = JSON.parse(readFileSync(await download.path(), 'utf8'));
-  check('exportación request-changes real', exported.decision === 'request-changes' && exported.notes === note, { decision: exported.decision, notes: exported.notes });
-  check('JSON conserva bloqueos y diferimiento', exported.gate_status === 'BLOCKED' && exported.operator_decision === 'provisional_approval' && exported.pending.full_suite === 'RUNNING_NO_VERDICT' && exported.pending.distributed_self_test === 'NOT_RUN' && exported.pending['AT-I1b-8'] === 'deferred-to-user-validation/not_run' && exported.release_authorized === false);
-  check('estado de exportación visible', await page.locator('#form-status').innerText().then(text => text.includes('JSON local generado') && text.includes('BLOCKED')));
+  check('exportación approve real', exported.decision === 'approve' && exported.notes === note, { decision: exported.decision, notes: exported.notes });
+  check('JSON conserva notas y diferimiento', exported.gate_status === 'PASS-WITH-NOTES' && exported.operator_decision === 'provisional_approval' && exported.pending.full_suite === 'COMPLETE_CLASSIFIED_RED' && exported.pending.distributed_self_test === 'NOT_RUN' && exported.pending['AT-I1b-8'] === 'deferred-to-user-validation/not_run' && exported.release_authorized === true);
+  check('estado de exportación visible', await page.locator('#form-status').innerText().then(text => text.includes('JSON local generado') && text.includes('PASS-WITH-NOTES') && text.includes('listo para promoción')));
 
   await page.reload({ waitUntil: 'load' });
   check('reload conserva ocho imágenes', await images.count() === 8 && await images.evaluateAll(items => items.every(img => img.complete && img.naturalWidth > 0)));
   check('reload no persiste notas ni checklist', (await page.locator('#notes').inputValue()) === '' && await page.locator('[data-at-step]:checked').count() === 0);
-  check('approve sigue bloqueado tras reload', await page.locator('#approve').isDisabled());
+  check('approve sigue habilitado tras reload', !(await page.locator('#approve').isDisabled()));
 
   await page.emulateMedia({ media: 'print' });
   const printState = await page.evaluate(() => ({
@@ -119,7 +119,7 @@ export default async function run(page, ui) {
   const report = {
     schema: 's19.batch103.g3-browser-verification.v1',
     page: 'g3-review.html',
-    commit: '35fabb25c42d752216433c095eb0d29024027294',
+    commit: 'bcc97d2b5a11c74c0ce30655e98684ab55c06307',
     browser: 'headless browser-automation / patchright',
     result: 'PASS',
     checks,

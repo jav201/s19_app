@@ -1,0 +1,37 @@
+nodeid	lane	status	time_s	signature	qc_tm
+tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]	main	missing
+tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files	main	failed	72.481	AssertionError: []
+tests/test_b100_save_dialog.py::test_tc_b100_65_summary_out_of_date_at_save_is_repainted_arm_1	main	failed	9.390	textual.worker.WorkerFailed: Worker raised exception: NoMatches("No nodes match '#log_line_1' on Screen(id='_default')")
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word	main	missing
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk	main	missing
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/5---]	main	failed	19.079	AssertionError: assert ['AlphaShared'] == []
+tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/1]	main	failed	17.896	AssertionError: assert 'OLD_ONLY' in '✓ AlphaShared  0x00000020\ndesc AlphaShared description\nunit u16 · conv CM_IDENT\nlayout RL_U16\nbyteorder little\nlimits 0..65535'
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]	main	failed	85.615	AssertionError: Load dialog did not open
+tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step	main	missing
+tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call	main	failed	6.938	AssertionError: (0, False, [False])
+tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs	main	missing
+tests/test_tui_map_big.py::test_tc_b77_20_b77_keys_enter_with_no_focus_selects_nothing[size1]	main	failed	4.687	AssertionError: (120, 30): PRECONDITION — no region row may hold focus; got {'settled': False, 'focus_is_row': False, 'selected_after': None, 'markers': [2147549184], 'nav_posts': 0}
+tests/test_tui_patch_glyphs.py::test_at077c_stale_provenance	main	failed	17.145	textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+tests/test_tui_patch_glyphs.py::test_at077d_index_alignment	main	failed	4.078	AssertionError: the glyphs must land in DOCUMENT ORDER: expected ['✓', '✗', '◐', '✓'], got ['·', '·', '·', '·']. This list is asymmetric under both reversal and a ±1 shift, so any positional drift fails here.
+tests/test_tui_patch_history_strip.py::test_at081b_bounds	main	failed	10.364	textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+tests/test_tui_patch_history_strip.py::test_tc081_1_derived	main	failed	7.454	textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_120	main	failed	4.473	textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+tests/test_tui_patch_variant.py::test_tc_035_4_routing_guards	main	failed	4.575	AssertionError: the run button must route execute_scope exactly once with the cycled scope, got []
+tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]	serial	failed	7.517	AssertionError: {'appended': 0.6830072000157088, 'load': 1.1376532000722364, 'painted': 0.23124839994125068, 'read': 0.2778130999067798}	sec6_5 read|0.278|1.000|72.2; sec6_5 load|1.138|1.000|-13.8
+tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files	serial	missing
+tests/test_b100_save_dialog.py::test_tc_b100_65_summary_out_of_date_at_save_is_repainted_arm_1	serial	missing
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word	serial	failed	24.577	AssertionError: {256: 0.015625, 512: 0.03125, 2048: 0.015625}	R-A2L-DEF.148 148/13 long conversion type word 400 names at 256 KiB|0.094|0.500|81.2; R-A2L-DEF.148 148/13 long conversion type word per-object part 2S/S|2.000|1.500|-33.3
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk	serial	failed	50.577	ZeroDivisionError: float division by zero	R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK 400 names at 256 KiB|0.188|0.500|62.5
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/5---]	serial	missing
+tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/1]	serial	missing
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]	serial	missing
+tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step	serial	failed	7.514	AttributeError: module 'os' has no attribute 'getloadavg'	R-PE-BENCH.100/3 idle after the last step|0.563|0.300|-87.7
+tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call	serial	missing
+tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs	serial	failed	7.136	AttributeError: module 'os' has no attribute 'getloadavg'
+tests/test_tui_map_big.py::test_tc_b77_20_b77_keys_enter_with_no_focus_selects_nothing[size1]	serial	missing
+tests/test_tui_patch_glyphs.py::test_at077c_stale_provenance	serial	missing
+tests/test_tui_patch_glyphs.py::test_at077d_index_alignment	serial	missing
+tests/test_tui_patch_history_strip.py::test_at081b_bounds	serial	missing
+tests/test_tui_patch_history_strip.py::test_tc081_1_derived	serial	missing
+tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_120	serial	missing
+tests/test_tui_patch_variant.py::test_tc_035_4_routing_guards	serial	missing

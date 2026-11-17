@@ -1,0 +1,21 @@
+[USER_HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- [USER_HOME]\anaconda3\python.exe
+rootdir: [USER_HOME]\Github\s19_app-b103-g3-base
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collecting ... collected 1 item
+
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word PASSED [100%]
+
+- generated xml file: [USER_HOME]\Github\s19_app-b103-g3-repro-last18\repeat\base\junit.xml -
+============================ QC-TM timing margins =============================
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.148 148/13 long conversion type word per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.148 148/13 long conversion type word per-object part 8S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word
+84.4%  0.078 s / 0.500 s  R-A2L-DEF.148 148/13 long conversion type word 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word
+QC-TM: 3 bounds, 0 under 20 % margin
+============================= 1 passed in 12.97s ==============================

@@ -1,0 +1,114 @@
+[USER_HOME]\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts =============================
+platform win32 -- Python 3.12.7, pytest-8.3.4, pluggy-1.6.0 -- [USER_HOME]\anaconda3\python.exe
+rootdir: [USER_HOME]\Github\s19_app-b103-g3-local-6
+configfile: pyproject.toml
+plugins: anyio-4.2.0, asyncio-0.25.0, cov-7.1.0, textual-snapshot-1.1.0, timeout-2.3.1, xdist-3.8.0, syrupy-4.8.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collecting ... collected 18 items
+
+tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene] PASSED [  5%]
+tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files PASSED [ 11%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_summary_out_of_date_at_save_is_repainted_arm_1 PASSED [ 16%]
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word FAILED [ 22%]
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk PASSED [ 27%]
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/5---] PASSED [ 33%]
+tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/1] PASSED [ 38%]
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2] PASSED [ 44%]
+tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step PASSED [ 50%]
+tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call PASSED [ 55%]
+tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs PASSED [ 61%]
+tests/test_tui_map_big.py::test_tc_b77_20_b77_keys_enter_with_no_focus_selects_nothing[size1] PASSED [ 66%]
+tests/test_tui_patch_glyphs.py::test_at077c_stale_provenance PASSED      [ 72%]
+tests/test_tui_patch_glyphs.py::test_at077d_index_alignment PASSED       [ 77%]
+tests/test_tui_patch_history_strip.py::test_at081b_bounds PASSED         [ 83%]
+tests/test_tui_patch_history_strip.py::test_tc081_1_derived PASSED       [ 88%]
+tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_120 PASSED [ 94%]
+tests/test_tui_patch_variant.py::test_tc_035_4_routing_guards PASSED     [100%]
+
+================================== FAILURES ===================================
+____________________ test_r_a2l_def_148_13_long_type_word _____________________
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last18/head/t/pytest/test_r_a2l_def_148_13_long_typ0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_148_13_long_type_word(tmp_path):
+        def check(kib, a2l_data):
+            defs = a2ldef.describe_definitions(_names("C"), a2l_data)
+            for name, d in defs.items():
+                assert d.refusal == a2ldef.Refusal("A2L-DEF-CONVERSION",
+                                                  f"{name}: the conversion type {'Z' * _ECHO}{_ELLIPSIS} of CM_T is not supported")
+                assert len(d.refusal.message) <= MESSAGE_BOUND
+>       _measure(tmp_path, "148/13 long conversion type word", _b148_13, check)
+
+tests\test_b103_a2l_definition_arrays_scale.py:501:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last18/head/t/pytest/test_r_a2l_def_148_13_long_typ0')
+case_label = '148/13 long conversion type word'
+build = <function _b148_13 at 0x000001B2E3961120>
+check = <function test_r_a2l_def_148_13_long_type_word.<locals>.check at 0x000001B2E74F3880>
+image_of = None
+
+    def _measure(tmp_path: Path, case_label: str, build: Callable[[Path, int], tuple[dict, list]],
+                 check: Callable[[int, dict], None],
+                 image_of: Optional[Callable[[str], dict]] = None) -> None:
+        """The E3S3-24 measure for one case: absolute bound at S (least of 15 runs)
+        then the interleaved least-of-15 per-object ratio at 2S and 8S."""
+        loaded = {kib: build(tmp_path, kib) for kib in SIZES_KIB}
+        names = loaded[S_KIB][1]
+
+        # Absolute: 400 names at S, process CPU time (E3S3-24), least of 15 runs.
+        runs = []
+        for _ in range(LEAST_OF):
+            seconds, _ = _timed(lambda: a2ldef.describe_definitions(names, loaded[S_KIB][0]), time.process_time)
+            runs.append(seconds)
+        assert min(runs) <= report_margin(f"R-A2L-DEF.148 {case_label} 400 names at 256 KiB",
+                                          min(runs), timing_bound(ABS_BOUND_S)), runs
+        check(S_KIB, loaded[S_KIB][0])
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(LEAST_OF):
+            for kib in SIZES_KIB:  # interleaved: S, 2S, 8S in turn within every round
+                a2l_data, nms = loaded[kib]
+                if image_of is None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(nms, a2l_data), time.process_time)
+                else:
+                    defs = a2ldef.describe_definitions(nms, a2l_data)
+                    t_outer, interval = _timed(lambda: _steady_decode(defs, nms, a2l_data, image_of), time.process_time)
+                    results[kib] = defs
+                part[kib] = min(part[kib], max(interval, 0.0))
+        ratio_2s = part[2 * S_KIB] / part[S_KIB]
+        ratio_8s = part[8 * S_KIB] / part[S_KIB]
+>       assert ratio_2s <= report_margin(f"R-A2L-DEF.148 {case_label} per-object part 2S/S",
+                                         ratio_2s, timing_bound(RATIO_BOUND_2S)), part
+E       AssertionError: {256: 0.015625, 512: 0.03125, 2048: 0.015625}
+E       assert 2.0 <= 1.5
+E        +  where 1.5 = report_margin('R-A2L-DEF.148 148/13 long conversion type word per-object part 2S/S', 2.0, 1.5)
+E        +    where 1.5 = timing_bound(1.5)
+
+tests\test_b103_a2l_definition_arrays_scale.py:181: AssertionError
+- generated xml file: [USER_HOME]\Github\s19_app-b103-g3-repro-last18\head\junit.xml -
+============================ QC-TM timing margins =============================
+LOW -33.3%  2.000 s / 1.500 s  R-A2L-DEF.148 148/13 long conversion type word per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word
+20.6%  0.794 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+23.6%  0.764 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+25.0%  0.375 s / 0.500 s  R-PE-BENCH.94/4 queued decode cue  tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK per-object part 2S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK per-object part 8S/S  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk
+58.3%  0.125 s / 0.300 s  R-PE-BENCH.100/3 idle after the last step  tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step
+65.6%  0.172 s / 0.500 s  R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk
+66.1%  0.339 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+72.8%  0.272 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+81.2%  0.094 s / 0.500 s  R-A2L-DEF.148 148/13 long conversion type word 400 names at 256 KiB  tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word
+QC-TM: 11 bounds, 1 under 20 % margin
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word - AssertionError: {256: 0.015625, 512: 0.03125, 2048: 0.015625}
+assert 2.0 <= 1.5
+ +  where 1.5 = report_margin('R-A2L-DEF.148 148/13 long conversion type word per-object part 2S/S', 2.0, 1.5)
+ +    where 1.5 = timing_bound(1.5)
+================== 1 failed, 17 passed in 231.06s (0:03:51) ===================

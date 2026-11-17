@@ -1,0 +1,19 @@
+role=control
+commit=6a8cfb0a9bb64b95dd9969fb08e05ae85c1bd6b4
+tree=[USER_HOME]/Github/s19_app-b103-g3-inc9b
+nodes=3
+python=[USER_HOME]/anaconda3/python.exe
+args=-I -B -m pytest -p no:cacheprovider -n0 --color=yes -vv --basetemp=<out>/t/pytest --junitxml=<out>/junit.xml
+stdin=closed
+isolation=HOME XDG_CACHE_HOME XDG_CONFIG_HOME XDG_DATA_HOME XDG_STATE_HOME LOCALAPPDATA APPDATA TMPDIR TMP TEMP below control output
+CI=unset
+GITHUB_ACTIONS=unset
+RUNNER_ENVIRONMENT=unset
+PYTEST_ADDOPTS=unset
+NO_COLOR=unset
+CLICOLOR=unset
+CLICOLOR_FORCE=unset
+TERM=xterm-256color
+COLORTERM=truecolor
+PYTHONDONTWRITEBYTECODE=1
+clipboard=suite autouse OS-boundary stand-ins; real clipboard never opened

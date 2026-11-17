@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="18" time="230.991" timestamp="2026-11-17T15:18:53.228207-06:00" hostname="[HOST]"><testcase classname="tests.test_b100_project_check" name="test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]" time="6.982"><properties><property name="qc_tm" value="sec6_5 read|0.272|1.000|72.8" /><property name="qc_tm" value="sec6_5 load|0.794|1.000|20.6" /><property name="qc_tm" value="sec6_5 painted|0.339|1.000|66.1" /><property name="qc_tm" value="sec6_5 appended|0.764|1.000|23.6" /></properties></testcase><testcase classname="tests.test_b100_project_homes" name="test_tc_b100_31_copy_ceiling_2000_files" time="32.592" /><testcase classname="tests.test_b100_save_dialog" name="test_tc_b100_65_summary_out_of_date_at_save_is_repainted_arm_1" time="4.817" /><testcase classname="tests.test_b103_a2l_definition_arrays_scale" name="test_r_a2l_def_148_13_long_type_word" time="17.762"><properties><property name="qc_tm" value="R-A2L-DEF.148 148/13 long conversion type word 400 names at 256 KiB|0.094|0.500|81.2" /><property name="qc_tm" value="R-A2L-DEF.148 148/13 long conversion type word per-object part 2S/S|2.000|1.500|-33.3" /></properties><failure message="AssertionError: {256: 0.015625, 512: 0.03125, 2048: 0.015625}&#10;assert 2.0 &lt;= 1.5&#10; +  where 1.5 = report_margin('R-A2L-DEF.148 148/13 long conversion type word per-object part 2S/S', 2.0, 1.5)&#10; +    where 1.5 = timing_bound(1.5)">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last18/head/t/pytest/test_r_a2l_def_148_13_long_typ0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_148_13_long_type_word(tmp_path):
+        def check(kib, a2l_data):
+            defs = a2ldef.describe_definitions(_names("C"), a2l_data)
+            for name, d in defs.items():
+                assert d.refusal == a2ldef.Refusal("A2L-DEF-CONVERSION",
+                                                  f"{name}: the conversion type {'Z' * _ECHO}{_ELLIPSIS} of CM_T is not supported")
+                assert len(d.refusal.message) &lt;= MESSAGE_BOUND
+&gt;       _measure(tmp_path, "148/13 long conversion type word", _b148_13, check)
+
+tests\test_b103_a2l_definition_arrays_scale.py:501:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last18/head/t/pytest/test_r_a2l_def_148_13_long_typ0')
+case_label = '148/13 long conversion type word'
+build = &lt;function _b148_13 at 0x000001B2E3961120&gt;
+check = &lt;function test_r_a2l_def_148_13_long_type_word.&lt;locals&gt;.check at 0x000001B2E74F3880&gt;
+image_of = None
+
+    def _measure(tmp_path: Path, case_label: str, build: Callable[[Path, int], tuple[dict, list]],
+                 check: Callable[[int, dict], None],
+                 image_of: Optional[Callable[[str], dict]] = None) -&gt; None:
+        """The E3S3-24 measure for one case: absolute bound at S (least of 15 runs)
+        then the interleaved least-of-15 per-object ratio at 2S and 8S."""
+        loaded = {kib: build(tmp_path, kib) for kib in SIZES_KIB}
+        names = loaded[S_KIB][1]
+
+        # Absolute: 400 names at S, process CPU time (E3S3-24), least of 15 runs.
+        runs = []
+        for _ in range(LEAST_OF):
+            seconds, _ = _timed(lambda: a2ldef.describe_definitions(names, loaded[S_KIB][0]), time.process_time)
+            runs.append(seconds)
+        assert min(runs) &lt;= report_margin(f"R-A2L-DEF.148 {case_label} 400 names at 256 KiB",
+                                          min(runs), timing_bound(ABS_BOUND_S)), runs
+        check(S_KIB, loaded[S_KIB][0])
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(LEAST_OF):
+            for kib in SIZES_KIB:  # interleaved: S, 2S, 8S in turn within every round
+                a2l_data, nms = loaded[kib]
+                if image_of is None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(nms, a2l_data), time.process_time)
+                else:
+                    defs = a2ldef.describe_definitions(nms, a2l_data)
+                    t_outer, interval = _timed(lambda: _steady_decode(defs, nms, a2l_data, image_of), time.process_time)
+                    results[kib] = defs
+                part[kib] = min(part[kib], max(interval, 0.0))
+        ratio_2s = part[2 * S_KIB] / part[S_KIB]
+        ratio_8s = part[8 * S_KIB] / part[S_KIB]
+&gt;       assert ratio_2s &lt;= report_margin(f"R-A2L-DEF.148 {case_label} per-object part 2S/S",
+                                         ratio_2s, timing_bound(RATIO_BOUND_2S)), part
+E       AssertionError: {256: 0.015625, 512: 0.03125, 2048: 0.015625}
+E       assert 2.0 &lt;= 1.5
+E        +  where 1.5 = report_margin('R-A2L-DEF.148 148/13 long conversion type word per-object part 2S/S', 2.0, 1.5)
+E        +    where 1.5 = timing_bound(1.5)
+
+tests\test_b103_a2l_definition_arrays_scale.py:181: AssertionError</failure></testcase><testcase classname="tests.test_b103_a2l_definition_arrays_scale" name="test_r_a2l_def_150_arr_2_enum_table_decode_val_blk" time="46.172"><properties><property name="qc_tm" value="R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK 400 names at 256 KiB|0.172|0.500|65.6" /><property name="qc_tm" value="R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK per-object part 2S/S|1.000|1.500|33.3" /><property name="qc_tm" value="R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK per-object part 8S/S|1.000|2.000|50.0" /></properties></testcase><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.008/5---]" time="16.006" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r010_detail_invalidation[R-A2L-REFRESH.010/1]" time="22.036" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r014_same_path[R-A2L-REFRESH.014/2]" time="30.543" /><testcase classname="tests.test_b103_inc9b_at" name="test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step" time="7.517"><properties><property name="qc_tm" value="R-PE-BENCH.100/3 idle after the last step|0.125|0.300|58.3" /></properties></testcase><testcase classname="tests.test_b103_inc9b_s" name="test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call" time="4.014" /><testcase classname="tests.test_b103_inc9b_w" name="test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs" time="6.772"><properties><property name="qc_tm" value="R-PE-BENCH.94/4 queued decode cue|0.375|0.500|25.0" /></properties></testcase><testcase classname="tests.test_tui_map_big" name="test_tc_b77_20_b77_keys_enter_with_no_focus_selects_nothing[size1]" time="2.091" /><testcase classname="tests.test_tui_patch_glyphs" name="test_at077c_stale_provenance" time="10.065" /><testcase classname="tests.test_tui_patch_glyphs" name="test_at077d_index_alignment" time="2.413" /><testcase classname="tests.test_tui_patch_history_strip" name="test_at081b_bounds" time="5.569" /><testcase classname="tests.test_tui_patch_history_strip" name="test_tc081_1_derived" time="8.877" /><testcase classname="tests.test_tui_patch_layout" name="test_at063c_reparent_safety_at_120" time="2.518" /><testcase classname="tests.test_tui_patch_variant" name="test_tc_035_4_routing_guards" time="2.377" /></testsuite></testsuites>

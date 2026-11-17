@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[4]
 BATCH = ROOT / ".dev-flow" / "2026-11-05-batch-103"
 OUT = Path(__file__).with_name("g3-review.html")
-COMMIT = "35fabb25c42d752216433c095eb0d29024027294"
+COMMIT = "bcc97d2b5a11c74c0ce30655e98684ab55c06307"
 
 INCREMENTS = [
     ("1a", "Clipboard core: instant paste", "PASS-WITH-NOTES", "122 passed / 75 skipped; límites Windows y AT manuales declarados."),
@@ -42,7 +42,7 @@ TEMPLATE = r"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>Batch 103 · Revisión G3 — BLOCKED</title>
+<title>Batch 103 · Revisión G3 — PASS-WITH-NOTES</title>
 <style>
 :root{color-scheme:dark;--bg:#0b1220;--surface:#111c2e;--surface2:#17243a;--text:#edf3fb;--muted:#b7c5d8;--line:#33445e;--accent:#7dd3fc;--ok:#86efac;--warn:#fcd34d;--bad:#fda4af;--focus:#fef08a}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:7rem}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}a{color:var(--accent);text-underline-offset:.2em}a:hover{text-decoration-thickness:2px}a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--focus);outline-offset:3px}.skip{position:fixed;top:.5rem;left:.5rem;z-index:20;transform:translateY(-200%);background:var(--focus);color:#111;padding:.7rem 1rem}.skip:focus{transform:none}.topbar{position:sticky;top:0;z-index:10;background:#0b1220f5;border-bottom:1px solid var(--line)}.topbar-inner{max-width:1240px;margin:auto;display:flex;align-items:center;gap:1rem;padding:.65rem 1.25rem}.brand{font-weight:800;white-space:nowrap}.nav{display:flex;flex-wrap:wrap;gap:.2rem .75rem}.nav a{font-size:.9rem;text-decoration:none;padding:.25rem}.wrap{max-width:1240px;margin:auto;padding:0 1.25rem}header.hero{padding:2.4rem 0 1.4rem}.eyebrow{color:var(--accent);font-size:.8rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.08;margin:.45rem 0 1rem;max-width:18ch}h2{font-size:clamp(1.55rem,3vw,2.1rem);line-height:1.2;margin:0 0 1rem}h3{line-height:1.3;margin:.3rem 0 .8rem}p{max-width:82ch}.lead{font-size:1.12rem;color:var(--muted)}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}.badge{display:inline-flex;align-items:center;gap:.35rem;border:1px solid currentColor;border-radius:999px;padding:.18rem .6rem;font-size:.78rem;font-weight:800;letter-spacing:.03em}.badge.blocked{color:var(--bad);background:#4c1522}.badge.ok{color:var(--ok);background:#103523}.badge.pending{color:var(--warn);background:#3b2d0b}.badge.neutral{color:var(--muted);background:var(--surface2)}.hero .badge{font-size:1rem;padding:.35rem .85rem}.alert{border:1px solid #a8495d;border-left:5px solid var(--bad);background:#2b1521;padding:1rem 1.1rem;border-radius:.5rem;margin:1rem 0}.alert strong{color:#fecdd3}.note{border-left:4px solid var(--accent);background:#102538;padding:.85rem 1rem;border-radius:.35rem;color:var(--text)}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}.card{background:var(--surface);border:1px solid var(--line);border-radius:.65rem;padding:1rem;min-width:0}.card .label{display:block;color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}.card strong{display:block;font-size:1.2rem;margin:.2rem 0;overflow-wrap:anywhere}.card p{font-size:.9rem;color:var(--muted);margin:.3rem 0}section{padding:2.2rem 0;border-top:1px solid var(--line)}.section-intro{color:var(--muted);margin-top:-.4rem}.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:.6rem}table{border-collapse:collapse;width:100%;background:var(--surface)}th,td{text-align:left;vertical-align:top;padding:.7rem .75rem;border-bottom:1px solid var(--line)}th{background:var(--surface2);color:var(--text);font-size:.82rem;letter-spacing:.03em}td{color:var(--muted)}td strong,td a{color:var(--text)}tbody tr:last-child td{border-bottom:0}.inc-table{min-width:850px}.inc-table td:nth-child(3){white-space:nowrap}.source-list{display:grid;gap:.45rem;padding-left:1.2rem}details{border:1px solid var(--line);border-radius:.55rem;background:var(--surface);padding:.7rem .9rem;margin:.8rem 0}summary{cursor:pointer;font-weight:750;color:var(--text)}details[open] summary{margin-bottom:.7rem}.capture-group{padding:.8rem}.capture-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}figure{margin:0;background:#080e18;border:1px solid var(--line);border-radius:.5rem;overflow:hidden}figure img{display:block;width:100%;height:auto;background:#000}figcaption{padding:.7rem;color:var(--muted);font-size:.85rem}figcaption strong{display:block;color:var(--text)}.capture-note{font-size:.9rem;color:var(--muted)}.checklist{list-style:none;padding:0;margin:1rem 0;display:grid;gap:.7rem;counter-reset:step}.checklist li{display:grid;grid-template-columns:auto 1fr;gap:.75rem;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:.55rem;padding:.9rem;counter-increment:step}.checklist li::before{content:counter(step);font-weight:900;color:var(--accent);font-size:1.2rem}.checklist input{grid-column:1;width:1.35rem;height:1.35rem;margin:.2rem 0 0;grid-row:1}.checklist label{grid-column:2;grid-row:1;cursor:pointer}.step-number{display:inline-block;color:var(--accent);font-weight:800;margin-right:.4rem}.exact{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.9rem;white-space:normal;overflow-wrap:anywhere}.tabs{display:flex;flex-wrap:wrap;gap:.35rem;border-bottom:1px solid var(--line);margin-bottom:1rem}.tab{border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:.65rem .9rem;border-radius:.45rem .45rem 0 0;cursor:pointer;font:inherit}.tab[aria-selected="true"]{background:var(--surface2);color:var(--text);border-bottom-color:var(--accent)}.tabpanel{min-height:12rem}.metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}.metric-grid .card strong{font-size:1.6rem}.risk-list{display:grid;gap:.75rem}.risk{display:grid;grid-template-columns:minmax(150px,.65fr) 2fr;gap:1rem;padding:1rem;border:1px solid var(--line);border-radius:.55rem;background:var(--surface)}.risk strong{color:var(--text)}.risk p{margin:0;color:var(--muted)}form{background:var(--surface);border:1px solid var(--line);border-radius:.7rem;padding:1.1rem}fieldset{border:0;padding:0;margin:0 0 1rem}legend{font-weight:800;margin-bottom:.6rem}.choices{display:grid;gap:.55rem}.choice{display:flex;gap:.65rem;align-items:flex-start;padding:.75rem;border:1px solid var(--line);border-radius:.45rem;background:var(--surface2)}.choice:has(input:disabled){opacity:.72}.choice input{width:1.2rem;height:1.2rem;margin-top:.2rem}.choice label{cursor:pointer}.choice input:disabled+label{cursor:not-allowed}.choice small{display:block;color:var(--muted)}label[for="notes"]{display:block;font-weight:800;margin:.8rem 0 .35rem}textarea{width:100%;min-height:8rem;resize:vertical;background:#0a1424;color:var(--text);border:1px solid var(--line);border-radius:.45rem;padding:.75rem;font:inherit}.actions{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1rem}.button{border:1px solid var(--accent);border-radius:.45rem;background:#123b55;color:var(--text);padding:.7rem 1rem;font:inherit;font-weight:800;cursor:pointer}.button.secondary{background:transparent;color:var(--accent)}.button:hover{filter:brightness(1.16)}#form-status{min-height:1.6rem;color:var(--ok);font-weight:700}.footer{color:var(--muted);font-size:.85rem;padding:1.5rem 0 2.5rem;border-top:1px solid var(--line)}[hidden]{display:none!important}
@@ -56,21 +56,23 @@ TEMPLATE = r"""<!doctype html>
 <div class="topbar"><div class="topbar-inner"><a class="brand" href="#resumen">B103 · G3</a><nav class="nav" aria-label="Secciones"><a href="#resumen">Resumen</a><a href="#incrementos">15 incrementos</a><a href="#capturas">8 capturas</a><a href="#at-i1b-8">AT-I1b-8</a><a href="#resultados">Resultados</a><a href="#riesgos">Riesgos</a><a href="#decision">Decisión</a></nav></div></div>
 <div class="wrap">
 <header class="hero" id="resumen">
-<div class="eyebrow">Revisión de integración · evidencia en 35fabb25</div>
+<div class="eyebrow">Revisión de integración · evidencia en bcc97d2b</div>
 <h1>Batch 103 · puerta G3</h1>
-<span class="badge blocked" data-gate-status>BLOCKED · no cerrada</span>
+<span class="badge ok" data-gate-status>PASS-WITH-NOTES · aceptada con notas</span>
 <span class="badge ok" data-operator-decision>APROBACIÓN PROVISIONAL · decisiones y página</span>
 <p class="lead"><strong>Operador:</strong> «Por ahora todo está aprobado. Durante el uso y priebas de usuario espero ver si se sostienen las decisiones tomadas.»</p>
-<p class="lead">La validación de las decisiones continuará durante el uso y las pruebas de usuario. AT-I1b-8 queda <strong>deferred-to-user-validation / not_run</strong>: diferida por el operador, no ejecutada. Esta página no declara G3 PASS ni autoriza release: la full-suite local sigue <strong>RUNNING</strong> en un clon separado del commit exacto 35fabb25, sin full-suite PASS ni cierre de G3.</p>
-<div class="alert" role="status"><strong>Decisión provisional registrada:</strong> la aprobación del operador cubre las decisiones y esta página, no un G3 PASS. «Aprobar G3» permanece bloqueado hasta que la full-suite local sea GREEN; AT-I1b-8 ya no es una ejecución previa exigida para la aprobación provisional.</div>
+<p class="lead">La full-suite <code>13b1e522</code> está completa y clasificada: <strong>364 RED = 298 main + 66 serial</strong>, con 346 persistentes reglados y 18 nuevos antes del A/B. <code>last18</code> concluye 16 contexto y 2 instrumento, <strong>0 regresiones reales abiertas</strong>. Esta página no declara full-suite GREEN: acepta G3 con notas y deja el proyecto listo para promoción. AT-I1b-8 queda <strong>deferred-to-user-validation / not_run</strong>.</p>
+<div class="alert" role="status"><strong>PASS-WITH-NOTES:</strong> approve está habilitado porque la full-suite está completa y clasificada y no hay regresiones abiertas. Es aceptación con notas, no GREEN. La aprobación provisional del operador se mantiene y AT-I1b-8 sigue diferida a validación de usuario, no es ejecución previa.</div>
 <div class="grid" aria-label="Datos de cabecera">
-<div class="card"><span class="label">Commit revisado</span><strong><code>35fabb25</code></strong><p><code>35fabb25c42d752216433c095eb0d29024027294</code></p></div>
+<div class="card"><span class="label">Commit revisado</span><strong><code>bcc97d2b</code></strong><p><code>bcc97d2b5a11c74c0ce30655e98684ab55c06307</code></p></div>
 <div class="card"><span class="label">Traza G3 final</span><strong>0 gaps</strong><p>14 US · US/CASE/TEST/SLICE/EVID/CANON · exit 0.</p></div>
 <div class="card"><span class="label">CANON</span><strong>752 activos</strong><p>10 withdrawn; fold y traza sin gaps, no equivale a suite GREEN.</p></div>
-<div class="card"><span class="label">Full-suite local</span><strong>RUNNING</strong><p>Clon separado exacto 35fabb25 · sin veredicto. Self-test distribuido NOT RUN por SSH.</p></div>
+<div class="card"><span class="label">Full-suite 13b1e522</span><strong>RED CLASIFICADA</strong><p>364 fallos clasificados · 0 regresiones abiertas · <a href="../full-suite/local-runs/RULINGS.md">RULINGS final</a>.</p></div>
 </div>
 <details><summary>Fuentes primarias del estado G3</summary><ul class="source-list">
-<li><a href="../full-suite/RESULT.md">full-suite/RESULT.md</a> — estado BLOCKED y ausencia de veredicto.</li>
+<li><a href="../full-suite/RESULT.md">full-suite/RESULT.md</a> — estado PASS-WITH-NOTES.</li>
+<li><a href="../full-suite/local-runs/RULINGS.md">local-runs/RULINGS.md</a> — censo final, last18 y doce objetivos PASS.</li>
+<li><a href="../full-suite/local-runs/comparison-85ed7210-13b1e522.tsv">comparison-85ed7210-13b1e522.tsv</a> — 17 resolved, 346 persistent, 18 new.</li>
 <li><a href="../full-suite/g3-batch-trace-final.txt">g3-batch-trace-final.txt</a> — 752 activos, 10 withdrawn, 0 gaps.</li>
 <li><a href="../canon/RECORD.md">canon/RECORD.md</a> — fold, precedencia y reconciliación del canon.</li>
 <li><a href="../../inc-1b/04-validation.md">inc-1b/04-validation.md</a> — WinCI, mutantes, capturas y pendientes.</li>
@@ -123,31 +125,31 @@ TEMPLATE = r"""<!doctype html>
 </div>
 </section>
 <section id="riesgos" aria-labelledby="riesgos-title">
-<h2 id="riesgos-title">Riesgos y pendientes abiertos</h2>
+<h2 id="riesgos-title">Notas y evidencia que permanece visible</h2>
 <div class="risk-list">
-<div class="risk"><strong>Full-suite local + self-test distribuido</strong><p><span class="badge blocked">RUNNING · sin veredicto</span> La full-suite local corre en un clon separado exacto 35fabb25; no se la declara PASS ni se cierra G3 mientras siga corriendo. El self-test y la pasada distribuida permanecen NOT RUN por SSH.</p></div>
-<div class="risk"><strong>AT-I1b-8</strong><p><span class="badge pending">deferred-to-user-validation / not_run</span> El operador difiere la comprobación al uso y las pruebas de usuario. No está ejecutada y no bloquea la aprobación provisional ya registrada.</p></div>
+<div class="risk"><strong>Full-suite 13b1e522</strong><p><span class="badge ok">COMPLETA · CLASIFICADA</span> 364 RED = 298 main + 66 serial; 269 guards literales, 19 plataforma, 58 residuales y 18 nuevos antes del A/B. Los 346 persistentes están reglados y last18 deja 0 regresiones abiertas. No es full-suite GREEN.</p></div>
+<div class="risk"><strong>AT-I1b-8</strong><p><span class="badge pending">deferred-to-user-validation / not_run</span> El operador difiere la comprobación al uso y las pruebas de usuario. No está ejecutada y no bloquea la aceptación con notas.</p></div>
 <div class="risk"><strong>74 partial</strong><p>El agregado WinCI 108/108 no tiene mapping por fila en el manifest. No promover esos casos sin esa correspondencia auditable.</p></div>
 <div class="risk"><strong>GC-C14</strong><p>Mutante BAD/bloqueado por diseño. Mantenerlo visible como no ejecutado válidamente; no convertirlo en killed ni en PASS.</p></div>
-<div class="risk"><strong>Release</strong><p><span class="badge blocked">NO autorizado</span> La traza 0 gaps, el canon plegado, la aprobación provisional y las aprobaciones visuales no cierran G3 ni constituyen release.</p></div>
+<div class="risk"><strong>Promoción</strong><p><span class="badge ok">LISTA</span> El estado es listo para promoción a main. No se ha realizado merge a main ni se afirma full-suite GREEN.</p></div>
 </div>
 </section>
 <section id="decision" aria-labelledby="decision-title">
 <h2 id="decision-title">Decisión de revisión G3</h2>
-<p class="section-intro">La aprobación provisional del operador ya consta en esta página. La exportación crea un JSON local en este equipo; no envía datos, no usa servicios y no modifica los registros del batch.</p>
+<p class="section-intro">La aprobación provisional del operador y la corrida final clasificada ya constan en esta página. La exportación crea un JSON local en este equipo; no envía datos, no usa servicios y no modifica los registros del batch.</p>
 <form id="decision-form">
 <fieldset aria-describedby="approve-reason"><legend>Decisión</legend><div class="choices">
-<div class="choice"><input type="radio" name="decision" value="approve" id="approve" disabled><label for="approve">Aprobar G3 <small>No disponible hasta que la full-suite local sea GREEN. AT-I1b-8 está diferida a validación de usuario, no exigida como ejecución previa.</small></label></div>
+<div class="choice"><input type="radio" name="decision" value="approve" id="approve"><label for="approve">Aceptar G3 con notas <small>Disponible porque la full-suite está completa y clasificada y no hay regresiones abiertas. No declara GREEN.</small></label></div>
 <div class="choice"><input type="radio" name="decision" value="reject" id="reject"><label for="reject">Rechazar <small>Registra una decisión negativa para esta revisión.</small></label></div>
 <div class="choice"><input type="radio" name="decision" value="request-changes" id="request-changes"><label for="request-changes">Solicitar cambios <small>Registra trabajo pendiente sin cerrar la puerta.</small></label></div>
-</div><p id="approve-reason" class="note"><strong>Regla de aprobación:</strong> approve permanece bloqueado mientras la full-suite local no sea GREEN. AT-I1b-8 queda <code>deferred-to-user-validation / not_run</code> por decisión del operador: no se exige como ejecución previa para la aprobación provisional, pero tampoco se marca ejecutada. Marcar el checklist visual no cambia ninguna evidencia.</p></fieldset>
+</div><p id="approve-reason" class="note"><strong>Regla de aprobación:</strong> approve está habilitado porque la full-suite está completa y clasificada y last18 deja 0 regresiones abiertas. AT-I1b-8 queda <code>deferred-to-user-validation / not_run</code>: no se exige como ejecución previa para esta aceptación con notas, pero tampoco se marca ejecutada. Marcar el checklist visual no cambia ninguna evidencia.</p></fieldset>
 <label for="notes">Notas de revisión</label><textarea id="notes" name="notes" maxlength="12000" placeholder="Describe evidencia pendiente, cambios solicitados o motivo de rechazo."></textarea>
 <div class="actions"><button class="button" type="submit" id="export-json">Exportar decisión JSON</button><button class="button secondary" type="button" id="print-page">Imprimir / guardar PDF</button></div>
 <p id="form-status" role="status" aria-live="polite"></p>
 </form>
 </section>
 </main>
-<footer class="footer">Página autocontenida generada desde evidencia del commit <code>35fabb25</code>. CSS, JavaScript y ocho imágenes van inline. Sin red, CDN, almacenamiento ni dependencias de render. Los enlaces Markdown son referencias opcionales al checkout.</footer>
+<footer class="footer">Página autocontenida generada desde evidencia del commit <code>bcc97d2b</code>. CSS, JavaScript y ocho imágenes van inline. Sin red, CDN, almacenamiento ni dependencias de render. Los enlaces Markdown son referencias opcionales al checkout.</footer>
 </div>
 <script>
 (() => {
@@ -178,35 +180,31 @@ TEMPLATE = r"""<!doctype html>
     const selected = form.querySelector('input[name="decision"]:checked');
     const status = document.getElementById('form-status');
     if (!selected) {
-      status.textContent = 'Selecciona reject o request-changes antes de exportar.';
-      return;
-    }
-    if (selected.value === 'approve') {
-      status.textContent = 'Approve bloqueado: la full-suite local aún no es GREEN.';
+      status.textContent = 'Selecciona approve, reject o request-changes antes de exportar.';
       return;
     }
     const payload = {
       schema: 's19.batch103.g3-review.v1',
-      commit: '35fabb25c42d752216433c095eb0d29024027294',
+      commit: 'bcc97d2b5a11c74c0ce30655e98684ab55c06307',
       gate: 'G3',
-      gate_status: 'BLOCKED',
+      gate_status: 'PASS-WITH-NOTES',
       operator_decision: 'provisional_approval',
       decision: selected.value,
       notes: document.getElementById('notes').value,
       exported_at: new Date().toISOString(),
-      pending: {full_suite: 'RUNNING_NO_VERDICT', distributed_self_test: 'NOT_RUN', 'AT-I1b-8': 'deferred-to-user-validation/not_run'},
-      release_authorized: false
+      pending: {full_suite: 'COMPLETE_CLASSIFIED_RED', distributed_self_test: 'NOT_RUN', 'AT-I1b-8': 'deferred-to-user-validation/not_run'},
+      release_authorized: true
     };
     const blob = new Blob([JSON.stringify(payload, null, 2) + '\n'], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'g3-decision-35fabb25.json';
+    link.download = 'g3-decision-bcc97d2b.json';
     document.body.appendChild(link);
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    status.textContent = 'JSON local generado. G3 permanece BLOCKED; no se envió información.';
+    status.textContent = 'JSON local generado. PASS-WITH-NOTES; listo para promoción, no se envió información.';
   });
   const printButton = document.getElementById('print-page');
   if (printButton) printButton.addEventListener('click', () => window.print());

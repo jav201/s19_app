@@ -1,0 +1,19 @@
+nodeid	category	evidence
+tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]	contexto	full serial=failed load 1.138/1.000 s; head/base=passed load 0.794/0.677 s; appended 0.764/0.606 s
+tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files	contexto	full main=failed AssertionError []; head/base=passed 32.592/32.341 s
+tests/test_b100_save_dialog.py::test_tc_b100_65_summary_out_of_date_at_save_is_repainted_arm_1	contexto	full main=failed WorkerFailed NoMatches #log_line_1; head/base=passed 4.817/5.199 s
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word	instrumento	full serial y head inicial=failed 2S/S=2.0 con part={S:0.015625,2S:0.03125,8S:0.015625}; base=passed; repetición head/base=passed 2S/S=8S/S=1.0; absoluto head=0.094/0.500 s; cuantización process_time Windows en tests/test_b103_a2l_definition_arrays_scale.py:178-183
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk	instrumento	full serial=ZeroDivisionError por denominador process_time cero en tests/test_b103_a2l_definition_arrays_scale.py:179; head/base=passed absoluto 0.172/0.500 s y ratios 2S/S=1.0 en ambos
+tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/5---]	contexto	full main=failed assert ['AlphaShared'] == []; head/base=passed
+tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/1]	contexto	full main=failed OLD_ONLY ausente; head/base=passed
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]	contexto	full main=failed Load dialog did not open; head/base=passed 30.543/31.720 s
+tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step	contexto	full serial=failed lag 0.563/0.300 s y luego AttributeError os.getloadavg al formar el mensaje; head/control=passed lag 0.125/0.125 s
+tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call	contexto	full main=failed (0, False, [False]); head/control=passed
+tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs	contexto	full serial=failed enmascarado por AttributeError os.getloadavg; head/control=passed cue 0.375/0.281 s dentro de 0.500 s
+tests/test_tui_map_big.py::test_tc_b77_20_b77_keys_enter_with_no_focus_selects_nothing[size1]	contexto	full main=failed precondition settled=False; head/base=passed
+tests/test_tui_patch_glyphs.py::test_at077c_stale_provenance	contexto	full main=failed NoMatches #patch_editor_panel; head/base=passed
+tests/test_tui_patch_glyphs.py::test_at077d_index_alignment	contexto	full main=failed glyphs ['·','·','·','·']; head/base=passed
+tests/test_tui_patch_history_strip.py::test_at081b_bounds	contexto	full main=failed NoMatches #patch_editor_panel; head/base=passed
+tests/test_tui_patch_history_strip.py::test_tc081_1_derived	contexto	full main=failed NoMatches #patch_editor_panel; head/base=passed
+tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_120	contexto	full main=failed NoMatches #patch_editor_panel; head/base=passed
+tests/test_tui_patch_variant.py::test_tc_035_4_routing_guards	contexto	full main=failed execute_scope calls=[]; head/base=passed

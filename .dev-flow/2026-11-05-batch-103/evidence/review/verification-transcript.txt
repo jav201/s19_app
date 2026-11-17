@@ -1,14 +1,14 @@
 url        file:///<WORKTREE>/.dev-flow/2026-11-05-batch-103/evidence/review/g3-review.html
 http       200
-load       5078ms
-title      "Batch 103 · Revisión G3 — BLOCKED"
-bodyChars  10482
+load       3875ms
+title      "Batch 103 · Revisión G3 — PASS-WITH-NOTES"
+bodyChars  10520
 patchright <HOME>\.vscode\extensions\danielsanmedium.dscodegpt-3.24.84\standalone/
-text       Saltar al contenido B103 · G3 Resumen 15 incrementos 8 capturas AT-I1b-8 Resultados Riesgos Decisión REVISIÓN DE INTEGRACIÓN · EVIDENCIA EN 35FABB25 Batch 103 · puerta G3 BLOCKED · no cerrada APROBACI
+text       Saltar al contenido B103 · G3 Resumen 15 incrementos 8 capturas AT-I1b-8 Resultados Riesgos Decisión REVISIÓN DE INTEGRACIÓN · EVIDENCIA EN BCC97D2B Batch 103 · puerta G3 PASS-WITH-NOTES · aceptada co
 script     {
  "result": "PASS",
  "checks": 39,
- "bodyChars": 10482,
+ "bodyChars": 10520,
  "images": 8,
  "consoleErrors": 0,
  "pageErrors": 0,

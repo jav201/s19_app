@@ -1,0 +1,37 @@
+tree	nodeid	status	time_s	signature	qc_tm
+head	tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]	passed	6.982		sec6_5 read|0.272|1.000|72.8; sec6_5 load|0.794|1.000|20.6; sec6_5 painted|0.339|1.000|66.1; sec6_5 appended|0.764|1.000|23.6
+head	tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files	passed	32.592
+head	tests/test_b100_save_dialog.py::test_tc_b100_65_summary_out_of_date_at_save_is_repainted_arm_1	passed	4.817
+head	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word	failed	17.762	AssertionError: {256: 0.015625, 512: 0.03125, 2048: 0.015625}	R-A2L-DEF.148 148/13 long conversion type word 400 names at 256 KiB|0.094|0.500|81.2; R-A2L-DEF.148 148/13 long conversion type word per-object part 2S/S|2.000|1.500|-33.3
+head	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk	passed	46.172		R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK 400 names at 256 KiB|0.172|0.500|65.6; R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK per-object part 8S/S|1.000|2.000|50.0
+head	tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/5---]	passed	16.006
+head	tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/1]	passed	22.036
+head	tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]	passed	30.543
+head	tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step	passed	7.517		R-PE-BENCH.100/3 idle after the last step|0.125|0.300|58.3
+head	tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call	passed	4.014
+head	tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs	passed	6.772		R-PE-BENCH.94/4 queued decode cue|0.375|0.500|25.0
+head	tests/test_tui_map_big.py::test_tc_b77_20_b77_keys_enter_with_no_focus_selects_nothing[size1]	passed	2.091
+head	tests/test_tui_patch_glyphs.py::test_at077c_stale_provenance	passed	10.065
+head	tests/test_tui_patch_glyphs.py::test_at077d_index_alignment	passed	2.413
+head	tests/test_tui_patch_history_strip.py::test_at081b_bounds	passed	5.569
+head	tests/test_tui_patch_history_strip.py::test_tc081_1_derived	passed	8.877
+head	tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_120	passed	2.518
+head	tests/test_tui_patch_variant.py::test_tc_035_4_routing_guards	passed	2.377
+base	tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]	passed	6.863		sec6_5 read|0.306|1.000|69.4; sec6_5 load|0.677|1.000|32.3; sec6_5 painted|0.393|1.000|60.7; sec6_5 appended|0.606|1.000|39.4
+base	tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files	passed	32.341
+base	tests/test_b100_save_dialog.py::test_tc_b100_65_summary_out_of_date_at_save_is_repainted_arm_1	passed	5.199
+base	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word	passed	18.462		R-A2L-DEF.148 148/13 long conversion type word 400 names at 256 KiB|0.094|0.500|81.2; R-A2L-DEF.148 148/13 long conversion type word per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.148 148/13 long conversion type word per-object part 8S/S|1.000|2.000|50.0
+base	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_150_arr_2_enum_table_decode_val_blk	passed	46.084		R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK 400 names at 256 KiB|0.172|0.500|65.6; R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.148 150/arr-2 enum table decode VAL_BLK per-object part 8S/S|0.000|2.000|100.0
+base	tests/test_b103_a2l_refresh.py::test_r007_r008_filters[R-A2L-REFRESH.008/5---]	passed	16.024
+base	tests/test_b103_a2l_refresh.py::test_r010_detail_invalidation[R-A2L-REFRESH.010/1]	passed	22.757
+base	tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]	passed	31.720
+base	tests/test_tui_map_big.py::test_tc_b77_20_b77_keys_enter_with_no_focus_selects_nothing[size1]	passed	2.322
+base	tests/test_tui_patch_glyphs.py::test_at077c_stale_provenance	passed	9.660
+base	tests/test_tui_patch_glyphs.py::test_at077d_index_alignment	passed	2.372
+base	tests/test_tui_patch_history_strip.py::test_at081b_bounds	passed	5.517
+base	tests/test_tui_patch_history_strip.py::test_tc081_1_derived	passed	8.981
+base	tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_120	passed	2.517
+base	tests/test_tui_patch_variant.py::test_tc_035_4_routing_guards	passed	2.360
+control	tests/test_b103_inc9b_at.py::test_r_pe_bench_100_3_a_written_record_returns_the_window_to_its_idle_look_within_0_3_s_of_the_last_step	passed	6.105		R-PE-BENCH.100/3 idle after the last step|0.125|0.300|58.3
+control	tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call	passed	3.571
+control	tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs	passed	6.092		R-PE-BENCH.94/4 queued decode cue|0.281|0.500|43.8

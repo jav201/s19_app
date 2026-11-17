@@ -1,7 +1,7 @@
 {
   "schema": "s19.batch103.g3-browser-verification.v1",
   "page": "g3-review.html",
-  "commit": "35fabb25c42d752216433c095eb0d29024027294",
+  "commit": "bcc97d2b5a11c74c0ce30655e98684ab55c06307",
   "browser": "headless browser-automation / patchright",
   "result": "PASS",
   "checks": [
@@ -19,11 +19,11 @@
       "name": "body renderizado",
       "result": "PASS",
       "detail": {
-        "bodyChars": 10482
+        "bodyChars": 10520
       }
     },
     {
-      "name": "cabecera BLOCKED y aprobación provisional",
+      "name": "cabecera PASS-WITH-NOTES y cero regresiones",
       "result": "PASS",
       "detail": null
     },
@@ -33,7 +33,7 @@
       "detail": null
     },
     {
-      "name": "sin declaración de release",
+      "name": "aceptación con notas sin GREEN",
       "result": "PASS",
       "detail": null
     },
@@ -177,15 +177,15 @@
       "detail": null
     },
     {
-      "name": "approve deshabilitado",
+      "name": "approve habilitado",
       "result": "PASS",
       "detail": null
     },
     {
-      "name": "bloqueo exige suite GREEN y difiere AT",
+      "name": "regla completa clasificada y AT diferida",
       "result": "PASS",
       "detail": {
-        "blockReason": "Regla de aprobación: approve permanece bloqueado mientras la full-suite local no sea GREEN. AT-I1b-8 queda deferred-to-user-validation / not_run por decisión del operador: no se exige como ejecución previa para la aprobación provisional, pero tampoco se marca ejecutada. Marcar el checklist visual no cambia ninguna evidencia."
+        "blockReason": "Regla de aprobación: approve está habilitado porque la full-suite está completa y clasificada y last18 deja 0 regresiones abiertas. AT-I1b-8 queda deferred-to-user-validation / not_run: no se exige como ejecución previa para esta aceptación con notas, pero tampoco se marca ejecutada. Marcar el checklist visual no cambia ninguna evidencia."
       }
     },
     {
@@ -215,15 +215,15 @@
       "detail": null
     },
     {
-      "name": "exportación request-changes real",
+      "name": "exportación approve real",
       "result": "PASS",
       "detail": {
-        "decision": "request-changes",
-        "notes": "Solicito confirmar full-suite GREEN; AT-I1b-8 permanece diferida a validación de usuario."
+        "decision": "approve",
+        "notes": "Acepto G3 con notas: full-suite completa clasificada, sin regresiones abiertas; AT-I1b-8 permanece diferida."
       }
     },
     {
-      "name": "JSON conserva bloqueos y diferimiento",
+      "name": "JSON conserva notas y diferimiento",
       "result": "PASS",
       "detail": null
     },
@@ -243,7 +243,7 @@
       "detail": null
     },
     {
-      "name": "approve sigue bloqueado tras reload",
+      "name": "approve sigue habilitado tras reload",
       "result": "PASS",
       "detail": null
     },

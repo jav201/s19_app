@@ -1,0 +1,3 @@
+tree	nodeid	status	time_s	qc_tm
+head	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word	passed	12.508	R-A2L-DEF.148 148/13 long conversion type word 400 names at 256 KiB|0.094|0.500|81.2; R-A2L-DEF.148 148/13 long conversion type word per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.148 148/13 long conversion type word per-object part 8S/S|1.000|2.000|50.0
+base	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word	passed	12.679	R-A2L-DEF.148 148/13 long conversion type word 400 names at 256 KiB|0.078|0.500|84.4; R-A2L-DEF.148 148/13 long conversion type word per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.148 148/13 long conversion type word per-object part 8S/S|1.000|2.000|50.0
