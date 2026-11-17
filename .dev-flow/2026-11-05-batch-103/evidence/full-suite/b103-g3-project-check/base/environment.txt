@@ -1,0 +1,17 @@
+HEAD=0c3a6bd4674c3f2df90a7399898fc98429f5a200
+TREE=0dbff84184ff41643ceeddcc462609d8ccc2382f
+ROLE=base
+NODES=20 (3 Inc9b nodes absent; delegated to control)
+PYTHON=[USER_HOME]\anaconda3\python.exe
+PYTHON_VERSION=3.12.7
+PYTEST_VERSION=8.3.4
+ARGS=-I -B -m pytest -p no:cacheprovider -n0 --color=yes -vv
+STDIN=closed
+CI=unset
+GITHUB_ACTIONS=unset
+PYTEST_ADDOPTS=unset
+NO_COLOR=unset
+CLICOLOR=unset
+TERM=xterm-256color
+COLORTERM=truecolor
+PYTHONDONTWRITEBYTECODE=1

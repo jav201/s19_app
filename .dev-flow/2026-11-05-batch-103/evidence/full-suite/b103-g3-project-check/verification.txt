@@ -1,0 +1,12 @@
+Verification
+
+ruff check s19_app/tui/app/projects.py: PASS.
+git diff --check: PASS.
+Assigned node pre-fix smoke: PASS, appended=0.986 s (1.4% margin); diagnosis continued because the margin did not explain the RED by itself.
+Assigned node fixed smoke: PASS, appended=0.712 s (28.8% margin).
+Final paired A/B: 10/10 PASS; see paired-final.tsv.
+Final archived node: 1/1 PASS; see final/run.txt and final/junit.xml.
+Targeted neighbors: 25/25 PASS after retrying eight failures with a short Windows basetemp. Seventeen passed in the initial selection. The other eight initially failed from WinError 206 due to the deep evidence basetemp (five), a dependent save timeout (two), and a distinct-folder load timing (one); all eight passed together in neighbors-retry with a short basetemp.
+A broad 175-node attempt was stopped after more than ten minutes blocked in test_tc_b100_25_load_reports_the_case[2-image-edited]. It is not used as green evidence and is outside the assigned node.
+
+No test source was edited. No oracle or timing bound was edited.

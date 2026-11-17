@@ -928,24 +928,25 @@ class ProjectsMixin:
         """
         if manifest is None:
             return {}
-        root = project_dir.resolve()
+        root_parts = project_dir.resolve().parts
+        depth = len(root_parts)
 
-        def _relative(paths: Sequence[Path]) -> list[str]:
-            return [path.relative_to(root).as_posix() for path in paths]
+        def _relative(path: Path) -> str:
+            return "/".join(path.parts[depth:]) or "."
 
         return {
-            "batch": _relative(manifest.batch),
+            "batch": [_relative(path) for path in manifest.batch],
             "assignments": {
-                variant_id: _relative(paths)
+                variant_id: [_relative(path) for path in paths]
                 for variant_id, paths in manifest.assignments.items()
             },
             "declared_regions": manifest.declared_regions,
             "gathered": {
-                home: _relative(paths) for home, paths in manifest.gathered.items()
+                home: [_relative(path) for path in paths]
+                for home, paths in manifest.gathered.items()
             },
             "derived_from": {
-                path.relative_to(root).as_posix(): record
-                for path, record in manifest.derived_from.items()
+                _relative(path): record for path, record in manifest.derived_from.items()
             },
             # LLR-168.3 / LLR-164.2: already project-relative text as the
             # reader accepted it (``None`` when absent or refused). Carried

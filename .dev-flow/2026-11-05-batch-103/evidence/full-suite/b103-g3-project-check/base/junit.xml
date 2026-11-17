@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="20" time="601.930" timestamp="2026-11-17T09:01:16.323322-06:00" hostname="[HOST]"><testcase classname="tests.test_b100_active_variant" name="test_tc_b100_71_byte_copy_records_nothing" time="2.535" /><testcase classname="tests.test_b100_project_check" name="test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked" time="5.515"><properties><property name="qc_tm" value="sec6_5 read|0.201|1.000|79.9" /><property name="qc_tm" value="sec6_5 load|0.323|1.000|67.7" /><property name="qc_tm" value="sec6_5 painted|0.379|1.000|62.1" /><property name="qc_tm" value="sec6_5 appended|0.859|1.000|14.1" /></properties></testcase><testcase classname="tests.test_b100_project_homes" name="test_at_b100_10_a2l_only_project_saves_and_reopens[size0]" time="16.413" /><testcase classname="tests.test_b100_project_homes" name="test_at_b100_10_a2l_only_project_saves_and_reopens[size1]" time="16.364" /><testcase classname="tests.test_b100_workers" name="test_at_b100_17_parse_half_case06_a2l_by_keys" time="298.225" /><testcase classname="tests.test_b101_patch_lifecycle" name="test_r_tui_049_3_2_prompt_hidden[guarded]" time="4.056" /><testcase classname="tests.test_b103_a2l_definition_arrays_scale" name="test_r_a2l_def_148_18_long_tabref_empty_curves" time="27.292"><properties><property name="qc_tm" value="R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) 400 names at 256 KiB|0.109|0.500|78.1" /><property name="qc_tm" value="R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) per-object part 2S/S|1.000|1.500|33.3" /><property name="qc_tm" value="R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) per-object part 8S/S|0.500|2.000|75.0" /></properties></testcase><testcase classname="tests.test_b103_a2l_definition_arrays_scale" name="test_r_a2l_def_148_18_long_tabref_empty_values" time="21.655"><properties><property name="qc_tm" value="R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (VALUEs) 400 names at 256 KiB|0.094|0.500|81.2" /></properties><failure message="ZeroDivisionError: float division by zero">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last23/base/tmp/test_r_a2l_def_148_18_long_tab1')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_148_18_long_tabref_empty_values(tmp_path):
+        def check(kib, a2l_data):
+            defs = a2ldef.describe_definitions(_names("S"), a2l_data)
+            for name, d in defs.items():
+                assert d.refusal == a2ldef.Refusal("A2L-DEF-TABLE-EMPTY",
+                                                  f"{name}: the table {'E' * _ECHO}{_ELLIPSIS} has no entries")
+                assert len(d.refusal.message) &lt;= MESSAGE_BOUND
+&gt;       _measure(tmp_path, "148/18 long COMPU_TAB_REF empty (VALUEs)", lambda p, k: _b148_18(p, k, True), check)
+
+tests\test_b103_a2l_definition_arrays_scale.py:570:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last23/base/tmp/test_r_a2l_def_148_18_long_tab1')
+case_label = '148/18 long COMPU_TAB_REF empty (VALUEs)'
+build = &lt;function test_r_a2l_def_148_18_long_tabref_empty_values.&lt;locals&gt;.&lt;lambda&gt; at 0x000001A8A36A5760&gt;
+check = &lt;function test_r_a2l_def_148_18_long_tabref_empty_values.&lt;locals&gt;.check at 0x000001A8A36A4F40&gt;
+image_of = None
+
+    def _measure(tmp_path: Path, case_label: str, build: Callable[[Path, int], tuple[dict, list]],
+                 check: Callable[[int, dict], None],
+                 image_of: Optional[Callable[[str], dict]] = None) -&gt; None:
+        """The E3S3-24 measure for one case: absolute bound at S (least of 15 runs)
+        then the interleaved least-of-15 per-object ratio at 2S and 8S."""
+        loaded = {kib: build(tmp_path, kib) for kib in SIZES_KIB}
+        names = loaded[S_KIB][1]
+
+        # Absolute: 400 names at S, process CPU time (E3S3-24), least of 15 runs.
+        runs = []
+        for _ in range(LEAST_OF):
+            seconds, _ = _timed(lambda: a2ldef.describe_definitions(names, loaded[S_KIB][0]), time.process_time)
+            runs.append(seconds)
+        assert min(runs) &lt;= report_margin(f"R-A2L-DEF.148 {case_label} 400 names at 256 KiB",
+                                          min(runs), timing_bound(ABS_BOUND_S)), runs
+        check(S_KIB, loaded[S_KIB][0])
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(LEAST_OF):
+            for kib in SIZES_KIB:  # interleaved: S, 2S, 8S in turn within every round
+                a2l_data, nms = loaded[kib]
+                if image_of is None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(nms, a2l_data), time.process_time)
+                else:
+                    defs = a2ldef.describe_definitions(nms, a2l_data)
+                    t_outer, interval = _timed(lambda: _steady_decode(defs, nms, a2l_data, image_of), time.process_time)
+                    results[kib] = defs
+                part[kib] = min(part[kib], max(interval, 0.0))
+&gt;       ratio_2s = part[2 * S_KIB] / part[S_KIB]
+E       ZeroDivisionError: float division by zero
+
+tests\test_b103_a2l_definition_arrays_scale.py:179: ZeroDivisionError</failure></testcase><testcase classname="tests.test_b103_a2l_definition_perf" name="test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object" time="22.962"><properties><property name="qc_tm" value="R-A2L-DEF.149/10 empty table name 400 calls at 256 KiB|0.101|0.500|79.7" /></properties><failure message="AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}&#10;assert 0.0 &gt;= 0.002">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last23/base/tmp/test_r_a2l_def_149_10_long_nam0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object(tmp_path):
+        """R-A2L-DEF.149/10 - a table named by a word of S ... 8S of E and holding no entries: echoed and found once per walk."""
+        def check(kib, c, result):
+            _first_last_alone(c, result)
+            _messages_bounded(result)
+            for name, d in result.items():
+                assert d.kind == "enum" and d.datatype == "UBYTE"
+                assert d.refusal == Refusal("A2L-DEF-TABLE-EMPTY", f"{name}: the table {'E' * 256}… has no entries")
+
+&gt;       _gp2_run(tmp_path, "emptyname", "149/10 empty table name", _describe_all, check, steady=_describe_steady)
+
+tests\test_b103_a2l_definition_perf.py:565:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last23/base/tmp/test_r_a2l_def_149_10_long_nam0')
+case = 'emptyname', label = '149/10 empty table name'
+work = &lt;function _describe_all at 0x000001A8D3369620&gt;
+check = &lt;function test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object.&lt;locals&gt;.check at 0x000001A8A36A5BC0&gt;
+image_byte = None, steady = &lt;function _describe_steady at 0x000001A8D33696C0&gt;
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -&gt; None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of &gt;= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds &gt; HOPELESS_S:
+                break
+        least = min(runs)
+        assert least &lt;= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+        check(SIZE_S_KIB, loaded[SIZE_S_KIB], result)
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                if steady is not None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: steady(loaded[kib]), time.process_time)
+                else:
+                    t_outer, results[kib] = _timed(lambda: work(loaded[kib]), time.process_time)
+                    interval = t_outer
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer &gt; SLOW_RUN_S
+            if slow:
+                break
+        if steady is not None:
+&gt;           assert part[SIZE_S_KIB] &gt;= NON_VACUITY_S, part
+E           AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+E           assert 0.0 &gt;= 0.002
+
+tests\test_b103_a2l_definition_perf.py:458: AssertionError</failure></testcase><testcase classname="tests.test_b103_a2l_definition_perf" name="test_r_a2l_def_149_2_scaling_enum_table" time="41.637"><failure message="AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}&#10;assert 0.0 &gt;= 0.002">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last23/base/tmp/test_r_a2l_def_149_2_scaling_e0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_2_scaling_enum_table(tmp_path):
+        """R-A2L-DEF.149/2 scaling - as /1 for a COMPU_VTAB."""
+&gt;       _scaling(tmp_path, "vtab", "/2 COMPU_VTAB")
+
+tests\test_b103_a2l_definition_perf.py:277:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last23/base/tmp/test_r_a2l_def_149_2_scaling_e0')
+case = 'vtab', label = '/2 COMPU_VTAB'
+
+    def _scaling(tmp_path: Path, case: str, label: str) -&gt; None:
+        """E5-3 measure (inc-2/E5-code-review.md): the per-object part is the process CPU time of the 399 names after the
+        first, read inside one fresh walk (``_steady_describe``); S, 2S and 8S are interleaved round by round; each time
+        is the least of 31 rounds (one round once a run exceeds 2 s)."""
+        loaded = {kib: _load(tmp_path, case, kib) for kib in SIZES_KIB}
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                a2l, names = loaded[kib]
+                t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(names, a2l), time.process_time)
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer &gt; SLOW_RUN_S
+            if slow:
+                break
+&gt;       assert part[SIZE_S_KIB] &gt;= NON_VACUITY_S, part
+E       AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+E       assert 0.0 &gt;= 0.002
+
+tests\test_b103_a2l_definition_perf.py:231: AssertionError</failure></testcase><testcase classname="tests.test_b103_a2l_definition_perf" name="test_r_a2l_def_149_4_scaling_layout" time="10.331"><failure message="AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}&#10;assert 0.0 &gt;= 0.002">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last23/base/tmp/test_r_a2l_def_149_4_scaling_l0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_4_scaling_layout(tmp_path):
+        """R-A2L-DEF.149/4 scaling - as /1 for a RECORD_LAYOUT whose first line is long."""
+&gt;       _scaling(tmp_path, "layout", "/4 RECORD_LAYOUT")
+
+tests\test_b103_a2l_definition_perf.py:289:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last23/base/tmp/test_r_a2l_def_149_4_scaling_l0')
+case = 'layout', label = '/4 RECORD_LAYOUT'
+
+    def _scaling(tmp_path: Path, case: str, label: str) -&gt; None:
+        """E5-3 measure (inc-2/E5-code-review.md): the per-object part is the process CPU time of the 399 names after the
+        first, read inside one fresh walk (``_steady_describe``); S, 2S and 8S are interleaved round by round; each time
+        is the least of 31 rounds (one round once a run exceeds 2 s)."""
+        loaded = {kib: _load(tmp_path, case, kib) for kib in SIZES_KIB}
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                a2l, names = loaded[kib]
+                t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(names, a2l), time.process_time)
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer &gt; SLOW_RUN_S
+            if slow:
+                break
+&gt;       assert part[SIZE_S_KIB] &gt;= NON_VACUITY_S, part
+E       AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+E       assert 0.0 &gt;= 0.002
+
+tests\test_b103_a2l_definition_perf.py:231: AssertionError</failure></testcase><testcase classname="tests.test_b103_a2l_definition_perf" name="test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid" time="9.579"><properties><property name="qc_tm" value="R-A2L-DEF.149/9 CUBOID layout 400 calls at 256 KiB|0.047|0.500|90.6" /></properties><failure message="AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}&#10;assert 0.0 &gt;= 0.002">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last23/base/tmp/test_r_a2l_def_149_9_shared_la0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid(tmp_path):
+        """R-A2L-DEF.149/9 - 400 CUBOIDs sharing a layout whose first line is S ... 8S: the layout step runs once per walk."""
+        def check(kib, c, result):
+            _first_last_alone(c, result)
+            _messages_bounded(result)
+            for name, d in result.items():
+                assert d.datatype == "UBYTE"
+                assert d.refusal == Refusal("A2L-DEF-KIND", f"{name}: the system has no definition for a CUBOID object")
+
+&gt;       _gp2_run(tmp_path, "cuboid", "149/9 CUBOID layout", _describe_all, check, steady=_describe_steady)
+
+tests\test_b103_a2l_definition_perf.py:552:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last23/base/tmp/test_r_a2l_def_149_9_shared_la0')
+case = 'cuboid', label = '149/9 CUBOID layout'
+work = &lt;function _describe_all at 0x000001A8D3369620&gt;
+check = &lt;function test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid.&lt;locals&gt;.check at 0x000001A902BE7A60&gt;
+image_byte = None, steady = &lt;function _describe_steady at 0x000001A8D33696C0&gt;
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -&gt; None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of &gt;= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds &gt; HOPELESS_S:
+                break
+        least = min(runs)
+        assert least &lt;= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+        check(SIZE_S_KIB, loaded[SIZE_S_KIB], result)
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                if steady is not None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: steady(loaded[kib]), time.process_time)
+                else:
+                    t_outer, results[kib] = _timed(lambda: work(loaded[kib]), time.process_time)
+                    interval = t_outer
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer &gt; SLOW_RUN_S
+            if slow:
+                break
+        if steady is not None:
+&gt;           assert part[SIZE_S_KIB] &gt;= NON_VACUITY_S, part
+E           AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+E           assert 0.0 &gt;= 0.002
+
+tests\test_b103_a2l_definition_perf.py:458: AssertionError</failure></testcase><testcase classname="tests.test_b103_a2l_refresh" name="test_r014_same_path[R-A2L-REFRESH.014/1]" time="22.182" /><testcase classname="tests.test_b103_a2l_refresh" name="test_r014_same_path[R-A2L-REFRESH.014/2]" time="32.339" /><testcase classname="tests.test_b97_key_bar" name="test_tc_b97_69_page_keys_do_nothing_where_disabled" time="42.062" /><testcase classname="tests.test_tui_diff_screen" name="test_tc024_report_trigger_surfaces_paths" time="2.950" /><testcase classname="tests.test_tui_patch_glyphs" name="test_at077d_index_alignment" time="5.302" /><testcase classname="tests.test_tui_patch_glyphs" name="test_at077e_image_generation_invalidates" time="4.708" /><testcase classname="tests.test_tui_patch_history_strip" name="test_at081b_bounds" time="9.559"><failure message="textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')">tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-repro-last23/base/tmp/test_at081b_bounds0')
+
+    def test_at081b_bounds(tmp_path: Path) -&gt; None:
+        """A fresh document reports the empty state; 21 ops saturate at 20, not 21.
+
+        Intent (AT-081b): the two boundary classes through the shipped surface.
+
+        - **Empty** — a fresh document has no history: 0 back, 0 forward, and the
+          depth total renders ``0/20`` with no crash and no divide-by-zero.
+        - **Saturation** — ``_push_history`` evicts at ``&gt; _HISTORY_MAX``
+          (``change_service.py:505-506``), so the 21st operation does NOT grow the
+          depth. The 21st op is the discriminator: at 20 ops nothing has been
+          evicted yet and a strip that simply counted operations would still agree.
+
+        The bound is READ from ``_HISTORY_MAX`` rather than spelled ``20``: a
+        hardcoded copy of a value the code owns keeps passing after the constant
+        moves and then certifies the OLD bound (the Inc-5b F3 bind-the-literal
+        lesson, applied before it was earned).
+        """
+
+        async def _drive(adds: int) -&gt; tuple[Content, dict[str, int], int]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _drive_history(app, pilot, adds=adds, undos=0)
+                service = app._change_service
+                return _strip(app), service.history_depths(), len(service._undo_stack)
+
+        # --- empty ------------------------------------------------------------
+        strip, depths, undo_len = asyncio.run(_drive(0))
+        assert undo_len == 0, f"fixture integrity: a fresh document has no history; got {undo_len}"
+        assert depths == {"back": 0, "forward": 0, "bound": _HISTORY_MAX}
+        assert strip.plain == _expect_position(0, 0, _HISTORY_MAX), (
+            f"a fresh document must render the empty state; got {strip.plain!r}"
+        )
+
+        # A zero count is styled DGRAY ("no step that way"), a non-zero one VALUE.
+        # Without this the empty state is just the number 0 in body text, which is
+        # what every other count looks like.
+        zero_index = strip.plain.index("0")
+        zero_style = next(
+            (
+                span.style.foreground.hex.lower()
+                for span in strip.spans
+                if span.start == zero_index and span.style.foreground is not None
+            ),
+            None,
+        )
+        assert zero_style == DGRAY.lower(), (
+            f"a zero step-count must render DGRAY, not as an ordinary value; got "
+            f"{zero_style!r}. The strip's spans are {strip.spans!r}"
+        )
+
+        # --- saturation -------------------------------------------------------
+        over = _HISTORY_MAX + 1
+&gt;       strip, depths, undo_len = asyncio.run(_drive(over))
+
+tests\test_tui_patch_history_strip.py:337:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_tui_patch_history_strip.py:304: in _drive
+    async with app.run_test(size=(120, 30)) as pilot:
+..\..\anaconda3\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+..\..\anaconda3\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+..\..\anaconda3\Lib\site-packages\textual\message_pump.py:663: in _process_messages_loop
+    await self._dispatch_message(message)
+..\..\anaconda3\Lib\site-packages\textual\message_pump.py:739: in _dispatch_message
+    await self._on_message(message)
+..\..\anaconda3\Lib\site-packages\textual\message_pump.py:829: in _on_message
+    await invoke(method, message)
+..\..\anaconda3\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+..\..\anaconda3\Lib\site-packages\textual\_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+s19_app\tui\app.py:5038: in on_patch_editor_panel_action_requested
+    panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+selector = '#patch_editor_panel'
+expect_type = &lt;class 's19_app.tui.screens_directionb.PatchEditorPanel'&gt;
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -&gt; QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+
+        base_node = self._get_dom_base()
+
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+&gt;           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+
+..\..\anaconda3\Lib\site-packages\textual\dom.py:1505: NoMatches</failure></testcase><testcase classname="tests.test_tui_patch_layout" name="test_at063c_reparent_safety_at_80" time="3.463" /></testsuite></testsuites>
