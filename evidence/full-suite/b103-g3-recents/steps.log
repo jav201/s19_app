@@ -1,0 +1,13 @@
+2026-11-16T20:32:04-06:00 lane=b103-g3-recents base=21ec06b2e668b76ec62e76b9c3c6eb7cf971f2b1
+created own worktree and branch; central and other lanes untouched; no push/reset/clean
+baseline known regressions: 2 failed in 85.93s (same two RED nodeids from full-suite evidence)
+changed only tests/test_b100_recents.py: worker completion now follows installation/status predicates across the shared and direct wait class
+helper-only probe: 1 passed, 1 failed in 34.27s; remaining RED isolated to fixed pauses in the negative control
+final known regressions: 2 passed in 25.77s, 0 failed, 0 errors
+full tests/test_b100_recents.py: 193 passed, 1 skipped in 416.66s; 194 collected, 0 failed, 0 errors
+skip=test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case reason=case-insensitive Windows volume
+pytest isolation: -I -B -n0; stdin closed; bytecode/cache off; HOME/XDG/LOCALAPPDATA/TMPDIR isolated; CI/clipboard guards and NO_COLOR/CLICOLOR unset; TERM=xterm-256color; COLORTERM=truecolor
+JUnit/logs retained outside clone; committed RESULT is redacted
+auxiliary ruff: pre-existing F401 at tests/test_b100_recents.py:2867 (highlight_row), unrelated and unchanged
+2026-11-16T20:38:24-06:00 git diff --check: PASS
+commit and final clean-worktree verification: pending at initial log write

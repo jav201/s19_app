@@ -340,10 +340,12 @@ async def _wait_image(pilot, app, name: str) -> None:
         lambda: app.current_file is not None and app.current_file.path.name == name,
         f"the image {name} installed",
     )
+    await settle_workers(pilot)
 
 
 async def _wait_a2l(pilot, app) -> None:
     await projects.wait_for(pilot, lambda: app.current_a2l_path is not None, "the A2L attached")
+    await settle_workers(pilot)
 
 
 def _digests_outside_logs(base: Path) -> dict:
@@ -450,6 +452,7 @@ async def _typed(pilot, app, log, text: str) -> list:
         await pilot.pause()
     for _ in range(10):
         await pilot.pause()
+    await settle_workers(pilot)
     await _close_panel_if_open(pilot, app)
     return log.since(mark)
 
@@ -463,6 +466,7 @@ async def _project_load(pilot, app, log, name: str) -> list:
         await pilot.pause()
     for _ in range(10):
         await pilot.pause()
+    await settle_workers(pilot)
     return log.since(mark)
 
 
@@ -807,13 +811,15 @@ def test_tc_b100_34_load_failing_before_its_copy_records_nothing(
     not exist, a file with an unsupported suffix, an outside source over the
     placement's per-file cap (the cap lowered through
     ``copy_into_workarea``'s default, finding F-3; ``Cannot load file:``) and
-    an outside A2L while the open project already holds an A2L (``Project
-    already has an A2L file.``) → the store's SHA-256 unchanged after each.
-    Control (proves the store is live, so "unchanged" means something): an
-    outside load that copies → 2 entries, the new source first.
+    a declined replacement of the open project's A2L → the store's SHA-256
+    unchanged after each. Control (proves the store is live, so "unchanged"
+    means something): an outside load that copies → 2 entries, the new source
+    first.
 
     RED (base): the control records nothing. Negative control: recording
     before the copy → the over-cap arm adds 1 entry → RED."""
+    from textual.widgets import Label
+
     base = tmp_path / "app"
     projects.save_case01_project(base, "pa", files=("firmware.s19", "firmware.a2l"))
     store = _store_of(_lad(tmp_path, monkeypatch))
@@ -843,17 +849,22 @@ def test_tc_b100_34_load_failing_before_its_copy_records_nothing(
         monkeypatch.setattr(copy, "__defaults__", (1024,) + tuple(real_defaults[1:]))
         mark = len(log.messages)
         app.load_from_path(big)
-        for _ in range(20):
-            await pilot.pause()
+        await settle_workers(pilot)
         monkeypatch.setattr(copy, "__defaults__", real_defaults)
         after["over cap"] = (_sha(store), _with(log.since(mark), "Cannot load file:"))
         await projects.load_project(pilot, app, "pa")
-        mark = len(log.messages)
         app.load_a2l_from_path(other_a2l)
-        for _ in range(20):
-            await pilot.pause()
-        await settle_workers(pilot)  # Inc 12b R-4: the A2L attach is a worker
-        after["project has an A2L"] = (_sha(store), _with(log.since(mark), "Project already has an A2L file."))
+        await projects.wait_for(
+            pilot,
+            lambda: len(app.screen.query("#confirm_title")) == 1,
+            "the A2L replacement question",
+        )
+        question = app.screen
+        title = question.query_one("#confirm_title", Label).render().plain
+        await pilot.press("n")
+        await projects.wait_for(pilot, lambda: app.screen is not question, "the declined A2L replacement")
+        await settle_workers(pilot)
+        after["project has an A2L"] = (_sha(store), title)
         app.load_from_path(good)
         await _wait_image(pilot, app, good.name)
         return after
@@ -861,7 +872,7 @@ def test_tc_b100_34_load_failing_before_its_copy_records_nothing(
     after = projects.run_app(base, _scenario)
     assert after["missing"] == digest and after["unsupported"] == digest, after
     assert after["over cap"][0] == digest and len(after["over cap"][1]) == 1, after
-    assert after["project has an A2L"][0] == digest and len(after["project has an A2L"][1]) == 1, after
+    assert after["project has an A2L"] == (digest, "Replace project A2L?"), after
     assert _entries(store) == [(str(good), "s19"), (str(seeded), "s19")]
 
 
@@ -938,11 +949,7 @@ def test_tc_b100_34_source_inside_the_work_area_is_not_recorded(
         await settle_workers(pilot)
         counts["variant switch"] = len(_entries(store))
         app._load_path_from_user_input(workarea / "ab" / "firmware.s19")
-        await projects.wait_for(
-            pilot,
-            lambda: app.current_file is not None and app.current_file.path.name.startswith("firmware"),
-            "the inside image",
-        )
+        await _wait_image(pilot, app, "firmware.s19")
         counts["typed inside file"] = len(_entries(store))
         shutil.copyfile(projects.CASE01_DIR / "firmware.a2l", workarea / "temp" / "work.a2l")
         app.refresh_files()
@@ -1105,6 +1112,7 @@ def test_tc_b100_34_failed_store_write_never_fails_the_load(
                 lambda: app.current_a2l_path is not None and app.current_a2l_path.name == path.name,
                 f"the A2L {path.name} attached",
             )
+            await settle_workers(pilot)
         for _ in range(10):
             await pilot.pause()
 
@@ -2982,7 +2990,7 @@ def _fallback_scene(base: Path, monkeypatch: pytest.MonkeyPatch, cwd: Path, type
             await _wait_a2l(pilot, app)
             name = app.current_a2l_path.name
         else:
-            await projects.wait_for(pilot, lambda: app.current_file is not None, "the typed load")
+            await _wait_image(pilot, app, Path(typed).name)
             name = app.current_file.path.name
         for _ in range(8):
             await pilot.pause()

@@ -1,0 +1,34 @@
+# Batch-103 G3 lane C — recents
+
+Date: 2026-11-16T20:38:24-06:00
+Base: 21ec06b2e668b76ec62e76b9c3c6eb7cf971f2b1
+Branch: b103-g3-recents
+Scope: tests/test_b100_recents.py only; no product or requirement changes.
+
+## Correction
+
+- `_wait_image` and `_wait_a2l` now retain their installation predicates and then await `settle_workers`, so every caller waits for the real worker end and deferred install.
+- Equivalent direct image/A2L waits and the typed/project helpers use the same worker-settle rule.
+- The failed-before-copy negative control awaits the worker before reading status and store bytes.
+- The existing second-A2L arm now follows the shipped replacement question, declines it with `n`, requires the exact `Replace project A2L?` title, and retains the unchanged-SHA-256/no-registration oracle.
+- The exact 20-entry newest-first assertion, bytes/state assertions, geometry, and negative controls are unchanged.
+
+## Local Windows evidence
+
+All pytest runs used Python `-I -B`, pytest `-n0`, closed stdin, disabled bytecode and pytest cache, isolated HOME/XDG/LOCALAPPDATA/TMPDIR, unset CI/clipboard guards and NO_COLOR/CLICOLOR, TERM=xterm-256color, and COLORTERM=truecolor. JUnit and full logs stayed outside the clone.
+
+1. Known regressions before the fix: 2 failed in 85.93s.
+   - `test_tc_b100_34_load_failing_before_its_copy_records_nothing`
+   - `test_tc_b100_34_twenty_five_outside_loads_keep_twenty_newest_first`
+2. Helper-only check: 1 passed, 1 failed in 34.27s; this isolated the remaining fixed-pause negative control.
+3. Known regressions after the complete correction: 2 passed in 25.77s; 0 failed, 0 errors.
+4. Complete `tests/test_b100_recents.py`: 193 passed, 1 skipped in 416.66s; 194 collected, 0 failed, 0 errors.
+   - Skip: `test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case`; the Windows volume is case-insensitive, so `Proj` and `proj` cannot coexist. This is a declared not-run arm, not a failure.
+
+External artifact names: `regressions-before.{log,xml}`, `regressions-helpers.{log,xml}`, `regressions-final.{log,xml}`, and `full-file.{log,xml}` under the lane's redacted output directory.
+
+## Remaining findings
+
+No test failure remains in this file. An auxiliary Ruff run reports the pre-existing unused `highlight_row` import at `tests/test_b100_recents.py:2867` (F401); it is unrelated to this correction and was left untouched.
+
+`git diff --check`: PASS.
