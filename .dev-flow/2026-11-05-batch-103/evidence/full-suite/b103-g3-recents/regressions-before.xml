@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="85.901" timestamp="2026-11-16T20:22:05.359842-06:00" hostname="[HOST]"><testcase classname="tests.test_b100_recents" name="test_tc_b100_34_load_failing_before_its_copy_records_nothing" time="11.410"><failure message="AssertionError: {'missing': '74c58accd296a0ccb4fd2089de8a205e8858851d5ccc798b544d418ebcf5187a', 'over cap': ('74c58accd296a0ccb4fd2089...8851d5ccc798b544d418ebcf5187a', []), 'unsupported': '74c58accd296a0ccb4fd2089de8a205e8858851d5ccc798b544d418ebcf5187a'}&#10;assert ('74c58accd296...d418ebcf5187a' == '74c58accd296...d418ebcf5187a'&#10;  &#10;  Skipping 53 identical leading characters in diff, use -v to show&#10;    18ebcf5187a and 0 == 1)&#10; +  where 0 = len([])">tmp_path = WindowsPath('[REPO]-out/tmp/baseline/test_tc_b100_34_load_failing_b0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000020F3771A930&gt;
+
+    @STORE_WRITE
+    def test_tc_b100_34_load_failing_before_its_copy_records_nothing(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        """LLR-172.1d (4 arms): a store holding 1 entry, then a path that does
+        not exist, a file with an unsupported suffix, an outside source over the
+        placement's per-file cap (the cap lowered through
+        ``copy_into_workarea``'s default, finding F-3; ``Cannot load file:``) and
+        an outside A2L while the open project already holds an A2L (``Project
+        already has an A2L file.``) → the store's SHA-256 unchanged after each.
+        Control (proves the store is live, so "unchanged" means something): an
+        outside load that copies → 2 entries, the new source first.
+
+        RED (base): the control records nothing. Negative control: recording
+        before the copy → the over-cap arm adds 1 entry → RED."""
+        base = tmp_path / "app"
+        projects.save_case01_project(base, "pa", files=("firmware.s19", "firmware.a2l"))
+        store = _store_of(_lad(tmp_path, monkeypatch))
+        seeded = tmp_path / "seed" / "old.s19"
+        digest = _seed(store, [_entry(seeded)])
+        missing = tmp_path / "src" / "missing.s19"
+        notes = tmp_path / "src" / "notes.txt"
+        notes.parent.mkdir(parents=True, exist_ok=True)
+        notes.write_text("not firmware", encoding="utf-8")
+        big = tmp_path / "src" / "big.s19"
+        big.write_bytes((projects.CASE01_DIR / "firmware.s19").read_bytes() * 8)
+        other_a2l = _outside(tmp_path, "y.a2l", source="firmware.a2l")
+        good = _outside(tmp_path, "good.s19")
+        copy = workspace_module.copy_into_workarea
+        real_defaults = copy.__defaults__
+
+        async def _scenario(app, pilot, log):
+            after = {}
+            app._load_path_from_user_input(missing)
+            for _ in range(10):
+                await pilot.pause()
+            after["missing"] = _sha(store)
+            app._load_path_from_user_input(notes)
+            for _ in range(10):
+                await pilot.pause()
+            after["unsupported"] = _sha(store)
+            monkeypatch.setattr(copy, "__defaults__", (1024,) + tuple(real_defaults[1:]))
+            mark = len(log.messages)
+            app.load_from_path(big)
+            for _ in range(20):
+                await pilot.pause()
+            monkeypatch.setattr(copy, "__defaults__", real_defaults)
+            after["over cap"] = (_sha(store), _with(log.since(mark), "Cannot load file:"))
+            await projects.load_project(pilot, app, "pa")
+            mark = len(log.messages)
+            app.load_a2l_from_path(other_a2l)
+            for _ in range(20):
+                await pilot.pause()
+            await settle_workers(pilot)  # Inc 12b R-4: the A2L attach is a worker
+            after["project has an A2L"] = (_sha(store), _with(log.since(mark), "Project already has an A2L file."))
+            app.load_from_path(good)
+            await _wait_image(pilot, app, good.name)
+            return after
+
+        after = projects.run_app(base, _scenario)
+        assert after["missing"] == digest and after["unsupported"] == digest, after
+        assert after["over cap"][0] == digest and len(after["over cap"][1]) == 1, after
+&gt;       assert after["project has an A2L"][0] == digest and len(after["project has an A2L"][1]) == 1, after
+E       AssertionError: {'missing': '74c58accd296a0ccb4fd2089de8a205e8858851d5ccc798b544d418ebcf5187a', 'over cap': ('74c58accd296a0ccb4fd2089...8851d5ccc798b544d418ebcf5187a', []), 'unsupported': '74c58accd296a0ccb4fd2089de8a205e8858851d5ccc798b544d418ebcf5187a'}
+E       assert ('74c58accd296...d418ebcf5187a' == '74c58accd296...d418ebcf5187a'
+E
+E         Skipping 53 identical leading characters in diff, use -v to show
+E           18ebcf5187a and 0 == 1)
+E        +  where 0 = len([])
+
+tests\test_b100_recents.py:864: AssertionError</failure></testcase><testcase classname="tests.test_b100_recents" name="test_tc_b100_34_twenty_five_outside_loads_keep_twenty_newest_first" time="73.677"><failure message="AssertionError: timed out waiting for the image s18.s19 installed">tmp_path = WindowsPath('[REPO]-out/tmp/baseline/test_tc_b100_34_twenty_five_ou0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000020F37E2FBC0&gt;
+
+    @STORE_WRITE
+    def test_tc_b100_34_twenty_five_outside_loads_keep_twenty_newest_first(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        """HLR-172: 25 distinct outside sources loaded through the shipped
+        dispatcher → 20 entries, newest first (entry 1 = source 25, entry 20 =
+        source 6), in ``&lt;LOCALAPPDATA&gt;/s19_app/recent_sources.json``; 0 files
+        named ``recent_sources.json`` under the base folder.
+
+        RED (base, code read): ``grep LOCALAPPDATA s19_app`` → 0 hits → no
+        store file."""
+        store = _store_of(_lad(tmp_path, monkeypatch))
+        sources = [_outside(tmp_path, f"s{n:02d}.s19") for n in range(1, 26)]
+        base = tmp_path / "app"
+
+        async def _scenario(app, pilot, log):
+            for source in sources:
+                app._load_path_from_user_input(source)
+                await _wait_image(pilot, app, source.name)
+
+&gt;       projects.run_app(base, _scenario)
+
+tests\test_b100_recents.py:1360:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\support\b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\support\b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+tests\test_b100_recents.py:1358: in _scenario
+    await _wait_image(pilot, app, source.name)
+tests\test_b100_recents.py:338: in _wait_image
+    await projects.wait_for(
+tests\support\b100_projects.py:626: in wait_for
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = &lt;Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})&gt;
+predicate = &lt;function _wait_image.&lt;locals&gt;.&lt;lambda&gt; at 0x0000020F3AACDBC0&gt;
+failure = 'timed out waiting for the image s18.s19 installed'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -&gt; None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() &gt; deadline:
+&gt;               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: timed out waiting for the image s18.s19 installed
+
+tests\support\timing.py:66: AssertionError</failure></testcase></testsuite></testsuites>
