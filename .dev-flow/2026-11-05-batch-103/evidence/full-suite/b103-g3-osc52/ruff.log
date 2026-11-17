@@ -1,0 +1,57 @@
+tests\support\b103_clipboard.py:56:37: F401 [*] `textual.widgets.Input` imported but unused
+   |
+54 | from textual import events
+55 | from textual.app import App, ComposeResult
+56 | from textual.widgets import Button, Input, TextArea
+   |                                     ^^^^^ F401
+57 |
+58 | from s19_app.tui.capped_text_area import CappedTextArea
+   |
+   = help: Remove unused import
+
+tests\support\b103_clipboard.py:56:44: F401 [*] `textual.widgets.TextArea` imported but unused
+   |
+54 | from textual import events
+55 | from textual.app import App, ComposeResult
+56 | from textual.widgets import Button, Input, TextArea
+   |                                            ^^^^^^^^ F401
+57 |
+58 | from s19_app.tui.capped_text_area import CappedTextArea
+   |
+   = help: Remove unused import
+
+tests\support\b103_clipboard.py:742:42: F841 [*] Local variable `exc` is assigned to but never used
+    |
+740 |             b"".join(result.stdout.split()), validate=True
+741 |         ).decode("utf-8")
+742 |     except (ValueError, UnicodeError) as exc:
+    |                                          ^^^ F841
+743 |         raise AssertionError(
+744 |             "other_program_read: PowerShell output was not Base64 UTF-8"
+    |
+    = help: Remove assignment to unused variable `exc`
+
+tests\test_b103_clipboard_core.py:51:5: F401 [*] `tests.support.b103_clipboard.P2_ESC` imported but unused
+   |
+49 |     P70K,
+50 |     P2,
+51 |     P2_ESC,
+   |     ^^^^^^ F401
+52 |     P_CTRL,
+53 |     P_CTRL_L,
+   |
+   = help: Remove unused import: `tests.support.b103_clipboard.P2_ESC`
+
+tests\test_b103_clipboard_core.py:2072:13: F841 Local variable `panel` is assigned to but never used
+     |
+2070 |             await pilot.pause()
+2071 |             await flow_project(app)
+2072 |             panel = await open_flow_builder(app, pilot)
+     |             ^^^^^ F841
+2073 |             ref = app.query_one("#flow_ref", Input)
+2074 |             ref.focus()
+     |
+     = help: Remove assignment to unused variable `panel`
+
+Found 5 errors.
+[*] 4 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).

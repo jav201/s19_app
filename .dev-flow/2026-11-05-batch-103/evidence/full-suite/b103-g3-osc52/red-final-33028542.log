@@ -1,0 +1,42 @@
+______ test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[multi] ______
+[gw4] win32 -- Python 3.12.7 [USER_HOME]\anaconda3\python.exe
+
+tmp_path = WindowsPath('[USER_HOME]/Github/s19_app-b103-g3-local-out4/tmp/pytest-of-[ACCOUNT]/pytest-0/popen-gw4/test_r_paste_15_6_7_one_osc52_1')
+box_kind = 'textarea'
+
+    @pytest.mark.parametrize("box_kind", ["input", "textarea"], ids=["single", "multi"])
+    def test_r_paste_15_6_7_one_osc52_request_for_right_click_copy(
+        tmp_path: Path, box_kind: str
+    ) -> None:
+        """R-PASTE.15/6-7 (LinuxH): one OSC 52 request for a right-click copy."""
+        _assert_linuxh_headless()
+
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                osc = install_osc52_spy(app)
+                if box_kind == "input":
+                    app.action_show_screen("a2l")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#a2l_tag_find_input", Input)
+                    widget.value = P1
+                    widget.selection = (0, len(P1))
+                else:
+                    await show_patch_paste(app, pilot)
+                    widget = app.query_one("#patch_paste_text", TextArea)
+                    widget.text = P2
+                    widget.select_all()
+                widget.focus()
+                await pilot.pause()
+                await right_click_app_route(app, pilot, widget)
+                await pilot.pause()
+                return len(osc), osc[0] if osc else None
+
+        count, payload = asyncio.run(_drive())
+>       assert count == 1, (count, payload)
+E       AssertionError: (0, None)
+E       assert 0 == 1
+
+tests\test_b103_clipboard_core.py:1302: AssertionError
