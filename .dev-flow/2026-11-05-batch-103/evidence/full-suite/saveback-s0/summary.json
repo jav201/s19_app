@@ -1,0 +1,102 @@
+{
+  "all_xml_parsed": true,
+  "junit_files": 12,
+  "runs": {
+    "green-full-files": {
+      "case_time_seconds": 349.508,
+      "errors": 0,
+      "failed": 0,
+      "passed": 105,
+      "skipped": 0,
+      "tests": 105
+    },
+    "green-targeted": {
+      "case_time_seconds": 6.876,
+      "errors": 0,
+      "failed": 0,
+      "passed": 3,
+      "skipped": 0,
+      "tests": 3
+    },
+    "probe-isolated-saveback-before": {
+      "case_time_seconds": 4.116,
+      "errors": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0,
+      "tests": 2
+    },
+    "probe-isolated-tc024-before": {
+      "case_time_seconds": 1.612,
+      "errors": 0,
+      "failed": 0,
+      "passed": 1,
+      "skipped": 0,
+      "tests": 1
+    },
+    "red-full85": {
+      "case_time_seconds": 8.438,
+      "errors": 0,
+      "failed": 2,
+      "passed": 0,
+      "skipped": 0,
+      "tests": 2
+    },
+    "red-last13-head": {
+      "case_time_seconds": 568.69,
+      "errors": 0,
+      "failed": 3,
+      "passed": 10,
+      "skipped": 0,
+      "tests": 13
+    },
+    "repro-85ed-tc024": {
+      "case_time_seconds": 1.525,
+      "errors": 0,
+      "failed": 0,
+      "passed": 1,
+      "skipped": 0,
+      "tests": 1
+    },
+    "repro-base-saveback": {
+      "case_time_seconds": 4.1,
+      "errors": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 0,
+      "tests": 2
+    },
+    "repro-base-tc024": {
+      "case_time_seconds": 1.431,
+      "errors": 0,
+      "failed": 0,
+      "passed": 1,
+      "skipped": 0,
+      "tests": 1
+    },
+    "repro-last13-base": {
+      "case_time_seconds": 515.95,
+      "errors": 0,
+      "failed": 1,
+      "passed": 10,
+      "skipped": 0,
+      "tests": 11
+    },
+    "repro-last23-base-tc024": {
+      "case_time_seconds": 2.95,
+      "errors": 0,
+      "failed": 0,
+      "passed": 1,
+      "skipped": 0,
+      "tests": 1
+    },
+    "repro-last23-head330-tc024": {
+      "case_time_seconds": 2.545,
+      "errors": 0,
+      "failed": 0,
+      "passed": 1,
+      "skipped": 0,
+      "tests": 1
+    }
+  }
+}

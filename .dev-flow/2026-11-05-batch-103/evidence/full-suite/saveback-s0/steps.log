@@ -1,0 +1,6 @@
+2026-11-17T12:34:02-06:00 full85 source RED: selected JUnit has saveback preserve-S0 and TC-024 failed (2/2); exact signatures archived.
+2026-11-17T13:04:38-06:00 85ed isolated TC-024 probe: 1 passed; base isolated TC-024 and saveback probes also passed.
+2026-11-17T13:06:35-06:00 driver synchronization fix: both saveback width32 nodes and TC-024 passed together (3/3).
+2026-11-17T13:13:06-06:00 complete patch-editor-v2 and diff-screen files: 105 passed; no global full-suite run.
+2026-11-17T13:14:17-06:00 Ruff passed for both changed test files and both evidence tools.
+2026-11-17T13:15:17-06:00 final evidence normalization: all 12 JUnit files parsed; project redaction scanner reported zero hits; SHA256 manifest generated next.

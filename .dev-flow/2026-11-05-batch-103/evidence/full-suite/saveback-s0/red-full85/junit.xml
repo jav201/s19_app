@@ -1,0 +1,185 @@
+<testsuite tests="2" failures="2" errors="0" skipped="0" time="8.438"><testcase classname="tests.test_tui_diff_screen" name="test_tc024_report_trigger_surfaces_paths" time="4.028"><failure message="textual.worker.WorkerFailed: Worker raised exception: NoMatches(&quot;No nodes match '#diff_status' on AbDiffPanel(id='ab_diff_panel', classes='diff-fallback')&quot;)">tmp_path = WindowsPath('[RUNTIME]/pytest-tmp/pytest-0/popen-gw9/test_tc024_report_trigger_surf0')
+
+    def test_tc024_report_trigger_surfaces_paths(tmp_path: Path) -&gt; None:
+        """A successful report trigger surfaces both written paths (LLR-005.4).
+
+        Intent: after a comparison, the Report button generates BOTH the Markdown
+        and HTML reports via the diff-report service and the status line shows a
+        filename matching each regex.
+        """
+        import s19_app.tui.app as app_mod
+        from s19_app.tui.services.diff_report_service import (
+            DIFF_REPORT_FILENAME_REGEX,
+            DIFF_REPORT_HTML_FILENAME_REGEX,
+            DiffReportResult,
+        )
+
+        fake = _diff_result([(0x10, 0x14, "changed")])
+        md_path = tmp_path / "20260101T000000Z-diff-report.md"
+        html_path = tmp_path / "20260101T000000Z-diff-report.html"
+
+        def _gen_md(*_a, **_k):
+            md_path.write_text("md", encoding="utf-8")
+            return DiffReportResult(path=md_path, written=True)
+
+        def _gen_html(*_a, **_k):
+            html_path.write_text("html", encoding="utf-8")
+            return DiffReportResult(path=html_path, written=True)
+
+        async def _drive() -&gt; str:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("diff")
+                await pilot.pause()
+                await _b78_press_compare(app, pilot)
+                app.query_one("#diff_report_button").press()
+                # batch-68 N5: the two generators now run on a worker thread, so
+                # the status is written after this handler returns. A bare pause()
+                # passed only because the fake generators are instant — a race this
+                # suite must not depend on.
+                await settle_workers(pilot)
+                return str(app.query_one("#diff_status").render())
+
+        monkey = pytest.MonkeyPatch()
+        monkey.setattr(app_mod.deps, "compare_images", lambda *a, **k: fake)
+        monkey.setattr(app_mod.deps, "generate_diff_report", _gen_md)
+        monkey.setattr(app_mod.deps, "generate_diff_report_html", _gen_html)
+        try:
+&gt;           status = asyncio.run(_drive())
+
+tests\test_tui_diff_screen.py:517:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_tui_diff_screen.py:499: in _drive
+    async with app.run_test(size=(120, 30)) as pilot:
+..\..\anaconda3\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    @asynccontextmanager
+    async def run_test(
+        self,
+        *,
+        headless: bool = True,
+        size: tuple[int, int] | None = (80, 24),
+        tooltips: bool = False,
+        notifications: bool = False,
+        message_hook: Callable[[Message], None] | None = None,
+    ) -&gt; AsyncGenerator[Pilot[ReturnType], None]:
+        """An asynchronous context manager for testing apps.
+
+        !!! tip
+
+            See the guide for [testing](/guide/testing) Textual apps.
+
+        Use this to run your app in "headless" mode (no output) and drive the app via a [Pilot][textual.pilot.Pilot] object.
+
+        Example:
+
+            ```python
+            async with app.run_test() as pilot:
+                await pilot.click("#Button.ok")
+                assert ...
+            ```
+
+        Args:
+            headless: Run in headless mode (no output or input).
+            size: Force terminal size to `(WIDTH, HEIGHT)`,
+                or None to auto-detect.
+            tooltips: Enable tooltips when testing.
+            notifications: Enable notifications when testing.
+            message_hook: An optional callback that will be called each time any message arrives at any
+                message pump in the app.
+        """
+        from textual.pilot import Pilot
+
+        app = self
+        app._disable_tooltips = not tooltips
+        app._disable_notifications = not notifications
+        app_ready_event = asyncio.Event()
+
+        def on_app_ready() -&gt; None:
+            """Called when app is ready to process events."""
+            app_ready_event.set()
+
+        async def run_app(app: App[ReturnType]) -&gt; None:
+            """Run the apps message loop.
+
+            Args:
+                app: App to run.
+            """
+
+            with app._context():
+                try:
+                    if message_hook is not None:
+                        message_hook_context_var.set(message_hook)
+                    app._loop = asyncio.get_running_loop()
+                    app._thread_id = threading.get_ident()
+                    await app._process_messages(
+                        ready_callback=on_app_ready,
+                        headless=headless,
+                        terminal_size=size,
+                    )
+                finally:
+                    app_ready_event.set()
+
+        # Launch the app in the "background"
+
+        self._task = app_task = create_task(run_app(app), name=f"run_test {app}")
+
+        # Wait until the app has performed all startup routines.
+        await app_ready_event.wait()
+        with app._context():
+            # Context manager returns pilot object to manipulate the app
+            try:
+                pilot = Pilot(app)
+                await pilot._wait_for_screen()
+                yield pilot
+            finally:
+                await asyncio.sleep(0)
+                # Shutdown the app cleanly
+                await app._shutdown()
+                await app_task
+                # Re-raise the exception which caused panic so test frameworks are aware
+                if self._exception:
+&gt;                   raise self._exception
+E                   textual.worker.WorkerFailed: Worker raised exception: NoMatches("No nodes match '#diff_status' on AbDiffPanel(id='ab_diff_panel', classes='diff-fallback')")
+
+..\..\anaconda3\Lib\site-packages\textual\app.py:2218: WorkerFailed</failure></testcase><testcase classname="tests.test_tui_patch_editor_v2" name="test_saveback_width_32_preserves_source_s0_header" time="4.410"><failure message="AssertionError: the 32-byte confirm must write a file&#10;assert None is not None">tmp_path = WindowsPath('[RUNTIME]/pytest-tmp/pytest-0/popen-gw6/test_saveback_width_32_preserv0')
+
+    def test_saveback_width_32_preserves_source_s0_header(tmp_path: Path) -&gt; None:
+        """AT-015.1 (preserve leg, F2) — when the loaded image carries a
+        content-bearing S0, saving in 32-byte mode through the shipped selector
+        writes that SOURCE S0 verbatim, NOT a header synthesized from the
+        destination filename.
+
+        Intent: exercise the genuine preserve branch of the save-back S0 policy
+        end-to-end. The synthesize branch is covered by AT-015.1's wide image
+        (no source S0). Here the load seam captures ``source_s0_header`` and the
+        handler must prefer it over ``_synth_s0_header_from_filename`` — observed
+        black-box by reading the written S0 off disk. A regression that always
+        synthesized would write the filename bytes and fail this assertion.
+        """
+        image_path = _make_wide_s19_image_with_s0(tmp_path)
+
+        # Sanity: the load seam actually captured the source S0 (guards against a
+        # vacuous pass where source_s0_header is None and the synth path is taken).
+        captured = S19File(str(image_path))
+        captured_loaded = build_loaded_s19(image_path, captured, None, None)
+        assert captured_loaded.source_s0_header == _SOURCE_S0_BYTES
+
+        written, intended = _drive_saveback_width(tmp_path, image_path, 32)
+
+&gt;       assert written is not None, "the 32-byte confirm must write a file"
+E       AssertionError: the 32-byte confirm must write a file
+E       assert None is not None
+
+tests\test_tui_patch_editor_v2.py:1264: AssertionError</failure></testcase></testsuite>
