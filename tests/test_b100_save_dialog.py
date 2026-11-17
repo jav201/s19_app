@@ -79,6 +79,7 @@ from tests.support import b100_load_dialog as ld
 from tests.support import b100_projects as projects
 from tests.support import b100_save_dialog as sd
 from tests.support.b100_workers import settle_workers
+from tests.support.b103_inc8_p import click_visible, show_tab
 from tests.support.timing import report_margin
 from tests.support import package_source as ps
 
@@ -269,14 +270,15 @@ async def _add_entry_by_keys(pilot, app, address: str = "0x8000007C", run: str =
     ``6``)."""
     await pilot.press("6")
     await sd.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) > 0, "the Patch Editor panel")
-    assert await pilot.click("#patch_entry_address_input")
+    await show_tab(pilot, "patch_tab_inspector")
+    assert await click_visible(pilot, "#patch_entry_address_input")
     await pilot.press("end", *(["backspace"] * 40))
     await pilot.press(*address)
-    assert await pilot.click("#patch_entry_bytes_input")
+    assert await click_visible(pilot, "#patch_entry_bytes_input")
     await pilot.press("end", *(["backspace"] * 40))
     await pilot.press(*run)
     before = len(app._change_service.document.entries) if app._change_service.document else 0
-    assert await pilot.click("#patch_entry_add_button")
+    assert await click_visible(pilot, "#patch_entry_add_button")
     await sd.wait_for(
         pilot,
         lambda: app._change_service.document is not None
@@ -294,7 +296,7 @@ def _painted_log(app) -> str:
 async def _apply_by_keys(pilot, app) -> None:
     """Apply the Patch Editor document (``#patch_doc_apply_button``) and
     wait for the painted apply line; back to the Workspace (rail ``1``)."""
-    assert await pilot.click("#patch_doc_apply_button"), "click missed #patch_doc_apply_button"
+    assert await click_visible(pilot, "#patch_doc_apply_button"), "click missed #patch_doc_apply_button"
     await sd.wait_for(pilot, lambda: "Apply:" in _painted_log(app), "the painted apply line")
     await _settle(pilot, 4)
     await _home(pilot)

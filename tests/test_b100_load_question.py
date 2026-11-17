@@ -65,6 +65,7 @@ from tests.support import b100_load_dialog as ld
 from tests.support import b100_save_dialog as sd
 from tests.support import b100_projects as projects
 from tests.support import package_source as ps
+from tests.support.b103_inc8_p import click_visible, show_tab
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01 = ROOT / "examples" / "case_01_basic_valid"
@@ -680,11 +681,12 @@ def test_tc_b100_44_project_load_asks_iff_a_flag_is_set(tmp_path: Path) -> None:
         await pilot.press("6")
         await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) > 0, "the Patch Editor")
         await _settle(pilot, 4)
-        assert await pilot.click("#patch_entry_address_input")
+        await show_tab(pilot, "patch_tab_inspector")
+        assert await click_visible(pilot, "#patch_entry_address_input")
         await pilot.press("ctrl+a", "delete", *"0x80000010")
-        assert await pilot.click("#patch_entry_bytes_input")
+        assert await click_visible(pilot, "#patch_entry_bytes_input")
         await pilot.press("ctrl+a", "delete", *"AB")
-        assert await pilot.click("#patch_entry_add_button")
+        assert await click_visible(pilot, "#patch_entry_add_button")
         await ld.wait_for(pilot, lambda: _panel(app)._dirty, "the panel flag")
         messages = await projects.save_project(pilot, app, log, "S1")
         assert any(m.startswith("Saved project to") for m in messages), messages
@@ -2740,7 +2742,8 @@ def test_tc_b100_12_cancelled_question_rehomes_the_focus(tmp_path: Path) -> None
         await pilot.press("6")
         await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_address_input")) > 0, "the Patch Editor")
         await _settle(pilot, 4)
-        assert await pilot.click("#patch_entry_address_input")
+        await show_tab(pilot, "patch_tab_inspector")
+        assert await click_visible(pilot, "#patch_entry_address_input")
         assert _focused_id(app) == "patch_entry_address_input"
         await pilot.press("ctrl+l")
         await ld.wait_for_dialog(pilot, app)
@@ -2788,11 +2791,12 @@ def test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved(tmp_pat
         await pilot.press("6")
         await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) > 0, "the Patch Editor")
         await _settle(pilot, 4)
-        assert await pilot.click("#patch_entry_address_input")
+        await show_tab(pilot, "patch_tab_inspector")
+        assert await click_visible(pilot, "#patch_entry_address_input")
         await pilot.press("ctrl+a", "delete", *address)
-        assert await pilot.click("#patch_entry_bytes_input")
+        assert await click_visible(pilot, "#patch_entry_bytes_input")
         await pilot.press("ctrl+a", "delete", *"DE AD")
-        assert await pilot.click("#patch_entry_add_button")
+        assert await click_visible(pilot, "#patch_entry_add_button")
         await ld.wait_for(pilot, lambda: _panel(app)._dirty, "the panel flag")
 
     async def scenario(app, pilot, log):
@@ -2922,6 +2926,7 @@ def test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route(tmp_path:
         await pilot.press("6")
         await ld.wait_for(pilot, lambda: len(app.query("#patch_entry_add_button")) > 0, "the Patch Editor")
         await _settle(pilot, 4)
+        await show_tab(pilot, "patch_tab_inspector")
         if add:
             # A second add keeps the first add's text, and ``ctrl+a`` moves to
             # the start rather than selecting it: clear both inputs first
@@ -2930,13 +2935,13 @@ def test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route(tmp_path:
 
             app.query_one("#patch_entry_address_input", Input).value = ""
             app.query_one("#patch_entry_bytes_input", Input).value = ""
-            assert await pilot.click("#patch_entry_address_input")
+            assert await click_visible(pilot, "#patch_entry_address_input")
             await pilot.press("ctrl+a", "delete", *"0x8000007C")
-            assert await pilot.click("#patch_entry_bytes_input")
+            assert await click_visible(pilot, "#patch_entry_bytes_input")
             await pilot.press("ctrl+a", "delete", *"DE AD BE EF")
-            assert await pilot.click("#patch_entry_add_button")
+            assert await click_visible(pilot, "#patch_entry_add_button")
             await ld.wait_for(pilot, lambda: "entry added" in status(app), "the entry added")
-        assert await pilot.click("#patch_doc_apply_button")
+        assert await click_visible(pilot, "#patch_doc_apply_button")
         await ld.wait_for(pilot, lambda: "1 applied" in status(app), "the apply")
         await _settle(pilot, 4)
 

@@ -51,6 +51,7 @@ from s19_app.tui.segment_split_view import SegRow
 from tests.support.independent_reader import read_hex, read_s19
 from tests.support.b100_projects import dismiss_load_result_panel
 from tests.support.b100_load_dialog import highlight_row, is_load_dialog
+from tests.support.b103_inc8_p import click_visible, show_tab
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE00 = ROOT / "examples" / "case_00_public"
@@ -1119,24 +1120,25 @@ def test_at_b99_11_sanitised_mac_only_second_export_takes_suffix(
                 lambda: len(app.query("#patch_editor_panel")) > 0,
                 "the Patch Editor",
             )
-            assert await pilot.click(
-                "#patch_entry_address_input"
+            await show_tab(pilot, "patch_tab_inspector")
+            assert await click_visible(
+                pilot, "#patch_entry_address_input"
             ), "click missed #patch_entry_address_input"
             await pilot.press(*f"0x{patch_addr:X}")
-            assert await pilot.click(
-                "#patch_entry_bytes_input"
+            assert await click_visible(
+                pilot, "#patch_entry_bytes_input"
             ), "click missed #patch_entry_bytes_input"
             await pilot.press(*f"0x{patch_value:02X}")
-            assert await pilot.click(
-                "#patch_entry_add_button"
+            assert await click_visible(
+                pilot, "#patch_entry_add_button"
             ), "click missed #patch_entry_add_button"
             await _wait_for(
                 pilot,
                 lambda: "entry added" in _status_text(app),
                 "the add status line",
             )
-            assert await pilot.click(
-                "#patch_doc_apply_button"
+            assert await click_visible(
+                pilot, "#patch_doc_apply_button"
             ), "click missed #patch_doc_apply_button"
             await _wait_for(
                 pilot,

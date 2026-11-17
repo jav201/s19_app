@@ -25,6 +25,7 @@ from pathlib import Path
 import pytest
 
 from s19_app.tui.services.change_service import parse_new_bytes
+from tests.support.b103_inc8_p import click_visible, show_tab
 from tests.support.independent_reader import read_s19
 
 
@@ -85,6 +86,7 @@ def test_tc_b99_33_field_and_help_state_the_hex_rule(tmp_path: Path) -> None:
             await pilot.pause()
             app.action_show_screen("patch")
             await pilot.pause()
+            await show_tab(pilot, "patch_tab_inspector")
             field = app.query_one("#patch_entry_bytes_input", Input)
             placeholder = field.placeholder
             inner_width = field.content_size.width
@@ -140,7 +142,7 @@ def test_at_b99_12_typed_hex_run_saves_back(tmp_path: Path) -> None:
     RED on HEAD (P-16): the digit-only tokens ``10`` and ``20`` were read
     as decimal, so the file held ``0F 0A 1F 14``.
     """
-    from textual.widgets import Button, Input
+    from textual.widgets import Input
 
     from s19_app.tui.app import S19TuiApp
     from s19_app.tui.changes import emit_s19_from_mem_map
@@ -176,17 +178,15 @@ def test_at_b99_12_typed_hex_run_saves_back(tmp_path: Path) -> None:
             await pilot.press("6")
             for _ in range(6):
                 await pilot.pause()
+            await show_tab(pilot, "patch_tab_inspector")
 
-            # Type through the real key path (focus + keys, no .value=).
-            address = app.query_one("#patch_entry_address_input", Input)
-            address.focus()
-            await pilot.pause()
+            # Type through the real key path (click + keys, no .value=).
+            assert await click_visible(pilot, "#patch_entry_address_input")
             await pilot.press(*list("0x100"))
             await pilot.pause()
 
             field = app.query_one("#patch_entry_bytes_input", Input)
-            field.focus()
-            await pilot.pause()
+            assert await click_visible(pilot, "#patch_entry_bytes_input")
             await pilot.press(
                 *(ch if ch != " " else "space" for ch in "0F 10 1F 20")
             )
@@ -194,12 +194,12 @@ def test_at_b99_12_typed_hex_run_saves_back(tmp_path: Path) -> None:
             assert field.value == "0F 10 1F 20", field.value
 
             # Click the shipped Add and Apply buttons.
-            assert await pilot.click(
-                "#patch_entry_add_button"
+            assert await click_visible(
+                pilot, "#patch_entry_add_button"
             ), "click missed #patch_entry_add_button"
             await pilot.pause()
-            assert await pilot.click(
-                "#patch_doc_apply_button"
+            assert await click_visible(
+                pilot, "#patch_doc_apply_button"
             ), "click missed #patch_doc_apply_button"
             await pilot.pause()
             await pilot.pause()
@@ -208,16 +208,12 @@ def test_at_b99_12_typed_hex_run_saves_back(tmp_path: Path) -> None:
             # The shipped name input pre-fills the save-back suggestion;
             # read it (a painted widget value) and find the written file
             # on disk under the work area.
+            await show_tab(pilot, "patch_tab_json")
             saved_name = app.query_one(
                 "#patch_saveback_name_input", Input
             ).value
             assert saved_name, "the save-back prompt pre-fills the name"
-            # The save-back confirm keeps a press(): the prompt row renders
-            # in the editor's hidden JSON-pane tab and, at this 40-row
-            # window, below the inspector's clip under the status bar — a
-            # pilot click would land on the status bar, not on the button
-            # (probed: the zero-region/underlap persist after Apply).
-            app.query_one("#patch_saveback_confirm_button", Button).press()
+            assert await click_visible(pilot, "#patch_saveback_confirm_button")
             await pilot.pause()
             target = workarea / saved_name
             for _ in range(100):
