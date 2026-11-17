@@ -1,0 +1,46 @@
+# Batch-103 G3 lane C — recents
+
+Date: 2026-11-16T20:38:24-06:00
+Base: 21ec06b2e668b76ec62e76b9c3c6eb7cf971f2b1
+Branch: b103-g3-recents
+Scope: tests/test_b100_recents.py only; no product or requirement changes.
+
+## Correction
+
+- `_wait_image` and `_wait_a2l` now retain their installation predicates and then await `settle_workers`, so every caller waits for the real worker end and deferred install.
+- Equivalent direct image/A2L waits and the typed/project helpers use the same worker-settle rule.
+- The failed-before-copy negative control awaits the worker before reading status and store bytes.
+- The existing second-A2L arm now follows the shipped replacement question, declines it with `n`, requires the exact `Replace project A2L?` title, and retains the unchanged-SHA-256/no-registration oracle.
+- The exact 20-entry newest-first assertion, bytes/state assertions, geometry, and negative controls are unchanged.
+
+## Local Windows evidence
+
+All pytest runs used Python `-I -B`, pytest `-n0`, closed stdin, disabled bytecode and pytest cache, isolated HOME/XDG/LOCALAPPDATA/TMPDIR, unset CI/clipboard guards and NO_COLOR/CLICOLOR, TERM=xterm-256color, and COLORTERM=truecolor. The original JUnit/logs stayed outside the clone; redacted copies are stored beside this RESULT so the counts are auditable from the branch.
+
+1. Known regressions before the fix: 2 failed in 85.93s.
+   - `test_tc_b100_34_load_failing_before_its_copy_records_nothing`
+   - `test_tc_b100_34_twenty_five_outside_loads_keep_twenty_newest_first`
+2. Helper-only check: 1 passed, 1 failed in 34.27s; this isolated the remaining fixed-pause negative control.
+3. Known regressions after the complete correction: 2 passed in 25.77s; 0 failed, 0 errors.
+4. Complete `tests/test_b100_recents.py`: 193 passed, 1 skipped in 416.66s; 194 collected, 0 failed, 0 errors.
+   - Skip: `test_tc_b100_38_picking_proj_loads_proj_when_proj_differs_by_case`; the Windows volume is case-insensitive, so `Proj` and `proj` cannot coexist. This is a declared not-run arm, not a failure.
+
+Redaction replaced only repository/output/home/Python paths, username, and hostname with `[REPO]`, `[OUT]`, `[HOME]`, `[PYTHON_HOME]`, `[USER]`, and `[HOST]`. Copies were normalized to LF and line-end spaces/tabs were trimmed for `git diff --check`; messages and counts were not edited. The copied JUnit files parse successfully and retain tests/failures/errors/skipped counts of 2/2/0/0, 2/1/0/0, 2/0/0/0, and 194/0/0/1 respectively.
+
+SHA-256 pairs below are `external original` → `redacted in-branch copy`:
+
+- `regressions-before.log`: `cf62912d7071804e103f69ab9df0266cb790290d0cc4f01df7af424278e7306c` → `b42b75396a29cb3965ab7a8829a4c933deeec5fb9ec18d2d9ee4e7c52ad11c14`
+- `regressions-before.xml`: `f892f577019915cacc8bd2dbbefeba88fbfe93c1f47efa54edef9951f1805dd0` → `8ecc6b8b27f781e7e51d590e73857d923a947f62e7b597e0467215a7aea81d99`
+- `regressions-helpers.log`: `a0a1a96d39129929cbe5e726b28ba78492817e775cc5bedfbec23342b4770249` → `0bda88d9bd272d30a4b009ed50a0e908669ea84717acffaaab4ff5c4acb7624d`
+- `regressions-helpers.xml`: `ef93b10928493ed743f01abe86ba50ffd8e19fc204b223fdb7063bda94c56517` → `ded1563b8903215a616ec17c472a5e7e80f884b2a564779ee8c8d1c73b6e7491`
+- `regressions-final.log`: `82ab7314ccba799f178ebb146220afb6ba2eb8ab3cdc5d517bff0cd1b3a117a4` → `08bba2185c8c72c704adf0f50531dd549e4d827f9dfa473fb37aa3a3aa6b0966`
+- `regressions-final.xml`: `7bbe9791e6794c2730df08076424ec65f7f6303ef9507553d2d47048059d0520` → `57703d51976c8617bc3117c56e987c09c3de25f222cd508132200a0da0bad14b`
+- `full-file.log`: `caf623ac489347447158cd0e6216335ed452e5d43ba0ffe6f8d7c35b46d4b5c5` → `483c87ff09a025c4ec4458e64e466fe1fdb4540fbc0248ff883389a50b67c502`
+- `full-file.xml`: `d0b1f816f63b47a82e6d270d097309f26acfa6d260f11e7ac69fee19521e36f8` → `b74942cfe902900437a894876e72dcb4d47ce4a395e71a5472432f7ec4066462`
+- `ruff.log`: `2c921743c0f979f1442c34a027749f97c471e9574dd2ab797f97f6ed307608f3` → `a7da2f0c83d80ed2a375f8988e444684475af364cd3eca5d68c9403126a51fe2`
+
+## Remaining findings
+
+No test failure remains in this file. An auxiliary Ruff run reports the pre-existing unused `highlight_row` import at `tests/test_b100_recents.py:2867` (F401); it is unrelated to this correction and was left untouched.
+
+`git diff --check`: PASS.

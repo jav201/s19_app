@@ -1,0 +1,13 @@
+tests\test_b100_recents.py:2867:48: F401 [*] `tests.support.b100_load_dialog.highlight_row` imported but unused
+     |
+2865 | async def _at_load_file(pilot, app, text: str) -> None:
+2866 |     """``l`` (Load file), type ``text`` into the path field, click OK."""
+2867 |     from tests.support.b100_load_dialog import highlight_row, is_load_dialog
+     |                                                ^^^^^^^^^^^^^ F401
+2868 |
+2869 |     await pilot.press("l")
+     |
+     = help: Remove unused import: `tests.support.b100_load_dialog.highlight_row`
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.
