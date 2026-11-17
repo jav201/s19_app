@@ -1,0 +1,9 @@
+{
+  "patched_sequence_present": true,
+  "s3_data_widths": [
+    32,
+    8
+  ],
+  "source_s0_ascii": "SRCHDR_PRESERVE_ME",
+  "total_data_bytes": 40
+}

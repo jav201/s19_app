@@ -1,0 +1,6 @@
+checked=2026-11-17T13:15:47-06:00
+scanner=tests.test_suite_hygiene._redaction_hits
+scope=.dev-flow/2026-11-05-batch-103/evidence/full-suite/saveback-s0
+identities=local account and host derived at runtime
+xml_files_parsed=12
+redaction_hits=0

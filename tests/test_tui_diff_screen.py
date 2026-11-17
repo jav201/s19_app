@@ -37,6 +37,7 @@ from pathlib import Path
 import pytest
 
 from s19_app.tui.app import S19TuiApp
+from tests.b97_probes import settled
 from tests.support.b100_workers import settle_workers
 
 # --------------------------------------------------------------------------
@@ -502,11 +503,15 @@ def test_tc024_report_trigger_surfaces_paths(tmp_path: Path) -> None:
             await pilot.pause()
             await _b78_press_compare(app, pilot)
             app.query_one("#diff_report_button").press()
-            # batch-68 N5: the two generators now run on a worker thread, so
-            # the status is written after this handler returns. A bare pause()
-            # passed only because the fake generators are instant — a race this
-            # suite must not depend on.
+            # Worker creation and its call_from_thread status install are both
+            # asynchronous; wait for the observable final status, not queue idleness.
             await settle_workers(pilot)
+            await settled(
+                pilot,
+                lambda: md_path.name in str(app.query_one("#diff_status").render())
+                and html_path.name in str(app.query_one("#diff_status").render()),
+                "TC-024: the worker painted both written report paths",
+            )
             return str(app.query_one("#diff_status").render())
 
     monkey = pytest.MonkeyPatch()

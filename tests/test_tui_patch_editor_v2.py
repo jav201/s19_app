@@ -1101,6 +1101,12 @@ def _drive_saveback_width(
             await pilot.pause()
             panel.request_action("apply_doc")
             await settle_workers(pilot)
+            saveback_row = app.query_one("#patch_saveback_row")
+            await settled(
+                pilot,
+                lambda: shown_widget(saveback_row),
+                "AT-015: the apply showed the save-back prompt",
+            )
 
             # Cycle the SHIPPED width selector to the target (default is 32).
             width_button = app.query_one(
@@ -1125,7 +1131,11 @@ def _drive_saveback_width(
                 await pilot.pause()
 
             app.query_one("#patch_saveback_confirm_button", Button).press()
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: saveback_row.has_class("hidden"),
+                "AT-015: the confirm dispatched the save-back decision",
+            )
 
             written = app._change_service.last_summary.saved_path
             # The intended firmware map after the apply (the engine mutated

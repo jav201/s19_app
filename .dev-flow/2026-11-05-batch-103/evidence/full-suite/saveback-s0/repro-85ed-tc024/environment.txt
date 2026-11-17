@@ -1,0 +1,12 @@
+started=2026-11-17T13:04:34-06:00
+finished=2026-11-17T13:04:38-06:00
+HEAD=85ed72102479585728b7dd8210b98b8d7639eef9
+platform=Windows local; Python 3.12.7
+command=$HOME/anaconda3/python.exe -I -B -m pytest -n0 -p no:cacheprovider --color=no --basetemp=<RUNTIME>/cases --junitxml=<artifact> <nodes>
+nodes=tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths
+stdin=closed
+bytecode=PYTHONDONTWRITEBYTECODE=1 and -B; pytest cacheprovider disabled
+isolation=fresh short runtime for HOME,XDG_CONFIG_HOME,XDG_DATA_HOME,XDG_CACHE_HOME,LOCALAPPDATA,TMPDIR,TMP,TEMP and pytest basetemp
+clipboard=CI,GITHUB_ACTIONS,RUNNER_ENVIRONMENT,B103_HOST_PLATFORM,DISPLAY unset
+colour=NO_COLOR,CLICOLOR,CLICOLOR_FORCE unset; TERM=xterm-256color; COLORTERM=truecolor
+exit_code=0

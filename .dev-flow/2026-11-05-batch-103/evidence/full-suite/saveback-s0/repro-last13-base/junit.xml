@@ -1,0 +1,52 @@
+<testsuite tests="11" failures="1" errors="0" skipped="0" time="515.950"><testcase classname="tests.test_b100_active_variant" name="test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]" time="3.971"><properties><property name="qc_tm" value="TC-B100-20 mac-sync|0.922|1.000|7.8" /></properties></testcase><testcase classname="tests.test_b100_project_check" name="test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling" time="7.146"><properties><property name="qc_tm" value="sec6_5 read|0.299|1.000|70.1" /><property name="qc_tm" value="sec6_5 load|0.825|1.000|17.5" /><property name="qc_tm" value="sec6_5 painted|0.346|1.000|65.4" /><property name="qc_tm" value="sec6_5 appended|0.765|1.000|23.5" /></properties></testcase><testcase classname="tests.test_b100_save_dialog" name="test_tc_b100_65_session_decided_once_per_open_case06" time="399.059"><properties><property name="qc_tm" value="TC-B100-65 case06 paint|0.422|2.000|78.9" /></properties></testcase><testcase classname="tests.test_b103_a2l_definition_arrays_scale" name="test_r_a2l_def_148_3_shared_layout_first_line_value" time="14.807"><properties><property name="qc_tm" value="R-A2L-DEF.148 148/3 layout first line VALUE 400 names at 256 KiB|0.062|0.500|87.5" /></properties><failure message="ZeroDivisionError: float division by zero">tmp_path = WindowsPath('[RUNTIME]/test_r_a2l_def_148_3_shared_la0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_148_3_shared_layout_first_line_value(tmp_path):
+        def check(kib, a2l_data):
+            defs = a2ldef.describe_definitions(_names("S"), a2l_data)
+            for d in defs.values():
+                assert d.kind == "number" and d.datatype == "UBYTE" and d.refusal is None
+&gt;       _measure(tmp_path, "148/3 layout first line VALUE", lambda p, k: _b148_2(p, k, "VALUE"), check)
+
+tests\test_b103_a2l_definition_arrays_scale.py:402:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('[RUNTIME]/test_r_a2l_def_148_3_shared_la0')
+case_label = '148/3 layout first line VALUE'
+build = &lt;function test_r_a2l_def_148_3_shared_layout_first_line_value.&lt;locals&gt;.&lt;lambda&gt; at 0x000002BA3A20BE20&gt;
+check = &lt;function test_r_a2l_def_148_3_shared_layout_first_line_value.&lt;locals&gt;.check at 0x000002BA3C6AD800&gt;
+image_of = None
+
+    def _measure(tmp_path: Path, case_label: str, build: Callable[[Path, int], tuple[dict, list]],
+                 check: Callable[[int, dict], None],
+                 image_of: Optional[Callable[[str], dict]] = None) -&gt; None:
+        """The E3S3-24 measure for one case: absolute bound at S (least of 15 runs)
+        then the interleaved least-of-15 per-object ratio at 2S and 8S."""
+        loaded = {kib: build(tmp_path, kib) for kib in SIZES_KIB}
+        names = loaded[S_KIB][1]
+
+        # Absolute: 400 names at S, process CPU time (E3S3-24), least of 15 runs.
+        runs = []
+        for _ in range(LEAST_OF):
+            seconds, _ = _timed(lambda: a2ldef.describe_definitions(names, loaded[S_KIB][0]), time.process_time)
+            runs.append(seconds)
+        assert min(runs) &lt;= report_margin(f"R-A2L-DEF.148 {case_label} 400 names at 256 KiB",
+                                          min(runs), timing_bound(ABS_BOUND_S)), runs
+        check(S_KIB, loaded[S_KIB][0])
+
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(LEAST_OF):
+            for kib in SIZES_KIB:  # interleaved: S, 2S, 8S in turn within every round
+                a2l_data, nms = loaded[kib]
+                if image_of is None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(nms, a2l_data), time.process_time)
+                else:
+                    defs = a2ldef.describe_definitions(nms, a2l_data)
+                    t_outer, interval = _timed(lambda: _steady_decode(defs, nms, a2l_data, image_of), time.process_time)
+                    results[kib] = defs
+                part[kib] = min(part[kib], max(interval, 0.0))
+&gt;       ratio_2s = part[2 * S_KIB] / part[S_KIB]
+E       ZeroDivisionError: float division by zero
+
+tests\test_b103_a2l_definition_arrays_scale.py:179: ZeroDivisionError</failure></testcase><testcase classname="tests.test_b103_a2l_definition_arrays_scale" name="test_r_a2l_def_148_6_shared_axis_object" time="15.767"><properties><property name="qc_tm" value="R-A2L-DEF.148 148/6 shared axis object 400 names at 256 KiB|0.094|0.500|81.2" /><property name="qc_tm" value="R-A2L-DEF.148 148/6 shared axis object per-object part 2S/S|1.000|1.500|33.3" /><property name="qc_tm" value="R-A2L-DEF.148 148/6 shared axis object per-object part 8S/S|0.500|2.000|75.0" /></properties></testcase><testcase classname="tests.test_b103_a2l_definition_arrays_scale" name="test_r_a2l_def_148_9_shared_range_table" time="32.865"><properties><property name="qc_tm" value="R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE 400 names at 256 KiB|0.156|0.500|68.8" /><property name="qc_tm" value="R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE per-object part 2S/S|1.000|1.500|33.3" /><property name="qc_tm" value="R-A2L-DEF.148 148/9 shared COMPU_VTAB_RANGE per-object part 8S/S|1.000|2.000|50.0" /></properties></testcase><testcase classname="tests.test_b103_a2l_definition_arrays_scale" name="test_r_a2l_def_150_arr_6_long_matched_range_text_referenced" time="16.506"><properties><property name="qc_tm" value="R-A2L-DEF.148 150/arr-6 long matched range text referenced 400 names at 256 KiB|0.094|0.500|81.2" /><property name="qc_tm" value="R-A2L-DEF.148 150/arr-6 long matched range text referenced per-object part 2S/S|1.000|1.500|33.3" /><property name="qc_tm" value="R-A2L-DEF.148 150/arr-6 long matched range text referenced per-object part 8S/S|1.000|2.000|50.0" /></properties></testcase><testcase classname="tests.test_b103_a2l_refresh" name="test_r007_r008_filters[R-A2L-REFRESH.007/4---]" time="16.742" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_paste_parse_then_apply_matches_file_loaded" time="4.307" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_saveback_width_32_packs_wide_records_and_populates_s0" time="2.472" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_saveback_width_32_preserves_source_s0_header" time="2.308" /></testsuite>

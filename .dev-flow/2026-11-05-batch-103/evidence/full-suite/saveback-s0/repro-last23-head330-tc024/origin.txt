@@ -1,0 +1,6 @@
+archived=2026-11-17T13:12:14-06:00
+commit=3302854210a8a62637c37f9d59745d70ae8c8a2a
+source_junit=[EVIDENCE_SOURCE]/junit.xml
+source_log=[EVIDENCE_SOURCE]/run.txt
+selection=1 named testcases
+transformation=UTF-8 decode with replacement where needed; selected JUnit testcases when named; ANSI removed; account, host, repository and runtime paths redacted
