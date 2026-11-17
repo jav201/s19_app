@@ -1,0 +1,15 @@
+Batch-103 G3 project-check diagnosis
+
+Existing RED (archived under red/): final 33028542 appended=1.172 s versus base=0.859 s, bound=1.000 s. The earlier full-suite reading was appended=1.043 s. Only appended failed in the assigned node.
+
+The existing instrument was kept. Its start is load_from_path entry and its stop is the painted manifest outcome; this is the explicitly ruled SEC6-5 interval, not a polling interval. No bound or functional assertion changed.
+
+Three pre-fix base/candidate pairs passed but both trees had low append margin. Candidate appended readings were 0.949, 0.931 and 0.844 s; base readings were 0.950, 0.747 and 0.841 s. This did not reproduce the full 0.313 s A/B delta in every process, so the investigation continued with internal timestamps rather than dismissing the result.
+
+Direct instrumentation of the unmodified candidate measured append=0.934 s and append=0.895 s. Within those runs, the pre-write manifest read took 0.254/0.150 s, _manifest_carry took 0.220/0.191 s, serialization took 0.166/0.171 s, and verify's re-read took 0.155/0.164 s. validate_project_files was not the cost in this existing-folder scene (about 1 ms in the profile).
+
+The repeated cost in _manifest_carry was Path.relative_to(...).as_posix() for every reader-produced absolute path. A local 3000-path microbenchmark measured 0.131790 s per conversion for relative_to versus 0.001065 s using already-parsed Path.parts with the root depth computed once. Python 3.12 relative_to repeatedly reconstructs parents; the parts conversion does not.
+
+Fix: s19_app/tui/app/projects.py now joins path.parts after the resolved project-root depth. The reader already guarantees that all these paths are under that root. A root path still maps to '.', matching Path.relative_to(root).as_posix(). The pre-read, serialization safety walk, verify re-read, status stamps and all timing bounds remain unchanged.
+
+Final five paired runs: base median=0.825 s, fixed median=0.715 s; all 10 passed. The archived final -vv run passed with read=0.166 s, load=0.299 s, painted=0.239 s and appended=0.685 s (31.5% margin).
