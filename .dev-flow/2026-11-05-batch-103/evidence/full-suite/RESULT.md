@@ -1,10 +1,11 @@
 # Batch-103 full-suite gate
 
-**CURRENT STATE: BLOCKED — four final corrective lanes are integrated; full-suite repetition is pending and G3 is not PASS.**
+**CURRENT STATE: BLOCKED — the final driver fixes are integrated; the final full-suite is pending and G3 is not PASS.**
 
 - The central backup exists. The full-suite must still be repeated on the final integrated tree; no full-suite PASS or G3 closure is claimed.
 - **Static fixes integrated:** reviewed GO lane `b103-g3-static-fixes` `85466c5db3cfb06dfbbfbbddaec490e5e3c93f18`, merged with provenance in `c6bdb13e6257364c5c6cf3e5b3cb8118c3e30507`. Its directed results and static runner self-test are recorded in `fix-g3-static/RESULT.md`; they do not change the RED full-suite state.
 - **Four final lanes integrated:** UI A `9960f78e` / merge `052abd14`: 603 passed, 3 inherited failed, 3 skipped, 1 xfailed; UI B `94f27be0` / merge `35d238ff`: 249 passed, 15 residual failed; recents `08f7db88` / merge `04665387`: 193 passed, 1 skipped; oracles `59e8e605` / merge `3124e163`: 231 passed. These are directed lane results, not a full-suite verdict.
+- **Four final driver fixes integrated:** `b103-g3-final-fixes` `8f979651` / merge `26bd4e4f` covers Inc15/TC-051, undo/redo real-key handling, Inc10 long written names and B100 project-load question synchronization. The four targets pass together; all 118 nodes in the four functional files pass. The five-file run has 180 passed and 5 unrelated hygiene failures, detailed in `final-fixes/RESULT.md`. The final full-suite remains pending.
 - **Review page: PREPARADA — [g3-review.html](../review/g3-review.html).** The operator's literal decision is: «Por ahora todo está aprobado. Durante el uso y priebas de usuario espero ver si se sostienen las decisiones tomadas.» This is **provisional approval of the decisions and page**, with validation continuing during user use/tests. AT-I1b-8 is **deferred-to-user-validation / not_run**, not executed and no longer a required prior execution for that provisional approval. The form's approve control remains disabled until the local full-suite is GREEN. G3 remains **BLOCKED**.
 - No claim is made that an earlier runner process remains alive or has terminated. No host endpoint is copied into this record.
 - The initial batch-end trace is `g3-batch-trace.txt`: 14 US, 752 active requirements (10 withdrawn), US/CASE/TEST/SLICE/EVID/CANON, **23 SLICE gaps**. The corrected full trace is `g3-batch-trace-final.txt`: **0 gaps**, with exit status 0. G3 is still not closed because the suite remains blocked.
