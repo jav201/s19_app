@@ -1,0 +1,617 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="185" time="1065.830" timestamp="2026-11-17T02:43:37.823578-06:00" hostname="&lt;HOST&gt;"><testcase classname="tests.test_suite_hygiene" name="test_r_tst_001_serial_timing_marker_is_registered" time="1.561" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_002_every_timing_arm_carries_serial_timing" time="69.731" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text" time="28.205" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_003_an_unmarked_timing_arm_is_named" time="0.006" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_004_a_marked_non_arm_is_named" time="0.011" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_005_detector_finds_each_timing_arm_form[form1]" time="0.006" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_005_detector_finds_each_timing_arm_form[form2]" time="0.014" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_005_detector_finds_each_timing_arm_form[form3]" time="0.013" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_005_detector_finds_each_timing_arm_form[form4]" time="0.008" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_005_detector_finds_each_timing_arm_form[form5]" time="0.006" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_005_detector_finds_each_timing_arm_form[form6]" time="0.016" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_005_detector_finds_each_timing_arm_form[form7]" time="0.011" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_006_detector_ignores_intervals_no_assert_reads" time="49.123" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_007_conventions_hold_each_test_rule[R-TST-007]" time="0.009" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_007_conventions_hold_each_test_rule[R-TST-030]" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_007_conventions_hold_each_test_rule[R-TST-047]" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_007_conventions_hold_each_test_rule[R-TST-048]" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_007_conventions_hold_each_test_rule[R-TST-052]" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_007_conventions_hold_each_test_rule[R-TST-060]" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_007_conventions_hold_each_test_rule[R-TST-158]" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_010_pull_request_runs_two_lanes" time="0.007" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_010_2_injection_ratchet_reads_every_run_line_of_every_job" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_011_push_runs_two_lanes" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_012_serial_lane_runs_after_a_red_lane" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_013_014_ci_checks_out_full_history" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_013_snapshot_job_changes_only_persist_credentials" time="0.048" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_015_016_017_ci_time_limits" time="0.003" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_018_ci_installs_pinned_xdist" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock" time="0.718"><properties><property name="qc_tm" value="R-TST-020 wall-clock bound|0.511|1.500|65.9" /><property name="qc_tm" value="R-TST-020 fast return|0.205|0.400|48.7" /></properties></testcase><testcase classname="tests.test_suite_hygiene" name="test_r_tst_020_021_shared_helpers_delegate_to_the_one_wait" time="0.006" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_021_shared_wait_yields_between_checks" time="1.030" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_022_settled_pauses_before_its_first_check" time="0.004" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_023_shared_wait_signatures_are_kept" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_024_shared_wait_failure_texts[W1]" time="0.230" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_024_shared_wait_failure_texts[W2]" time="0.233" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_024_shared_wait_failure_texts[W3]" time="0.236" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_024_shared_wait_failure_texts[W4]" time="0.242" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_024_shared_wait_failure_texts[W5]" time="0.230" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_024_shared_wait_failure_texts[W6]" time="0.235" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_024_shared_wait_failure_texts[W7]" time="0.007" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_024_shared_wait_failure_texts[W8]" time="0.008" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_024_shared_wait_failure_texts[W9]" time="0.006" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_025_load_project_clock_stops_at_the_install_callback" time="13.166" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms" time="52.403" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_040_report_margin_returns_the_bound" time="0.003" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_040_2_report_margin_refuses_unsafe_labels" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_049_wrap_drift_detector_names_a_dropped_assertion" time="0.004" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_049_wrapped_arms_change_nothing_else" time="2.237" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_040_041_every_upper_timing_bound_is_reported" time="51.011" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_040_1_base_tree_reports_its_37_bounds" time="0.235"><failure message="FileNotFoundError: [Errno 2] No such file or directory: 'REDACTED_WORKTREE\\.dev-flow\\2026-11-05-batch-103\\evidence\\full-suite\\final-fixes\\full-files-tmp\\test_r_tst_040_1_base_tree_rep0\\tests\\__snapshots__\\test_tui_snapshot\\test_tc016s_density_layout_snapshot[a2l-comfortable-120x30].svg'">tmp_path = WindowsPath('REDACTED_WORKTREE/.dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_040_1_base_tree_rep0')
+
+
+
+
+
+
+
+    def test_r_tst_040_1_base_tree_reports_its_37_bounds(tmp_path) -&gt; None:
+
+
+
+        """R-TST-040/1, 040/3, 040/4 base halves: the census of the b3bf42e tree
+
+
+
+        reports exactly its 37 upper bounds, the 3 list-appended reads among them,
+
+
+
+        and none of the count or lower-bound comparisons."""
+
+
+
+&gt;       root = _extract_tests_tree(_BOUND_BASE_COMMIT, tmp_path)
+
+
+
+
+
+
+
+tests\test_suite_hygiene.py:1460:
+
+
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+
+
+tests\test_suite_hygiene.py:322: in _extract_tests_tree
+
+
+
+    archive.extractall(dest)
+
+
+
+..\..\anaconda3\Lib\zipfile\__init__.py:1744: in extractall
+
+
+
+    self._extract_member(zipinfo, path, pwd)
+
+
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+
+
+
+
+
+
+self = &lt;zipfile.ZipFile [closed]&gt;
+
+
+
+member = &lt;ZipInfo filename='tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[a2l-comfortable-120x30].svg' compress_type=deflate file_size=75356 compress_size=6274&gt;
+
+
+
+targetpath = 'REDACTED_WORKTREE\\.dev-flow\\2026-11-05-batch-103\\evidence\\full-suite\\final-f...se_tree_rep0\\tests\\__snapshots__\\test_tui_snapshot\\test_tc016s_density_layout_snapshot[a2l-comfortable-120x30].svg'
+
+
+
+pwd = None
+
+
+
+
+
+
+
+    def _extract_member(self, member, targetpath, pwd):
+
+
+
+        """Extract the ZipInfo object 'member' to a physical
+
+
+
+           file on the path targetpath.
+
+
+
+        """
+
+
+
+        if not isinstance(member, ZipInfo):
+
+
+
+            member = self.getinfo(member)
+
+
+
+
+
+
+
+        # build the destination pathname, replacing
+
+
+
+        # forward slashes to platform specific separators.
+
+
+
+        arcname = member.filename.replace('/', os.path.sep)
+
+
+
+
+
+
+
+        if os.path.altsep:
+
+
+
+            arcname = arcname.replace(os.path.altsep, os.path.sep)
+
+
+
+        # interpret absolute pathname as relative, remove drive letter or
+
+
+
+        # UNC path, redundant separators, "." and ".." components.
+
+
+
+        arcname = os.path.splitdrive(arcname)[1]
+
+
+
+        invalid_path_parts = ('', os.path.curdir, os.path.pardir)
+
+
+
+        arcname = os.path.sep.join(x for x in arcname.split(os.path.sep)
+
+
+
+                                   if x not in invalid_path_parts)
+
+
+
+        if os.path.sep == '\\':
+
+
+
+            # filter illegal characters on Windows
+
+
+
+            arcname = self._sanitize_windows_name(arcname, os.path.sep)
+
+
+
+
+
+
+
+        if not arcname and not member.is_dir():
+
+
+
+            raise ValueError("Empty filename.")
+
+
+
+
+
+
+
+        targetpath = os.path.join(targetpath, arcname)
+
+
+
+        targetpath = os.path.normpath(targetpath)
+
+
+
+
+
+
+
+        # Create all upper directories if necessary.
+
+
+
+        upperdirs = os.path.dirname(targetpath)
+
+
+
+        if upperdirs and not os.path.exists(upperdirs):
+
+
+
+            os.makedirs(upperdirs)
+
+
+
+
+
+
+
+        if member.is_dir():
+
+
+
+            if not os.path.isdir(targetpath):
+
+
+
+                os.mkdir(targetpath)
+
+
+
+            return targetpath
+
+
+
+
+
+
+
+        with self.open(member, pwd=pwd) as source, \
+
+
+
+&gt;            open(targetpath, "wb") as target:
+
+
+
+E            FileNotFoundError: [Errno 2] No such file or directory: 'REDACTED_WORKTREE\\.dev-flow\\2026-11-05-batch-103\\evidence\\full-suite\\final-fixes\\full-files-tmp\\test_r_tst_040_1_base_tree_rep0\\tests\\__snapshots__\\test_tui_snapshot\\test_tc016s_density_layout_snapshot[a2l-comfortable-120x30].svg'
+
+
+
+
+
+
+
+..\..\anaconda3\Lib\zipfile\__init__.py:1801: FileNotFoundError</failure></testcase><testcase classname="tests.test_suite_hygiene" name="test_r_tst_041_margin_guard_names_each_raw_bound" time="0.015" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_040_3_counts_and_lower_bounds_are_not_bounds" time="0.012" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_040_4_appended_and_conditional_reads_are_bounds" time="0.011" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_042_margin_report_is_a_test_property" time="1.055" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_043_045_qc_tm_section_rows_and_count" time="0.988"><failure message="AssertionError: ['LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_...nce/full-suite/final-fixes/full-files-tmp/test_r_tst_043_045_qc_tm_section_rows_and_count0/test_qc_tm_rows.py::test_a']&#10;assert ['LOW 15.0%  ...s.py::test_a'] == ['LOW 15.0%  ...s.py::test_a']&#10;  &#10;  At index 0 diff: 'LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_043_045_qc_tm_section_rows_and_count0/test_qc_tm_rows.py::test_b' != 'LOW 15.0%  0.850 s / 1.000 s  b  test_qc_tm_rows.py::test_b'&#10;  Use -v to get more diff">pytester = &lt;Pytester WindowsPath('REDACTED_WORKTREE/.dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_043_045_qc_tm_section_rows_and_count0')&gt;
+
+
+
+
+
+
+
+    def test_r_tst_043_045_qc_tm_section_rows_and_count(pytester) -&gt; None:
+
+
+
+        result = _inner_run(pytester, {"test_qc_tm_rows.py": _PLANTED_THREE_ARMS})
+
+
+
+        assert result.ret == 0, result.stdout.str()
+
+
+
+        rows, count_line = _qc_tm_rows(result.stdout.str())
+
+
+
+&gt;       assert rows == [
+
+
+
+            "LOW 15.0%  0.850 s / 1.000 s  b  test_qc_tm_rows.py::test_b",
+
+
+
+            "25.0%  0.750 s / 1.000 s  c  test_qc_tm_rows.py::test_c",
+
+
+
+            "40.0%  0.600 s / 1.000 s  a  test_qc_tm_rows.py::test_a",
+
+
+
+        ], rows
+
+
+
+E       AssertionError: ['LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_...nce/full-suite/final-fixes/full-files-tmp/test_r_tst_043_045_qc_tm_section_rows_and_count0/test_qc_tm_rows.py::test_a']
+
+
+
+E       assert ['LOW 15.0%  ...s.py::test_a'] == ['LOW 15.0%  ...s.py::test_a']
+
+
+
+E
+
+
+
+E         At index 0 diff: 'LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_043_045_qc_tm_section_rows_and_count0/test_qc_tm_rows.py::test_b' != 'LOW 15.0%  0.850 s / 1.000 s  b  test_qc_tm_rows.py::test_b'
+
+
+
+E         Use -v to get more diff
+
+
+
+
+
+
+
+REDACTED_WORKTREE\tests\test_suite_hygiene.py:1708: AssertionError</failure></testcase><testcase classname="tests.test_suite_hygiene" name="test_r_tst_043_2_teardown_error_report_gives_one_row" time="1.098" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_044_low_margin_prefix" time="1.009"><failure message="AssertionError: ['LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_...batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_044_low_margin_prefix0/test_low_prefix.py::test_d']&#10;assert ['LOW 15.0%  ...x.py::test_d'] == ['LOW 15.0%  ...x.py::test_d']&#10;  &#10;  At index 0 diff: 'LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_044_low_margin_prefix0/test_low_prefix.py::test_b' != 'LOW 15.0%  0.850 s / 1.000 s  b  test_low_prefix.py::test_b'&#10;  Use -v to get more diff">pytester = &lt;Pytester WindowsPath('REDACTED_WORKTREE/.dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_044_low_margin_prefix0')&gt;
+
+
+
+
+
+
+
+    def test_r_tst_044_low_margin_prefix(pytester) -&gt; None:
+
+
+
+        result = _inner_run(pytester, {"test_low_prefix.py": _PLANTED_LOW_PREFIX})
+
+
+
+        assert result.ret == 0, result.stdout.str()
+
+
+
+        rows, count_line = _qc_tm_rows(result.stdout.str())
+
+
+
+&gt;       assert rows == [
+
+
+
+            "LOW 15.0%  0.850 s / 1.000 s  b  test_low_prefix.py::test_b",
+
+
+
+            "20.0%  0.800 s / 1.000 s  d  test_low_prefix.py::test_d",
+
+
+
+        ], rows
+
+
+
+E       AssertionError: ['LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_...batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_044_low_margin_prefix0/test_low_prefix.py::test_d']
+
+
+
+E       assert ['LOW 15.0%  ...x.py::test_d'] == ['LOW 15.0%  ...x.py::test_d']
+
+
+
+E
+
+
+
+E         At index 0 diff: 'LOW 15.0%  0.850 s / 1.000 s  b  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_044_low_margin_prefix0/test_low_prefix.py::test_b' != 'LOW 15.0%  0.850 s / 1.000 s  b  test_low_prefix.py::test_b'
+
+
+
+E         Use -v to get more diff
+
+
+
+
+
+
+
+REDACTED_WORKTREE\tests\test_suite_hygiene.py:1758: AssertionError</failure></testcase><testcase classname="tests.test_suite_hygiene" name="test_r_tst_046_over_bound_arm_still_reports" time="1.048"><failure message="AssertionError: ['LOW -20.0%  1.200 s / 1.000 s  o  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_046_over_bound_arm_still_reports0/test_over_bound.py::test_over']&#10;assert ['LOW -20.0% ...y::test_over'] == ['LOW -20.0% ...y::test_over']&#10;  &#10;  At index 0 diff: 'LOW -20.0%  1.200 s / 1.000 s  o  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_046_over_bound_arm_still_reports0/test_over_bound.py::test_over' != 'LOW -20.0%  1.200 s / 1.000 s  o  test_over_bound.py::test_over'&#10;  Use -v to get more diff">pytester = &lt;Pytester WindowsPath('REDACTED_WORKTREE/.dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_046_over_bound_arm_still_reports0')&gt;
+
+
+
+
+
+
+
+    def test_r_tst_046_over_bound_arm_still_reports(pytester) -&gt; None:
+
+
+
+        result = _inner_run(pytester, {"test_over_bound.py": _PLANTED_OVER_BOUND})
+
+
+
+        assert result.ret != 0, "the planted over-bound arm must fail"
+
+
+
+        rows, count_line = _qc_tm_rows(result.stdout.str())
+
+
+
+&gt;       assert rows == [
+
+
+
+            "LOW -20.0%  1.200 s / 1.000 s  o  test_over_bound.py::test_over"
+
+
+
+        ], rows
+
+
+
+E       AssertionError: ['LOW -20.0%  1.200 s / 1.000 s  o  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_046_over_bound_arm_still_reports0/test_over_bound.py::test_over']
+
+
+
+E       assert ['LOW -20.0% ...y::test_over'] == ['LOW -20.0% ...y::test_over']
+
+
+
+E
+
+
+
+E         At index 0 diff: 'LOW -20.0%  1.200 s / 1.000 s  o  .dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/full-files-tmp/test_r_tst_046_over_bound_arm_still_reports0/test_over_bound.py::test_over' != 'LOW -20.0%  1.200 s / 1.000 s  o  test_over_bound.py::test_over'
+
+
+
+E         Use -v to get more diff
+
+
+
+
+
+
+
+REDACTED_WORKTREE\tests\test_suite_hygiene.py:1777: AssertionError</failure></testcase><testcase classname="tests.test_suite_hygiene" name="test_r_tst_050_status_log_keeps_every_painted_line" time="7.271" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_051_newest_line_waits_do_not_grow" time="0.176" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_051_all_line_reader_counts_only_under_minus_one" time="0.012" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses" time="12.723"><failure message="PermissionError: [Errno 13] Permission denied: 'REDACTED_WORKTREE\\.dev-flow\\2026-11-05-batch-103\\evidence\\full-suite\\final-fixes\\tmp\\tmp2szyy0vl'">def test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses() -&gt; None:
+
+
+
+        """E3S-2 / E5S-1 / R-PASTE.36: every text file of both batch folders
+
+
+
+        (records and evidence, not git-ignored) holds no home path, account or
+
+
+
+        host name, junit host attribute, shell prompt, UNC host path or LAN
+
+
+
+        address. A root missing from the checkout fails the test."""
+
+
+
+        inc2_dir = EVIDENCE_ROOT / "inc-2"
+
+
+
+        if not inc2_dir.is_dir():
+
+
+
+            pytest.fail(
+
+
+
+                "the increment's evidence folder is missing from this checkout; "
+
+
+
+                "the redaction gate has nothing it is responsible for"
+
+
+
+            )
+
+
+
+        all_hits = []
+
+
+
+        for root in _redaction_roots(REPO_ROOT):
+
+
+
+            if not root.is_dir():
+
+
+
+                pytest.fail(
+
+
+
+                    f"the redaction root {root} is missing from this checkout; "
+
+
+
+                    "the gate has nothing it is responsible for"
+
+
+
+                )
+
+
+
+&gt;           all_hits.extend(_redaction_hits(root, _local_identity_names(), _git_ignored(root)))
+
+
+
+
+
+
+
+tests\test_suite_hygiene.py:2052:
+
+
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+
+
+tests\test_suite_hygiene.py:1992: in _redaction_hits
+
+
+
+    data = path.read_bytes()
+
+
+
+..\..\anaconda3\Lib\pathlib.py:1019: in read_bytes
+
+
+
+    with self.open(mode='rb') as f:
+
+
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+
+
+
+
+
+
+self = WindowsPath('REDACTED_WORKTREE/.dev-flow/2026-11-05-batch-103/evidence/full-suite/final-fixes/tmp/tmp2szyy0vl')
+
+
+
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+
+
+
+
+
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+
+
+
+             errors=None, newline=None):
+
+
+
+        """
+
+
+
+        Open the file pointed to by this path and return a file object, as
+
+
+
+        the built-in open() function does.
+
+
+
+        """
+
+
+
+        if "b" not in mode:
+
+
+
+            encoding = io.text_encoding(encoding)
+
+
+
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+
+
+
+E       PermissionError: [Errno 13] Permission denied: 'REDACTED_WORKTREE\\.dev-flow\\2026-11-05-batch-103\\evidence\\full-suite\\final-fixes\\tmp\\tmp2szyy0vl'
+
+
+
+
+
+
+
+..\..\anaconda3\Lib\pathlib.py:1013: PermissionError</failure></testcase><testcase classname="tests.test_suite_hygiene" name="test_r_tst_070_3_redaction_gate_names_each_leak_form" time="0.038" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_080_report_goldens_hold_no_tool_version" time="0.052" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_081_golden_takes_the_package_version" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_082_wrong_version_still_differs" time="0.002" /><testcase classname="tests.test_suite_hygiene" name="test_r_tst_154_155_inc15_arms_wait_through_settled" time="0.349" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_panel_composition" time="1.768" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_action_routing_pins_exactly_eleven_v2_actions" time="0.003" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_paste_textarea_preloads_dummy_changeset" time="3.044" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_paste_parse_then_apply_matches_file_loaded" time="3.845" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_action_routing_observable_effects" time="4.221" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_legacy_load_rejected[legacy.cdfx-&lt;?xml version=&quot;1.0&quot;?&gt;&lt;MSRSW&gt;&lt;SW-INSTANCE-TREE&gt;&lt;/SW-INSTANCE-TREE&gt;&lt;/MSRSW&gt;-MF-JSON-PARSE]" time="1.924" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_legacy_load_rejected[legacy-v1.json-{&quot;format&quot;: &quot;s19app-unified-changeset&quot;, &quot;version&quot;: &quot;1.0&quot;, &quot;parameters&quot;: [], &quot;memory&quot;: []}-CHG-V1-FORMAT]" time="3.253" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_save_back_prompt" time="3.268" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_declaration_faults_visible" time="3.882" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_check_run_display" time="1.910" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_save_back_suggestion_is_format_aware" time="3.448" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_verify_quiet_pass_on_faithful_hex_save" time="2.081" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_verify_loud_mismatch_notice" time="3.608" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_saveback_width_32_packs_wide_records_and_populates_s0" time="2.289" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_saveback_width_16_caps_records_and_empties_s0" time="3.593" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_saveback_width_32_preserves_source_s0_header" time="2.180" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at031a_save_doc_lands_in_patches_folder" time="1.924" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at031b_two_saves_are_distinct_no_clobber" time="3.643" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at030a_dropdown_lists_and_loads_selected_change_file" time="2.417" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at030a_r2_save_while_open_appears_without_reactivation" time="3.594" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at030b_empty_patches_folder_renders_placeholder_no_crash" time="2.030" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at030c_directly_dropped_file_is_listed_and_loadable" time="1.764" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_repopulate_blank_reset_posts_no_spurious_load" time="3.353" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_f1_symlink_entry_is_skipped_by_scan" time="1.774" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_tc030_scan_returns_sorted_json_set_ignoring_non_change_files" time="3.219" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at032a_checks_help_states_what_and_which_artifact" time="1.613" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at032b_clarity_added_action_wiring_unchanged" time="1.836" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_ac4_patch_paste_textarea_min_height" time="3.978" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at050a_pilot_mixed_results_via_real_button" time="2.006" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at051a_containment_reasons_visible_in_rows" time="3.412" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at051b_doc_kind_loud_status_capped_log_and_not_ok" time="2.001" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at051e_hostile_kind_renders_literal_on_all_surfaces" time="1.994" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at052a_checks_help_states_semantics" time="3.229" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at052b_checks_help_survives_screen_cycle" time="2.137" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_tc051_4_hostile_encoding_sibling_through_load_funnel" time="3.256" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at057a_two_labeled_sections_ids_and_parentage" time="2.899" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at057b_regroup_wiring_and_binding_regression" time="4.770" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at058b_id_census_and_wiring_survive_reparent" time="2.866" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at064a_refresh_rereads_edited_file_into_editor" time="3.344" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_tc328_refresh_uses_source_path_not_widget_and_noops_when_unloaded" time="1.921" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at064b_json_popup_edit_confirm_cancel_and_geometry" time="11.344" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at_batch41_escape_cancels_changeset_json_popup" time="2.185" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at064c_edit_json_disabled_for_file_backed_document" time="3.516" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_tc329_popup_seed_and_load_text_apply_seam" time="5.699" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_tc331_disable_guard_predicate_tracks_source_path" time="1.820" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at068a_undo_redo_roundtrip_through_surface" time="9.466" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_tc344_undo_redo_disabled_for_file_backed_document" time="3.236" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_tc341_entry_seed_json_is_single_entry_scoped_to_index" time="0.005" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_tc342_edit_entry_json_mutates_only_the_selected_index" time="0.005" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_tc343_edit_entry_json_rejects_malformed_without_mutation" time="0.004" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_at068b_per_entry_json_popup_edits_only_selected_entry" time="3.379" /><testcase classname="tests.test_tui_patch_editor_v2" name="test_tc345_entry_edit_json_disabled_for_file_backed_document" time="3.336" /><testcase classname="tests.test_undo_redo_ux" name="test_ac1_checks_panel_clears_after_undo_and_redo" time="2.469" /><testcase classname="tests.test_undo_redo_ux" name="test_ac2_1_ctrl_z_y_undo_redo_via_real_key" time="2.658" /><testcase classname="tests.test_undo_redo_ux" name="test_ac2_2_ctrl_z_respects_a01_guard_and_is_crash_free" time="4.307" /><testcase classname="tests.test_b103_inc10_mu_survivors" name="test_the_largest_dock_is_four_rows_high_with_one_chip_row[MU-DOCK/1]" time="10.597" /><testcase classname="tests.test_b103_inc10_mu_survivors" name="test_the_largest_dock_is_four_rows_high_with_one_chip_row[MU-DOCK/2]" time="11.181" /><testcase classname="tests.test_b103_inc10_mu_survivors" name="test_r_s19_s0header_001_2_6_a_long_written_name_is_cut_to_252_bytes" time="6.835" /><testcase classname="tests.test_b103_inc10_mu_survivors" name="test_r_s19_s0header_001_2_7_the_header_follows_a_landing_name_that_moves_twice" time="12.249" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_44_twenty_four_cells_ask_by_kind" time="8.283" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_44_saved_states_load_without_asking" time="29.947" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_44_undo_alone_and_repatch_after_save_ask" time="12.978" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_44_attach_asks_nothing_and_keeps_the_patch" time="7.620" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_44_project_load_asks_iff_a_flag_is_set" time="18.090" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_44_patch_editor_reader_follows_its_writers" time="3.499" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_44_no_private_dirty_read_outside_the_panel" time="2.394" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_44_guard_reads_the_public_reader" time="3.987" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_one_modal_with_replace_and_cancel" time="6.684" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_modal_builds_from_its_parameters" time="5.415" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_focus_starts_on_cancel_on_every_route" time="8.236" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_y_replaces_with_the_focus_on_either_button" time="3.511" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_n_and_escape_cancel_with_the_focus_on_either_button" time="6.246" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_enter_answers_with_the_focused_button" time="4.903" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_click_answers_with_the_clicked_button" time="5.067" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_other_keys_leave_the_question_open" time="5.465" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_priority_keys_are_inert_under_the_question" time="9.855" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_names_paint_literally" time="11.718" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_refusal_lines_paint_names_literally" time="4.647" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_patch_editor_load_keeps_its_own_guard" time="6.792" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_title_names_what_is_replaced" time="14.911" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_unsaved_image_is_named_by_its_file_name" time="6.671" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_patch_editor_entries_named_only_when_w" time="7.580" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_flow_item_named_with_its_flow_name" time="7.569" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_load_target_named_per_route" time="8.055" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_body_says_unsaved_changes_once_in_two_sentences" time="7.624" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_buttons_and_body_stay_fully_visible[size0-long]" time="2.695" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_buttons_and_body_stay_fully_visible[size1-long]" time="2.768" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_buttons_and_body_stay_fully_visible[size2-long]" time="3.877" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_buttons_and_body_stay_fully_visible[size3-short]" time="2.705" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_a_second_answer_is_ignored" time="4.221" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_change_file_dropdown_keeps_the_guard" time="11.727" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_45_modal_imports_nothing_from_the_app" time="0.033" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_46_reset_runs_after_the_answer" time="8.551" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_46_cancel_keeps_the_session_and_runs_no_reset" time="13.684" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_46_project_load_handler_asks_nothing" time="8.226" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_46_refused_project_after_yes_keeps_the_work" time="6.597" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_46_unreadable_a2l_project_after_yes_keeps_the_work" time="5.250" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_46_cancelled_variant_switch_keeps_the_pending_selection" time="7.973" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_46_go_runs_at_once_when_clean_and_after_the_question_on_replace" time="5.640" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_46_project_load_adopts_declared_regions_after_the_reset" time="6.223" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_72_every_route_asks_and_cancel_keeps_the_session" time="22.582" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_72_replace_runs_the_load_on_every_route[load dialog]" time="4.842" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_72_replace_runs_the_load_on_every_route[workarea]" time="6.288" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_72_replace_runs_the_load_on_every_route[v]" time="6.469" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_72_replace_runs_the_load_on_every_route[panel v]" time="7.422" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_72_replace_runs_the_load_on_every_route[project]" time="6.130" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_72_every_load_call_passes_the_seam" time="0.576" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_72_one_question_per_request" time="11.663" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_72_typed_path_takes_its_kind_from_the_classification" time="13.722" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_72_relative_mac_takes_its_kind_from_the_resolved_path[link]" time="6.580" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_72_relative_mac_takes_its_kind_from_the_resolved_path[plain]" time="6.616" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_72_workarea_file_takes_its_kind_from_its_suffix" time="15.187" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_12_cancelled_question_rehomes_the_focus" time="25.155" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_70_project_load_asks_only_while_the_document_is_unsaved" time="18.682" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_66_question_text_holds_no_decision_ids" time="9.748" /><testcase classname="tests.test_b100_load_question" name="test_at_b100_15_load_over_unsaved_work_asks_one_question_per_route" time="87.428" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_72_the_load_guard_refuses_while_busy_before_it_asks" time="6.886" /><testcase classname="tests.test_b100_load_question" name="test_tc_b100_66_busy_line_and_quit_question_hold_no_decision_ids" time="0.005" /></testsuite></testsuites>
