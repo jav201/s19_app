@@ -1,0 +1,16 @@
+REDACTED_HOME\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+..........s.......................s.................s................... [ 44%]
+........................................................................ [ 88%]
+...................                                                      [100%]
+- generated xml file: REDACTED_OUT\test_b100_save_dialog.junit.xml -
+============================ QC-TM timing margins =============================
+42.7%  0.172 s / 0.300 s  TC-B100-65 final paint  tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+42.7%  0.172 s / 0.300 s  TC-B100-65 keystroke paint  tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+42.7%  0.172 s / 0.300 s  TC-B100-65 4MiB paint  tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+68.6%  0.157 s / 0.500 s  TC-B100-65 q delay  tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+70.4%  0.593 s / 2.000 s  TC-B100-65 case06 paint  tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+QC-TM: 5 bounds, 0 under 20 % margin
+160 passed, 3 skipped in 2333.00s (0:38:52)

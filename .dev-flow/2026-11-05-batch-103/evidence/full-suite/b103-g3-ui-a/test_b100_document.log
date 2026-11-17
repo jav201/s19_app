@@ -1,0 +1,31 @@
+REDACTED_HOME\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+........................................................................ [ 44%]
+........................................................................ [ 88%]
+...................                                                      [100%]
+- generated xml file: REDACTED_OUT\test_b100_document.junit.xml -
+============================ QC-TM timing margins =============================
+50.5%  0.495 s / 1.000 s  TC-B100-30 5000-digit-integer  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+79.0%  0.210 s / 1.000 s  TC-B100-30 20000-entries  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+80.9%  0.191 s / 1.000 s  TC-B100-30 brackets-1MiB  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+88.1%  0.119 s / 1.000 s  TC-B100-30 classifier exactly-1000-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+98.0%  0.020 s / 1.000 s  TC-B100-28  tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+99.0%  0.010 s / 1.000 s  TC-B100-30 classifier 1001-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+99.0%  0.010 s / 1.000 s  TC-B100-30 classifier brackets-1MiB  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+99.2%  0.008 s / 1.000 s  TC-B100-30 classifier brackets-under-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+99.2%  0.008 s / 1.000 s  TC-B100-30 classifier entries-long-string  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+99.3%  0.007 s / 1.000 s  TC-B100-30 classifier entries-wide-object  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier 5000-digit-integer  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier bare-entries-is-5  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier empty-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier entries-is-5  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier one-entry  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier truncated  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier v1-document  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier 20000-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier not-utf8  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier one-byte-over-1MiB  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+QC-TM: 20 bounds, 0 under 20 % margin
+163 passed in 252.01s (0:04:12)
