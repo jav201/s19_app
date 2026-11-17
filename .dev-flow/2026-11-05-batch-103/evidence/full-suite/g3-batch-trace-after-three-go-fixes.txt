@@ -1,0 +1,1 @@
+trace_check: 14 US, 752 active requirements (10 withdrawn), checks run: US, CASE, TEST, SLICE, EVID, CANON, 0 gap(s)
