@@ -1,80 +1,100 @@
-# Batch-103 G3 — rulings de evidencia local previa
+# Batch-103 G3 — rulings de evidencia local previa y corrida 33028542
 
 ## Alcance y estado
 
-Este documento clasifica evidencia **previa** a la full-suite final. No es un verdict agregado ni cierra G3. La tercera corrida sobre `3302854210a8a62637c37f9d59745d70ae8c8a2a` fue **INVALID / infraestructura** por `OSError: [Errno 22]` durante el flush de terminal de pytest y quedó parcial; sus JUnit no se usan ni se archivan como full-suite final. Una cuarta corrida corre actualmente en un clon separado del mismo commit, con salida directa a archivos que este paquete no toca. Mientras no termine y toda diferencia quede clasificada, G3 sigue abierto y no hay G3 PASS.
+Este documento clasifica evidencia local y no cierra G3. La tercera corrida sobre `3302854210a8a62637c37f9d59745d70ae8c8a2a` fue INVALID/infra por `OSError: [Errno 22]` durante el flush de terminal y quedó parcial; sus JUnit no se usan como full-suite final. La cuarta corrida sobre el mismo commit sí completó main/serial y está archivada en `run-33028542/`: es **RED clasificada**, no PASS.
 
-Las dos ejecuciones archivadas son anteriores a los últimos fixes. Ambas terminaron con `main_exit=1`, `serial_exit=1` y `full_suite_exit=1`; ninguna es GREEN.
+Una nueva full-suite corre actualmente sobre `85ed72102479585728b7dd8210b98b8d7639eef9` en un clon separado, con salida directa a archivos. No tiene veredicto en este record y no se anticipa su resultado. G3 sigue abierto.
 
-## Censo reconciliado de las dos corridas
+## Censo reconciliado de las corridas
 
-La fuente mecánica son los JUnit main/serial almacenados en `run-35fabb25/` y `run-795779ad/`. `comparison-35fabb25-795779ad.tsv` contiene la unión de failed-sets, una fila por nodeid, con categoría `fixed`, `persistent` o `new`.
+La fuente mecánica son los JUnit main/serial almacenados en `run-35fabb25/`, `run-795779ad/` y `run-33028542/`.
 
 | Ejecución | Commit | Main failed | Serial failed | Total failed |
 |---|---|---:|---:|---:|
 | Primera | `35fabb25c42d752216433c095eb0d29024027294` | 428 | 94 | **522** |
 | Segunda | `795779add81875976ac3651f8862498426d45abf` | 304 | 68 | **372** |
+| Completa 330 | `3302854210a8a62637c37f9d59745d70ae8c8a2a` | 306 | 66 | **372** |
 
-- **170** nodeids salieron del failed-set en la segunda ejecución.
-- **352** permanecieron en él.
-- **20** nodeids entraron como nuevos en la segunda ejecución.
+`comparison-35fabb25-795779ad.tsv` registra la primera transición:
+
+- **170** nodeids salieron del failed-set.
+- **352** permanecieron.
+- **20** nodeids entraron como nuevos.
 - Reconciliación: `522 = 170 + 352`; `372 = 20 + 352`.
 
-Los cuatro targets de `final-fixes` `8f9796517cc17c33495778792504ee87c2666429` quedaron posteriormente GREEN en su evidencia dirigida. Esto no se anticipa ni se mezcla con una tercera suite: la full-suite final sobre `33028542` todavía no tiene veredicto en este record.
+`comparison-795779ad-33028542.tsv` registra la transición a la corrida completa 330:
 
-## Guards de clipboard y WinCI
+- **23 resolved** respecto al failed-set de `795779ad`.
+- **349 persistent**.
+- **23 new** en `33028542`.
+- Reconciliación: `372 = 23 + 349` para la corrida previa y `372 = 23 + 349` para la nueva, con conjuntos de nodeids distintos.
 
-El antiguo conteo **271** se reconcilia como **269 guards literales de clipboard + 2 censos ya corregidos**. Los 269 son 238 exclusiones main y 31 seriales documentadas en `probes/residual/selection-summary.json` y las listas `main-excluded-clipboard.txt` / `serial-excluded-clipboard.txt`.
+Los cuatro targets de `final-fixes` `8f9796517cc17c33495778792504ee87c2666429` quedaron posteriormente **GREEN** en evidencia dirigida. Los fixes posteriores project-check, LoadGuard y refresh same_path también tienen sus carriles GO integrados. Ninguno se mezcla con el censo 330 ni se anticipa a la suite actual `85ed7210`.
 
-Estos guards representan **indisponibilidad local**, no cobertura ni pases. No se contabilizan como PASS ni como pruebas ejecutadas. Los dos censos fueron corregidos y su evidencia está en el carril estático; no se reutiliza el antiguo 271 como si siguiera vigente.
+## Guards de clipboard, excepciones y WinCI
 
-El WinCI histórico **10/10** pertenece al árbol `b2d6` citado por los records históricos. No es una ejecución del árbol final ni evidencia de que la full-suite final pase.
+Se corrige la nota histórica:
 
-## Instrumentos y evidencia incremental
+- Primera suite: **271 = 238 main + 33 serial**.
+- Segunda suite: **269 guards literales + 2 excepciones**; las dos excepciones no son censos.
+- Corrida completa 330: **270 guards literales + 1 excepción OSC52**. Esa excepción fue corregida posteriormente en `b103-g3-osc52` `ba819252`, sin cambiar retrospectivamente el censo 330.
 
-Hay **21 instrumentos sin veredicto Windows**: 10 basados en `process_time`, 7 dependientes de `/proc` y 4 usos puros de `getloadavg`. La evidencia Linux incremental existente no se reclama como cobertura Windows actual ni como PASS de esos instrumentos en esta corrida.
+Los guards literales representan **indisponibilidad local**, no cobertura ni pases. No se contabilizan como PASS ni como pruebas ejecutadas. Las selecciones y listas de exclusión permanecen en `probes/residual/`; el caso OSC52 y su corrección tienen evidencia separada en `../b103-g3-osc52/`.
 
-Los cuatro casos `getloadavg` que tienen assertions propias fueron medidos en `probes/final-timing/`:
+El WinCI histórico **10/10** pertenece al árbol `b2d6` citado por records históricos. No es una ejecución del árbol final ni evidencia de que la full-suite actual pase.
 
-- **B29/2:** PASS en head y control; el margen head bajo permanece visible en `comparison.md`.
+## Instrumentos, plataforma y heredados
+
+La evidencia incremental previa conserva **21 instrumentos sin veredicto Windows**: 10 `process_time`, 7 `/proc` y 4 usos puros de `getloadavg`. Esa evidencia Linux no se reclama como cobertura Windows actual.
+
+Para la corrida 330, la auditoría actual usa **30 firmas de instrumentos/plataforma con 18 solapamientos heredados** y **68 atribuciones heredadas**. No se reutilizan los antiguos conteos **61/25** como si fueran el censo final.
+
+Los cuatro casos `getloadavg` con assertions propias fueron medidos en `probes/final-timing/`:
+
+- **B29/2:** PASS en head y control; margen head bajo visible.
 - **B82/1:** PASS en head y control.
 - **B97/3:** PASS en head y control.
-- **B95/1:** la misma falla aparece en head y control; no es una regresión respecto a ese control y no se convierte en PASS.
+- **B95/1:** misma falla head/control; no regresión respecto a ese control y no PASS.
 
-Los cuatro nodos no existen en la base `0c3a6bd4`; por eso el contraste es head/control. `comparison.md`, los tres JUnit y las listas `nodes-*.txt` contienen los nodeids completos y las condiciones de ejecución.
+Las referencias exactas por nodeid y evidencia son:
 
-## Heredados que siguen RED
+- `probes/residual/comparison.tsv` y `comparison-summary.json`: estados, categorías y firmas base/head.
+- `probes/functional/comparison.tsv` y `probes/visual/signature-comparison.txt`: comparaciones funcionales/visuales y sus JUnit.
+- `probes/a2l/comparison.tsv`: estado por nodeid para cada JUnit head/base/control A2L.
+- `probes/new2/comparison.tsv`: los 20 nuevos de la segunda corrida.
+- `probes/last23/comparison.tsv`, `classification.tsv` y `results.tsv`: los 23 nuevos de 330 con su A/B y clasificación.
+- `probes/final-timing/comparison.md`: los ocho casos antiguos con misma firma base/head, `focus[map]` separado y los cuatro nuevos head/control.
 
-El censo reconciliado conserva **38 heredados previos + 23 vigentes**, atribuidos mediante comparación base/head del mismo oráculo. Siguen **RED / no PASS**; la aprobación provisional no los cierra.
+Las atribuciones heredadas siguen **RED / no PASS**. La aprobación provisional no las cierra.
 
-Referencias exactas por nodeid y evidencia:
+## A/B de los últimos 23
 
-- `probes/residual/comparison.tsv`: columnas `nodeid`, categoría, estados y firmas base/head; `comparison-summary.json` conserva el censo y mensajes asociados.
-- `probes/functional/comparison.tsv`: comparación funcional base/head por nodeid y firma.
-- `probes/visual/signature-comparison.txt` y los JUnit base/head del mismo paquete: diferencias visuales y clipboard clasificadas sin ocultar fallos.
-- `probes/a2l/comparison.tsv`: estado por nodeid para cada JUnit head/base/control del probe A2L.
-- `probes/new2/comparison.tsv`: los 20 nodeids nuevos de la segunda corrida, con clasificación y evidencia head/base/control.
-- `probes/final-timing/comparison.md`: los ocho casos antiguos con la misma firma base/head y el cambio `focus[map]` separado, además de los cuatro casos nuevos head/control.
+`probes/last23/` contiene 23 casos finales, 20 base y 3 control, con JUnit/log/exit y comparaciones:
 
-Estas referencias mantienen separados heredados, contexto no reproducido, regresiones y diferencias de firma; ninguna fila heredada se promueve a PASS.
+- **15 contexto no reproducido**: no se promocionan como regresiones ni como cobertura de la suite.
+- **5 instrumentos/portabilidad Windows**: fallan también en el comparador según las filas `heredado_portabilidad`.
+- **3 regresiones reales:** project_check, LoadGuard y A2L refresh same_path. Fueron corregidas en carriles posteriores `045cc707` y `0f190ecb`; su resultado no se anticipa a la suite `85ed7210`.
+
+Para `test_r_a2l_def_149_2_scaling_enum_table`, el **base aislado también falla** con `{256: 0.0, 512: 0.0, 2048: 0.0}`, igual que final. `windows-process-time-probe.txt` registra 2000/2000 muestras `process_time` en cero. Esta nueva evidencia documenta cuantización del instrumento y **no afirma una regresión**.
 
 ## Hygiene heredado y runner
 
-Se conservan los **60 hits hygiene heredados**; no se reescriben records históricos para ocultarlos. Tras el fix estático, el runner aporta **0 nuevos hits**: el detalle está en `../fix-g3-static/RESULT.md`, incluida la ausencia de hits para `run_distributed.py` y las formas removidas `isolation/home/...`.
+Se conservan los **60 hits hygiene heredados**; no se reescriben records históricos para ocultarlos. Tras el fix estático, el runner aporta **0 nuevos hits**, según `../fix-g3-static/RESULT.md`, incluida la ausencia de hits para `run_distributed.py` y las formas removidas `isolation/home/...`.
 
-## Regresiones y correcciones integradas
+## Regresiones previas ya integradas
 
-Las dos regresiones nuevas explícitamente clasificadas son:
+Las dos regresiones nuevas de `new2` fueron:
 
 1. `tests/test_suite_hygiene.py::test_r_tst_154_155_inc15_arms_wait_through_settled` — espera settled después de `apply_doc`.
-2. `tests/test_undo_redo_ux.py::test_ac2_1_ctrl_z_y_undo_redo_via_real_key` — el Add real no aparecía antes de undo/redo.
+2. `tests/test_undo_redo_ux.py::test_ac2_1_ctrl_z_y_undo_redo_via_real_key` — Add real no visible antes de undo/redo.
 
-Sus firmas head/control están en `probes/new2/comparison.tsv`. Esas dos correcciones y las otras dos —sincronización de B100 load question y escritura Inc10 del nombre largo— están integradas por `8f979651`. La evidencia dirigida y sus hashes están en `../final-fixes/`; no se afirma aquí el resultado de la tercera suite.
+Esas correcciones y las otras dos de final-fixes —B100 load question e Inc10 long written name— están integradas por `8f979651`. Su evidencia dirigida y hashes están en `../final-fixes/`.
 
 ## AT y decisión del operador
 
-AT-I1b-8 permanece **deferred-to-user-validation / not_run**: no ejecutada por agentes y no convertida en cobertura. Queda registrada la aprobación provisional del operador de las decisiones/página, cuya validación continúa durante el uso y las pruebas de usuario. Esto no equivale a G3 cerrado ni a full-suite PASS.
+AT-I1b-8 permanece **deferred-to-user-validation / not_run**: no ejecutada por agentes y no convertida en cobertura. La aprobación provisional del operador cubre decisiones/página y su validación continúa durante el uso/pruebas de usuario. No equivale a G3 cerrado ni a full-suite PASS.
 
 ## Regla de cierre pendiente
 
-G3 permanece abierto hasta disponer del resultado de la full-suite final sobre `33028542` y clasificar cualquier diferencia por nodeid contra esta evidencia previa. Cada diferencia nueva, persistente o corregida deberá enlazar su JUnit/transcript y su comparación; ningún conteo de este documento sustituye esa ejecución final.
+G3 permanece abierto hasta disponer del resultado de la full-suite actual sobre `85ed7210` y clasificar cualquier diferencia por nodeid contra esta evidencia. Cada diferencia nueva, persistente o corregida deberá enlazar su JUnit/transcript y comparación. Ningún conteo de este documento sustituye esa ejecución final.

@@ -1,8 +1,8 @@
 # Batch-103 full-suite gate
 
-**CURRENT STATE: BLOCKED — three additional GO fixes are integrated; the final full-suite must be repeated and G3 is not PASS.**
+**CURRENT STATE: BLOCKED — run `33028542` is complete RED/classified; the new full-suite on `85ed7210` is RUNNING with no verdict and G3 is not PASS.**
 
-- The central backup exists. The prior run on `3302854210a8a62637c37f9d59745d70ae8c8a2a` predates these three integrations. A new final full-suite on the resulting integrated tree is still required. No full-suite PASS or G3 closure is claimed.
+- The central backup exists. The completed `3302854210a8a62637c37f9d59745d70ae8c8a2a` run is archived under `local-runs/run-33028542/`: 306 main +66 serial = **372 failed**, with 23 resolved, 349 persistent and 23 new against `795779ad`. The new full-suite on `85ed72102479585728b7dd8210b98b8d7639eef9` is **RUNNING** as task `bash-tncm33am` in a separate clone. No full-suite PASS or G3 closure is claimed.
 - **Prior local evidence:** [local-runs/RULINGS.md](local-runs/RULINGS.md) reconciles the completed runs on `35fabb25` and `795779ad`, their fixed/persistent/new nodeids, probes, inherited RED, transformations and original/stored hashes. It does not anticipate the current run's outcome.
 - **Static fixes integrated:** reviewed GO lane `b103-g3-static-fixes` `85466c5db3cfb06dfbbfbbddaec490e5e3c93f18`, merged with provenance in `c6bdb13e6257364c5c6cf3e5b3cb8118c3e30507`. Its directed results and static runner self-test are recorded in `fix-g3-static/RESULT.md`; they do not change the RED full-suite state.
 - **Four final lanes integrated:** UI A `9960f78e` / merge `052abd14`: 603 passed, 3 inherited failed, 3 skipped, 1 xfailed; UI B `94f27be0` / merge `35d238ff`: 249 passed, 15 residual failed; recents `08f7db88` / merge `04665387`: 193 passed, 1 skipped; oracles `59e8e605` / merge `3124e163`: 231 passed. These are directed lane results, not a full-suite verdict.

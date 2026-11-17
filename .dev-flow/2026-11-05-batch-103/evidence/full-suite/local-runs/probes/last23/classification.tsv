@@ -1,0 +1,24 @@
+nodeid	category	evidence
+tests/test_b100_active_variant.py::test_tc_b100_71_byte_copy_records_nothing	contexto_no_reproducido	final=passed base=passed; full-33028542=failed
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked	regresion_real_tiempo	final=failed base=passed; appended final=1.172s base=0.859s bound=1.000s
+tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size0]	contexto_no_reproducido	final=passed base=passed; full-33028542=failed
+tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size1]	contexto_no_reproducido	final=passed base=passed; full-33028542=failed
+tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys	contexto_no_reproducido	final=passed base=passed; full-33028542=failed
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded]	regresion_real_funcional	final=failed base=passed; NoMatches #load_guard_accept
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_curves	contexto_no_reproducido	final=passed base=passed; final qc_tm 8S/S margin=0.0% LOW
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_values	heredado_portabilidad	final=failed base=failed; ZeroDivisionError from process_time zero interval
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object	heredado_portabilidad	final=failed base=failed; {256:0.0 512:0.0 2048:0.0}
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table	heredado_portabilidad	final=failed base=failed; {256:0.0 512:0.0 2048:0.0}
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout	heredado_portabilidad	final=failed base=failed; {256:0.0 512:0.0 2048:0.0}
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid	heredado_portabilidad	final=failed base=failed; {256:0.0 512:0.0 2048:0.0}
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/1]	regresion_real_funcional	final=failed base=passed; isolated signature assert 1 > 1
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]	contexto_no_reproducido	final=passed base=passed; full-33028542=failed
+tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call	contexto_no_reproducido	final=passed control=passed; node absent from base
+tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result	contexto_no_reproducido	final=passed control=passed; final qc_tm=0.125/0.300s
+tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs	contexto_no_reproducido	final=passed control=passed; final qc_tm=0.297/0.500s control=0.453/0.500s LOW
+tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled	contexto_no_reproducido	final=passed base=passed; full-33028542=failed
+tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths	contexto_no_reproducido	final=passed base=passed; full-33028542=failed
+tests/test_tui_patch_glyphs.py::test_at077d_index_alignment	contexto_no_reproducido	final=passed base=passed; full-33028542=failed
+tests/test_tui_patch_glyphs.py::test_at077e_image_generation_invalidates	contexto_no_reproducido	final=passed base=passed; full-33028542=failed
+tests/test_tui_patch_history_strip.py::test_at081b_bounds	contexto_no_reproducido	final=passed base=failed NoMatches #patch_editor_panel; not a final regression
+tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_80	contexto_no_reproducido	final=passed base=passed; full-33028542=failed

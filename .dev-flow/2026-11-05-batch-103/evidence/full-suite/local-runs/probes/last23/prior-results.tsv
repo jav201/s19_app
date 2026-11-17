@@ -1,0 +1,47 @@
+nodeid	run	lane	status	signature	qc_tm
+tests/test_b100_active_variant.py::test_tc_b100_71_byte_copy_records_nothing	33028542	main	failed	AssertionError: timed out waiting for the project save
+tests/test_b100_active_variant.py::test_tc_b100_71_byte_copy_records_nothing	795779ad	main	passed
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked	33028542	serial	failed	AssertionError: {'appended': 1.042953300056979, 'load': 0.27096919994801283, 'painted': 0.1254713999805972, 'read': 0.15333469992037863}	sec6_5 read|0.153|1.000|84.7; sec6_5 load|0.271|1.000|72.9; sec6_5 painted|0.125|1.000|87.5; sec6_5 appended|1.043|1.000|-4.3
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked	795779ad	serial	passed		sec6_5 read|0.208|1.000|79.2; sec6_5 load|0.410|1.000|59.0; sec6_5 painted|0.165|1.000|83.5; sec6_5 appended|0.936|1.000|6.4
+tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size0]	33028542	main	failed	AssertionError: timed out waiting for the Save project dialog
+tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size0]	795779ad	main	passed
+tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size1]	33028542	main	failed	AssertionError: timed out waiting for the Save project dialog
+tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size1]	795779ad	main	passed
+tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys	33028542	main	failed	AssertionError: timed out waiting for the attach to end
+tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys	795779ad	main	passed
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded]	33028542	main	failed	textual.css.query.NoMatches: No nodes match '#load_guard_accept' on LoadGuardScreen()
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded]	795779ad	main	passed
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_curves	33028542	serial	failed	AssertionError: {256: 0.015625, 512: 0.03125, 2048: 0.03125}	R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) 400 names at 256 KiB|0.125|0.500|75.0; R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) per-object part 2S/S|2.000|1.500|-33.3
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_curves	795779ad	serial	passed		R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) 400 names at 256 KiB|0.156|0.500|68.8; R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) per-object part 8S/S|1.000|2.000|50.0
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_values	33028542	serial	failed	ZeroDivisionError: float division by zero	R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (VALUEs) 400 names at 256 KiB|0.094|0.500|81.2
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_values	795779ad	serial	passed		R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (VALUEs) 400 names at 256 KiB|0.125|0.500|75.0; R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (VALUEs) per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (VALUEs) per-object part 8S/S|1.000|2.000|50.0
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object	33028542	serial	failed	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}	R-A2L-DEF.149/10 empty table name 400 calls at 256 KiB|0.104|0.500|79.2
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object	795779ad	serial	passed		R-A2L-DEF.149/10 empty table name 400 calls at 256 KiB|0.130|0.500|74.0; R-A2L-DEF.149/10 empty table name per-object part 2S/S|0.000|1.500|100.0; R-A2L-DEF.149/10 empty table name per-object part 8S/S|1.000|2.000|50.0
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table	33028542	serial	failed	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table	795779ad	serial	passed		R-A2L-DEF.149 /2 COMPU_VTAB per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.149 /2 COMPU_VTAB per-object part 8S/S|1.000|2.000|50.0
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout	33028542	serial	failed	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout	795779ad	serial	passed		R-A2L-DEF.149 /4 RECORD_LAYOUT per-object part 2S/S|0.000|1.500|100.0; R-A2L-DEF.149 /4 RECORD_LAYOUT per-object part 8S/S|0.000|2.000|100.0
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid	33028542	serial	failed	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}	R-A2L-DEF.149/9 CUBOID layout 400 calls at 256 KiB|0.048|0.500|90.5
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid	795779ad	serial	passed		R-A2L-DEF.149/9 CUBOID layout 400 calls at 256 KiB|0.062|0.500|87.7; R-A2L-DEF.149/9 CUBOID layout per-object part 2S/S|0.000|1.500|100.0; R-A2L-DEF.149/9 CUBOID layout per-object part 8S/S|1.000|2.000|50.0
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/1]	33028542	main	failed	AssertionError: Load dialog did not open
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/1]	795779ad	main	passed
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]	33028542	main	failed	AssertionError: ['Loaded img1.s19 (S19 only)', 'Loaded img1.s19']
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]	795779ad	main	passed
+tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call	33028542	main	failed	AssertionError: (0, False, [False])
+tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call	795779ad	main	passed
+tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result	33028542	serial	failed	AttributeError: module 'os' has no attribute 'getloadavg'	R-PE-BENCH idle after preview VAL_BLK_DEF_0001|0.625|0.300|-108.3
+tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result	795779ad	serial	passed		R-PE-BENCH idle after preview VAL_BLK_DEF_0001|0.063|0.300|79.0
+tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs	33028542	serial	failed	AttributeError: module 'os' has no attribute 'getloadavg'	R-PE-BENCH.94/4 queued decode cue|0.719|0.500|-43.8
+tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs	795779ad	serial	passed		R-PE-BENCH.94/4 queued decode cue|0.359|0.500|28.2
+tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled	33028542	main	failed	AssertionError: did not settle: A2L loaded
+tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled	795779ad	main	passed
+tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths	33028542	main	failed	textual.worker.WorkerFailed: Worker raised exception: NoMatches("No nodes match '#log_line_1' on Screen(id='_default')")
+tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths	795779ad	main	passed
+tests/test_tui_patch_glyphs.py::test_at077d_index_alignment	33028542	main	failed	AssertionError: the glyphs must land in DOCUMENT ORDER: expected ['✓', '✗', '◐', '✓'], got ['·', '·', '·', '·']. This list is asymmetric under both reversal and a ±1 shift, so any positional drift fails here.
+tests/test_tui_patch_glyphs.py::test_at077d_index_alignment	795779ad	main	passed
+tests/test_tui_patch_glyphs.py::test_at077e_image_generation_invalidates	33028542	main	failed	AssertionError: PRECONDITION: both entries must PASS against image A, or the stale verdict this AT hunts never exists; got ['·', '·']
+tests/test_tui_patch_glyphs.py::test_at077e_image_generation_invalidates	795779ad	main	passed
+tests/test_tui_patch_history_strip.py::test_at081b_bounds	33028542	main	failed	textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+tests/test_tui_patch_history_strip.py::test_at081b_bounds	795779ad	main	passed
+tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_80	33028542	main	failed	textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_80	795779ad	main	passed

@@ -1,0 +1,24 @@
+nodeid	final_status	reference_tree	reference_status	final_signature	reference_signature
+tests/test_b100_active_variant.py::test_tc_b100_71_byte_copy_records_nothing	passed	base	passed
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked	failed	base	passed	AssertionError: {'appended': 1.1715634999563918, 'load': 0.5529876999789849, 'painted': 0.31968409998808056, 'read': 0.20201649994123727}
+tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size0]	passed	base	passed
+tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size1]	passed	base	passed
+tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys	passed	base	passed
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded]	failed	base	passed	textual.css.query.NoMatches: No nodes match '#load_guard_accept' on LoadGuardScreen()
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_curves	passed	base	passed
+tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_values	failed	base	failed	ZeroDivisionError: float division by zero	ZeroDivisionError: float division by zero
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object	failed	base	failed	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table	failed	base	failed	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout	failed	base	failed	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid	failed	base	failed	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/1]	failed	base	passed	AssertionError: assert 1 > 1
+tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]	passed	base	passed
+tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call	passed	control	passed
+tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result	passed	control	passed
+tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs	passed	control	passed
+tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled	passed	base	passed
+tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths	passed	base	passed
+tests/test_tui_patch_glyphs.py::test_at077d_index_alignment	passed	base	passed
+tests/test_tui_patch_glyphs.py::test_at077e_image_generation_invalidates	passed	base	passed
+tests/test_tui_patch_history_strip.py::test_at081b_bounds	passed	base	failed		textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_80	passed	base	passed

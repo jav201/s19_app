@@ -1,0 +1,47 @@
+tree	nodeid	status	time_s	signature	qc_tm
+final	tests/test_b100_active_variant.py::test_tc_b100_71_byte_copy_records_nothing	passed	3.069
+final	tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked	failed	6.519	AssertionError: {'appended': 1.1715634999563918, 'load': 0.5529876999789849, 'painted': 0.31968409998808056, 'read': 0.20201649994123727}	sec6_5 read|0.202|1.000|79.8; sec6_5 load|0.553|1.000|44.7; sec6_5 painted|0.320|1.000|68.0; sec6_5 appended|1.172|1.000|-17.2
+final	tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size0]	passed	17.984
+final	tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size1]	passed	17.669
+final	tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys	passed	356.161
+final	tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded]	failed	14.247	textual.css.query.NoMatches: No nodes match '#load_guard_accept' on LoadGuardScreen()
+final	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_curves	passed	27.557		R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) 400 names at 256 KiB|0.109|0.500|78.1; R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) per-object part 8S/S|2.000|2.000|0.0
+final	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_values	failed	20.931	ZeroDivisionError: float division by zero	R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (VALUEs) 400 names at 256 KiB|0.094|0.500|81.2
+final	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object	failed	24.786	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}	R-A2L-DEF.149/10 empty table name 400 calls at 256 KiB|0.102|0.500|79.7
+final	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table	failed	45.193	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+final	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout	failed	10.577	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+final	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid	failed	9.420	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}	R-A2L-DEF.149/9 CUBOID layout 400 calls at 256 KiB|0.048|0.500|90.4
+final	tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/1]	failed	21.146	AssertionError: assert 1 > 1
+final	tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]	passed	30.549
+final	tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call	passed	5.074
+final	tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result	passed	8.217		R-PE-BENCH idle after preview VAL_BLK_DEF_0001|0.125|0.300|58.3
+final	tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs	passed	7.577		R-PE-BENCH.94/4 queued decode cue|0.297|0.500|40.6
+final	tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled	passed	31.444
+final	tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths	passed	2.545
+final	tests/test_tui_patch_glyphs.py::test_at077d_index_alignment	passed	2.961
+final	tests/test_tui_patch_glyphs.py::test_at077e_image_generation_invalidates	passed	3.342
+final	tests/test_tui_patch_history_strip.py::test_at081b_bounds	passed	6.961
+final	tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_80	passed	3.889
+base	tests/test_b100_active_variant.py::test_tc_b100_71_byte_copy_records_nothing	passed	2.535
+base	tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked	passed	5.515		sec6_5 read|0.201|1.000|79.9; sec6_5 load|0.323|1.000|67.7; sec6_5 painted|0.379|1.000|62.1; sec6_5 appended|0.859|1.000|14.1
+base	tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size0]	passed	16.413
+base	tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size1]	passed	16.364
+base	tests/test_b100_workers.py::test_at_b100_17_parse_half_case06_a2l_by_keys	passed	298.225
+base	tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded]	passed	4.056
+base	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_curves	passed	27.292		R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) 400 names at 256 KiB|0.109|0.500|78.1; R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) per-object part 2S/S|1.000|1.500|33.3; R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (curves) per-object part 8S/S|0.500|2.000|75.0
+base	tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_values	failed	21.655	ZeroDivisionError: float division by zero	R-A2L-DEF.148 148/18 long COMPU_TAB_REF empty (VALUEs) 400 names at 256 KiB|0.094|0.500|81.2
+base	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object	failed	22.962	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}	R-A2L-DEF.149/10 empty table name 400 calls at 256 KiB|0.101|0.500|79.7
+base	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table	failed	41.637	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+base	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout	failed	10.331	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}
+base	tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid	failed	9.579	AssertionError: {256: 0.0, 512: 0.0, 2048: 0.0}	R-A2L-DEF.149/9 CUBOID layout 400 calls at 256 KiB|0.047|0.500|90.6
+base	tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/1]	passed	22.182
+base	tests/test_b103_a2l_refresh.py::test_r014_same_path[R-A2L-REFRESH.014/2]	passed	32.339
+base	tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled	passed	42.062
+base	tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths	passed	2.950
+base	tests/test_tui_patch_glyphs.py::test_at077d_index_alignment	passed	5.302
+base	tests/test_tui_patch_glyphs.py::test_at077e_image_generation_invalidates	passed	4.708
+base	tests/test_tui_patch_history_strip.py::test_at081b_bounds	failed	9.559	textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+base	tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_80	passed	3.463
+control	tests/test_b103_inc9b_s.py::test_r_pe_def_62_and_llr_081_3_the_synchronous_refresh_callers_repaint_in_the_same_call	passed	7.516
+control	tests/test_b103_inc9b_w.py::test_r_pe_bench_100_2_the_cue_leaves_within_0_3_s_of_a_preview_result	passed	9.026		R-PE-BENCH idle after preview VAL_BLK_DEF_0001|0.062|0.300|79.3
+control	tests/test_b103_inc9b_w.py::test_r_pe_bench_94_4_a_queued_decode_shows_its_cue_while_another_rows_summary_runs	passed	10.133		R-PE-BENCH.94/4 queued decode cue|0.453|0.500|9.4

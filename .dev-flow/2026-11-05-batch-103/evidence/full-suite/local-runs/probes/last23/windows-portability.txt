@@ -1,0 +1,4 @@
+platform=os.name nt
+process_time namespace(implementation='GetProcessTimes()', monotonic=True, adjustable=False, resolution=1e-07)
+perf_counter namespace(implementation='QueryPerformanceCounter()', monotonic=True, adjustable=False, resolution=1e-07)
+has_getloadavg False
