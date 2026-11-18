@@ -886,9 +886,10 @@ def test_r_tst_015_016_017_ci_time_limits() -> None:
             by_run[run] = step
     for command in (PR_LANE_1, PR_LANE_2, PUSH_LANE_1, PUSH_LANE_2):
         assert command in by_run, f"missing lane step: {command}"
-    assert _step_value(by_run[PUSH_LANE_1], "timeout-minutes") == "180"
+    # Run 44198600705 exhausted both push-lane limits; PR limits stay unchanged.
+    assert _step_value(by_run[PUSH_LANE_1], "timeout-minutes") == "360"
     assert _step_value(by_run[PR_LANE_1], "timeout-minutes") == "120"
-    assert _step_value(by_run[PUSH_LANE_2], "timeout-minutes") == "45"
+    assert _step_value(by_run[PUSH_LANE_2], "timeout-minutes") == "90"
     assert _step_value(by_run[PR_LANE_2], "timeout-minutes") == "30"
     # R-TST-017: lane 2 still runs after a red or timed-out lane 1.
     assert _step_value(by_run[PR_LANE_2], "if") == LANE_2_IF_PR
@@ -896,7 +897,7 @@ def test_r_tst_015_016_017_ci_time_limits() -> None:
     job_level = [
         line.strip() for line in tui_lines if line.startswith("    timeout-minutes:")
     ]
-    assert job_level == ["timeout-minutes: 240"], job_level
+    assert job_level == ["timeout-minutes: 480"], job_level
     install_steps = [step for step in steps if _step_value(step, "id") == "install"]
     assert len(install_steps) == 1, "install step must carry id: install (E3A-13)"
     # Lane 2 fits after a lane-1 stop: install + lane 1 + lane 2 <= job limit.
