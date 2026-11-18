@@ -1,0 +1,49 @@
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->A_ctrl_c_ctrl_v]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->A_right_click_ctrl_v]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->A_ctrl_c_terminal]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->A_right_click_terminal]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->A_ctrl_c_right_click]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->A_right_click_right_click]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->M_ctrl_c_ctrl_v]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->M_right_click_ctrl_v]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->M_ctrl_c_terminal]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->M_right_click_terminal]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->M_ctrl_c_right_click]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->M_right_click_right_click]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->A_ctrl_c_ctrl_v]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->A_right_click_ctrl_v]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->A_ctrl_c_terminal]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->A_right_click_terminal]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->A_ctrl_c_right_click]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->A_right_click_right_click]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->M_ctrl_c_ctrl_v]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->M_right_click_ctrl_v]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->M_ctrl_c_terminal]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->M_right_click_terminal]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->M_ctrl_c_right_click]
+tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->M_right_click_right_click]
+tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_walk_single_line_round_trip[workspace]
+tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_walk_single_line_round_trip[a2l]
+tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_walk_single_line_round_trip[mac]
+tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_walk_single_line_round_trip[patch]
+tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_walk_single_line_round_trip[diff]
+tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_walk_single_line_round_trip[crc_designer]
+tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_10_command_palette_box_round_trip
+tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_11_load_dialog_path_box_round_trip
+tests/test_b103_clipboard_matrix.py::test_r_paste_18_walk_multi_line_round_trip[patch]
+tests/test_b103_clipboard_matrix.py::test_r_paste_18_walk_multi_line_round_trip[sje]
+tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_7_flow_ref_box_round_trip
+tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_8_fx_set_name_box_round_trip
+tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_5_check_mem_address_box_round_trip
+
+37 tests collected in 0.13s
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+s                                                                        [100%]
+1 skipped in 0.12s

@@ -38,6 +38,7 @@ from tests.support.b103_clipboard import (
     P1,
     P2,
     _box,
+    _poll_until,
     _set_box,
     install_osc52_spy,
     right_click_app_route,
@@ -250,8 +251,8 @@ def test_r_tui_044_1_walk_single_line_round_trip(tmp_path: Path, place: tuple) -
             widget.value = f"R1-{P1}"
             widget.selection = (0, len(widget.value))
             await pilot.pause()
-            await right_click_app_route(app, pilot, widget)
-            await pilot.pause()
+            await right_click_app_route(app, pilot, widget, wait_for_hit=True)
+            await _poll_until(pilot, lambda: app.clipboard == f"R1-{P1}")
             rc_copied = app.clipboard
             widget.value = ""
             await pilot.pause()

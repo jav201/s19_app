@@ -443,16 +443,13 @@ def test_r_pe_bench_98_2_a_later_step_raise_releases_record_done_exactly_once(tm
             calls.append("raise")
             raise RuntimeError("later refresh step")
 
-        try:
-            app._run_refresh_steps(
-                [lambda: calls.append("first"), raises, lambda: calls.append("unreached")],
-                lambda: calls.append("done"),
-            )
-            assert len(callbacks) == 1
-            with pytest.raises(RuntimeError, match="later refresh step"):
-                callbacks.pop(0)()
-        finally:
-            app.__dict__.pop("set_timer", None)
+        app._run_refresh_steps(
+            [lambda: calls.append("first"), raises, lambda: calls.append("unreached")],
+            lambda: calls.append("done"),
+        )
+        assert len(callbacks) == 1
+        with pytest.raises(RuntimeError, match="later refresh step"):
+            callbacks.pop(0)()
         return calls, callbacks
 
     calls, callbacks = run(tmp_path, defc_dir, body)
@@ -467,16 +464,12 @@ def test_r_pe_bench_98_2_a_panel_gone_skips_the_tail_and_releases_record_done_ex
         callbacks, calls = [], []
         monkeypatch.setattr(app, "set_timer", lambda _delay, callback: callbacks.append(callback))
         monkeypatch.setattr(app, "query", lambda _selector: [])
-        try:
-            app._run_refresh_steps(
-                [lambda: calls.append("first"), lambda: calls.append("unreached")],
-                lambda: calls.append("done"),
-            )
-            assert len(callbacks) == 1
-            callbacks.pop(0)()
-        finally:
-            app.__dict__.pop("set_timer", None)
-            app.__dict__.pop("query", None)
+        app._run_refresh_steps(
+            [lambda: calls.append("first"), lambda: calls.append("unreached")],
+            lambda: calls.append("done"),
+        )
+        assert len(callbacks) == 1
+        callbacks.pop(0)()
         return calls, callbacks
 
     calls, callbacks = run(tmp_path, defc_dir, body)
