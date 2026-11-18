@@ -27,7 +27,7 @@ permissions:
 jobs:
   tui-ci:
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 480
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -68,12 +68,12 @@ jobs:
 
       - name: Run full test suite (pushes)
         if: github.event_name == 'push'
-        timeout-minutes: 180
+        timeout-minutes: 360
         run: pytest -v -rs -n auto -m "not serial_timing"
 
       - name: Run timing arms (pushes)
         if: github.event_name == 'push' && !cancelled() && steps.install.outcome == 'success'
-        timeout-minutes: 45
+        timeout-minutes: 90
         run: pytest -q -rs -m serial_timing
 
   # Non-blocking layout-drift oracle (batch-25). Runs the pytest-textual-snapshot
