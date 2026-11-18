@@ -1,4 +1,4 @@
-C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+C:\Users\<user>\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
@@ -6,8 +6,8 @@ The event loop scope for asynchronous fixtures will default to the fixture cachi
 ================================== FAILURES ===================================
 _ test_r_pe_bench_101_3_a_record_stage_refused_at_its_write_with_the_a2l_unloaded_returns_to_the_idle_look _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-40130/test_r_pe_bench_101_3_a_record0')
-defc_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-40130/b103_inc9_w_defc0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-40130/test_r_pe_bench_101_3_a_record0')
+defc_dir = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-40130/b103_inc9_w_defc0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000220EFA8CBC0>
 
     @pytest.mark.serial_timing
@@ -18,17 +18,17 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000220EFA8CBC0>
         within 0.3 s of the refusal status. Negative control: a cue cleared only on success stays amber -> RED."""
         gate = Gate(monkeypatch, "encode_values")
         statuses = stamped_statuses(monkeypatch)
-    
+
         async def body(app, pilot, panel):
             def sabotage():
                 app.current_a2l_data = None
                 return None
-    
+
             return await refused_at_the_write(pilot, app, panel, gate, sabotage, statuses, lambda _m: NO_A2L)
-    
+
 >       latency, entries, job = run(tmp_path, defc_dir, body)
 
-tests\test_b103_inc9b_s.py:212: 
+tests\test_b103_inc9b_s.py:212:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\support\b103_inc9_w.py:44: in run
     return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",
@@ -66,8 +66,8 @@ E       AssertionError: did not settle within 5 s: the busy cue `stage VAL_BLK_D
 tests\support\b103_inc9_w.py:92: AssertionError
 _ test_r_pe_bench_101_4_a_record_stage_refused_at_its_write_by_a_running_session_action_returns_to_the_idle_look _
 
-tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-40130/test_r_pe_bench_101_4_a_record0')
-defc_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-40130/b103_inc9_w_defc0')
+tmp_path = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-40130/test_r_pe_bench_101_4_a_record0')
+defc_dir = WindowsPath('C:/Users/<user>/AppData/Local/Temp/pytest-of-<user>/pytest-40130/b103_inc9_w_defc0')
 monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000220F19D8590>
 
     @pytest.mark.serial_timing
@@ -77,17 +77,17 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000220F19D8590>
         record hold released only by the stepped refresh's end is never released on this refusal -> amber stays -> RED."""
         gate = Gate(monkeypatch, "encode_values")
         statuses = stamped_statuses(monkeypatch)
-    
+
         async def body(app, pilot, panel):
             def sabotage():
                 app._busy_begin_action("file_load", "x.s19")
                 return app._running_session_action().label
-    
+
             return await refused_at_the_write(pilot, app, panel, gate, sabotage, statuses, lambda label: _BUSY_LINE.format(label=label))
-    
+
 >       latency, entries, job = run(tmp_path, defc_dir, body)
 
-tests\test_b103_inc9b_s.py:234: 
+tests\test_b103_inc9b_s.py:234:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests\support\b103_inc9_w.py:44: in run
     return drive(tmp_path, size, body, a2l=a2l or defc_dir / "definitions.a2l",

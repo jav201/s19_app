@@ -1,0 +1,11 @@
+Run: https://github.com/jav201/s19_app/actions/runs/44276970151
+Workflow/job: clipboard-windows / clipboard-windows
+Event: push (existing run inspected; no additional run dispatched)
+Status/conclusion: completed / success; watcher exit 0; job duration 37m9s
+Tested branch/SHA: b103-ci-driver-fixes a12a30065db12979c9d5bef00b506e2110874ea5
+Pytest: 216 passed, 44 skipped, 2 warnings in 2175.42s (0:36:15)
+Gate: WINCI_GATE tests=260 passed=216 failed=0 errors=0 skipped=44 obligations_passed=108/108 at_passed=28/28 at_p1=14/14 at_p2=14/14
+Gate result: WINCI_GATE_RESULT PASS violations=0 pytest_exit=0 gate_exit=0
+Artifact safety: ARTIFACT_SAFETY_RESULT PASS violations=0
+Skips: 37 legacy-linux-h, 6 linux-only, 1 manual Windows Terminal operator acceptance; no manual acceptance claimed.
+Scope: hosted Windows clipboard validation on a12a30065; this is not tui-ci pytest9.2/LinuxH validation after main and not a full-suite GREEN claim.

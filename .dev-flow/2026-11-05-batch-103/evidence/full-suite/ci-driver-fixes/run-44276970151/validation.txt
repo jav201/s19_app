@@ -1,0 +1,7 @@
+Downloaded artifact: b103-winci-outcomes, artifact id 14418330558, expired=false.
+ORIGINAL: downloaded files hashed in ORIGINAL-SHA256SUMS under run-44276970151/.
+Stored copies: redact hostname as XML-escaped <host>, LF, no trailing whitespace; no tally/oracle changes.
+stored == redact(normalize(ORIGINAL)): PASS (4 artifact files).
+XML parse: PASS; tests=260 errors=0 failures=0 skipped=44; testcases=260; parsed hostname=<host>.
+Independent stored-JUnit gate: WINCI_GATE_RESULT PASS violations=0 pytest_exit=0 gate_exit=0; obligations 108/108; AT 28/28.
+Independent stored-artifact safety: ARTIFACT_SAFETY_RESULT PASS violations=0.

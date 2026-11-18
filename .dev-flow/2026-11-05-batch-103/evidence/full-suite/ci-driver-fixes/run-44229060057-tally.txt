@@ -1,0 +1,8 @@
+Run: https://github.com/jav201/s19_app/actions/runs/44229060057
+Workflow: tui-ci
+Branch/SHA: main 65fcaa3f2a58ab6dd78152c4b6af596a01e2d1d6
+Conclusion: failure
+Full lane: 56 failed, 9256 passed, 293 skipped, 4 xfailed, 2 errors in 16082.31s (4:28:02)
+Serial lane: 4 failed, 198 passed, 23 skipped, 9609 deselected in 4541.51s (1:15:41)
+Classification: pre-fix main failure; NOT GREEN and not evidence that this driver-fix branch is green.
+The two R-PE-BENCH.98/2 cases passed their bodies and then errored at teardown in the full lane.

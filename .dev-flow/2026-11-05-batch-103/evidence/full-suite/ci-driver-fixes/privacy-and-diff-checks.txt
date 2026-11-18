@@ -1,0 +1,8 @@
+Privacy guard before redaction: 1 failed, 1 passed; 9 evidence hits (2 clipboard-static-and-windows, 1 scheduler-focused, 5 scheduler-full-file, 1 scheduler-non-timing).
+Privacy guard after redaction, with new evidence staged: 2 passed in 49.06s; 0 hits.
+Direct ci-driver-fixes forbidden-token scan: 0 hits.
+Redacted .txt copies: LF only and no trailing spaces/tabs; PASS.
+All five stored logs equal redact(normalize(ORIGINAL)) byte for byte: PASS; no tally/oracle edits.
+ORIGINAL-SHA256SUMS against commit a12a30065: PASS (6 files).
+git diff --check b5968f23: PASS.
+git diff --exit-code a12a30065 -- tests/test_b103_inc9b_s.py tests/test_b103_clipboard_matrix.py: PASS; driver files unchanged.

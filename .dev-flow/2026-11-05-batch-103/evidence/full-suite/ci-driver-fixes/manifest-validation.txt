@@ -1,0 +1,20 @@
+sha256sum -c SHA256SUMS: PASS (16 stored files listed before this validation record).
+clipboard-static-and-windows.txt: OK
+ORIGINAL-SHA256SUMS: OK
+privacy-and-diff-checks.txt: OK
+RESULTS.md: OK
+run-44229060057-tally.txt: OK
+run-44276970151/b103-winci-artifact_safety.txt: OK
+run-44276970151/b103-winci-gate.txt: OK
+run-44276970151/b103-winci-junit.xml: OK
+run-44276970151/b103-winci-pytest.txt: OK
+run-44276970151/tally.txt: OK
+run-44276970151/validation.txt: OK
+run-44276970151-metadata.json: OK
+scheduler-focused.txt: OK
+scheduler-full-file.txt: OK
+scheduler-non-timing.txt: OK
+static-checks.txt: OK
+ORIGINAL local hashes: 6/6 matched a12a30065 blobs.
+ORIGINAL Windows hashes: 4/4 matched the downloaded artifact before redaction; all stored copies matched redact(normalize(ORIGINAL)).
+Stored XML ElementTree parse: PASS; tests=260 errors=0 failures=0 skipped=44; testcases=260; hostname=<host>.

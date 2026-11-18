@@ -27,8 +27,48 @@ Entorno: Windows, Python 3.12.7, pytest 8.3.4. No se accedió al clipboard real 
 - `clipboard-static-and-windows.txt`: `37 tests collected`; se conserva el nodo `[patch]`. Su ejecución local terminó en `1 skipped` por el guard Windows/LinuxH, antes de crear la app o usar clipboard.
 - `static-checks.txt`: `py_compile` PASS para ambos archivos; comprobación AST PASS del orden hit → actualización de clipboard → borrado; `git diff --check` PASS.
 
+## Clasificación del run completo 44229060057
+
+El run `tui-ci` [`44229060057`](https://github.com/jav201/s19_app/actions/runs/44229060057), ejecutado sobre `main` `65fcaa3f2a58ab6dd78152c4b6af596a01e2d1d6`, terminó en **failure**, no GREEN:
+
+- Full lane: `56 failed, 9256 passed, 293 skipped, 4 xfailed, 2 errors in 16082.31s (4:28:02)`.
+- Serial lane: `4 failed, 198 passed, 23 skipped, 9609 deselected in 4541.51s (1:15:41)`.
+- Los dos casos R-PE-BENCH.98/2 pasaron sus cuerpos y produjeron los dos errores de teardown que corrige esta rama.
+
+La clasificación y procedencia se conservan en `run-44229060057-tally.txt`. La auditoría agente62 encontró cero regresiones de producto y limitó la intervención a los tres drivers descritos arriba; esa conclusión y los pases locales no convierten el run completo ni esta rama en GREEN.
+
+## Redacción de evidencia — revisión agente64
+
+La revisión independiente agente64 dio NO-GO a `a12a30065` por evidencia, no por los drivers. El guard inicial encontró nueve rutas con cuenta local: dos en `clipboard-static-and-windows.txt`, una en `scheduler-focused.txt`, cinco en `scheduler-full-file.txt` y una en `scheduler-non-timing.txt`.
+
+- ORIGINAL local: seis capturas almacenadas en el commit `a12a30065`, con hashes registrados en `ORIGINAL-SHA256SUMS`. No se duplican aquí sin redactar.
+- ORIGINAL Windows: los cuatro archivos descargados del artefacto `b103-winci-outcomes` (id `14418330558`) del run `44276970151`; sus hashes originales también están en `ORIGINAL-SHA256SUMS`.
+- Stored: las copias publicadas sustituyen la cuenta local por `<user>` y el hostname del runner por `<host>` (`&lt;host&gt;` en el XML), usan LF y no tienen espacios/tabuladores finales. `static-checks.txt` también se normalizó. No se alteraron tallies, aserciones, nodeids ni oráculos; cada copia fue comparada byte a byte con `redact(normalize(ORIGINAL))`.
+- `SHA256SUMS` identifica las copias redactadas y los demás artefactos almacenados; sus hashes difieren de ORIGINAL por la redacción/normalización documentada.
+- Los dos archivos de tests permanecen byte-idénticos a `a12a30065`; este cambio sólo afecta a evidencia.
+
+## Run clipboard-windows 44276970151
+
+Se esperó el run existente [`44276970151`](https://github.com/jav201/s19_app/actions/runs/44276970151), disparado por push sobre `a12a30065`; no se lanzó otro. Terminó **completed / success** en 37 min 9 s, con watcher exit 0.
+
+- Pytest: **216 passed, 44 skipped, 2 warnings in 2175.42s**.
+- Gate: **108/108 obligations; AT 28/28 (P1 14/14, P2 14/14)**; `WINCI_GATE_RESULT PASS violations=0 pytest_exit=0 gate_exit=0`.
+- Artifact safety: `ARTIFACT_SAFETY_RESULT PASS violations=0`.
+- Los 44 skips son 37 LinuxH, seis linux-only y una aceptación manual de Windows Terminal; no se reclama aceptación manual.
+- Los cuatro artefactos redactados están en `run-44276970151/`; tally y metadata tienen referencias explícitas. `validation.txt` documenta parse XML PASS (260 casos, cero failures/errors), gate independiente PASS y artifact-safety PASS sobre las copias almacenadas.
+
+Este éxito es específico del workflow Windows sobre `a12a30065`; no equivale a full-suite GREEN ni a la validación `tui-ci` pytest 9.2/LinuxH pendiente tras `main`.
+
+## Comprobaciones de higiene posteriores
+
+- `python -m pytest -q tests/test_no_private_tokens.py`: **2 passed in 49.06s**, cero hits nuevos tras redacción y con la evidencia nueva indexada.
+- Escaneo directo de `ci-driver-fixes`: cero tokens prohibidos; copias `.txt` LF y sin trailing whitespace.
+- `ORIGINAL-SHA256SUMS` contrastado con los blobs de `a12a30065`: PASS, seis archivos.
+- `git diff --check b5968f23`: PASS; los dos archivos de tests no cambiaron desde `a12a30065`.
+- Registro literal en `privacy-and-diff-checks.txt`. La validación de `SHA256SUMS` y el parse XML se documentan junto al artefacto Windows correspondiente.
+
 ## Límites y validación pendiente
 
-No se pudo ejecutar localmente el cuerpo LinuxH del caso clipboard `[patch]`: la plataforma es Windows y no se forzó el guard ni se usó clipboard real. La recolección y la comprobación AST son verificaciones estáticas, no evidencia end-to-end de ese cuerpo. CI debe validarlo.
+No se pudo ejecutar localmente el cuerpo LinuxH del caso clipboard `[patch]`: la plataforma es Windows y no se forzó el guard ni se usó clipboard real. La recolección y la comprobación AST son verificaciones estáticas, no evidencia end-to-end de ese cuerpo.
 
-El entorno local tiene pytest 8.3.4, no pytest 9.2; los dos nodos de teardown pasan localmente, pero CI debe confirmar específicamente la versión donde se observó el fallo. Los dos timeouts `serial_timing` del archivo completo quedan reportados como fallos locales no relacionados, sin reclamar suite completa verde.
+El entorno local tiene pytest 8.3.4, no pytest 9.2; los dos nodos de teardown pasan localmente, pero eso no confirma la versión donde se observó el fallo. **`tui-ci` validará pytest 9.2/LinuxH tras integrar en `main`; esa validación queda pendiente y no se presenta como completada.** Los dos timeouts `serial_timing` del archivo completo local quedan reportados como fallos no relacionados, sin reclamar suite completa verde.
