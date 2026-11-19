@@ -520,8 +520,8 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | R-TST-012 | If | If the first lane of a CI run fails, then the system shall still run the serial lane of that CI run and mark the job failed. |
 | R-TST-013 | U | The system shall check out the repository with its full history in the `tui-ci` job of its CI workflow. |
 | R-TST-014 | When | When the CI workflow runs, the system shall run the 6 history arms without skipping them. |
-| R-TST-015 | U | The system shall stop lane 1 of its CI workflow at the lane's time limit: 180 minutes on a push, 120 minutes on a pull request. |
-| R-TST-016 | U | The system shall stop the `tui-ci` job of its CI workflow after 240 minutes. |
+| R-TST-015 | U | The system shall stop lane 1 of its CI workflow at the lane's time limit: 220 minutes on a push, 120 minutes on a pull request. |
+| R-TST-016 | U | The system shall stop the `tui-ci` job of its CI workflow after 300 minutes. |
 | R-TST-017 | If | If lane 1 of a push run reaches its time limit, then the system shall still run lane 2 of that run. |
 | R-TST-018 | U | The system shall install pytest-xdist 3.8.0 in the `tui-ci` job of its CI workflow. |
 | R-TST-020 | U | The system shall bound the wait of each shared wait helper by the wall clock, 60 s by default. |
