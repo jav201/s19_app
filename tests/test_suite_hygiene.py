@@ -821,6 +821,7 @@ def test_r_tst_012_serial_lane_runs_after_a_red_lane() -> None:
 
 
 def test_r_tst_013_014_ci_checks_out_full_history() -> None:
+    """Traces: R-TST-013, R-TST-014."""
     text = WORKFLOW_PATH.read_text(encoding="utf-8")
     jobs = _workflow_jobs(text)
     assert "snapshot" in jobs, "snapshot job must stay present"
@@ -1219,6 +1220,7 @@ def test_r_tst_025_load_project_clock_stops_at_the_install_callback(tmp_path) ->
 
 
 def test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms() -> None:
+    """Traces: R-TST-031, R-TST-032."""
     from tests.support import suite_census
 
     workers_text = (TESTS_ROOT / "test_b100_workers.py").read_text(encoding="utf-8")
@@ -1702,6 +1704,7 @@ def test_c():
 
 
 def test_r_tst_043_045_qc_tm_section_rows_and_count(pytester) -> None:
+    """Traces: R-TST-043, R-TST-045."""
     result = _inner_run(pytester, {"test_qc_tm_rows.py": _PLANTED_THREE_ARMS})
     assert result.ret == 0, result.stdout.str()
     rows, count_line = _qc_tm_rows(result.stdout.str())

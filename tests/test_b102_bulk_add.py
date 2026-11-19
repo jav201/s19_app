@@ -348,6 +348,8 @@ def test_tc_b102_bulk_03_inclusion_semantics_and_duplicate_controls(tmp_path: Pa
 
     RED on base: the modal does not ship. Mutant: replace the picks, or
     append duplicates; log the pasted content.
+
+    Traces: R-B102-BULK-003.1, R-B102-BULK-003.2, R-B102-BULK-004.1, R-B102-BULK-004.2.
     """
     statuses = record_statuses(monkeypatch)
 
@@ -379,6 +381,8 @@ def test_tc_b102_bulk_03_unique_name_counts(tmp_path: Path) -> None:
     ``included 0`` and no first-missing suffix.
 
     RED on base: the modal does not ship. Mutant: count tokens, not names.
+
+    Traces: R-B102-BULK-003.2, R-B102-BULK-004.1, R-B102-BULK-005.3.
     """
 
     async def body(app, pilot, panel):
@@ -421,6 +425,8 @@ def test_tc_b102_bulk_04_summary_with_first_missing(tmp_path: Path) -> None:
 
     RED on base: the modal does not ship. Mutant: drop the first-missing
     detail, or permute the counts.
+
+    Traces: R-B102-BULK-004.1, R-B102-BULK-004.2.
     """
 
     async def body(app, pilot, panel):
@@ -445,6 +451,8 @@ def test_tc_b102_bulk_04_summary_contained_at_80x24(tmp_path: Path) -> None:
 
     RED on base: the modal does not ship. Mutant: paint the summary as markup,
     or let the first-missing detail overflow the modal.
+
+    Traces: R-B102-BULK-004.2.
     """
     long_name = "Missing" + "X" * 400
 
@@ -487,6 +495,8 @@ def test_tc_b102_bulk_05_no_match_arm(tmp_path: Path) -> None:
 
     RED on base: the modal does not ship. Mutant: clear the picks, or close
     without feedback.
+
+    Traces: R-B102-BULK-005.1, R-B102-BULK-005.2.
     """
 
     async def body(app, pilot, panel):
@@ -523,6 +533,8 @@ def test_tc_b102_bulk_06_hostile_pasted_names_render_literally(tmp_path: Path) -
     RED on base: the modal does not ship (the case exercises the modal, per
     the notas de ejecución). Mutant: route the summary through markup, or
     scrub without the exact-name inclusion.
+
+    Traces: R-B102-BULK-006.1, R-B102-BULK-006.2.
     """
 
     async def body(app, pilot, panel):
@@ -560,6 +572,8 @@ def test_tc_b102_bulk_07_close_and_apply_do_not_rebuild_the_ledger(tmp_path: Pat
 
     RED on base: the modal does not ship. Mutant: rebuild the ledger on
     modal close, or refresh through ``load_spec``.
+
+    Traces: R-B102-BULK-007.1, R-B102-BULK-007.2.
     """
     rebuilds = {"n": 0}
     spy_ledger_rebuilds(monkeypatch, rebuilds)

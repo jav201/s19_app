@@ -1795,6 +1795,8 @@ def test_tc_b97_64_a_new_set_run_restarts_the_dwell(tmp_path: Path, monkeypatch)
     held by the test: it moves only where the test moves it (the old base
     ages 0.6 s before the run, none after), and the restarted base must read
     the moved time before the ``c``.
+
+    Traces: R-TST-032.
     """
     from tests.b97_probes import record_statuses
 

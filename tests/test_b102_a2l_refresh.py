@@ -332,6 +332,7 @@ def test_tc_b102_a2l_03_active_filter_applied_to_new_attach(tmp_path: Path) -> N
 
 @pytest.mark.parametrize("filt", ["Missing", HOSTILE_FILTER])
 def test_tc_b102_a2l_04_no_match_filter_names_filter(tmp_path: Path, filt: str) -> None:
+    """Traces: R-TUI-068.4."""
     b_a2l = _write_a2l(tmp_path, "fixture_b.a2l", FIXTURE_B_A2L)
 
     async def scenario(app: S19TuiApp, pilot, log) -> None:

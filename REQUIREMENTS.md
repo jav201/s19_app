@@ -514,9 +514,10 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | Id | Form | Requirement |
 |---|---|---|
 | R-DOC-ARCHIVE.1 | U | The system shall hold each finished note of CTX-ARCHIVE only at its archive path. |
-| R-DOC-ARCHIVE.2 | U | The system shall keep, in the architecture archive of CTX-ARCHIVE, each line that this increment removes from §10 and §11 of `docs/architecture.md` and from its amendment notes. |
 | R-DOC-ARCHIVE.3 | U | The system shall hold none of the files of CTX-REMOVED. |
 | R-DOC-ARCHIVE.4 | U | The system shall hold no local identity in the files of the archive folder. |
+
+R-DOC-ARCHIVE.2 (keep in the architecture archive each line that batch-101 Inc 16 removed from §10 and §11 of `docs/architecture.md`) is retired: batch-101 kept it local to that increment (`.dev-flow/2026-11-01-batch-101/inc-16/E1-rulings.md:99`, D-1) and verified it there (`.dev-flow/2026-11-01-batch-101/03-increments/increment-016.md:143`); the fix-round fold had copied it in from the hand-over.
 
 #### S0.11 · Test suite: timing arms, waits, margins and CI (from batch-101 Inc 2)
 

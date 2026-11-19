@@ -523,3 +523,62 @@ def test_tc_b102_sel_07_hostile_parameter_name_reads_literally(tmp_path: Path) -
     assert HOSTILE_SENTINEL in plain, plain
     assert markup_spans == [], markup_spans
     assert control_bytes == [], control_bytes
+
+
+# --------------------------------------------------------------------------- #
+# R-CHKED-001 — every parameter of the loaded A2L, one row each, across pages
+# --------------------------------------------------------------------------- #
+
+
+def _ledger_names(panel) -> list:
+    """The parameter names the ledger shows, in row order (rows are keyed by name)."""
+    table = panel.query_one("#check_param_table", DataTable)
+    return [row.key.value for row in table.ordered_rows]
+
+
+async def _names_on_both_pages(panel, pilot) -> tuple:
+    first = _ledger_names(panel)
+    need(panel, "#check_param_page_next_button", Button).press()
+    await settled_delay(
+        pilot,
+        lambda: page_tuple(panel) == (2, 2) and table_rows(panel) == 50,
+        "the second page settles with its 50 rows",
+    )
+    return first, _ledger_names(panel)
+
+
+def test_r_chked_001_1_every_parameter_once_across_the_pages(tmp_path: Path) -> None:
+    """R-CHKED-001/1 (verification): 250 parameters on 200-row pages. Page 1 shows
+    200 rows and page 2 shows 50; together they hold every parameter exactly once.
+
+    Why: the fold reworded R-CHKED-001 to "in the ledger's pages" because
+    R-B102-SEL-001 caps a page at 200 rows; the every-parameter half must still
+    hold. Mutant: a page slice one row short drops a parameter -> RED.
+    """
+
+    async def body(app, pilot, panel):
+        panel.set_a2l_parameters(synthetic_rows(250))
+        await settle(pilot, 2)
+        return await _names_on_both_pages(panel, pilot)
+
+    first, second = run(tmp_path, SIZE, body, a2l=None)
+    assert (len(first), len(second)) == (PAGE_SIZE, 50), (len(first), len(second))
+    assert sorted(first + second) == [f"P{i:05d}" for i in range(250)], "a parameter is missing or shown twice"
+
+
+def test_r_chked_001_2_a_loaded_a2l_lists_every_parameter_once(tmp_path: Path) -> None:
+    """R-CHKED-001/2 (validation, black box): the operator loads an A2L with 250
+    CHARACTERISTICs and opens the Check Editor from the rail; paging through the
+    ledger shows each of the 250 parameters exactly once.
+
+    Mutant: as R-CHKED-001/1 -> RED.
+    """
+    a2l = write_wide_a2l(tmp_path, 250)
+
+    async def body(app, pilot, panel):
+        await settled_delay(pilot, lambda: table_rows(panel) == PAGE_SIZE, "the first page shows 200 rows")
+        return await _names_on_both_pages(panel, pilot)
+
+    first, second = run(tmp_path, SIZE, body, a2l=a2l)
+    assert (len(first), len(second)) == (PAGE_SIZE, 50), (len(first), len(second))
+    assert sorted(first + second) == sorted(f"P{i:03d}" for i in range(250)), "a parameter is missing or shown twice"

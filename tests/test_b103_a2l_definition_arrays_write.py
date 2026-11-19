@@ -926,6 +926,7 @@ def test_r_a2l_def_140_9_cross_page_final_span_and_single_materialization(tmp_pa
 
 
 def test_r_a2l_def_153_1_scalar_values_through_encode_values(tmp_path):
+    """Traces: R-A2L-DEF.153.1, R-A2L-DEF.153.2."""
     a2l_data = inline2(
         tmp_path,
         _val("N", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
