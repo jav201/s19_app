@@ -245,6 +245,7 @@ def test_load_selected_file_attaches_mac_to_loaded_binary(tmp_path: Path, monkey
     monkeypatch.setattr(app, "update_mac_hex_view", lambda focus_address=None: None)
     monkeypatch.setattr(app, "update_mac_view", lambda: None)
     monkeypatch.setattr(app, "update_a2l_view", lambda: None)
+    monkeypatch.setattr(app, "update_memory_map", lambda: None)
     monkeypatch.setattr(app, "update_project_labels", lambda: None)
     monkeypatch.setattr(app, "set_file_status", lambda _: None)
     monkeypatch.setattr(app, "_append_log_line", lambda _: None)

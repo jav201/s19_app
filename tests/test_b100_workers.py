@@ -1368,7 +1368,7 @@ def test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install(
 ) -> None:
     """LLR-177.1g, LLR-165.1 (P1-29): a call-order spy over the end of the
     worker step (``_prepare_project_load``), ``_reset_project_session`` and
-    ``_apply_loaded_file`` → ``["worker_end", "reset@main", "install",
+    ``_apply_prepared_load`` → ``["worker_end", "reset@main", "install",
     "install"]`` for ``P2``; a ``PermissionError`` forced into
     ``read_project_manifest`` → 0 resets and the session kept.
 
@@ -1391,7 +1391,7 @@ def test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install(
 
     Spy(monkeypatch, S19TuiApp, "_prepare_project_load", after=_end)
     Spy(monkeypatch, S19TuiApp, "_reset_project_session", before=_reset)
-    Spy(monkeypatch, S19TuiApp, "_apply_loaded_file", before=lambda *_a, **_k: events.append("install"))
+    Spy(monkeypatch, S19TuiApp, "_apply_prepared_load", before=lambda *_a, **_k: events.append("install"))
     real_manifest = app_module.deps.read_project_manifest
 
     def _manifest(project_dir, *a, **k):
@@ -3246,7 +3246,7 @@ def test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished(
         real_stat = pathlib.Path.stat
 
         def _stat(self, *args, **kwargs):
-            if sys._getframe(1).f_code.co_name == "load_a2l_from_path":
+            if sys._getframe(1).f_code.co_name == "_start_a2l_load":
                 raise OSError(5, "synthetic size read failure")
             return real_stat(self, *args, **kwargs)
 

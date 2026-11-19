@@ -157,3 +157,4 @@ Sun Nov 15 04:17:49 CSTM 2026 | E4 C9b-W | claude-sonnet-5-5 | group W done: bus
 2026-11-19T12:55:39-0600 | G3 fix round CI | orchestrator (Opus) change and Linux-host check, no worker | ci: restore batch-101 CI time limits (fix round)
 2026-11-19T12:57:08-0600 | G3 fix round FOLD | FOLD-1 deepseek-v4-pro script, F2a/F2a-2 opus congruence review, orchestrator application + Linux-host check | docs: fold batch-101 and batch-102 requirements into the canon (fix round)
 2026-11-19T13:02:11-0600 | G3 fix round G1 | deepseek-v4-pro workers G1+G1b (rtx), deepseek-v4-pro mechanical check (CHK-ds), orchestrator intent review | batch-103 G3 fix round: emit MATRIX_DIM for case_08 VAL_BLK and re-pin its digests (G1)
+2026-11-19T13:08:25-0600 | G3 fix round G3b | deepseek-v4-pro worker (rtx, timed out; frozen diff per MD-06), sonnet independent check, orchestrator laws run + intent review | batch-103 G3 fix round: re-pin worker/attach tests to the current seams (G3b)
