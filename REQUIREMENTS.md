@@ -483,6 +483,12 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | R-DOC-DEV.14 | U | The system shall state in `docs/overview.md` that the Operations modal lists `extract` and `split_by_segment` without running them. |
 | R-DOC-DEV.15 | U | The system shall list in `examples/case_00_public/MANIFEST.md` each example case folder of `examples/`. |
 
+**(from the batch-103 trace audit, TR-02)** The TUI's entry points carry docstrings (S0 D0-3 kept these checks without a row).
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-DOC-DEV.16 | U | The system shall carry a docstring on the `s19_app.tui` package and on the class `S19TuiApp`. |
+
 #### S0.9 · The architecture map (from batch-101 Inc 16)
 
 | Id | Form | Requirement |
@@ -493,6 +499,15 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | R-DOC-ARCH.4 | U | The system shall declare in §10 of `docs/architecture.md` each sub-module of CTX-SUBMOD with exactly the facts of CTX-SUBMOD. |
 | R-DOC-ARCH.5 | U | The system shall list the contracts of CTX-IFACE in one Interfaces table in §11 of `docs/architecture.md`. |
 | R-DOC-ARCH.6 | U | The system shall state in `docs/architecture.md` that an increment changes at most 4 source files. |
+
+**(from the batch-103 trace audit, TR-02)** Import rules and surfaces the code keeps; their tests were guards with no row.
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-DOC-ARCH.7 | U | The system shall import no Textual module into a headless module: `s19_app/tui/changes/check.py`, `s19_app/tui/services/change_service.py`, `s19_app/tui/services/compare_service.py`, `s19_app/tui/services/manifest_writer.py` and every `s19_app` module that the first two import, directly or indirectly. |
+| R-DOC-ARCH.8 | U | The system shall import no logging module into `s19_app/tui/services/manifest_writer.py`. |
+| R-DOC-ARCH.9 | U | The system shall import no `s19_app.tui` module into a module of `s19_app/render`. |
+| R-DOC-ARCH.10 | U | The system shall implement the four batch-92 surfaces of CTX-IFACE (`render.hexview`, `render.format`, `utils.safe_text` and the `tui/__init__` re-export) as the Interfaces table of `docs/architecture.md` states them. |
 
 #### S0.10 · Archived and removed files (from batch-101 Inc 16)
 

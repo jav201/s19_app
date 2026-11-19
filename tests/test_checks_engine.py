@@ -378,6 +378,8 @@ def test_no_textual_in_static_import_graph() -> None:
     the LLR's named alternative and inspects the code-level dependencies
     themselves (and an in-session ``sys.modules`` assertion stays banned —
     F-Q-07).
+
+    Traces: R-DOC-ARCH.7.
     """
     roots = [
         "s19_app.tui.changes.check",

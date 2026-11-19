@@ -26,7 +26,10 @@ PRODUCT_ROOT = Path(s19_app.__file__).resolve().parent
 
 
 def test_tc655_render_format_values_pinned_to_frozen_origins() -> None:
-    """TC-655 — every value at the new address equals its frozen tui origin."""
+    """TC-655 — every value at the new address equals its frozen tui origin.
+
+    Traces: R-DOC-ARCH.10.
+    """
     # The 5 style constants the moved hexview consumes (LLR-001.1 import block).
     assert render_format.CYAN == "#7dd3fc"
     assert render_format.DGRAY == "#969aad"

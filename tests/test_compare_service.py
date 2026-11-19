@@ -114,6 +114,7 @@ def test_module_imports_no_textual() -> None:
     # canonical check is the rg purity probe; this mirror parses the module's
     # own import statements via AST so no Textual import can land unnoticed
     # (prose mentions of the word "textual" in docstrings are ignored).
+    """Traces: R-DOC-ARCH.7."""
     import ast
     import sys
 

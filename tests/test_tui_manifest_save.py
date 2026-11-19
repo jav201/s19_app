@@ -303,6 +303,8 @@ def test_manifest_writer_module_is_headless() -> None:
     side-effect-quiet so it is reusable and testable without a running app. The
     probe matches IMPORT STATEMENTS (not the bare token, V-4) so a docstring
     mention never trips it.
+
+    Traces: R-DOC-ARCH.7, R-DOC-ARCH.8.
     """
     source = Path(
         "s19_app/tui/services/manifest_writer.py"

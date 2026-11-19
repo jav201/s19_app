@@ -372,8 +372,10 @@ def test_find_string_in_mem_supports_next_search():
 
 
 def test_tui_module_has_docstring():
+    """Traces: R-DOC-DEV.16."""
     assert tui.__doc__
 
 
 def test_tui_app_has_docstring():
+    """Traces: R-DOC-DEV.16."""
     assert S19TuiApp.__doc__

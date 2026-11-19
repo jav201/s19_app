@@ -232,7 +232,10 @@ def _tests_module_of(path: Path) -> str:
 
 
 def test_tc653_safe_text_import_census() -> None:
-    """TC-653 — live-tree AST census over the safe_text move (LLR-003.1/003.3)."""
+    """TC-653 — live-tree AST census over the safe_text move (LLR-003.1/003.3).
+
+    Traces: R-DOC-ARCH.10.
+    """
     # LLR-003.1: exactly one definition site per symbol in the product tree,
     # and it is s19_app/utils.py.
     def_sites: dict = {}
@@ -309,7 +312,10 @@ def test_tc653_safe_text_import_census() -> None:
 
 
 def test_tc654_format_census_and_shim_identity() -> None:
-    """TC-654 — render.format census + the 8-symbol shim identity (LLR-004.2/004.3)."""
+    """TC-654 — render.format census + the 8-symbol shim identity (LLR-004.2/004.3).
+
+    Traces: R-DOC-ARCH.10.
+    """
     census = _census(PRODUCT_ROOT, _product_package_of, _product_module_of)
 
     # LLR-004.3: the service-layer insight_style importer set is EMPTY — a

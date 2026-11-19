@@ -159,7 +159,10 @@ def _tests_module_of(path: Path) -> str:
 
 
 def test_tc651_import_census_all_consumers_read_render_hexview() -> None:
-    """TC-651 — live-tree AST census over s19_app/ (LLR-001.4, F-QA-2)."""
+    """TC-651 — live-tree AST census over s19_app/ (LLR-001.4, F-QA-2).
+
+    Traces: R-DOC-ARCH.9, R-DOC-ARCH.10.
+    """
     census = _census(PRODUCT_ROOT, _product_package_of, _product_module_of)
 
     importers = census.get(HEXVIEW_MODULE, set())
@@ -267,7 +270,10 @@ def test_tc651_import_census_all_consumers_read_render_hexview() -> None:
 
 def test_tc652_wrapper_absence_and_renderer_surface() -> None:
     """AT-289 — black-box node: the 3 wrapper names are not importable from s19_app.tui,
-    absent from tui.__all__, and still live at s19_app.range_index (V-5 re-point, LED-…92.14)."""
+    absent from tui.__all__, and still live at s19_app.range_index (V-5 re-point, LED-…92.14).
+
+    Traces: R-DOC-ARCH.10.
+    """
     """TC-652 — wrappers gone from the render module and the tui namespace."""
     # LLR-002.1: wrappers absent from the moved module.
     for name in WRAPPER_NAMES:

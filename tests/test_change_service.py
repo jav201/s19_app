@@ -576,6 +576,8 @@ def test_change_service_module_imports_no_textual() -> None:
     Intent: the service layer is headless by contract; a source-level
     inspection is the reliable check (in-session ``sys.modules`` assertions
     are polluted by earlier tests — F-Q-07).
+
+    Traces: R-DOC-ARCH.7.
     """
     import s19_app.tui.services.change_service as module
 
