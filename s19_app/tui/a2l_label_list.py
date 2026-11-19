@@ -70,6 +70,11 @@ STACK_MIN_HEIGHT = 32
 #: table keeps a row.
 TIGHT_BELOW_HEIGHT = 15
 
+#: Tiny body threshold (R-A2L-LIST.093, operator I = A): below this many body
+#: rows in list mode the summary under the table hides so a tag row paints
+#: (the 80x24 body is 9).
+TINY_BELOW_HEIGHT = 10
+
 #: Per-status Rich style (R-A2L-LIST.017 etc.): found accent, missing red,
 #: duplicate and hidden yellow.
 _STATUS_STYLE = {FOUND: GREEN, MISSING: RED, DUPLICATE: YELLOW, HIDDEN: YELLOW}
@@ -1553,6 +1558,8 @@ class A2LExplorerBody(Container):
               aligned with R-A2L-LIST.083; the 80x24 body is 9): the
               stylesheet frees rows for the tag table (R-A2L-LIST.090,
               G6, BL-I7-6).
+            - ``-tiny`` exactly when height < :data:`TINY_BELOW_HEIGHT` (10;
+              R-A2L-LIST.093).
         """
         wide = self.size.width >= WIDE_AT
         short = self.size.width < STACK_MIN_WIDTH or self.size.height < STACK_MIN_HEIGHT
@@ -1561,6 +1568,7 @@ class A2LExplorerBody(Container):
         self.set_class(wide, "-wide")
         self.set_class(short, "-short")
         self.set_class(self.size.height < TIGHT_BELOW_HEIGHT, "-tight")
+        self.set_class(self.size.height < TINY_BELOW_HEIGHT, "-tiny")
 
     def action_paste_list(self) -> None:
         """

@@ -1144,6 +1144,42 @@ def test_r_a2l_list_092_2(case08, tmp_path) -> None:
     assert _table_rows_shown(case08, tmp_path, (80, 27)) >= 1
 
 
+def test_r_a2l_list_092_3(case08, tmp_path) -> None:
+    """R-A2L-LIST.092/3: 80x24 (body 9 rows, list mode) -> at least 1 table row."""
+    assert _table_rows_shown(case08, tmp_path, (80, 24)) >= 1
+
+
+def test_r_a2l_list_093_1(case08, tmp_path) -> None:
+    """R-A2L-LIST.093/1: list mode at 80x24 hides the summary; 80x25 (body 10) shows it starting ``LIST  rows``."""
+    async def sc(app, pilot):
+        await set_filter(app, pilot, G2L_JOINED)
+        await settle(pilot, 10)
+        label = app.query_one("#a2l_tags_summary", Label)
+        tiny_display = label.display
+        await pilot.resize_terminal(80, 25)
+        await settle(pilot, 10)
+        label = app.query_one("#a2l_tags_summary", Label)
+        return tiny_display, label.display, static_text(label)
+
+    tiny_display, roomy_display, roomy_text = run_a2l(tmp_path, case08, sc, size=(80, 24))
+    assert tiny_display is False
+    assert roomy_display is True and roomy_text.startswith("LIST  rows")
+
+
+def test_r_a2l_list_093_2(case08, tmp_path) -> None:
+    """R-A2L-LIST.093/2: clearing the list at 80x24 back to text mode removes ``-list`` and shows the summary."""
+    async def sc(app, pilot):
+        await set_filter(app, pilot, G2L_JOINED)
+        await settle(pilot, 10)
+        await set_filter(app, pilot, "")
+        await settle(pilot, 10)
+        panes = app.query_one("#a2l_panes")
+        return mode_tag(app), "-list" in panes.classes, app.query_one("#a2l_tags_summary", Label).display
+
+    tag, has_list, shown = run_a2l(tmp_path, case08, sc, size=(80, 24))
+    assert tag == "FILTER" and not has_list and shown
+
+
 def _tags_pane_frame(app) -> tuple:
     """The tags pane's four border edge types and whether its title is shown."""
     pane = app.query_one("#a2l_tags_pane")

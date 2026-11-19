@@ -1862,7 +1862,7 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-LIST.013 | When | When the system shows a found, duplicate or hidden name in a list-mode row, the system shall show in its `Kind` cell the tag's characteristic type, `MEASURE` for a measurement, and the tag's section otherwise. |
 | R-A2L-LIST.014 | When | When the system shows a found, duplicate or hidden name in a list-mode row, the system shall show in its `Address`, `Len`, `Physical`, `Unit` and `Limits` cells the text the text-mode table shows for that tag in its `Address`, `Length`, `Physical`, `Unit` and `Limits` cells. |
 | R-A2L-LIST.015 | If | If a list-mode row shows a missing name, then the system shall leave its cells after `Status` blank. |
-| R-A2L-LIST.016 | While | While the viewer is in list mode, the system shall show under the table the summary `LIST  rows <a>-<b> / <n> in pasted order`. |
+| R-A2L-LIST.016 | While | While the viewer is in list mode and the A2L Explorer body is 10 rows high or more, the system shall show under the table the summary `LIST  rows <a>-<b> / <n> in pasted order`. |
 | R-A2L-LIST.017 | While | While the viewer is in list mode, the system shall show above the table ` LIST ` and two spaces followed by the counts line. |
 | R-A2L-LIST.018 | While | While the viewer is in list mode, the system shall show under the counts line `order ` followed by the ribbon and `   field ignored in LIST mode · esc back to text filter · alt+p edit the list`. |
 | R-A2L-LIST.019 | While | While the viewer is in text mode, the system shall show above the table ` TEXT `, two spaces, `'<short text of the filter text>' in <field>` or `no text filter`, `  ·  showing <n> of <T>` and `   paste several names, or alt+p, to filter by a LIST`. |
@@ -1932,7 +1932,8 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-LIST.087 | If | If the name-list preparation of the current A2L raised an error, then the system shall start it once more at the next ranking request. |
 | R-A2L-LIST.090 | While | While the A2L Explorer body is less than 15 rows high, the system shall show the tags pane without its frame and without its title. |
 | R-A2L-LIST.091 | While | While the A2L Explorer body is 9 to 14 rows high and the viewer is in text mode, the system shall show at least one tag table row. |
-| R-A2L-LIST.092 | While | While the A2L Explorer body is 10 to 14 rows high and the viewer is in list mode, the system shall show at least one tag table row. |
+| R-A2L-LIST.092 | While | While the A2L Explorer body is 9 to 14 rows high and the viewer is in list mode, the system shall show at least one tag table row. |
+| R-A2L-LIST.093 | While | While the viewer is in list mode and the A2L Explorer body is less than 10 rows high, the system shall hide the summary under the table. |
 
 <a id="s3"></a>
 

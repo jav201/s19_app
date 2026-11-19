@@ -952,7 +952,9 @@ class A2lViewMixin:
         """
         Summary:
             Paint the list-mode / text-mode filter chips, mode tag and missing
-            line above the A2L tag table (R-A2L-LIST.007-.008, .017-.024).
+            line above the A2L tag table (R-A2L-LIST.007-.008, .017-.024), and
+            mark the body with the ``-list`` class exactly in list mode so the
+            stylesheet can hide the summary under a tiny body (R-A2L-LIST.093).
 
         Args:
             None
@@ -963,6 +965,8 @@ class A2lViewMixin:
         Data Flow:
             - Decide list mode via ``_a2l_list_names`` and mark the active
               mode's button with the ``-on`` class.
+            - Mark ``#a2l_panes`` with ``-list`` exactly when ``names is not
+              None`` (list mode), and remove it otherwise (text mode).
             - Paint the mode tag (``LIST`` / ``FILTER``) and the chips line(s).
             - Show ``#a2l_list_missing`` with the missing line in list mode and
               hide it in text mode. Every widget is queried defensively so an
@@ -979,6 +983,9 @@ class A2lViewMixin:
         if not self.is_running:
             return
         names = self._a2l_list_names()
+        panes = self.query("#a2l_panes")
+        if panes:
+            panes.first().set_class(names is not None, "-list")
         self._mark_a2l_filter_mode()
         mode_tag = self.query("#a2l_filter_mode_tag")
         if mode_tag:
