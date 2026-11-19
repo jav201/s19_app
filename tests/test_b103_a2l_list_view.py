@@ -1132,6 +1132,38 @@ def test_r_a2l_list_083_3(case08, tmp_path) -> None:
     assert _table_rows_shown(case08, tmp_path, (118, 54)) >= 10
 
 
+def test_r_a2l_list_092_1(case08, tmp_path) -> None:
+    """R-A2L-LIST.092/1: 80x25 (body 10 rows, list mode) -> at least 1 table row."""
+    assert _table_rows_shown(case08, tmp_path, (80, 25)) >= 1
+
+
+def test_r_a2l_list_092_2(case08, tmp_path) -> None:
+    """R-A2L-LIST.092/2: 80x27 (body 12 rows, list mode) -> at least 1 table row."""
+    # 80x27 is the measured terminal height whose body is 12 rows at 80 columns
+    # (80x25 -> 10, 80x26 -> 11, 80x27 -> 12; see the unit's REPORT.md probe).
+    assert _table_rows_shown(case08, tmp_path, (80, 27)) >= 1
+
+
+def _tags_pane_frame(app) -> tuple:
+    """The tags pane's four border edge types and whether its title is shown."""
+    pane = app.query_one("#a2l_tags_pane")
+    title = app.query_one("#a2l_tags_title")
+    return tuple(edge[0] for edge in pane.styles.border), bool(title.display)
+
+
+def test_r_a2l_list_090_1(case08, tmp_path) -> None:
+    """R-A2L-LIST.090/1: tight body (80x24) drops the tags pane frame and title; 120x30 keeps both."""
+    async def frame(app, pilot):
+        await set_filter(app, pilot, G2L_JOINED)
+        await settle(pilot, 10)
+        return _tags_pane_frame(app)
+
+    tight_border, tight_title = run_a2l(tmp_path, case08, frame, size=(80, 24))
+    roomy_border, roomy_title = run_a2l(tmp_path, case08, frame, size=(120, 30))
+    assert tight_border == ("", "", "", "") and not tight_title
+    assert all(roomy_border) and roomy_title
+
+
 # ---------------------------------------------------------------------------
 # The paste window opened from the viewer (.040 - .056)
 # ---------------------------------------------------------------------------

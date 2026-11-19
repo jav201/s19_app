@@ -1930,6 +1930,9 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-LIST.085 | If | If a ranking raises an error, or ends after the app has stopped running or after the box, window or detail card that asked for it has left the screen, then the system shall drop its ranked names without an error. |
 | R-A2L-LIST.086 | If | If the paste window's preview comes due after the window has closed or the app has stopped running, then the system shall drop it without an error. |
 | R-A2L-LIST.087 | If | If the name-list preparation of the current A2L raised an error, then the system shall start it once more at the next ranking request. |
+| R-A2L-LIST.090 | While | While the A2L Explorer body is less than 15 rows high, the system shall show the tags pane without its frame and without its title. |
+| R-A2L-LIST.091 | While | While the A2L Explorer body is 9 to 14 rows high and the viewer is in text mode, the system shall show at least one tag table row. |
+| R-A2L-LIST.092 | While | While the A2L Explorer body is 10 to 14 rows high and the viewer is in list mode, the system shall show at least one tag table row. |
 
 <a id="s3"></a>
 

@@ -537,6 +537,22 @@ DataTable > .datatable--odd-row {
     height: 1fr;
 }
 
+/* Tight body (G6, BL-I7-6): under 12 body rows (80x24 gives 9) the pane frame,
+ * the title and the filter row's bottom padding would leave the tag table no
+ * body row (the two-line chips and the summary keep their rows); the frame
+ * and the title go and the filter row sits flush, so tag rows paint. */
+#a2l_panes.-tight #a2l_tags_pane {
+    border: none;
+}
+
+#a2l_panes.-tight #a2l_tags_title {
+    display: none;
+}
+
+#a2l_panes.-tight #a2l_tags_filters {
+    padding-bottom: 0;
+}
+
 /* List-mode chips and the missing-names line (R-A2L-LIST.083): one screen
  * line per text line, the cut marked with `…`. */
 #a2l_list_chips, #a2l_list_missing {

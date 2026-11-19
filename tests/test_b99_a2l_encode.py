@@ -607,6 +607,27 @@ async def _run_at_09(s19_path: Path, a2l_path: Path, size: tuple[int, int]) -> N
         table = app.query_one("#a2l_tags_list", DataTable)
         table.focus()
         await pilot.pause()
+        # the tag table owns its header line plus at least one tag row at every
+        # size (G6, BL-I7-6: at 80x24 it had no body row at all;
+        # R-A2L-LIST.091 (text mode, body 9 at 80x24))
+        assert table.region.height >= 2, (
+            f"no tag row paints at {size}: table region {table.region}"
+        )
+        # R-A2L-REFRESH.010: nothing is highlighted until a key moves the
+        # cursor (it rests on row 0 unhighlighted), so down then up highlights
+        # row 0 (the detail card leaves its "Highlight a tag" prompt) before
+        # any row is described.
+        await pilot.press("down")
+        await settled(
+            pilot,
+            lambda: "Highlight a tag to inspect" not in _screen_text(app)
+            and table.cursor_row == 1,
+            "a tag row is highlighted",
+        )
+        await pilot.press("up")
+        await settled(
+            pilot, lambda: table.cursor_row == 0, "the cursor is back on row 0"
+        )
         cursor = 0
         for target, name, expected in (
             (0, "SYM_U16_MSB", "Scalar value: 4113"),

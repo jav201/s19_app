@@ -65,6 +65,10 @@ PREVIEW_MAX = 200
 WIDE_AT = 180
 STACK_MIN_WIDTH = 110
 STACK_MIN_HEIGHT = 32
+#: Tight body threshold (R-A2L-LIST.090, aligned with R-A2L-LIST.083): below
+#: this many body rows the tags pane drops its frame and title so the tag
+#: table keeps a row.
+TIGHT_BELOW_HEIGHT = 15
 
 #: Per-status Rich style (R-A2L-LIST.017 etc.): found accent, missing red,
 #: duplicate and hidden yellow.
@@ -1545,6 +1549,10 @@ class A2LExplorerBody(Container):
             - Else ``-short`` exactly when width < :data:`STACK_MIN_WIDTH`
               (110) or height < :data:`STACK_MIN_HEIGHT` (32).
             - Else neither class (the stacked body); the stylesheet lays out.
+            - ``-tight`` exactly when height < :data:`TIGHT_BELOW_HEIGHT` (15,
+              aligned with R-A2L-LIST.083; the 80x24 body is 9): the
+              stylesheet frees rows for the tag table (R-A2L-LIST.090,
+              G6, BL-I7-6).
         """
         wide = self.size.width >= WIDE_AT
         short = self.size.width < STACK_MIN_WIDTH or self.size.height < STACK_MIN_HEIGHT
@@ -1552,6 +1560,7 @@ class A2LExplorerBody(Container):
             short = False
         self.set_class(wide, "-wide")
         self.set_class(short, "-short")
+        self.set_class(self.size.height < TIGHT_BELOW_HEIGHT, "-tight")
 
     def action_paste_list(self) -> None:
         """
