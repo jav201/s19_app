@@ -254,8 +254,30 @@ async def _show_a2l(app, pilot) -> DataTable:
     )
     table = _tag_table(app)
     table.focus()
+    await pilot.pause()
     if table.row_count:
-        table.move_cursor(row=0)
+        # Perform a real operator highlight so the detail card leaves its
+        # "Highlight a tag to inspect its fields." hint (R-A2L-REFRESH.010).
+        # The old ``table.move_cursor(row=0)`` was a no-op: after the page
+        # build the cursor already sits on row 0, and DataTable only posts
+        # ``RowHighlighted`` when the cursor coordinate changes, so the card
+        # never received the tag.  Move the cursor off row 0 and back through
+        # the pilot's real keys; a single-row page cannot move off row 0, so
+        # nudge the cursor to column 1 and back — the coordinate change alone
+        # re-fires the genuine row highlight (the product's own
+        # ``_focus_a2l_tag_absolute_index`` moves the cursor the same way).
+        if table.row_count > 1:
+            await pilot.press("down")
+            await pilot.press("up")
+        else:
+            table.move_cursor(row=0, column=1)
+            table.move_cursor(row=0, column=0)
+        await wait_until(
+            pilot,
+            lambda: _card(app).render().plain != "Highlight a tag to inspect its fields.",
+            lambda: f"the detail card still shows the hint: {_card(app).render().plain!r}",
+            timeout=15,
+        )
     await _settle(pilot, 10)
     return table
 
@@ -1244,7 +1266,12 @@ def test_r_tui_042a_7_1_6_limits(tmp_path: Path) -> None:
     """R-TUI-042a.7.1 case /6: a hostile lower-limit word, then a hostile
     upper-limit word — each loaded from a real A2L file; the limits line sits
     below the card's 5 visible rows and is scrolled into view, proven painted,
-    before the hostile introducers are asserted absent."""
+    before the hostile introducers are asserted absent.  Run at 100×24 so the
+    body is in the -short regime (R-A2L-LIST.083), where the card's max-height
+    is 5 rows: the card's 6 logical lines (header, desc, unit·conv, layout,
+    byteorder, limits) overflow those 5 rows, so the scroll condition the case
+    is about exists under the Inc 7 stacked layout (at 118×54 the card is 14
+    rows tall and the 6 lines no longer overflow)."""
     for field in ("lower_limit", "upper_limit"):
         hostile, scrubbed = _hostile("LIM", "_END")
         if field == "lower_limit":
@@ -1255,7 +1282,7 @@ def test_r_tui_042a_7_1_6_limits(tmp_path: Path) -> None:
         async def _observe(app, pilot, table, scrubbed=scrubbed):
             await _assert_card_painted_then_safe(app, pilot, scrubbed, scroll=True)
 
-        _explore_card(tmp_path, a2l, (118, 54), _observe)
+        _explore_card(tmp_path, a2l, (100, 24), _observe)
 
 
 def test_r_tui_042a_7_1_7_name_on_the_name_line(tmp_path: Path) -> None:
@@ -1281,9 +1308,9 @@ def test_r_tui_042a_7_1_7_name_on_the_name_line(tmp_path: Path) -> None:
 
 def test_r_tui_042a_7_2_1_description_break_run(tmp_path: Path) -> None:
     """R-TUI-042a.7.2 case /1: a long identifier written over two lines, the
-    second starting with a TAB — the painted desc line reads
-    ``desc SYN  desc part two`` and no TAB/LF/CR from the value is painted or
-    sent to the terminal."""
+    second starting with a TAB — the logical desc line reads
+    ``desc SYN  desc part two`` (one space where the break run was) and no
+    TAB/LF/CR from the value is painted or sent to the terminal."""
     a2l = (
         _CARD_HEAD
         + '/begin MEASUREMENT SYN_NAME "SYN  desc\n\tpart two"\n'
@@ -1295,10 +1322,13 @@ def test_r_tui_042a_7_2_1_description_break_run(tmp_path: Path) -> None:
 
     async def _observe(app, pilot, table):
         card = _card(app)
-        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
-        joined = "".join(lines)
-        assert "desc SYN  desc part two" in joined, joined
         plain = card.render().plain
+        # R-TUI-042a.7.2: the value's break run (LF + TAB) collapses to exactly
+        # one space on the LOGICAL desc line.  Painted rows joined without
+        # separators lose the wrap-point space, so assert the logical line, not
+        # the joined painted rows.
+        desc_lines = [ln for ln in plain.split("\n") if ln.startswith("desc ")]
+        assert desc_lines == ["desc SYN  desc part two"], desc_lines
         assert "\t" not in plain and "\r" not in plain, repr(plain)
         _assert_no_introducers(_screen_output(app))
         assert "\t" not in _screen_output(app)
@@ -1325,16 +1355,19 @@ def test_r_tui_042a_7_2_2_unit_break_run(tmp_path: Path) -> None:
 
 def test_r_tui_042a_8_1_name_line_with_a_display_identifier(tmp_path: Path) -> None:
     """R-TUI-042a.8 case /1: LONGMAP(48) with ``DISPLAY_IDENTIFIER SYN_DISP_W`` —
-    first line ``✓ SYN_DISP_W  0x1C2D3E00``; the painted Name line and its
-    painted continuations hold the full 48-character name (never read from
-    ``card.render().plain``)."""
+    the first logical card line ``✓ SYN_DISP_W  0x1C2D3E00`` and the name on a
+    logical line of its own, read from the card's content (``card.render()``),
+    not from painted (soft-wrapped) rows."""
     async def _check(app, pilot, table):
         card = _card(app)
-        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        # Logical card lines (the content before soft-wrap), read from the
+        # card's renderable — not from painted (soft-wrapped) rows.
+        # R-TUI-042a.8: the display identifier is on the first logical line and
+        # the name is on a logical line of its own.
+        lines = card.render().plain.split("\n")
         assert lines and lines[0] == f"✓ SYN_DISP_W  {ADDR_STR}", lines
-        start = next((i for i, ln in enumerate(lines) if ln == "name" or ln.startswith("name ")), None)
-        assert start is not None, lines
-        assert longname(48) in "".join(lines[start:]), (longname(48), lines[start:])
+        name_lines = [ln for ln in lines if ln.startswith("name ")]
+        assert name_lines == [f"name {longname(48)}"], lines
 
     _explore(tmp_path, HEAD + map_block(longname(48), display_identifier="SYN_DISP_W") + TAIL,
              (118, 54), _check)
@@ -1381,7 +1414,7 @@ def test_at_b103_i12_1_no_glued_or_cut_values(tmp_path: Path) -> None:
     """AT-B103-I12-1: SYNMAP at 220/160/118/100/80; LONGMAP(48) at 118; PAGE64(48)
     loaded while the Explorer is shown at 80 and 118 — every ``0x…`` run is a
     declared address, every Length cell a declared length, every Tag cell ends
-    inside the visible width, and the SYNMAP card's first line is
+    inside the visible width, and the SYNMAP card's first logical line is
     ``✓ SYN_MAP_W  0x1C2D3E00``."""
     syn_declared = {ADDR_STR}
     syn_lengths = {"2266"}
@@ -1389,7 +1422,10 @@ def test_at_b103_i12_1_no_glued_or_cut_values(tmp_path: Path) -> None:
     for width in (220, 160, 118, 100, 80):
         async def _syn(app, pilot, table):
             _assert_at_invariants(app, table, syn_declared, syn_lengths)
-            lines = [ln.rstrip() for ln in _painted_lines(_card(app)) if ln.strip()]
+            # The card's first LOGICAL line (its content before soft-wrap)
+            # holds the name and address unglued; a wrapped painted row may
+            # split them, so read the card's renderable, not painted rows.
+            lines = _card(app).render().plain.split("\n")
             assert lines and lines[0] == f"✓ SYN_MAP_W  {ADDR_STR}", lines
 
         _explore(tmp_path, page_syn(), (width, 50), _syn)
