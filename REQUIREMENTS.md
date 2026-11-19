@@ -3429,20 +3429,20 @@ dialogs today (owner = the chapter of the content):
   Load                                      S7     Load (alt+l) · Cancel (esc)      path box or     yes
                                                                                     list (S7.2)
   Project name (Save project)               S11    Save (alt+s) · Cancel (esc)      name box        yes
-  Select variant (project '<name>'):        S11    Activate · Cancel                variant list    no
+  Select variant (project '<name>'):        S11    Activate · Cancel                variant list    yes
   Project <name> opened[ with <n>           S11    Select variant (v) ·             result list     yes
     problem(s)] (the Load-result panel)            Close (esc)
   Replace <what>? (the load question)       S5     Replace (y) · Cancel (n)         Cancel (n)      yes
   Quit? (the quit question)                 S6     Quit (y) · Stay (n)              Stay (n)        yes
-  Save flow as:                             S16    Save · Cancel                    name box        no
-  Load flow:                                S16    Import… · Load · Cancel          flow list       no
-  Discard unsaved flow edits?               S16    Discard · Cancel                 Discard         no
+  Save flow as:                             S16    Save · Cancel                    name box        yes
+  Load flow:                                S16    Import… · Load · Cancel          flow list       yes
+  Discard unsaved flow edits?               S16    Discard · Cancel                 Discard         yes
   Edit change-set JSON:                     S10    Confirm · Cancel                 text            yes
-  Edit entry JSON:                          S10    Confirm · Cancel                 text            no
+  Edit entry JSON:                          S10    Confirm · Cancel                 text            yes
   Unsaved changes will be lost              S10    Accept loss and load · Cancel    Cancel          yes
-  Write the computed CRC(s) into a new      S13    Width: <n> bytes/line ·          Width           no
+  Write the computed CRC(s) into a new      S13    Width: <n> bytes/line ·          Width           yes
     modified S19 under the work area?              Confirm · Cancel
-  Operations:                               S13    Load config · Execute ·          operation list  no
+  Operations:                               S13    Load config · Execute ·          operation list  yes
                                                    Write CRC · Close
   Reports (project '<name>'):               S12    Generate new report · Close      report list     yes
                                                                                     (the ? chip

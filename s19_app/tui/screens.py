@@ -848,6 +848,9 @@ class EntryJsonScreen(ModalScreen[Optional[str]]):
     #: than on the Confirm button (mirrors :class:`ChangeSetJsonScreen`).
     AUTO_FOCUS = "#entry_json_text"
 
+    #: Escape does what Cancel does (R-DLG.2; the ChangeSetJsonScreen idiom).
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+
     def __init__(self, seed_text: str) -> None:
         super().__init__()
         self._seed_text = seed_text
@@ -866,9 +869,13 @@ class EntryJsonScreen(ModalScreen[Optional[str]]):
             classes="modal-dialog",
         )
 
+    def action_cancel(self) -> None:
+        """Escape and the Cancel button share this path (R-DLG.2)."""
+        self.dismiss(None)
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "entry_json_cancel":
-            self.dismiss(None)
+            self.action_cancel()
             return
         if event.button.id == "entry_json_confirm":
             self.dismiss(self.query_one("#entry_json_text", TextArea).text)
@@ -1422,6 +1429,9 @@ class SaveFlowScreen(ModalScreen[Optional[str]]):
             overwrite notice fires when the sanitised input is one of these.
     """
 
+    #: Escape does what Cancel does (R-DLG.2; the ChangeSetJsonScreen idiom).
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+
     def __init__(self, default_name: str, existing: Optional[List[str]] = None) -> None:
         super().__init__()
         self.default_name = default_name
@@ -1462,9 +1472,13 @@ class SaveFlowScreen(ModalScreen[Optional[str]]):
         notice = self.query_one("#flow_overwrite_notice", Label)
         notice.update("(overwrites existing)" if clean in self.existing else "")
 
+    def action_cancel(self) -> None:
+        """Escape and the Cancel button share this path (R-DLG.2)."""
+        self.dismiss(None)
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "flow_save_cancel":
-            self.dismiss(None)
+            self.action_cancel()
             return
         if event.button.id == "flow_save_ok":
             raw = self.query_one("#flow_save_name", Input).value.strip()
@@ -1490,6 +1504,9 @@ class LoadFlowScreen(ModalScreen[Optional[str]]):
         project_dir (Path): The active project dir — the Import copy destination
             (``project_dir/flows``).
     """
+
+    #: Escape does what Cancel does (R-DLG.2; the ChangeSetJsonScreen idiom).
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
 
     def __init__(self, flows: List[str], project_dir: Path) -> None:
         super().__init__()
@@ -1518,9 +1535,13 @@ class LoadFlowScreen(ModalScreen[Optional[str]]):
             classes="modal-dialog",
         )
 
+    def action_cancel(self) -> None:
+        """Escape and the Cancel button share this path (R-DLG.2)."""
+        self.dismiss(None)
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "flow_load_cancel":
-            self.dismiss(None)
+            self.action_cancel()
             return
         if event.button.id == "flow_import":
             self._import_external()
@@ -2197,6 +2218,9 @@ class ConfirmDiscardScreen(ModalScreen[bool]):
         target (str): The stem of the flow about to be loaded (shown, markup-safe).
     """
 
+    #: Escape does what Cancel does (R-DLG.2; the ChangeSetJsonScreen idiom).
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+
     def __init__(self, target: str) -> None:
         super().__init__()
         self.target = target
@@ -2219,11 +2243,15 @@ class ConfirmDiscardScreen(ModalScreen[bool]):
             classes="modal-dialog",
         )
 
+    def action_cancel(self) -> None:
+        """Escape and the Cancel button share this path (R-DLG.2)."""
+        self.dismiss(False)
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "flow_discard_ok":
             self.dismiss(True)
         elif event.button.id == "flow_discard_cancel":
-            self.dismiss(False)
+            self.action_cancel()
 
 
 class ConfirmQuestionScreen(ModalScreen[bool]):
@@ -2331,6 +2359,9 @@ class SelectVariantScreen(ModalScreen[Optional[str]]):
     Calm Dark ``.modal-dialog`` token classes from ``styles.tcss``.
     """
 
+    #: Escape does what Cancel does (R-DLG.2; the ChangeSetJsonScreen idiom).
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+
     def __init__(
         self,
         project_name: str,
@@ -2377,10 +2408,14 @@ class SelectVariantScreen(ModalScreen[Optional[str]]):
             list_view.index = self.active_index
         list_view.focus()
 
+    def action_cancel(self) -> None:
+        """Escape and the Cancel button share this path (R-DLG.2)."""
+        logger.info("SelectVariantScreen dismissed by cancel.")
+        self.dismiss(None)
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "variant_cancel":
-            logger.info("SelectVariantScreen dismissed by cancel.")
-            self.dismiss(None)
+            self.action_cancel()
             return
         if event.button.id == "variant_ok":
             list_view = self.query_one("#variant_list", ListView)
@@ -3488,6 +3523,9 @@ class ConfirmWriteScreen(ModalScreen[Optional[ConfirmWriteResult]]):
     #: ``SAVEBACK_WIDTHS`` (screens_directionb.py).
     CRC_WIDTHS = (32, 16)
 
+    #: Escape does what Cancel does (R-DLG.2; the ChangeSetJsonScreen idiom).
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+
     def __init__(self) -> None:
         super().__init__()
         #: The currently-selected save width; cycled by ``#confirm_write_width``
@@ -3511,6 +3549,11 @@ class ConfirmWriteScreen(ModalScreen[Optional[ConfirmWriteResult]]):
             classes="modal-dialog",
         )
 
+    def action_cancel(self) -> None:
+        """Escape and the Cancel button share this path (R-DLG.2)."""
+        logger.info("ConfirmWriteScreen cancelled.")
+        self.dismiss(ConfirmWriteResult(False, self._crc_saveback_width))
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "confirm_write_width":
             # Selector state only — cycle the record width and relabel; no
@@ -3529,8 +3572,7 @@ class ConfirmWriteScreen(ModalScreen[Optional[ConfirmWriteResult]]):
             self.dismiss(ConfirmWriteResult(True, self._crc_saveback_width))
             return
         if event.button.id == "confirm_write_cancel":
-            logger.info("ConfirmWriteScreen cancelled.")
-            self.dismiss(ConfirmWriteResult(False, self._crc_saveback_width))
+            self.action_cancel()
 
 
 class OperationsScreen(ModalScreen[None]):
@@ -3605,6 +3647,9 @@ class OperationsScreen(ModalScreen[None]):
     #: Status prefix when no file was written (containment / emit / write
     #: fault, F-L1): a failure must NOT read like a clean write.
     WRITE_FAILED_TEXT = "WRITE FAILED - no file was written:"
+
+    #: Escape does what Close does (R-DLG.2; the ChangeSetJsonScreen idiom).
+    BINDINGS = [Binding("escape", "close_operations", "Close", show=False)]
 
     def __init__(self, options: List[Tuple[str, str]], loaded: LoadedFile) -> None:
         super().__init__()
@@ -3755,10 +3800,14 @@ class OperationsScreen(ModalScreen[None]):
         if not is_crc:
             write_button.disabled = True
 
+    def action_close_operations(self) -> None:
+        """Escape and the Close button share this path (R-DLG.2)."""
+        logger.info("OperationsScreen dismissed by close.")
+        self.dismiss(None)
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "operations_close":
-            logger.info("OperationsScreen dismissed by close.")
-            self.dismiss(None)
+            self.action_close_operations()
             return
         if event.button.id == "operations_execute":
             self._execute_selected()

@@ -1131,3 +1131,139 @@ def test_at_i12_2_rail_keys_and_issue_peek_after_the_aliases_go(tmp_path: Path, 
         assert app._active_screen_key == "issues"
 
     _run(tmp_path, scenario)
+
+
+# --------------------------------------------------------------------------- #
+# R-DLG.2 in the seven dialogs that ignored Escape (BL-I12-5, batch-103 fix round)
+# --------------------------------------------------------------------------- #
+_SEVEN_DIALOGS = [
+    "EntryJsonScreen",
+    "SaveFlowScreen",
+    "LoadFlowScreen",
+    "ConfirmDiscardScreen",
+    "SelectVariantScreen",
+    "ConfirmWriteScreen",
+    "OperationsScreen",
+]
+
+
+def _seven_dialogs(tmp_path: Path) -> dict:
+    """name -> (factory, id of its Cancel or Close button, the result that button gives)."""
+    from s19_app.tui.models import LoadedFile
+    from s19_app.tui.screens import (
+        ConfirmDiscardScreen,
+        ConfirmWriteResult,
+        ConfirmWriteScreen,
+        EntryJsonScreen,
+        LoadFlowScreen,
+        OperationsScreen,
+        SaveFlowScreen,
+        SelectVariantScreen,
+    )
+
+    loaded = LoadedFile(
+        path=Path("firmware.s19"),
+        file_type="s19",
+        mem_map={0x1000: 0x12},
+        row_bases=[0x1000],
+        ranges=[(0x1000, 0x1004)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_records=[],
+        mac_diagnostics=[],
+    )
+    return {
+        "EntryJsonScreen": (lambda: EntryJsonScreen('{"type": "bytes"}'), "entry_json_cancel", None),
+        "SaveFlowScreen": (lambda: SaveFlowScreen("flow", existing=[]), "flow_save_cancel", None),
+        "LoadFlowScreen": (lambda: LoadFlowScreen(["nightly"], tmp_path), "flow_load_cancel", None),
+        "ConfirmDiscardScreen": (lambda: ConfirmDiscardScreen("nightly"), "flow_discard_cancel", False),
+        "SelectVariantScreen": (
+            lambda: SelectVariantScreen("proj1", [("v1", "v1"), ("v2", "v2")], 0),
+            "variant_cancel",
+            None,
+        ),
+        "ConfirmWriteScreen": (ConfirmWriteScreen, "confirm_write_cancel", ConfirmWriteResult(False, 32)),
+        "OperationsScreen": (lambda: OperationsScreen([("crc", "CRC")], loaded), "operations_close", None),
+    }
+
+
+async def _dismiss_with(app, pilot, screen, how: str, button_id: str) -> list:
+    from textual.widgets import Button
+
+    results: list = []
+    kind = type(screen)
+    app.push_screen(screen, callback=results.append)
+    await settled(pilot, lambda: isinstance(app.screen, kind), f"{kind.__name__} opens", timeout=CLOSE_WAIT_S)
+    await settle(pilot)
+    if how == "escape":
+        await pilot.press("escape")
+    else:
+        app.screen.query_one(f"#{button_id}", Button).press()
+    await settled(
+        pilot,
+        lambda: not any(isinstance(s, kind) for s in app.screen_stack),
+        f"{kind.__name__} closes by {how}; stack {_stack(app)}",
+        timeout=CLOSE_WAIT_S,
+    )
+    await settle(pilot)
+    return results
+
+
+@pytest.mark.parametrize("name", _SEVEN_DIALOGS)
+def test_r_dlg_2_13_escape_does_what_cancel_does(tmp_path: Path, name: str) -> None:
+    """R-DLG.2/13 (verification): in each dialog that ignored Escape (CTX-DIALOG
+    "Esc today: no", BL-I12-5), Escape closes the dialog with exactly the result its
+    Cancel or Close button gives, and that is the result the button always gave
+    (the callers read None or False as "nothing changes").
+
+    Mutant: drop one dialog's escape binding -> that case never closes -> RED.
+    """
+    factory, button_id, expected = _seven_dialogs(tmp_path)[name]
+
+    async def scenario(app, pilot) -> None:
+        by_button = await _dismiss_with(app, pilot, factory(), "button", button_id)
+        by_escape = await _dismiss_with(app, pilot, factory(), "escape", button_id)
+        assert by_button == [expected], by_button
+        assert by_escape == [expected], by_escape
+
+    _run(tmp_path, scenario)
+
+
+def test_r_dlg_2_14_escape_in_save_flow_saves_nothing(tmp_path: Path) -> None:
+    """R-DLG.2/14 (validation, black box): in the Flow Builder of an open project the
+    operator adds a block, presses Save, then Escape in the Save flow dialog: the
+    dialog closes, no flow file is written and the flow stays unsaved.
+
+    Mutant: as R-DLG.2/13 -> RED (the dialog stays open).
+    """
+    from textual.widgets import Button, Static
+
+    from s19_app.tui.screens import SaveFlowScreen
+
+    async def scenario(app, pilot) -> None:
+        make_project(app, "proj1")
+        project = await load_project(app, "proj1")
+        await open_flow_builder(app, pilot)
+        app.query_one("#flow_ref", Input).value = "prg.s19"
+        app.query_one("#flow_add", Button).press()
+        await settle(pilot)
+        app.query_one("#flow_save", Button).press()
+        await settled(pilot, lambda: isinstance(app.screen, SaveFlowScreen), "Save flow opens", timeout=CLOSE_WAIT_S)
+        await settle(pilot)
+        await pilot.press("escape")
+        await settled(
+            pilot,
+            lambda: not any(isinstance(s, SaveFlowScreen) for s in app.screen_stack),
+            f"Save flow closes on Escape; stack {_stack(app)}",
+            timeout=CLOSE_WAIT_S,
+        )
+        await settle(pilot)
+        flows = project / "flows"
+        written = sorted(p.name for p in flows.glob("*.json")) if flows.is_dir() else []
+        assert written == [], written
+        strip = app.query_one("#flow_name_strip", Static).render().plain
+        assert "· unsaved" in strip, strip
+
+    _run(tmp_path, scenario)
