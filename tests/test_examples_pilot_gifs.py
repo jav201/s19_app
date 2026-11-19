@@ -191,7 +191,10 @@ _CASES = _discover_cases()
     ids=[c[0] for c in _CASES],
 )
 def test_case_pilot_capture_and_gif(case_id: str, case_dir: Path, tmp_path: Path) -> None:
-    """Drive the TUI headlessly for one case and emit SVG frames + a GIF."""
+    """Drive the TUI headlessly for one case and emit SVG frames + a GIF.
+
+    Traces: R-TST-200.
+    """
     primary = _pick_primary(case_dir)
     if primary is None:
         pytest.skip(f"{case_id}: no S19/HEX image present")

@@ -85,7 +85,10 @@ def _expand_runs(runs: dict) -> dict:
 
 
 def test_tc_b99_01_deterministic(tmp_path):
-    """Two ``--out`` runs write byte-identical corpora (LLR-152.1)."""
+    """Two ``--out`` runs write byte-identical corpora (LLR-152.1).
+
+    Traces: R-TST-202.
+    """
     d1 = tmp_path / "run1"
     d2 = tmp_path / "run2"
     for out in (d1, d2):
@@ -100,7 +103,10 @@ def test_tc_b99_01_deterministic(tmp_path):
 
 
 def test_tc_b99_02_coverage_classes():
-    """Every LLR-152.2 coverage class names at least one manifest file."""
+    """Every LLR-152.2 coverage class names at least one manifest file.
+
+    Traces: R-TST-202.
+    """
     manifest = _load_manifest()
     present = set()
     for entry in manifest["files"]:
@@ -182,7 +188,10 @@ def _extents(image) -> list:
 
 
 def test_tc_b99_03b_hex_extents_literal():
-    """HEX extents pinned literally from the spec (LLR-152.3 hardening, F4)."""
+    """HEX extents pinned literally from the spec (LLR-152.3 hardening, F4).
+
+    Traces: R-TST-202.
+    """
     for name, expected in LITERAL_HEX_EXTENTS.items():
         assert _extents(read_hex(CORPUS / name)) == expected, name
 

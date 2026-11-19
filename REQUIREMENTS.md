@@ -593,6 +593,15 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | R-TST-163 | U | The system shall place each wait of R-TST-150 … R-TST-153, R-TST-159 … R-TST-162 and R-TST-164 (D9) as the statement that directly follows its table-D trigger. |
 | R-TST-164 | When | When the TC-B94-27 arm imports the template `base` a second time, the system shall read lane B's bindings and lane B's box only after the panel's lane names read `["base", "base_2"]` and lane B's box `#fx_in_1_0` is mounted with a non-empty screen region. |
 
+#### S0.14 · Test suite: tooling and oracle guards (from the batch-103 trace audit)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-TST-200 | U | The system shall keep the visual-evidence tools, the pilot capture of `tests/test_examples_pilot_gifs.py` and the gallery sync of `tools/sync_evidence.py`, to the contract their docstrings and command-line help state. |
+| R-TST-201 | U | The system shall keep the address-origin tool `tools/address_origin.py` to the contract its docstrings state. |
+| R-TST-202 | When | When the generator `tests/fixtures/synth/generate.py` writes the synthetic corpus, the system shall give the corpus the same bytes on every run, at least one file of each coverage class and the Intel HEX extents its manifest pins. |
+| R-TST-203 | If | If a report golden would keep a host path after canonicalisation, or the AT-B77-02 fixture would hold runs of equal length or a gap, then the system shall fail the guard of that oracle. |
+
 <a id="s1"></a>
 
 ## S1 · S19 / Intel HEX reading & parsing

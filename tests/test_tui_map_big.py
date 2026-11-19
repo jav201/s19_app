@@ -1251,6 +1251,8 @@ def test_b77_gapless_fixture_is_unequal_and_gapless(tmp_path: Path) -> None:
     and the ``round()`` mutation cannot redden it. A gap would make ``n_gaps``
     non-zero, changing the allocation the golden pins and silently voiding the
     "gapless no-op" the requirement names.
+
+    Traces: R-TST-203.
     """
     loaded = _gapless_unequal_loaded(tmp_path)
 
