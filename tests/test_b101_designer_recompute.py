@@ -1203,7 +1203,10 @@ def test_r_crc_preview_coverage_crc_error_after_a_clean_evaluation_is_named(
 
     Why: without the branch the preview formatted ``None`` as a CRC and raised
     ``TypeError`` inside the recompute. Negative control: the ``crc_error``
-    branch removed from ``_coverage_preview_text`` -> ``TypeError`` -> RED."""
+    branch removed from ``_coverage_preview_text`` -> ``TypeError`` -> RED.
+
+    Traces: R-CRC-PREVIEW-001.13, R-CRC-PREVIEW-001.14.
+    """
 
     async def scenario():
         app = S19TuiApp(base_dir=tmp_path)

@@ -9034,6 +9034,8 @@ def test_ac5_files_list_grows_beyond_legacy_cap(tmp_path: Path) -> None:
     the sections list — both lists must keep >= 1 visible row. A loaded file
     is installed first because the Workspace shows its empty-state panel
     (content hidden, heights 0) until `current_file` is set (LLR-002.3).
+
+    Traces: R-TUI-029.8.
     """
 
     async def _drive(size: "tuple[int, int]") -> "tuple[int, int]":

@@ -747,6 +747,8 @@ def test_tc_b78_34_control_rows_are_one_row_at_80x24(tmp_path: Path) -> None:
     and ``#diff_columns`` still paint zero here. Making that case honest is
     HLR-124's notice regime, built at Inc-5 - it is deliberately NOT asserted
     here, because a node that pins today's zero would false-fail Inc-5.
+
+    Traces: R-DIFF-SCR.23.
     """
     geometry = _b78_diff_geometry(tmp_path, (80, 24))
 
@@ -1087,6 +1089,8 @@ def test_at_b78_16_every_run_reachable_by_mouse(tmp_path: Path) -> None:
     targets lay OUTSIDE the list's content region before scrolling and requires
     that count to be non-zero, so a fixture that happens to fit on screen fails
     loudly instead of quietly testing nothing.
+
+    Traces: R-DIFF-SCR.21.
     """
     runs = [(i * 0x100, i * 0x100 + 4, "changed") for i in range(20)]
 
@@ -2868,6 +2872,8 @@ def test_at_b78_23_no_wrapped_row_in_the_wide_regime(tmp_path: Path) -> None:
     The wide regime's own property rides here too: the run list is BESIDE the
     window (LLR-124.2), which is what distinguishes this regime from the
     fallback one where the same width clause also holds.
+
+    Traces: R-DIFF-SCR.22.
     """
     widest = _b78_widest_emitted_hex_row()
     measured = _b78_regime_probe(tmp_path, _B78_INC5_WIDE)
@@ -4097,6 +4103,8 @@ def test_at_b78_24_no_hex_row_wraps_in_the_fallback_regime(tmp_path: Path) -> No
     pretending to be one, and every offset below it lies. The window must be at
     least `79` cells wide, and the clipped height must be at least 1 -- a window
     79 cells wide and 0 rows tall wraps nothing because it shows nothing (M3).
+
+    Traces: R-DIFF-SCR.22.
     """
     at_120 = _b79_diff_at(tmp_path, (120, 30))
 

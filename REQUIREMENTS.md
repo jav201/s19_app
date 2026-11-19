@@ -2718,6 +2718,7 @@ The busy refusal of a work-area pick, `U` and the Loaded panel's unload is S6's 
 | R-TUI-029.2 | While | While the Workspace is shown at less than 120 columns, the system shall make the left pane 24 % of the width. |
 | R-TUI-029.7 | While | While the Workspace is shown at less than 120 columns, the system shall make the right pane 30 % of the width. |
 | R-TUI-029.3 | While | While the Workspace is shown, the system shall give the middle pane the rest of the width. |
+| R-TUI-029.8 | While | While a file is loaded, the system shall give the Workarea Files list half of the free height of the Workspace's left pane, at least one row. |
 | R-TUI-029.4 | If | If no file is loaded, then the system shall show the empty state on the Workspace, Issues, Memory Map and Checks screens. |
 | R-TUI-066.1 | When | When the system shows the primary's ranges, the system shall show one section row per range, in address order. |
 | R-TUI-066.2 | When | When the system shows a section row, the system shall colour it green for a valid range and red for an invalid one. |
@@ -7698,6 +7699,8 @@ F-23 template     A template file with CRC-16/MODBUS parameters, Check 0x4B37, N
 | R-CRC-PREVIEW-001.10 | U | The system shall write no image file from the CRC Designer. |
 | R-CRC-PREVIEW-001.11 | If | If the coverage size exceeds the coverage cap, then the system shall show `Cannot preview: coverage exceeds 16777216 bytes` in the coverage preview and the coverage window. |
 | R-CRC-PREVIEW-001.12 | If | If the Ranges are not in ascending address order, then the system shall draw line 1 of the coverage window with at most 48 glyphs per range or gap. |
+| R-CRC-PREVIEW-001.13 | If | If computing a coverage CRC fails outside the refusal of R-CRC-PREVIEW-001.4, then the system shall show `Cannot preview: <reason>` in the coverage preview. |
+| R-CRC-PREVIEW-001.14 | If | If computing a coverage CRC fails, then the system shall show `Cannot compute: <reason>` as line 2 of the coverage window. |
 | R-CRC-PREVIEW-002.1 | When | When the loaded image changes while the CRC Designer is displayed, the system shall recompute every result surface of CTX-DESIGNER. |
 | R-CRC-PREVIEW-002.2 | When | When the operator changes Join gaps from concat to fill in the F-23 CRC scene, the system shall show the recomputed coverage window within 3 seconds. |
 | R-CRC-PREVIEW-002.3 | When | When the operator loads the F-23 template in the F-23 CRC scene, the system shall show the recomputed coverage window within 3 seconds. |
@@ -7957,6 +7960,7 @@ title           "# Before/after report" (Markdown line 1); "Before/after report"
 | R-CMP-006.8 | When | When a compare with at least one run succeeds, the system shall select its first run. |
 | R-DIFF-SCR.1 | When | When the operator moves the selection in the run list, the system shall show the selected run in both windows from its first page. |
 | R-DIFF-SCR.2 | U | The system shall let Up and Down reach every shown run and no header line of the run list. |
+| R-DIFF-SCR.21 | U | The system shall let a mouse click reach every shown run and no header line of the run list. |
 | R-DIFF-SCR.3 | When | When a run is selected, the system shall show in each window the rows of CTX-DIFFSCREEN window. |
 | R-DIFF-SCR.4 | U | The system shall show the same addresses on the same rows of the image A and image B windows. |
 | R-DIFF-SCR.5 | If | If a compare has no run, then the system shall show the windows `Image A — no differing runs` and `Image B — no differing runs`. |
@@ -7971,6 +7975,8 @@ title           "# Before/after report" (Markdown line 1); "Before/after report"
 |---|---|---|
 | R-DIFF-SCR.9 | While | While the A2B Diff is in the wide regime, the system shall show the run list 26 columns wide beside the windows. |
 | R-DIFF-SCR.10 | While | While the A2B Diff is in the narrow regime, the system shall give the windows the full width. |
+| R-DIFF-SCR.22 | While | While the A2B Diff is in the wide or the narrow regime, the system shall show each hex row of a window on one screen line. |
+| R-DIFF-SCR.23 | U | The system shall draw row A, row B and the action row of the A2B Diff one terminal row high each. |
 | R-DIFF-SCR.11 | When | When the operator presses `f` in the narrow regime, the system shall toggle the run list over the windows. |
 | R-DIFF-SCR.12 | When | When the run-list overlay opens, the system shall move the focus to the run list. |
 | R-DIFF-SCR.13 | When | When the operator presses Escape with the run-list overlay open, the system shall close the overlay. |
