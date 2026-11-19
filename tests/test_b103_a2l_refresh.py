@@ -215,7 +215,8 @@ def _a2l_visible_shape(app: S19TuiApp) -> list[tuple[str, str, str, str]]:
 
 
 def _picker_visible_shape(panel: CheckEditorPanel | PatchEditorPanel) -> list[tuple[str, str, str]]:
-    table = panel.query_one("#check_param_table" if isinstance(panel, CheckEditorPanel) else "#patch_param_table", DataTable)
+    prefix = "check" if isinstance(panel, CheckEditorPanel) else "patch"
+    table = panel.query_one(f"#{prefix}_param_table", DataTable)
     result = []
     for index in range(table.row_count):
         cells = table.get_row_at(index)
@@ -279,7 +280,8 @@ async def _assert_snap(
             assert visible_name == name
             assert visible_address == f"0x{address:08X}"
             assert visible_format.startswith(f"u{size * 8}")
-        full_name = panel.query_one("#check_full_name_line" if isinstance(panel, CheckEditorPanel) else "#patch_param_full_name_line", Static)
+        full_name_id = "#check_full_name_line" if isinstance(panel, CheckEditorPanel) else "#patch_param_full_name_line"
+        full_name = panel.query_one(full_name_id, Static)
         if not names:
             assert _plain(full_name.render()) == NO_PICKERS
         else:

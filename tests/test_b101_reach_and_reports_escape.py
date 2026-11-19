@@ -457,8 +457,10 @@ class _DeadAlone(App):
         self.action_show_screen("mac")
 
 
+# Not named action_copy: the census reaches by name, and OsClipboardInput._on_mouse_down
+# (os_clipboard_input.py, 3dc52a95) calls self.action_copy(), which would reach it.
 class PlainCard:
-    def action_copy(self):
+    def action_unbound_card_probe(self):
         return None
 
 
@@ -548,7 +550,7 @@ def test_r_shell_keys_3_1_every_action_has_a_reach(tree: Dict[str, str], tree_ce
     the six clipboard overrides reached through the toolkit's bindings. Negative
     controls (synthetic mutants of the base's shapes): a dead chain (an alias whose
     only call lies in a function no reached function calls), a lone dead alias, an
-    unbound ``action_copy`` on a class that is not a toolkit widget, and an action
+    unbound ``action_unbound_card_probe`` on a class that is not a toolkit widget, and an action
     whose name is only a widget id and a comparison literal (E3A-R2-1)."""
     assert len(tree_census.actions) >= 80, len(tree_census.actions)
     assert tree_census.actions_without_reach == [], tree_census.actions_without_reach
@@ -563,7 +565,7 @@ def test_r_shell_keys_3_1_every_action_has_a_reach(tree: Dict[str, str], tree_ce
     # negative controls
     dead = census_sources(_with(tree, _DEAD_ACTIONS))
     assert dead.actions_without_reach == [
-        "PlainCard.action_copy",
+        "PlainCard.action_unbound_card_probe",
         "_DeadAlone.action_dead_mac_alias",
         "_DeadChain.action_dead_alias",
         "_IdOnly.action_find_nxt_probe",

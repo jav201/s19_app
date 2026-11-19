@@ -91,7 +91,7 @@ def _ids(panel):
 async def _show_panel(app, pilot, kind: str):
     app.action_show_screen("check_editor" if kind == "check" else "patch")
     await _settle(pilot, 6)
-    panel = app.query_one("#check_editor_panel" if kind == "check" else "#patch_editor_panel")
+    panel = app.query_one(f"#{kind}_editor_panel")
     if kind == "patch":
         # Inc 8 R-TUI-063.3 / R-PE-DEF.3: #patch_tab_a2l (retired) -> #patch_tab_inspector
         panel.query_one("#patch_tab_inspector", Button).press()
@@ -183,18 +183,21 @@ def _plain(value) -> str:
 
 
 def _cells(panel, name: str):
-    table = panel.query_one(_ids(panel)["table"], DataTable)
+    table_id = _ids(panel)["table"]
+    table = panel.query_one(table_id, DataTable)
     return table.get_row(name)
 
 
 def _full_name(panel):
-    return panel.query_one(_ids(panel)["full"], Static).render()
+    full_id = _ids(panel)["full"]
+    return panel.query_one(full_id, Static).render()
 
 
 def _row_result(panel, name: str):
     picker = _picker(panel)
     address, size, fmt = picker.param_rows[name]
-    table = panel.query_one(_ids(panel)["table"], DataTable)
+    table_id = _ids(panel)["table"]
+    table = panel.query_one(table_id, DataTable)
     table.move_cursor(row=picker.visible_params.index(name))
     picker.refresh_full_name()
     cells = _cells(panel, name)
@@ -668,7 +671,7 @@ def test_r018_2_changed_generation_batches_once_per_picker(tmp_path, monkeypatch
         describes.clear()
         rows = await _load_a2l(app, pilot, second)
         assert next(row for row in rows if row["name"] == "ARR12")["length"] == 8
-        return {editor: _row_result(app.query_one("#check_editor_panel" if editor == "check" else "#patch_editor_panel"), "ARR12") for editor in ("check", "patch")}
+        return {editor: _row_result(app.query_one(f"#{editor}_editor_panel"), "ARR12") for editor in ("check", "patch")}
 
     results = _run(tmp_path, body)
     assert len(describes) == 2
@@ -735,7 +738,7 @@ def test_r018_4_live_reload_refreshes_both_without_reentry(tmp_path, monkeypatch
 
         def end_busy(kind, gen, message):
             outcomes.append((message, {
-                editor: _picker(app.query_one("#check_editor_panel" if editor == "check" else "#patch_editor_panel")).param_rows["ARR12"][1]
+                editor: _picker(app.query_one(f"#{editor}_editor_panel")).param_rows["ARR12"][1]
                 for editor in ("check", "patch")
             }))
             real_end(kind, gen, message)
