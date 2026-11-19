@@ -745,6 +745,9 @@ def test_tc_b102_pe_06_empty_states_mirror_check(tmp_path: Path) -> None:
     parameter matches the filter.``
 
     RED on base: no ``#patch_tab_a2l`` / no Patch picker.
+
+    Traces: R-CHKED-002, R-CHKED-004 (the shared picker's empty-state lines; the
+    Patch surface mirrors the Check Editor's, fix-round ruling P-182).
     """
 
     async def body(app, pilot, panel):

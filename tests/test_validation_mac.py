@@ -34,6 +34,8 @@ def test_validate_mac_records_duplicate_name_remains_hard_error():
 
 
 def test_validate_mac_records_reports_parse_and_empty_fields():
+    """Traces: R-VAL-020 (the MAC_PARSE_ERROR arm; the empty-name and
+    invalid-address arms go with code change D3-4, fix-round ruling P-182)."""
     records = [
         {"parse_ok": False, "line_number": 1, "parse_error": "invalid hex address"},
         {"parse_ok": True, "line_number": 2, "name": "", "address": 0x1000},
