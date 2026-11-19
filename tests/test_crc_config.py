@@ -127,7 +127,7 @@ def test_no_real_config_required() -> None:
 def test_unresolvable_path_collects_one_error(tmp_path: Path) -> None:
     """Unresolvable path → (None, [1 error]); no raise (collect-don't-abort).
 
-    Encodes WHY: LLR-004.1 mandates a single collected error and zero compute
+    Encodes WHY: R-CRC-CONFIGLOAD-001.6 mandates a single collected error and zero compute
     on a bad path. A raise here would abort the operation instead of reporting.
     """
     missing = tmp_path / "does_not_exist.json"
@@ -141,7 +141,7 @@ def test_unresolvable_path_collects_one_error(tmp_path: Path) -> None:
 def test_malformed_json_collects_one_error(tmp_path: Path) -> None:
     """Malformed JSON → (None, [1 error]); no raise.
 
-    Encodes WHY: LLR-004.1 requires a parse fault to surface as exactly one
+    Encodes WHY: R-CRC-CONFIG-001.7 requires a parse fault to surface as exactly one
     collected error, not an unhandled JSONDecodeError.
     """
     bad = tmp_path / "broken.json"
@@ -156,7 +156,7 @@ def test_malformed_json_collects_one_error(tmp_path: Path) -> None:
 def test_over_size_cap_collects_one_error_without_reading(tmp_path: Path) -> None:
     """Over-cap → (None, [1 error]) via the size probe seam; file never read.
 
-    Encodes WHY: LLR-004.1 enforces READ_SIZE_CAP_BYTES BEFORE reading, so an
+    Encodes WHY: R-CRC-CONFIGLOAD-001.7, R-CRC-CONFIGLOAD-001.8 enforces READ_SIZE_CAP_BYTES BEFORE reading, so an
     oversized declaration cannot force an unbounded read. A deterministic
     over-cap probe drives this without manufacturing a 256 MB file. The file
     content is deliberately well-formed so a regression that reads-then-checks
@@ -180,7 +180,7 @@ def test_over_size_cap_collects_one_error_without_reading(tmp_path: Path) -> Non
 def test_missing_field_collects_one_error(tmp_path: Path) -> None:
     """A config missing a required field → (None, [1 error]); no raise.
 
-    Encodes WHY: LLR-004.1 treats a missing/invalid field as a data-quality
+    Encodes WHY: R-CRC-CONFIG-001.10 treats a missing/invalid field as a data-quality
     fault that must be collected, not raised — guards the typed-build path.
     """
     config_path = tmp_path / "incomplete.json"
@@ -239,7 +239,7 @@ def test_parse_crc_config_valid_text_populates_config() -> None:
 def test_parse_crc_config_dummy_prefill_is_valid() -> None:
     """The DUMMY_CONFIG_TEXT pre-fill itself parses cleanly (no error).
 
-    Encodes WHY: the TUI editor (LLR-004.2) pre-fills DUMMY_CONFIG_TEXT for
+    Encodes WHY: the TUI editor (R-CRC-CONFIG-001.1) pre-fills DUMMY_CONFIG_TEXT for
     format guidance; if the embedded template ever drifts to invalid JSON the
     operator would see a parse error on an untouched dummy. This pins the
     pre-fill as valid config text with the documented dummy values.
@@ -257,7 +257,7 @@ def test_parse_crc_config_dummy_prefill_is_valid() -> None:
 def test_parse_crc_config_malformed_text_collects_one_error() -> None:
     """Malformed JSON text → (None, [1 error]); no raise (collect-don't-abort).
 
-    Encodes WHY: LLR-004.2 mandates a config-load fault on the edited text
+    Encodes WHY: R-CRC-CONFIG-001.7 mandates a config-load fault on the edited text
     surface to a single collected error and run NO computation — never an
     unhandled JSONDecodeError that would crash the operation.
     """
@@ -377,6 +377,8 @@ def test_parse_crc_config_missing_field_collects_one_error() -> None:
 
     Encodes WHY: the typed-build path must collect a missing/invalid field on
     the text seam exactly as the file path does (LLR-004.2 / LLR-004.1 parity).
+
+    Traces: R-CRC-CONFIG-001.10.
     """
     text = (
         '{"polynomial":"0x04C11DB7","init":"0xFFFFFFFF","reverse":true,'

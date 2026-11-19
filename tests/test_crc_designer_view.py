@@ -573,7 +573,7 @@ def test_save_all_symbol_name_writes_nothing_and_warns(tmp_path: Path) -> None:
 
 
 def test_save_check_mismatch_warns_but_still_writes(tmp_path: Path) -> None:
-    """A KAT mismatch on Save warns but still writes (LLR-V5.4c).
+    """A KAT mismatch on Save warns but still writes (R-CRC-TEMPLATE-001.4).
 
     Intent: pinning a wrong ``check`` (``0x00000000``) while the algorithm's real
     KAT is ``0xCBF43926`` makes ``kat_ok()`` False; Save WARNS (obs #3) but still
@@ -602,7 +602,7 @@ def test_save_check_mismatch_warns_but_still_writes(tmp_path: Path) -> None:
 
 
 def test_store_width_too_small_warns_live(tmp_path: Path) -> None:
-    """A too-small store_width warns live (LLR-V5.4b).
+    """A too-small store_width warns live (R-CRC-DESIGNER-005.1).
 
     Intent: the seed CRC-32 needs ``ceil(32/8) == 4`` stored bytes; typing
     ``store_width = 1`` truncates the stored CRC's detection strength, so the

@@ -14,6 +14,7 @@ from s19_app.range_index import (
 
 
 def test_address_in_sorted_ranges_binary_search_membership():
+    """Traces: R-IMG-005.1, R-IMG-005.2."""
     index = build_sorted_range_index([(0x2000, 0x2100), (0x1000, 0x1010)])
     assert address_in_sorted_ranges(0x1000, index)
     assert address_in_sorted_ranges(0x100F, index)
@@ -23,6 +24,7 @@ def test_address_in_sorted_ranges_binary_search_membership():
 
 
 def test_range_in_sorted_ranges_requires_single_range_coverage():
+    """Traces: R-IMG-005.1, R-IMG-005.2, R-IMG-005.3."""
     index = build_sorted_range_index([(0x1000, 0x1010), (0x1020, 0x1030)])
     assert range_in_sorted_ranges(0x1004, 4, index)
     assert not range_in_sorted_ranges(0x100F, 2, index)

@@ -1726,7 +1726,10 @@ def test_r_before_after_report_001_35_3_bkey_loaded_mac_is_used(
     app forwards the loaded MAC, so both artifact lines of both files read
     ``summary=both; a2l=used (1/2); mac=used (1/2)``, the run's Symbols cell
     names the A2L tag and the MAC record, and the painted status is the
-    written-pair line."""
+    written-pair line.
+
+    Traces: US-BAR-1.
+    """
     outcome = _drive_bkey_texts(
         tmp_path, a2l_tags=_TWO_TAG_A2L["tags"], mac_text=_TWO_RECORD_MAC
     )

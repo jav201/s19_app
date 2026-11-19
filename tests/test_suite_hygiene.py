@@ -2087,7 +2087,10 @@ _PLANTED_LEAKS = {
 
 def test_r_tst_070_3_redaction_gate_names_each_leak_form(tmp_path) -> None:
     """E5S-1 negative control: one planted line per form, each named; the
-    placeholder spellings of the records are not."""
+    placeholder spellings of the records are not.
+
+    Traces: R-PASTE.36.
+    """
     for index, (form, line) in enumerate(_PLANTED_LEAKS.items()):
         (tmp_path / f"leak{index}.xml").write_text(line + "\n", encoding="utf-8")
     (tmp_path / "clean.md").write_text(

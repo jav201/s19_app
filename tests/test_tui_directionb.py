@@ -4767,7 +4767,7 @@ def test_map_band_view_survives_rerender(tmp_path: Path) -> None:
     """A second ``update_memory_map`` re-renders the band view without a
     DuplicateIds crash or doubled region rows (regression: the re-mounted band
     containers must use CLASSES, not unique IDs — ``grid.remove_children`` is
-    deferred, so an id collides at re-render, LLR-045A.2).
+    deferred, so an id collides at re-render, R-TUI-073.1).
     """
     loaded = _two_band_loaded(tmp_path)
     runs = _expected_band_runs(loaded)

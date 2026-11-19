@@ -88,7 +88,7 @@ def _flow_a2b_block(ref_a: str, ref_b: str) -> A2BBlock:
 
 
 def test_tc_b94_21_roundtrip_one_of_each_kind_incl_a2b(tmp_path: Path) -> None:
-    """TC-B94-21 (LLR-013.2): a serialized flow with one of each block kind —
+    """TC-B94-21 (R-FLOW-FILE.4): a serialized flow with one of each block kind —
     SOURCE / PATCH / CHECK / CRC / WRITE-OUT / REPORT + the NEW A2B — round-
     trips through flow_to_dict/dict_to_flow with kind equality and per-kind
     fields intact (the two A2B bindings survive verbatim); schema_version
@@ -130,7 +130,7 @@ def test_tc_b94_21_roundtrip_one_of_each_kind_incl_a2b(tmp_path: Path) -> None:
     # untouched by the A2B addition).
     assert loaded.blocks[0].image_ref == "prg.s19"
 
-    # Negative control (LLR-013.2): a foreign kind refuses fail-closed.
+    # Negative control (R-FLOW-FILE.4): a foreign kind refuses fail-closed.
     envelope["blocks"].append({"kind": "shell", "cmd_ref": "run.bat"})
     refused, refuse_findings = fps.dict_to_flow(envelope, project)
     assert refused is None
@@ -146,7 +146,10 @@ def test_tc_b94_21_loader_refuses_a2b_binding_arm(tmp_path: Path) -> None:
     mixed): the branch set is the grammar, not the host platform — on POSIX
     a raw backslash traversal is one literal filename, so the refusal must
     come from the loader's normalized pre-reject, not the OS's separator
-    semantics (the PR #211 CI fix)."""
+    semantics (the PR #211 CI fix).
+
+    Traces: R-FLOW-FILE.5, R-FLOW-A2B.2.
+    """
     project = _make_project(tmp_path, {"prg.s19": _S19_A, "base.s19": _S19_A})
 
     def _envelope(image_a: dict, image_b: dict) -> dict:
@@ -205,7 +208,7 @@ def test_tc_b94_21_loader_refuses_a2b_binding_arm(tmp_path: Path) -> None:
 def test_tc_b94_22_patch_write_out_run_records_per_block_results(
     tmp_path: Path,
 ) -> None:
-    """TC-B94-22 (LLR-013.3): a headless patch → write-out run writes an image
+    """TC-B94-22 (R-FLOW-PATCH.10): a headless patch → write-out run writes an image
     whose declared addresses 100% hold the patch's new bytes; every block's
     result is recorded (0 missing)."""
     project = _make_project(

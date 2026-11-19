@@ -1014,7 +1014,7 @@ def _b78_focus_run_list(app, listing) -> None:
 def test_at_b78_15_every_run_reachable_by_keyboard(tmp_path: Path) -> None:
     """AT-B78-15 (GATE) - the arrow keys alone reach EVERY displayed run.
 
-    Intent: HLR-122 - "the set of run indices reachable by keyboard alone shall
+    Intent: R-DIFF-SCR.2 - "the set of run indices reachable by keyboard alone shall
     equal the full set of displayed run indices". Pre-change the run list was a
     ``Static`` (``can_focus = False``, 0 selectable entries), so no run was
     reachable by any means; ``_render_run_windows`` was called once with the
@@ -1153,7 +1153,7 @@ def test_at_b78_17_exactly_one_entry_is_visibly_selected(tmp_path: Path) -> None
     """AT-B78-17 (GATE) - exactly one entry carries the selection, and it is
     VISIBLY distinguished.
 
-    Intent: HLR-122 - "the entry holding the selection shall be visually
+    Intent: R-CMP-006.8 - "the entry holding the selection shall be visually
     distinguished from every other entry". A selection index that changes
     nothing the operator can see satisfies AT-B78-15/16 completely.
 
@@ -1225,6 +1225,8 @@ def test_at_b78_18_display_caps_and_notice_survive(tmp_path: Path) -> None:
     Subject split against the rewritten ``test_tc029`` (same clause, same file,
     same increment): that node observes ``panel._runs`` and the header; this one
     observes the RENDERED rows and the notice text.
+
+    Traces: R-CMP-006.6.
     """
     import re
 
@@ -1568,7 +1570,7 @@ def test_tc_b78_48_hostile_artifact_summary_renders_verbatim(tmp_path: Path) -> 
     """TC-B78-48 - a markup-shaped artifact summary renders verbatim, with no
     ``MarkupError``.
 
-    Intent: C-17 / LLR-122.1. The artifact-usage summaries are the one
+    Intent: C-17 / R-CMP-003.4, R-TUI-103b. The artifact-usage summaries are the one
     file-derived string reaching this column. Pre-change they were passed
     through ``rich.markup.escape`` into a ``markup=True`` ``Static``; the
     widget-type swap is exactly where an escape call gets lost. The panel now
@@ -1619,7 +1621,7 @@ def test_tc_b78_49_a_second_compare_rebuilds_the_list(tmp_path: Path) -> None:
     ``index`` is assigned while the stale rows are still in ``_nodes``, so
     ``watch_index`` highlights a row that is then pruned; because the VALUE does
     not change the watcher never fires again and **no row is highlighted after
-    any re-render** - HLR-122's visual-distinction clause, silently violated.
+    any re-render** - R-CMP-006.5's visual-distinction clause, silently violated.
 
     The two fixtures have DIFFERENT run counts on purpose: with equal counts the
     entry-count assertion is satisfied by a list that was never rebuilt at all.
@@ -1897,7 +1899,7 @@ def test_at_b78_31_written_report_is_complete_under_display_caps(
     tmp_path: Path,
 ) -> None:
     """AT-B78-31 (PIN, green today) - the WRITTEN report holds every run of the
-    comparison while the panel paints only the capped subset (LLR-122.4, G-9).
+    comparison while the panel paints only the capped subset (R-CMP-006.7, R-CMP-004.2, G-9).
 
     Intent: the operator's evidence artifact must not silently inherit a
     DISPLAY budget. The panel caps because a terminal has finite rows; the
@@ -2923,6 +2925,8 @@ def test_at_b78_29_notice_names_every_unsatisfied_axis(tmp_path: Path) -> None:
     C-40: the notice's presence is co-asserted with the results area's ABSENCE,
     so "the panel says it is too small" cannot be green beside an empty results
     box that is still on screen.
+
+    Traces: R-DIFF-SCR.18.
     """
     measured = _b78_regime_probe(tmp_path, _B78_INC5_FLOOR)
     width, height = _B78_INC5_FLOOR
@@ -2962,7 +2966,7 @@ def test_at_b78_29_notice_names_every_unsatisfied_axis(tmp_path: Path) -> None:
 def test_tc_b78_29_the_layout_flips_exactly_once(tmp_path: Path) -> None:
     """TC-B78-29 - one column below the wide breakpoint, and one at it.
 
-    Intent: HLR-124's boundary catalog - the layout flips EXACTLY once, at
+    Intent: R-DIFF-SCR.9, R-DIFF-SCR.10's boundary catalog - the layout flips EXACTLY once, at
     _DIFF_WIDE_MIN. Both sizes are written from the constant, so this node
     cannot drift when the measurement does; what it pins is that the flip is
     where the constant says, not three columns either side of it.
@@ -3066,7 +3070,7 @@ def test_tc_b78_30_a_resize_across_the_breakpoint_follows(tmp_path: Path) -> Non
 def test_tc_b78_31_the_width_floor_is_the_notice_boundary(tmp_path: Path) -> None:
     """TC-B78-31 - the notice appears exactly once, one column below the floor.
 
-    Intent: HLR-124's boundary catalog - `size=(_DIFF_MIN_W, ...)` and
+    Intent: R-DIFF-SCR.18's boundary catalog - `size=(_DIFF_MIN_W, ...)` and
     `(_DIFF_MIN_W - 1, ...)`. _DIFF_MIN_W is the measured width at which a
     full-width window first fits an unwrapped row (93 -> 78, 94 -> 79), so the
     node also asserts the consequence, not only the class: AT the floor the
@@ -3098,7 +3102,7 @@ def test_tc_b78_31_the_width_floor_is_the_notice_boundary(tmp_path: Path) -> Non
 def test_tc_b78_32_a_single_axis_failure_names_that_axis(tmp_path: Path) -> None:
     """TC-B78-32 - a one-axis failure names THAT axis and not the other.
 
-    Intent: LLR-124.4 - the two conditions are independent, so a terminal that
+    Intent: R-DIFF-SCR.18 - the two conditions are independent, so a terminal that
     passes height and fails width must not be told about its height, and vice
     versa. This is the node that makes "every unsatisfied axis" mean something
     stronger than "all of them, always": it is the mapping, and C-78-xxiii is
@@ -3145,11 +3149,11 @@ def test_tc_b78_32_a_single_axis_failure_names_that_axis(tmp_path: Path) -> None
 def test_tc_b78_33_the_regime_applies_with_no_comparison(tmp_path: Path) -> None:
     """TC-B78-33 - the regime applies before any comparison, and nothing raises.
 
-    Intent: HLR-124's boundary catalog - "no comparison rendered: the regime
+    Intent: R-DIFF-SCR.18, R-DIFF-SCR.19's boundary catalog - "no comparison rendered: the regime
     still applies, nothing raises". The regime is a property of the terminal, not
     of the panel's contents, and the notice regime in particular has to be right
     on the empty panel: an operator who opens the diff screen at 80x24 and sees
-    an empty box has been told nothing, which is the defect HLR-124 exists to
+    an empty box has been told nothing, which is the defect R-DIFF-SCR.18, R-DIFF-SCR.19 exists to
     fix - and that operator has not compared anything yet.
 
     Every other node in this block also runs without a comparison; this one says
@@ -3375,7 +3379,7 @@ def test_tc_b78_52_pagination_reaches_bytes_past_the_pane(tmp_path: Path) -> Non
 def test_tc_b78_53_the_overlay_reserves_no_width(tmp_path: Path) -> None:
     """TC-B78-53 - the run-list overlay costs the window nothing, open or shut.
 
-    Intent: LLR-124.3 - "the run list shall be presented without permanently
+    Intent: R-DIFF-SCR.10, R-DIFF-SCR.11 - "the run list shall be presented without permanently
     reserving columns or rows from it". The word doing the work is *permanently*,
     but the honest reading is stronger and is what is implemented: the overlay
     sits on its own CSS layer, so the window column keeps the full content width

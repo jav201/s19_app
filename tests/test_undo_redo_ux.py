@@ -86,6 +86,8 @@ def test_ac1_checks_panel_clears_after_undo_and_redo(tmp_path: Path) -> None:
     it (AC-1.1); it is re-populated for the restored 1-entry set, then Redo
     clears it (AC-1.2). RED counterfactual (pre-fix): ``last_check_result``
     survives the move so the stale rows persist (>0) after Undo and after Redo.
+
+    Traces: R-CHK-PE-012.
     """
     from textual.widgets import Button
 
@@ -163,6 +165,8 @@ def test_ac2_1_ctrl_z_y_undo_redo_via_real_key(tmp_path: Path) -> None:
     press re-applies it — the SAME path the Undo/Redo buttons drive, asserted
     over the entries table (C-10). RED counterfactual (pre-binding): ``ctrl+z``
     is unbound so the table is unchanged after the press.
+
+    Traces: R-TUI-057.4, R-TUI-057.5.
     """
     from textual.widgets import Button
 

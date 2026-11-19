@@ -109,7 +109,7 @@ def _variant_set(project_dir: Path, name: str = "proj") -> ProjectVariantSet:
 def test_manifest_absent_defaults_to_batch_all(tmp_path: Path) -> None:
     """No manifest → plan covers ALL variants with the fallback batch.
 
-    Intent: LLR-006.1 — the manifest is optional; its absence means batch
+    Intent: R-VAR-002.24 — the manifest is optional; its absence means batch
     mode over every variant (the default), with the caller-supplied
     fallback file list applied to each.
     """
@@ -139,7 +139,7 @@ def test_manifest_absent_defaults_to_batch_all(tmp_path: Path) -> None:
 def test_manifest_round_trip(tmp_path: Path) -> None:
     """A written manifest reads back field-for-field, paths project-resolved.
 
-    Intent: LLR-006.1 — ``project.json`` carries
+    Intent: R-VAR-002.1, R-MAN-SER-001.6 — ``project.json`` carries
     ``{schema_version, active_variant, batch, assignments}``; ``batch`` and
     ``assignments`` entries resolve against the project directory only.
     """
@@ -259,7 +259,7 @@ def test_load_project_unknown_active_variant_falls_back(tmp_path: Path) -> None:
 def test_manifest_containment_skips_unsafe_entries(tmp_path: Path) -> None:
     """Escaping and absolute entries are one ERROR each and skipped.
 
-    Intent: F-S-03 / LLR-006.1 — ``batch``/``assignments`` entries resolve
+    Intent: F-S-03 / R-VAR-002.14, R-VAR-002.15, R-VAR-002.17 — ``batch``/``assignments`` entries resolve
     against the project directory ONLY: a ``..`` escape and an absolute
     path each produce exactly one ERROR ``MANIFEST-PATH-ESCAPE`` finding
     and are dropped, while the safe relative entry survives — the read
@@ -307,7 +307,7 @@ def test_manifest_containment_skips_unsafe_entries(tmp_path: Path) -> None:
 def test_double_run_orderings_identical(tmp_path: Path) -> None:
     """Two runs over the same inputs produce identical orderings.
 
-    Intent: LLR-006.2 — variants execute in ``ProjectVariantSet`` order
+    Intent: R-VAR-002.24 — variants execute in ``ProjectVariantSet`` order
     (outer) and per variant in batch-then-assignments order (inner); the
     plan and the result sequence are pure functions of the inputs, so two
     runs compare equal.
@@ -375,7 +375,7 @@ def test_failing_variant_never_aborts_the_rest(
 ) -> None:
     """One crashing variant yields one "error"; len(results) == N always.
 
-    Intent: LLR-006.4 — an exception inside one variant's execution is
+    Intent: R-VAR-002.34 — an exception inside one variant's execution is
     captured as that variant's ``"error"`` result with a diagnostic; every
     other variant still executes.
     """
@@ -421,6 +421,8 @@ def test_batch_execution_stamps_variant_ids(tmp_path: Path) -> None:
     ``variant_id`` through the engines' parameter; the per-variant image is
     parsed inside the call (LLR-006.3), so variant ``a`` applies at 0x1000
     while variant ``b`` skips it as outside.
+
+    Traces: R-VAR-002.30, R-VAR-002.28, R-VAR-002.29.
     """
     project_dir = _make_project(tmp_path, {"a.s19": S19_A, "b.s19": S19_B})
     chg = _write_v2_document(
@@ -545,7 +547,7 @@ def test_at017_2_consumer_pickup_of_saved_composition(tmp_path: Path) -> None:
 def test_save_back_files_land_under_project_dir(tmp_path: Path) -> None:
     """Applied variants save back as <variant_id>-patched.s19, promptless.
 
-    Intent: LLR-002.7 headless parameter — a change file that applies ≥1
+    Intent: R-VAR-002.31 headless parameter — a change file that applies ≥1
     entry on an S19 variant persists the patched image into the PROJECT
     directory under the default ``<variant_id>-patched.s19`` name with no
     prompt; a variant with zero applied entries writes nothing.
@@ -580,7 +582,7 @@ def test_save_back_files_land_under_project_dir(tmp_path: Path) -> None:
 def test_execute_scope_without_project_is_status_error(tmp_path: Path) -> None:
     """Routing execute_scope with no project is one status line, app alive.
 
-    Intent: LLR-006.6 — ``execute_scope`` is the ninth routed action; with
+    Intent: R-VAR-002.20 — ``execute_scope`` is the ninth routed action; with
     no active project / variant set the router answers with a status
     message and stays responsive (the nine-action pin itself is asserted in
     ``tests/test_tui_patch_editor_v2.py``).

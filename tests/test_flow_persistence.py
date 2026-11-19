@@ -270,7 +270,7 @@ def test_output_name_shape_rejected_per_branch(project_dir: Path) -> None:
 
 
 def test_block_count_cap_boundary(project_dir: Path) -> None:
-    """LLR-002.3: exactly FLOW_MAX_BLOCKS accepts; one over rejects."""
+    """R-FLOW-FILE.5, R-FLOW-FILE.6: exactly FLOW_MAX_BLOCKS accepts; one over rejects."""
     at_cap = {
         "schema_version": 1,
         "name": "n",
@@ -287,7 +287,7 @@ def test_block_count_cap_boundary(project_dir: Path) -> None:
 
 
 def test_name_length_cap_boundary(project_dir: Path) -> None:
-    """LLR-002.3: a name at FLOW_MAX_NAME_LEN accepts; one char over rejects."""
+    """R-FLOW-FILE.5, R-FLOW-FILE.6: a name at FLOW_MAX_NAME_LEN accepts; one char over rejects."""
     base = {"schema_version": 1, "blocks": [{"kind": "report"}]}
     at_cap = {**base, "name": "a" * fps.FLOW_MAX_NAME_LEN}
     flow, findings = dict_to_flow(at_cap, project_dir)

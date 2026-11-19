@@ -162,7 +162,7 @@ def test_le_codec_roundtrip() -> None:
 
 
 def test_entry_point_does_not_mutate_mem_map() -> None:
-    """LLR-001.3 — the entry point returns one CRC per region in config order
+    """R-CRC-CONTRACT-001.1, R-CRC-CHECK-001.1 — the entry point returns one CRC per region in config order
     and does not mutate the input ``mem_map`` (pure compute)."""
     mem = _mem_from_bytes(0, b"\x01\x02\x03\x04\x05\x06")
     snapshot = dict(mem)

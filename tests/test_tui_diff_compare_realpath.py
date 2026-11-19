@@ -361,6 +361,8 @@ def test_compare_hex_windows_report_no_runs_for_identical_images(tmp_path: Path)
     images produce zero differing runs, so the panel takes the no-run branch and the
     hex windows must SAY so ("no differing runs") rather than going blank or showing
     a stale window — distinguishing a real no-run message from a blanked pane.
+
+    Traces: R-DIFF-SCR.5.
     """
     same_map = {0x500 + i: i & 0xFF for i in range(8)}
     ranges = [(0x500, 0x508)]

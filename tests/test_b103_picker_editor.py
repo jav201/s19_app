@@ -456,7 +456,10 @@ class _CoverageReadSpy(Mapping):
 @pytest.mark.parametrize("case", ["R-PICKER-CORRECT.008/1", "R-PICKER-CORRECT.008/2"], ids=lambda value: value)
 def test_r008_declared_length_observes_decode_cap(tmp_path: Path, case: str) -> None:
     """R-PICKER-CORRECT.008/1 refuses cap+1 before any READ with the exact
-    over-cap line; R-PICKER-CORRECT.008/2 reads exactly cap ascending bytes."""
+    over-cap line; R-PICKER-CORRECT.008/2 reads exactly cap ascending bytes.
+
+    Traces: R-PICKER-CORRECT.008.1, R-PICKER-CORRECT.008.2.
+    """
     cap = MAX_A2L_DECODE_BYTES
     length = cap + 1 if case.endswith("/1") else cap
 

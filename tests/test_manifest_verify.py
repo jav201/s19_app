@@ -76,7 +76,7 @@ def _project_dir(tmp_path: Path, name: str = "proj") -> Path:
 def test_faithful_write_verifies(tmp_path: Path) -> None:
     """A faithfully written manifest re-reads as intent -> status VERIFIED.
 
-    Intent (LLR-003.1): verify-on-write must confirm the written file re-reads
+    Intent (R-MAN-VERIFY-001.1, R-MAN-VERIFY-001.4): verify-on-write must confirm the written file re-reads
     through the reader oracle as the intended composition (C-1 canonical form),
     with empty drift and no reader issues.
     """
@@ -109,7 +109,7 @@ def test_faithful_write_verifies(tmp_path: Path) -> None:
 def test_tampered_active_variant_mismatches_naming_the_key(tmp_path: Path) -> None:
     """Tampering active_variant on disk -> MISMATCH, drift == [active_variant].
 
-    Intent (LLR-003.2): a re-read that differs from intent must be MISMATCH and
+    Intent (R-MAN-VERIFY-001.2): a re-read that differs from intent must be MISMATCH and
     must NAME the drifting key, and ONLY that key, so a consumer can report
     exactly what failed. The fault planted (flip active_variant) matches the
     asserted single-key drift (Rule 9).
@@ -155,6 +155,8 @@ def test_reader_issues_force_mismatch_even_if_surviving_keys_match(
     The fault is planted by writing ``project.json`` DIRECTLY (the writer would
     refuse the escaping entry up front, LLR-001.5), so the reader degrades it on
     re-read exactly as asserted (Rule 9).
+
+    Traces: R-MAN-VERIFY-001.2.
     """
     project_dir = _project_dir(tmp_path)
     vset = _variant_set("a", "a")
@@ -192,7 +194,7 @@ def test_verify_reads_canonical_name_not_a_stray_suffixed_file(
 ) -> None:
     """A stray project_1.json must NOT be what verify reads (the M-1 fix).
 
-    Intent (LLR-003.1 / M-1): verify re-reads by the CANONICAL fixed name
+    Intent (R-MAN-VERIFY-001.1 / M-1): verify re-reads by the CANONICAL fixed name
     ``project_dir / PROJECT_MANIFEST_NAME``. A stray ``project_1.json`` carrying
     a DIFFERENT active_variant is planted alongside the faithful ``project.json``;
     verify must read ``project.json`` and return VERIFIED, proving it never

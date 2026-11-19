@@ -792,7 +792,7 @@ def test_tc_b97_45_keyboard_order_enter_space_and_chip_states(tmp_path: Path) ->
     unfocused, focused and selected styles are pairwise distinct. The
     batch-102 Inc 3 pagination controls ship in the chain's slot after
     Include; with the one-page demo ledger both are disabled and out of the
-    chain (R-B102-SEL-005). The batch-102 Inc 4 bulk-add button (E3 ruling 5)
+    chain (R-B102-SEL-005.1, R-B102-SEL-005.2, R-B102-SEL-005.3). The batch-102 Inc 4 bulk-add button (E3 ruling 5)
     takes the enabled slot right after Include (``BULK_GROUP``).
 
     RED on main (P-33, P-43): no header chip and no tab chip in the chain;
@@ -878,7 +878,7 @@ def test_tc_b97_45_keyboard_order_enter_space_and_chip_states(tmp_path: Path) ->
             json_chip.focus()
             await settle(pilot, 2)
             states["check_tab_json"].append(chip_style(app, json_chip))
-        # batch-102 Inc 3 (R-B102-SEL-005): with the one-page demo ledger both
+        # batch-102 Inc 3 (R-B102-SEL-005.1, R-B102-SEL-005.2, R-B102-SEL-005.3): with the one-page demo ledger both
         # pagination controls ship disabled and out of the focus chain. Absent
         # on the pre-integration tree, so the clause is conditional (PC-11).
         page_state = None

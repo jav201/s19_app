@@ -104,7 +104,7 @@ def _two_one_two_entries() -> list[ChangeEntry]:
 def test_check_schema_shared(tmp_path: Path) -> None:
     """The same fixture read as change vs check yields identical issues.
 
-    Intent: LLR-004.1 — one reader serves both kinds with one rule table:
+    Intent: R-CHG-001.40, R-CHG-001.15 — one reader serves both kinds with one rule table:
     metadata, entry shapes, and the intra-document collision rule apply
     identically, and a colliding pair of expectations is ERROR exactly as a
     colliding pair of changes (operator decision D-3 — no severity fork).
@@ -154,7 +154,7 @@ def test_check_schema_shared(tmp_path: Path) -> None:
 def test_results_two_one_two_with_immutability() -> None:
     """The loaded-image run is exactly (2 pass, 1 fail, 2 uncheckable).
 
-    Intent: LLR-004.2 — equal→pass, readable-unequal→fail with the actual
+    Intent: R-CHK-001.8, R-CHK-001.9, R-CHK-001.10, R-CHK-001.2 — equal→pass, readable-unequal→fail with the actual
     bytes captured, not-fully-INSIDE→uncheckable with actual ``None`` (both
     provocations: one PARTIAL-range entry, one OUTSIDE-range entry), and the
     execution mutates nothing in the memory map.
@@ -187,7 +187,7 @@ def test_results_two_one_two_with_immutability() -> None:
 def test_results_no_image_all_uncheckable() -> None:
     """With no image loaded, every entry is uncheckable.
 
-    Intent: LLR-004.2 — the third uncheckable provocation (F-Q-16): no
+    Intent: R-CHK-001.10, R-CHK-002.7 — the third uncheckable provocation (F-Q-16): no
     image means no entry can be compared; every actual is ``None``.
     """
     document = _check_document(_two_one_two_entries())
@@ -264,7 +264,7 @@ def test_collision_pair_uncheckable_and_wrong_kind_blocked(
 def test_result_shape_deterministic() -> None:
     """The C-6 result fields are exact; fixed-clock double runs are equal.
 
-    Intent: LLR-004.3 — ``CheckRunResult`` carries source_path /
+    Intent: R-CHK-001.11 — ``CheckRunResult`` carries source_path /
     timestamp_utc / variant_id / issues / all-three-key aggregates and the
     per-entry C-6 field set with informative linkage; ``to_dict()`` is
     deterministic (same object, same dict) and two runs over the same

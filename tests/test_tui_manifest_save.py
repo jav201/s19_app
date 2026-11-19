@@ -102,6 +102,8 @@ def test_project_save_writes_and_verifies_manifest(tmp_path: Path) -> None:
     dir, re-reads through the reader oracle with the saved variant as
     ``active_variant``, and the operator sees a quiet "manifest verified" line —
     no loud notice on a clean save.
+
+    Traces: R-MAN-VERIFY-001.4, R-PROJ-001.10.
     """
     external = tmp_path / "a.s19"
     external.write_text(S19_A, encoding="utf-8")
@@ -152,7 +154,7 @@ def test_manifest_mismatch_surfaces_loud_notice_naming_drift(
 ) -> None:
     """A verify MISMATCH surfaces a loud error notice naming the drifting key.
 
-    Intent (LLR-004.2): on mismatch the operator must get a prominent notice
+    Intent (R-MAN-VERIFY-001.5): on mismatch the operator must get a prominent notice
     that NAMES what drifted, plus a MISMATCH status line. We force the mismatch
     by tampering the on-disk ``project.json`` between write and verify (patching
     ``write_project_manifest`` to flip ``active_variant`` after the real write),
@@ -227,6 +229,8 @@ def test_manifest_write_refusal_surfaces_error_notice_no_crash(
     patch ``write_project_manifest`` to return the documented refusal tuple, so
     the real surfacing branch runs (Rule 9: the planted failure matches the
     asserted "no file / error notice" outcome).
+
+    Traces: R-MAN-TUI-001.2, R-MAN-TUI-001.1.
     """
     external = tmp_path / "a.s19"
     external.write_text(S19_A, encoding="utf-8")

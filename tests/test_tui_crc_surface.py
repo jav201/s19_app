@@ -178,13 +178,15 @@ def test_crc_check_reaches_result_surface_via_handler(tmp_path: Path) -> None:
 def test_crc_execute_path_uses_thread_worker() -> None:
     """The CRC execute path is a @work(thread=True) worker, not a sync call.
 
-    Intent (R-6 / LLR-002.3): inspection asserts ``_run_crc_worker`` carries
+    Intent (R-6 / R-OPS-003.7): inspection asserts ``_run_crc_worker`` carries
     the ``@work(thread=True)`` decorator (the ``app.py:1599`` ``execute_scope``
     precedent), so the side-effect-capable CRC execute never blocks the UI
     thread; and the CRC branch of the Execute handler dispatches to that
     worker rather than calling ``operation.execute`` synchronously. A
     regression that re-inlined a synchronous UI-thread execute on the CRC
     path would drop one of these and fail here.
+
+    Traces: R-OPS-003.7.
     """
     # The worker method is decorated @work(thread=True) — Textual wraps it in
     # a closure with no public metadata, so the executed-at-import decorator

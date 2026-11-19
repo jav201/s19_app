@@ -173,7 +173,7 @@ def _planted_diff(run_count: int) -> tuple:
 def test_filename_scheme_and_same_second_collision(tmp_path: Path) -> None:
     """Injected fixed clock → base name, then zero-padded -01 counter.
 
-    Intent: LLR-004.1 — the diff filename carries the ``-diff-report.md`` kind
+    Intent: R-CMP-005.6, R-CMP-005.7 — the diff filename carries the ``-diff-report.md`` kind
     suffix and a same-second collision inserts ``-NN`` before it instead of
     overwriting. Threshold: two distinct files (base + ``-01``), both matching
     DIFF_REPORT_FILENAME_REGEX; 0 overwrites.
@@ -203,7 +203,7 @@ def test_filename_scheme_and_same_second_collision(tmp_path: Path) -> None:
 def test_collision_never_overwrites_existing_file(tmp_path: Path) -> None:
     """A pre-created target filename forces a -01 sibling; the original is untouched.
 
-    Intent: LLR-004.1 / M-5 — never a silent overwrite. Threshold: pre-existing
+    Intent: R-CMP-005.7 / M-5 — never a silent overwrite. Threshold: pre-existing
     file byte-identical after generation; the new file is the ``-01`` sibling.
     """
     reports = tmp_path / "reports"
@@ -251,7 +251,7 @@ def test_self_contained_listing_newest_first(tmp_path: Path) -> None:
 def test_report_service_regex_unedited() -> None:
     """The shared REPORT_FILENAME_REGEX still rejects the diff scheme (G-4).
 
-    Intent: LLR-004.2 / G-4 — proof the diff module did NOT generalize the
+    Intent: R-RPT-002.3 / G-4 — proof the diff module did NOT generalize the
     shared regex. Threshold: the shared regex matches the project-report scheme
     and does NOT match the diff scheme.
     """
@@ -270,7 +270,7 @@ def test_report_service_regex_unedited() -> None:
 def test_report_sections_present_in_order(tmp_path: Path) -> None:
     """Header → Statistics → Runs → Hex windows appear, in that order.
 
-    Intent: LLR-004.3 — all four sections present in order; exact stats/run
+    Intent: R-CMP-004.1 — all four sections present in order; exact stats/run
     table rows. Threshold: section indices strictly increasing; exact rows
     present.
     """
@@ -341,7 +341,7 @@ def test_generation_is_deterministic_fixed_clock(tmp_path: Path) -> None:
 def test_markdown_file_is_complete_no_truncation(tmp_path: Path) -> None:
     """A large planted diff → every run present, 0 TRUNCATED markers (G-9).
 
-    Intent: LLR-004.3 / G-9 — the WRITTEN file is complete: no run cap, no byte
+    Intent: R-CMP-004.2 / G-9 — the WRITTEN file is complete: no run cap, no byte
     truncation, no marker. Threshold: 0 ``TRUNCATED`` occurrences; every
     planted run's hex-window heading is present (200 runs).
     """
@@ -371,7 +371,7 @@ def test_markdown_file_is_complete_no_truncation(tmp_path: Path) -> None:
 def test_changed_run_emits_diff_fenced_block(tmp_path: Path) -> None:
     """A changed run emits a ```diff block: A bytes as `-`, B bytes as `+`.
 
-    Intent: LLR-004.3 — the format-appropriate Markdown cue. Threshold: a
+    Intent: R-CMP-004.3 — the format-appropriate Markdown cue. Threshold: a
     ```diff fence exists; inside it ≥ 1 ``-`` line (image A byte 0xAA) and ≥ 1
     ``+`` line (image B byte 0xBB).
     """
@@ -409,7 +409,7 @@ def test_changed_run_emits_diff_fenced_block(tmp_path: Path) -> None:
 def test_symbol_annotation_only_intersecting_run(tmp_path: Path) -> None:
     """A symbol inside one run annotates that run only; an outside symbol does not.
 
-    Intent: LLR-004.4 / G-2 — annotate exactly the intersecting symbol, 0 false
+    Intent: R-CMP-004.5 / G-2 — annotate exactly the intersecting symbol, 0 false
     positives. Threshold: the inside symbol name appears on its run row; the
     outside symbol never appears; the non-annotated run renders ``-``.
     """
@@ -439,7 +439,7 @@ def test_symbol_annotation_only_intersecting_run(tmp_path: Path) -> None:
 def test_annotation_absent_without_context(tmp_path: Path) -> None:
     """No artifact context → every run is a raw binary run annotated ``-``.
 
-    Intent: LLR-004.4 — annotation is non-gating; the diff is unaffected.
+    Intent: R-CMP-004.5 — annotation is non-gating; the diff is unaffected.
     Threshold: the run row renders ``-`` and the run is still reported.
     """
     comparison = _comparison()
@@ -462,7 +462,7 @@ def test_annotation_absent_without_context(tmp_path: Path) -> None:
 def test_module_performs_no_logging() -> None:
     """The module source imports no logging and grabs no logger (F-S-07).
 
-    Intent: LLR-004.5 — report body content can never reach the rotating log.
+    Intent: R-CMP-004.10 — report body content can never reach the rotating log.
     Threshold: 0 occurrences of ``import logging`` / ``getLogger`` in the
     module source.
     """
@@ -479,7 +479,7 @@ def test_module_performs_no_logging() -> None:
 def test_no_project_valid_directory_writes_one_file(tmp_path: Path) -> None:
     """An operator directory that exists → exactly one tool-generated file there.
 
-    Intent: LLR-004.6 / G-8 (a) — valid dir ⇒ 1 file, tool-generated filename.
+    Intent: R-CMP-005.2 / G-8 (a) — valid dir ⇒ 1 file, tool-generated filename.
     Threshold: exactly 1 ``.md`` file in the dir; its name matches the regex
     and is wholly tool-generated (no operator string).
     """
@@ -503,7 +503,7 @@ def test_no_project_valid_directory_writes_one_file(tmp_path: Path) -> None:
 def test_no_project_empty_path_refused(tmp_path: Path, bad: str) -> None:
     """An empty/blank operator path → 0 files, a diagnostic, no exception.
 
-    Intent: LLR-004.6 / G-8 (b) — no implicit default; empty path is REFUSED.
+    Intent: R-CMP-005.3 / G-8 (b) — no implicit default; empty path is REFUSED.
     Threshold: written False; ≥ 1 diagnostic; 0 files anywhere; 0 exceptions.
     """
     result = generate_diff_report(
@@ -524,7 +524,7 @@ def test_no_project_empty_path_refused(tmp_path: Path, bad: str) -> None:
 def test_no_project_nonexistent_dir_refused(tmp_path: Path) -> None:
     """A non-existent directory path → 0 files, a diagnostic naming the input.
 
-    Intent: LLR-004.6 / G-8 (b) — a path that is not an existing directory is
+    Intent: R-CMP-005.4 / G-8 (b) — a path that is not an existing directory is
     REFUSED. Threshold: written False; the rejected input appears in a
     diagnostic; 0 files written.
     """
@@ -546,7 +546,7 @@ def test_no_project_nonexistent_dir_refused(tmp_path: Path) -> None:
 def test_no_project_collision_no_overwrite(tmp_path: Path) -> None:
     """A pre-created target in the operator dir → a -01 sibling; original untouched.
 
-    Intent: LLR-004.6 / M-5 — the no-project branch applies the same
+    Intent: R-CMP-005.7 / M-5 — the no-project branch applies the same
     no-silent-overwrite counter. Threshold: pre-existing file byte-identical;
     the new file is the ``-01`` sibling.
     """
@@ -569,7 +569,7 @@ def test_no_project_collision_no_overwrite(tmp_path: Path) -> None:
 def test_no_sanitize_project_name_in_validator() -> None:
     """The destination validator never calls sanitize_project_name (M-4).
 
-    Intent: LLR-004.6 / M-4 — path validation must NOT use the single-token
+    Intent: R-CMP-005.2 / M-4 — path validation must NOT use the single-token
     name cleaner. Probe targets the validator function body (the module
     docstring legitimately explains the M-4 decision). Threshold: 0 occurrences
     of ``sanitize_project_name`` in the validator source.
@@ -584,9 +584,9 @@ def test_no_sanitize_project_name_in_validator() -> None:
 
 
 def test_html_export_complete_and_safe(tmp_path: Path) -> None:
-    """A large planted diff → complete, self-contained, safe HTML (LLR-004.7).
+    """A large planted diff → complete, self-contained, safe HTML (R-CMP-004.7, R-CMP-004.2).
 
-    Intent: LLR-004.7 / G-9 — the HTML is complete (0 TRUNCATED, every run
+    Intent: R-CMP-004.7, R-CMP-004.2 / G-9 — the HTML is complete (0 TRUNCATED, every run
     present), self-contained (0 ``<script>``, 0 external-resource matches), and
     colour-cued (≥ 1 inline-CSS colour per run kind). Threshold encoded inline.
     """
@@ -626,7 +626,7 @@ def test_html_export_complete_and_safe(tmp_path: Path) -> None:
 def test_html_escapes_embedded_payload(tmp_path: Path) -> None:
     """An escapable payload in a path round-trips as its html.escape form.
 
-    Intent: LLR-004.7 — every embedded value is ``html.escape``-d. Threshold:
+    Intent: R-CMP-004.8 — every embedded value is ``html.escape``-d. Threshold:
     a path containing ``<script>`` & ``"`` appears escaped (``&lt;``/``&amp;``/
     ``&quot;``), NOT raw; 0 ``<script`` tags; 0 external-resource matches.
     """
@@ -654,7 +654,7 @@ def test_html_escapes_embedded_payload(tmp_path: Path) -> None:
 def test_html_filename_scheme_and_collision(tmp_path: Path) -> None:
     """HTML filename matches its own regex; a same-second collision → -01 (M-5).
 
-    Intent: LLR-004.7 — own ``.html`` filename scheme + collision discipline,
+    Intent: R-CMP-005.6, R-CMP-005.7 — own ``.html`` filename scheme + collision discipline,
     shared regex untouched. Threshold: base + ``-01`` siblings, both matching
     DIFF_REPORT_HTML_FILENAME_REGEX; the Markdown regex does NOT match.
     """

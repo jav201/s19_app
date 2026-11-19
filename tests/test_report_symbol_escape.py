@@ -144,6 +144,8 @@ def test_hostile_linkage_symbol_md_escaped(tmp_path: Path) -> None:
     ``_md_table_cell`` fix the pipe is ``\\|``, the backslash is doubled, and
     the control/newline chars are stripped — the row keeps its 6-cell shape.
     RED pre-fix (raw ``|`` present, extra structural pipes); GREEN post-fix.
+
+    Traces: R-TUI-077.1.
     """
     evil = "EVIL|SYM\\PATH\x01\nEND"
     text = _generate(

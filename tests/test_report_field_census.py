@@ -959,7 +959,7 @@ def test_f17_format_bytes_is_inert_by_construction(tmp_path: Path) -> None:
     image contains — including `0x60`, whose ASCII form would be a backtick but
     whose HEX form is the harmless `60`.
 
-    batch-74 (LLR-105.7) caps the run at `REPORT_BYTES_PER_CELL` values and
+    batch-74 (R-TUI-101.6) caps the run at `REPORT_BYTES_PER_CELL` values and
     appends a cue stating the elided count, which introduces characters the
     original closed alphabet did not admit. The alphabet is WIDENED to
     `HEX | {" "} | CUE_ALPHABET` — asserted against the module constant, never
@@ -991,7 +991,7 @@ def test_f17_format_bytes_is_inert_by_construction(tmp_path: Path) -> None:
     # The fixture SCALES with the constant. A fixed `range(256)` would stop
     # truncating if `REPORT_CELL_CHARS` were ever raised past 767 — no cue, the
     # widened alphabet trivially satisfied, and this node green while testing
-    # nothing. That is the fixture-shrink LLR-105.7 forbids, arriving by itself.
+    # nothing. That is the fixture-shrink R-TUI-101.6 forbids, arriving by itself.
     rendered = _format_bytes(
         [i % 256 for i in range(2 * REPORT_BYTES_PER_CELL)],
         max_bytes=REPORT_BYTES_PER_CELL,

@@ -129,7 +129,7 @@ def test_module_imports_no_textual() -> None:
 
 
 def test_variant_pair_matches_engine(tmp_path: Path) -> None:
-    # LLR-002.2: comparing two project variants equals the engine over the two
+    # R-CMP-002.1: comparing two project variants equals the engine over the two
     # independently-parsed memory maps (fresh parse, not the TUI snapshot).
     project = _make_variant_project(tmp_path)
     vset = _variant_set(project)
@@ -158,7 +158,7 @@ def test_variant_pair_matches_engine(tmp_path: Path) -> None:
 
 
 def test_variant_pair_reports_real_diff(tmp_path: Path) -> None:
-    # LLR-002.2 (diff path): a genuinely-different second variant yields the
+    # R-CMP-002.2 (diff path): a genuinely-different second variant yields the
     # engine's changed runs through the service.
     project = _make_variant_project(tmp_path)
     # Replace fw_b with the other example image so the maps differ.
@@ -201,7 +201,7 @@ def test_external_unresolvable_returns_refused(tmp_path: Path) -> None:
 
 
 def test_external_resolved_pair(tmp_path: Path) -> None:
-    # LLR-002.3 success: two existing external files resolve and compare.
+    # R-CMP-002.3 success: two existing external files resolve and compare.
     src = EXAMPLE_PROJECT / "firmware.s19"
     a = tmp_path / "a.s19"
     b = tmp_path / "b.s19"

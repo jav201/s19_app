@@ -8,6 +8,7 @@ from s19_app.validation import ValidationSeverity, validate_mac_records
 
 
 def test_validate_mac_records_detects_duplicate_address_alias_candidate():
+    """Traces: R-VAL-023."""
     records = [
         {"parse_ok": True, "line_number": 1, "name": "RPM", "address": 0x1000},
         {"parse_ok": True, "line_number": 2, "name": "LOAD", "address": 0x1004},
@@ -22,6 +23,7 @@ def test_validate_mac_records_detects_duplicate_address_alias_candidate():
 
 
 def test_validate_mac_records_duplicate_name_remains_hard_error():
+    """Traces: R-VAL-021."""
     records = [
         {"parse_ok": True, "line_number": 1, "name": "RPM", "address": 0x1000},
         {"parse_ok": True, "line_number": 2, "name": "RPM", "address": 0x1004},
@@ -45,6 +47,7 @@ def test_validate_mac_records_reports_parse_and_empty_fields():
 
 
 def test_validate_mac_records_duplicate_address_hard_conflict_from_a2l():
+    """Traces: R-VAL-022."""
     records = [
         {"parse_ok": True, "line_number": 1, "name": "RPM", "address": 0x1000},
         {"parse_ok": True, "line_number": 2, "name": "TORQUE", "address": 0x1000},

@@ -1607,7 +1607,10 @@ def test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l(tmp_path: Path) -> None
     recompute of R-1 must describe the same bytes). Negative controls: the full refresh at
     every write -> above the bound -> RED; a changed-byte test that reads only
     a tag's first byte -> the tags covering ``0x80100005`` keep their old
-    values -> RED."""
+    values -> RED.
+
+    Traces: US-FRESH-3.
+    """
     from s19_app.tui.services.a2l_service import enrich_tags_and_render
 
     async def scenario(app, pilot, log):

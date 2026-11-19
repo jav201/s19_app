@@ -416,7 +416,7 @@ def test_ac6_band_segments_do_not_widen_region_row_queries(
 
 
 def test_ac6_gap_hatch_segments_are_not_clickable(tmp_path: Path) -> None:
-    """A click on an unmapped gap hatch is inert (LLR-045C.3, preserved).
+    """A click on an unmapped gap hatch is inert (R-TUI-062.9, preserved).
 
     Guards the boundary N4b (Inc-4) is about to move: band-strip segments become
     clickable, but the ``╱`` hatch marking an UNMAPPED gap must stay inert —

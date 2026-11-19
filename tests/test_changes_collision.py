@@ -109,7 +109,10 @@ def test_collision_geometries(
     tmp_path: Path, entries: list[dict], expected_collisions: int
 ) -> None:
     """Each geometry yields EXACTLY its expected CHG-COLLISION count, and a
-    colliding document is marked not applicable (LLR-001.5 / HLR-001 (4))."""
+    colliding document is marked not applicable (LLR-001.5 / HLR-001 (4)).
+
+    Traces: R-CHG-001.40, R-CHG-001.42.
+    """
     document = read_change_document(_write_doc(tmp_path, entries), tmp_path)
 
     collision_codes = [
@@ -125,7 +128,7 @@ def test_collision_geometries(
 
 def test_collision_messages_name_both_addresses(tmp_path: Path) -> None:
     """Each collision issue names the entry's own address and its partner's
-    address — and never the raw byte content (LLR-001.5 / C-9)."""
+    address — and never the raw byte content (R-CHG-001.41, R-CHG-001.39 / C-9)."""
     entries = [_bytes_entry("0x100", 4), _bytes_entry("0x102", 4)]
     document = read_change_document(_write_doc(tmp_path, entries), tmp_path)
 
@@ -170,7 +173,7 @@ def test_collision_three_entry_chain(tmp_path: Path) -> None:
 def test_collision_uses_encoded_length_not_char_count(tmp_path: Path) -> None:
     """"éé" is 2 characters but 4 UTF-8 bytes: its true span [0x100,0x104)
     collides with a byte patch at 0x102, which a char-count range
-    [0x100,0x102) would have missed (LLR-001.5 — encoded length
+    [0x100,0x102) would have missed (R-CHG-001.38 — encoded length
     everywhere)."""
     entries = [
         {"type": "string", "address": "0x100", "value": "éé"},

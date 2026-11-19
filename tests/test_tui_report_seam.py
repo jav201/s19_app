@@ -244,6 +244,8 @@ def test_report_seam_surfaces_written_path_in_status(tmp_path: Path) -> None:
     location through the shipped status surface as ``reports/<file>.md``
     (project-relative because the status log trims to 50 chars). The
     operator sees WHERE the report landed without leaving the app.
+
+    Traces: R-RPT-002.22.
     """
 
     async def _drive() -> Tuple[list[str], str]:
@@ -289,6 +291,8 @@ def test_report_seam_renders_generated_report_in_viewer(tmp_path: Path) -> None:
     on-disk content into the ``Markdown`` widget. The rendered source is
     the generated file's bytes (the report header line), never a hand-built
     fixture.
+
+    Traces: R-RPT-002.5.
     """
 
     async def _drive() -> Tuple[str, str, Path, object]:

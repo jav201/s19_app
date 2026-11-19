@@ -78,7 +78,7 @@ def _variant_set(active_id: str | None, *ids: str) -> ProjectVariantSet:
 def test_envelope_keys_and_active_variant(tmp_path: Path) -> None:
     """Serialized dict has the 4 canonical keys; active_variant == active_id.
 
-    Intent (LLR-001.1): the writer must emit exactly the key set the reader
+    Intent (R-MAN-SER-001.1, R-MAN-SER-001.3): the writer must emit exactly the key set the reader
     parses (``payload.get("schema_version"|"active_variant"|"batch"|
     "assignments")``) so the round-trip can succeed; ``active_variant`` is
     sourced from ``ProjectVariantSet.active_id``, not re-derived.
@@ -88,7 +88,7 @@ def test_envelope_keys_and_active_variant(tmp_path: Path) -> None:
 
     assert issues == []
     assert text is not None
-    payload = json.loads(text)  # JSON-serializable / parseable (LLR-001.1 AC)
+    payload = json.loads(text)  # JSON-serializable / parseable (R-MAN-SER-001.1, R-MAN-SER-001.3 AC)
     assert set(payload) >= {
         "schema_version",
         "active_variant",
@@ -102,7 +102,7 @@ def test_envelope_keys_and_active_variant(tmp_path: Path) -> None:
 def test_envelope_empty_project_active_variant_is_null(tmp_path: Path) -> None:
     """An empty project (active_id None) serializes active_variant as null.
 
-    Intent (LLR-001.1 AC): ``active_id is None`` round-trips through the reader
+    Intent (R-MAN-SER-001.3 AC): ``active_id is None`` round-trips through the reader
     as ``None`` — JSON ``null``.
     """
     vset = _variant_set(None)
@@ -122,7 +122,7 @@ def test_envelope_empty_project_active_variant_is_null(tmp_path: Path) -> None:
 def test_relative_paths_resolve_with_no_escape(tmp_path: Path) -> None:
     """Every emitted entry resolves in-project with 0 MANIFEST-PATH-ESCAPE.
 
-    Intent (LLR-001.2): the writer's entries must satisfy the reader's
+    Intent (R-MAN-SER-001.6, R-MAN-SER-001.4): the writer's entries must satisfy the reader's
     ``_resolve_manifest_entry`` (non-None Path, no appended issue) so the
     reader resolves them inside the project root.
     """
@@ -141,7 +141,7 @@ def test_relative_paths_resolve_with_no_escape(tmp_path: Path) -> None:
     assert emitted  # the test is non-vacuous
     escape_count = 0
     for entry in emitted:
-        assert "\\" not in entry  # forward-slash only (LLR-001.2)
+        assert "\\" not in entry  # forward-slash only (R-MAN-SER-001.6, R-MAN-SER-001.4)
         probe: list = []
         resolved = _resolve_manifest_entry(tmp_path.resolve(), entry, "batch", probe)
         assert resolved is not None
@@ -150,7 +150,7 @@ def test_relative_paths_resolve_with_no_escape(tmp_path: Path) -> None:
 
 
 def test_windows_backslashes_normalized_to_forward_slash(tmp_path: Path) -> None:
-    """A back-slash entry is normalized to POSIX before emission (LLR-001.2 AC)."""
+    """A back-slash entry is normalized to POSIX before emission (R-MAN-SER-001.4 AC)."""
     vset = _variant_set("a", "a")
     text, issues = serialize_manifest(
         vset, tmp_path, batch=["sub\\nested\\doc.json"]
@@ -170,7 +170,7 @@ def test_windows_backslashes_normalized_to_forward_slash(tmp_path: Path) -> None
 def test_roundtrip_equals_intent_in_canonical_form(tmp_path: Path) -> None:
     """serialize -> write -> read_project_manifest yields intent, 0 issues.
 
-    Intent (LLR-001.3): correctness is round-trip fidelity to the reader
+    Intent (R-MAN-SER-001.6): correctness is round-trip fidelity to the reader
     oracle. Equality is asserted in the C-1 canonical comparison form — the
     intended entries are RESOLVED against the project dir (the
     ``test_variant_execution.py:163`` idiom), so both sides are
@@ -203,7 +203,7 @@ def test_roundtrip_equals_intent_in_canonical_form(tmp_path: Path) -> None:
 
 
 def test_roundtrip_schema_version_survives(tmp_path: Path) -> None:
-    """schema_version survives the round-trip as the same int (LLR-001.3 AC)."""
+    """schema_version survives the round-trip as the same int (R-MAN-SER-001.2 AC)."""
     project_dir = tmp_path
     vset = _variant_set("a", "a")
     text, issues = serialize_manifest(vset, project_dir, schema_version=1)
@@ -224,7 +224,7 @@ def test_roundtrip_schema_version_survives(tmp_path: Path) -> None:
 def test_deterministic_byte_identical_output(tmp_path: Path) -> None:
     """Two serializations of the same composition are byte-identical.
 
-    Intent (LLR-001.4): a no-change re-save must be a no-op and the verify
+    Intent (R-MAN-SER-001.5): a no-change re-save must be a no-op and the verify
     step deterministic, so the encoder uses stable key/list order.
     """
     vset = _variant_set("b", "a", "b")
@@ -248,7 +248,7 @@ def test_deterministic_byte_identical_output(tmp_path: Path) -> None:
 def test_refuse_escape_and_absolute_entries_writes_nothing(tmp_path: Path) -> None:
     """A ../../x entry AND an absolute entry are both refused, no text emitted.
 
-    Intent (LLR-001.5 / M-3): the serializer must REFUSE — return
+    Intent (R-MAN-SER-001.7, R-MAN-SER-001.8 / M-3): the serializer must REFUSE — return
     ``(None, [finding, ...])`` and emit nothing — for any entry the reader
     would reject, so the tool never writes a manifest the reader can't use.
     """
@@ -274,7 +274,7 @@ def test_refuse_escape_and_absolute_entries_writes_nothing(tmp_path: Path) -> No
 def test_clean_composition_passes_the_gate(tmp_path: Path) -> None:
     """A clean composition yields 0 findings and serialization proceeds.
 
-    Intent (LLR-001.5 threshold): the gate must not be a false positive — a
+    Intent (R-MAN-SER-001.7 threshold): the gate must not be a false positive — a
     safe composition serializes normally.
     """
     vset = _variant_set("a", "a")
@@ -290,6 +290,8 @@ def test_refusal_emits_no_file_when_caller_would_write(tmp_path: Path) -> None:
 
     Intent: verify the HLR-002-side write-refusal invariant at the serialize
     boundary — a refused serialize gives the caller nothing to write.
+
+    Traces: R-MAN-SER-001.7, R-MAN-SER-001.8.
     """
     vset = _variant_set("a", "a")
     text, issues = serialize_manifest(vset, tmp_path, batch=["../../x.json"])
@@ -326,7 +328,7 @@ def _project_dir(tmp_path: Path, name: str = "proj") -> Path:
 def test_write_places_manifest_and_reads_back(tmp_path: Path) -> None:
     """write_project_manifest lands project.json that re-reads as intent.
 
-    Intent (LLR-002.1): the staged-then-atomic-replace write must produce a
+    Intent (R-MAN-WRITE-001.1): the staged-then-atomic-replace write must produce a
     manifest the reader oracle parses back without findings — the write side of
     the round-trip.
     """
@@ -356,7 +358,7 @@ def test_write_places_manifest_and_reads_back(tmp_path: Path) -> None:
 def test_two_saves_leave_exactly_one_manifest_second_wins(tmp_path: Path) -> None:
     """Two saves -> ONE project.json, NO project_1.json, 2nd content wins.
 
-    Intent (LLR-002.1 / M-1 regression): the writer must NOT route through
+    Intent (R-MAN-WRITE-001.1, R-MAN-WRITE-001.2 / M-1 regression): the writer must NOT route through
     ``copy_into_workarea``'s dedup body — a re-save overwrites the fixed name in
     place. A ``project_1.json`` would be invisible to the reader (it opens only
     ``project_dir / PROJECT_MANIFEST_NAME``), letting a stale manifest survive
@@ -391,7 +393,7 @@ def test_two_saves_leave_exactly_one_manifest_second_wins(tmp_path: Path) -> Non
 def test_fixed_name_and_staged_temp_removed(tmp_path: Path) -> None:
     """Written name is the fixed project.json; the staged temp file is gone.
 
-    Intent (LLR-002.2): the name is fixed (no caller-supplied component, no
+    Intent (R-MAN-WRITE-001.2, R-MAN-WRITE-001.3): the name is fixed (no caller-supplied component, no
     dedup), and the staging file under ``temp/`` must not be left behind.
     """
     project_dir = _project_dir(tmp_path)
@@ -415,7 +417,7 @@ def test_fixed_name_and_staged_temp_removed(tmp_path: Path) -> None:
 def test_destination_outside_workarea_returns_finding(tmp_path: Path) -> None:
     """A project_root with no .s19tool/workarea ancestor -> (None, finding).
 
-    Intent (LLR-002.3): a destination that fails containment must be a returned
+    Intent (R-MAN-WRITE-001.5): a destination that fails containment must be a returned
     ``MANIFEST-WRITE-CONTAINMENT`` finding (collect-don't-abort), never an
     uncaught exception, and no file is written.
     """
@@ -438,6 +440,8 @@ def test_refused_serialize_short_circuits_without_writing(tmp_path: Path) -> Non
     Intent (LLR-001.5 ∩ HLR-002): the write helper must short-circuit on a
     refused serialize and write nothing — the refusal finding propagates, no
     ``MANIFEST-WRITE-CONTAINMENT`` is manufactured.
+
+    Traces: R-MAN-SER-001.7.
     """
     project_dir = _project_dir(tmp_path)
     written, issues = write_project_manifest(

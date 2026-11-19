@@ -277,7 +277,7 @@ def test_tc666_region_rows_fixed_width_no_wrap(tmp_path: Path, size) -> None:
 
 @pytest.mark.parametrize("size", _GEOMETRIES, ids=[f"{w}x{h}" for w, h in _GEOMETRIES])
 def test_tc667_inspector_hostile_symbols_no_wrap(tmp_path: Path, size) -> None:
-    """LLR-130's defect limb — with hostile over-long A2L symbol names, every
+    """R-TUI-074.9's defect limb — with hostile over-long A2L symbol names, every
     inspector line (2-space indent + CLIPPED name) fits the measured interior
     at every tested geometry; the painted line count equals the authored
     count (8 fields/hdr lines + 2 names + Peek + peek rows), no hidden wrap."""

@@ -29,6 +29,7 @@ from s19_app.validation.model import ValidationSeverity
 
 
 def test_ac1_valid_address_missing_length_is_schema_ok() -> None:
+    """Traces: R-A2L-072, R-A2L-070."""
     tags = [{"section": "CHARACTERISTIC", "name": "NOLEN", "address": 0x1008, "length": None}]
 
     results = validate_a2l_tags(tags, {0x1008: 0x01})
@@ -47,6 +48,7 @@ def test_ac1_valid_address_missing_length_is_schema_ok() -> None:
 
 
 def test_ac2_missing_length_row_severity_is_not_error() -> None:
+    """Traces: R-A2L-087."""
     tag = {
         "name": "NOLEN",
         "schema_ok": True,
@@ -67,6 +69,7 @@ def test_ac2_missing_length_row_severity_is_not_error() -> None:
 
 
 def test_ac3_missing_address_still_schema_fail() -> None:
+    """Traces: R-A2L-072, R-A2L-083."""
     tags = [{"section": "CHARACTERISTIC", "name": "NOADDR", "address": None, "length": 4}]
 
     result = validate_a2l_tags(tags, {0x1008: 0x01})[0]
@@ -87,6 +90,7 @@ def test_ac3_missing_address_still_schema_fail() -> None:
 
 
 def test_ac4_virtual_without_address_still_schema_ok() -> None:
+    """Traces: R-A2L-072."""
     tags = [
         {
             "section": "CHARACTERISTIC",
@@ -111,6 +115,7 @@ def test_ac4_virtual_without_address_still_schema_ok() -> None:
 
 
 def test_both_present_still_memory_checks() -> None:
+    """Traces: R-A2L-070."""
     tags = [{"section": "MEASUREMENT", "name": "OK", "address": 0x1000, "length": 2}]
 
     result = validate_a2l_tags(tags, {0x1000: 0x01, 0x1001: 0x02})[0]

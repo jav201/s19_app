@@ -142,7 +142,7 @@ def test_unsupported_file_type_raises(tmp_path: Path) -> None:
 
 def test_written_path_is_stamped(tmp_path: Path) -> None:
     """C-10 carrier guard: the result stamps the verified path so a mismatch
-    notice (LLR-004.2) can name the file."""
+    notice (R-HEX-VERIFY-002.5) can name the file."""
     written = _write_image(_INTENDED, "hex", tmp_path)
     result = verify_written_image(written, _INTENDED, "hex")
     assert result.written_path == written

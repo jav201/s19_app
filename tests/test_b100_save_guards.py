@@ -1179,7 +1179,7 @@ def test_tc_b100_07_rollback_keeps_concurrent_writer_file_r8(
 def test_tc_b100_07_manifest_mismatch_is_the_newest_status_line(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """R2-5 (LLR-004.2): a manifest write that verifies with a MISMATCH
+    """R2-5 (R-MAN-VERIFY-001.6): a manifest write that verifies with a MISMATCH
     is reported, not a failure — and the drift report stays the NEWEST
     painted status line: ``Saved project to …`` paints first, then
     ``Manifest verify MISMATCH`` re-paints over it, so the success line

@@ -98,7 +98,7 @@ def test_error_blocks_apply_zero_writes_all_blocked() -> None:
     }
     assert all(entry.disposition == "blocked" for entry in summary.entries)
     assert all(entry.before_bytes is None for entry in summary.entries)
-    # LLR-002.8: the document's declaration faults ride on the summary.
+    # R-CHG-002.3, R-CHG-002.4: the document's declaration faults ride on the summary.
     assert [issue.code for issue in summary.issues] == [
         "CHG-COLLISION",
         "CHG-COLLISION",
@@ -186,7 +186,7 @@ def test_before_after_capture_exact_tuples_outside_keys_unchanged() -> None:
     assert entry.before_bytes == (0x04, 0x05)
     assert entry.after_bytes == (0xAA, 0xBB)
     assert (mem_map[0x104], mem_map[0x105]) == (0xAA, 0xBB)
-    # Re-reading the written range yields exactly after_bytes (LLR-002.3).
+    # Re-reading the written range yields exactly after_bytes (R-CHG-002.12, R-CHG-002.15).
     assert tuple(mem_map[a] for a in range(0x104, 0x106)) == entry.after_bytes
     # Every key outside the applied range is byte-identical.
     assert {
@@ -344,7 +344,7 @@ def test_save_back_written_file_reparses_to_post_apply_map(
     reparsed = S19File(str(saved_path))
     assert reparsed.get_errors() == []
     assert reparsed.get_memory_map() == mem_map
-    # LLR-002.7 linkage: the caller records the path on the summary.
+    # R-IMG-WRITE.2 linkage: the caller records the path on the summary.
     summary.saved_path = saved_path
     assert summary.to_dict()["saved_path"] == str(saved_path)
 

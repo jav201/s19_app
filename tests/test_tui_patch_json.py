@@ -1152,6 +1152,8 @@ def test_tc079_5b_cap_gauge_escalates_without_verdict_hues() -> None:
     hues — the smallest addition that reads as escalation, and the shape the
     palette already uses (HILITE and LBLUE are the same hue at 38.6% and 19.4%
     saturation, measured 0.2deg apart).
+
+    Traces: R-PATCH-PASTE-001.10, R-PATCH-PASTE-001.11.
     """
     warn, bad = 75.0, 100.0
 

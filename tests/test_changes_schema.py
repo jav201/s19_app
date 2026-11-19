@@ -77,7 +77,7 @@ def _write_json(tmp_path: Path, payload: object, name: str = "doc.json") -> str:
 
 
 def test_metadata_roundtrip(tmp_path: Path) -> None:
-    """All 5 metadata fields survive write→read byte-identical (LLR-001.1)."""
+    """All 5 metadata fields survive write→read byte-identical (R-CHG-WRITE.11)."""
     document = ChangeDocument(
         format=FORMAT_ID,
         version=FORMAT_VERSION,
@@ -197,7 +197,7 @@ def test_entry_shapes(
     expected: tuple,
 ) -> None:
     """Strict wire grammar: each shape parses exactly or is rejected with the
-    exact CHG-* code (LLR-001.2)."""
+    exact CHG-* code (R-CHG-001.37, R-CHG-001.27)."""
     path_text = _write_json(
         tmp_path, _v2_payload(value_mode=value_mode, entries=[entry])
     )
@@ -266,7 +266,7 @@ def test_metadata_faults(
     tmp_path: Path, payload: object, expected_code: str
 ) -> None:
     """Each crafted metadata fault yields exactly its one code, and the
-    faulted envelope yields ZERO entries (LLR-001.3 / F-A-16)."""
+    faulted envelope yields ZERO entries (R-CHG-001.12, R-CHG-001.14 / F-A-16)."""
     path_text = _write_json(tmp_path, payload)
     document = read_change_document(path_text, tmp_path)
 
@@ -361,7 +361,7 @@ def test_entry_faults(
 ) -> None:
     """Each entry fault records exactly one ERROR with the exact code, the
     entry is skipped while parsing continues, and no issue message embeds
-    the fixture's raw value/byte content (LLR-001.4 / C-9)."""
+    the fixture's raw value/byte content (R-CHG-001.22, R-CHG-001.23, R-CHG-001.39 / C-9)."""
     path_text = _write_json(
         tmp_path,
         _v2_payload(
@@ -391,7 +391,7 @@ def test_entry_faults(
 def test_resource_ceilings_size_cap_before_parse(tmp_path: Path) -> None:
     """An over-cap size probe stops the read BEFORE json.load: the file body
     is deliberately invalid JSON, so any parse attempt would add
-    MF-JSON-PARSE — only MF-SIZE-CAP may appear (LLR-001.7)."""
+    MF-JSON-PARSE — only MF-SIZE-CAP may appear (R-CHG-001.5, R-CHG-001.4)."""
     path = tmp_path / "huge.json"
     path.write_text("{this is not json", encoding="utf-8")
 
@@ -408,7 +408,7 @@ def test_resource_ceilings_entry_count(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Entries past the entry-count ceiling are dropped with one
-    MF-ENTRY-LIMIT; the in-ceiling prefix is kept (LLR-001.7)."""
+    MF-ENTRY-LIMIT; the in-ceiling prefix is kept (R-CHG-001.25, R-CHG-001.26)."""
     monkeypatch.setattr(changes_io, "MF_ENTRY_COUNT_CEILING", 3)
     entries = [
         {"type": "bytes", "address": f"0x{0x100 + 16 * i:X}", "bytes": "01"}
@@ -428,7 +428,7 @@ def test_resource_ceilings_encoded_run_length(
 ) -> None:
     """The run-length ceiling binds on the ENCODED byte length: 3 chars that
     UTF-8-encode to 6 bytes breach a ceiling of 4 even though the raw
-    character count does not (LLR-001.7)."""
+    character count does not (R-CHG-001.33)."""
     monkeypatch.setattr(changes_io, "MF_RUN_LENGTH_CEILING", 4)
     entry = {"type": "string", "address": "0x100", "value": "ééé"}
     path_text = _write_json(tmp_path, _v2_payload(entries=[entry]))
@@ -461,7 +461,7 @@ def test_resource_ceilings_pre_encode_guard(
 
 def test_resource_ceilings_path_unresolved(tmp_path: Path) -> None:
     """An unresolvable path is one MF-PATH-UNRESOLVED and no file is opened
-    (LLR-001.7 — resolve_input_path is the resolution seam)."""
+    (R-CHG-001.3 — resolve_input_path is the resolution seam)."""
     document = read_change_document("no-such-file-anywhere.json", tmp_path)
 
     assert [issue.code for issue in document.issues] == [MF_PATH_UNRESOLVED]

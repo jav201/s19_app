@@ -193,7 +193,7 @@ def defc_dir(tmp_path_factory):
 
 
 def test_r_pe_def_2_the_seven_controls_sit_on_the_filter_row_and_the_table_is_hidden(tmp_path, defc_dir):
-    # E4 integration, test side: with no A2L the count line is hidden by design (R-B102-SEL-002, both empty
+    # E4 integration, test side: with no A2L the count line is hidden by design (R-B102-SEL-002.2, both empty
     # states), so the seven controls can all hold a region only over a populated picker: DEFC's A2L.
     async def body(app, pilot, panel):
         row = need(panel, "#patch_filter_row")

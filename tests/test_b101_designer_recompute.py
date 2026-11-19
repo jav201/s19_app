@@ -1144,7 +1144,10 @@ def test_r_crc_designer_recompute_updates_each_of_the_six_surfaces_once(
     recompute reaches every surface (verdict, custom vector, JSON, Warnings,
     coverage preview and window) and that no surface is refreshed twice or
     skipped. Negative control: a surface dropped from ``_recompute`` (or the
-    coverage rendered twice) -> its count differs from 1 -> RED."""
+    coverage rendered twice) -> its count differs from 1 -> RED.
+
+    Traces: R-CRC-DESIGNER-001.2.1.
+    """
     _set_quiet(monkeypatch, 0.6)
 
     async def scenario():

@@ -211,7 +211,7 @@ def test_tc_b102_sel_01_population_mounts_at_most_one_page(tmp_path: Path, count
 
 
 def test_tc_b102_sel_02_filter_is_debounced_and_reports_truncation(tmp_path: Path, monkeypatch) -> None:
-    """TC-B102-SEL-02 (R-B102-SEL-002, full): with 10 000 parameters, one typed
+    """TC-B102-SEL-02 (R-B102-SEL-002.1, R-B102-SEL-002.2, full): with 10 000 parameters, one typed
     burst causes exactly one ledger rebuild (after the 150 ms debounce) and the
     count line is exactly ``200 of 10000 shown — refine filter.``; a narrow
     match (<= 200) drops the truncation marker.
@@ -305,7 +305,7 @@ def test_tc_b102_sel_03_repeated_includes_touch_only_marks_and_preview(tmp_path:
 
 
 def test_tc_b102_sel_04_reentry_with_same_signature_preserves_state(tmp_path: Path) -> None:
-    """TC-B102-SEL-04 (R-B102-SEL-004, full; E3 ruling 9: firma no nula): with
+    """TC-B102-SEL-04 (R-B102-SEL-004.1, R-B102-SEL-004.2, full; E3 ruling 9: firma no nula): with
     the app's own A2L loaded (a real ``_a2l_enriched_key``), the operator
     filters to two pages, includes two parameters, moves to page 2 and leaves
     for the workspace and back twice: filter text, page, picked names and the
@@ -396,7 +396,7 @@ async def _drive_pagination(panel, pilot):
 
 
 def test_tc_b102_sel_05_pagination_boundaries(tmp_path: Path) -> None:
-    """TC-B102-SEL-05 (R-B102-SEL-005, full): 250 filtered parameters on a
+    """TC-B102-SEL-05 (R-B102-SEL-005.1, R-B102-SEL-005.2, R-B102-SEL-005.3, full): 250 filtered parameters on a
     200-row page size — next, previous, next, then next again at the last page
     land on pages 1, 2, 1, 2; previous is disabled on page 1 and next on page
     2, and the out-of-range activation clamps.

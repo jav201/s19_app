@@ -455,7 +455,7 @@ def test_tc_b102_a2l_06_clear_unload_renders_empty_state(tmp_path: Path) -> None
 
 # ---------------------------------------------------------------------------
 # TC-B102-A2L-07 — a stale worker precompute is discarded when generations
-# change before apply (R-B102-A2L-006, robustness; umbral 2/2).
+# change before apply (R-A2L-REFRESH.028, robustness; umbral 2/2).
 #
 # Arm 1 (valid snapshot installs): the shipped worker path
 # (``load_from_path`` -> ``_start_load_worker`` -> ``_prepare_load_payload`` ->

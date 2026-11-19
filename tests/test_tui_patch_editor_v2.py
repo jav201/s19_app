@@ -143,7 +143,7 @@ def _set_entry_inputs(
 def test_panel_composition(tmp_path: Path) -> None:
     """6 new widget ids exist; 7 retired ids resolve to no widget.
 
-    Intent: LLR-003.1 — the Patch Editor presents exactly one v2 change-flow
+    Intent: R-TUI-063.1 — the Patch Editor presents exactly one v2 change-flow
     section. The 6 new control ids must be queryable; the batch-03 parameter
     section, the ``.cdfx`` file row, and the export control (7 retired ids)
     must not exist — 13 queries total.
@@ -486,7 +486,7 @@ def test_legacy_load_rejected(
 ) -> None:
     """A legacy ``.cdfx`` / v1 JSON load is one ERROR finding, app alive.
 
-    Intent: LLR-003.5 — loading a retired format through the v2 Load
+    Intent: R-CHG-001.7, R-CHG-001.9 — loading a retired format through the v2 Load
     control surfaces exactly one ERROR-severity unsupported-format finding
     (``MF-JSON-PARSE`` for XML, ``CHG-V1-FORMAT`` for v1 JSON) and the app
     stays responsive — the router's except-arm pattern, never a crash.
@@ -685,7 +685,7 @@ def test_declaration_faults_visible(tmp_path: Path) -> None:
     """Faults render, survive unrelated UI actions, clear on clean
     re-validate (3 stages).
 
-    Intent: LLR-002.8 (F-Q-11) — declaration faults are widget state, not a
+    Intent: R-CHG-004.2, R-CHG-VAL.1 (F-Q-11) — declaration faults are widget state, not a
     transient status line: (1) a 2-fault document renders 2 fault lines plus
     the count; (2) a focus move and a table scroll leave them rendered;
     (3) re-validating a corrected document clears the listing and the
@@ -786,6 +786,8 @@ def test_check_run_display(tmp_path: Path) -> None:
     coloured through ``css_class_for_severity`` (pass→``sev-ok``,
     fail→``sev-error``, uncheckable→``sev-warning``) and a status line
     stating the three aggregate counts. No stub is injected anywhere.
+
+    Traces: R-CHK-PE-001, R-CHK-PE-002, R-CHK-PE-003.
     """
     from textual.widgets import Label, Static
 
@@ -1738,7 +1740,7 @@ def test_repopulate_blank_reset_posts_no_spurious_load(tmp_path: Path) -> None:
 def test_f1_symlink_entry_is_skipped_by_scan(tmp_path: Path) -> None:
     """Security TC (F1) — a symlinked patches/ entry is skipped by the scan.
 
-    Intent: the read-path containment fold (LLR-030.3 / F-S1). The typed-path
+    Intent: the read-path containment fold (R-PATCH-DOC-DROPDOWN-001.1 / F-S1). The typed-path
     load resolves through ``resolve_input_path`` which has only a size cap (no
     containment/symlink guard); the dropdown closes that asymmetry by SKIPPING
     symlink entries at scan time and re-asserting ``is_relative_to`` before
@@ -3312,6 +3314,8 @@ def test_at_batch41_escape_cancels_changeset_json_popup(tmp_path: Path) -> None:
     TextArea pops the modal and leaves the change document UNCHANGED (a
     Cancel, never an apply). Pre-fix RED: ``Escape`` is unbound → the modal
     stays on screen (still a ``ChangeSetJsonScreen``).
+
+    Traces: R-DLG.2.
     """
     from textual.widgets import Button, TextArea
 

@@ -133,7 +133,7 @@ def test_check_reports_mismatch() -> None:
 def test_read_stored_missing_returns_none() -> None:
     """An output address with fewer than 4 present bytes → ``read_stored_crc_le``
     returns ``None`` and ``check_regions`` yields ``matched is None``, with no
-    exception raised (LLR-002.1 "no stored value")."""
+    exception raised (R-CRC-CHECK-001.2 "no stored value")."""
     region_bytes = b"\x01\x02\x03"
     mem = _mem_from_bytes(0, region_bytes)
     # Only 3 of the 4 output bytes present (0x10..0x12; 0x13 absent).
@@ -154,7 +154,7 @@ def test_read_stored_missing_returns_none() -> None:
 
 def test_check_multi_region_order() -> None:
     """Two regions → one ``CrcRegionResult`` per region, in config order
-    (LLR-002.2 deterministic ordering)."""
+    (R-CRC-CHECK-001.1 deterministic ordering)."""
     mem = _mem_from_bytes(0, b"\x11\x22\x33\x44\x55\x66")
     region_a = CrcRegion(start=0, end=3, output_address=0x100)
     region_b = CrcRegion(start=3, end=6, output_address=0x200)
@@ -420,7 +420,7 @@ def test_write_outside_workarea_collects_finding_and_writes_no_file(
     """Containment — a forced target OUTSIDE the contained work area fails the
     real ``copy_into_workarea`` seam (``is_relative_to(workarea_root)`` +
     reparse-point checks); the result collects exactly 1 finding and NO file is
-    written, with no exception raised (collect-don't-abort, LLR-003.2 / D-8)."""
+    written, with no exception raised (collect-don't-abort, R-CRC-WRITE-001.22 / D-8)."""
     payload = bytes(range(0, 16))
     op_input = _contiguous_op_input(0x500, payload)
     region = CrcRegion(start=0x500, end=0x508, output_address=0x504)

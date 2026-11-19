@@ -170,6 +170,8 @@ def test_five_construction_sites_yield_capped_text_area() -> None:
     ids and their constructors are still read out of the AST, so a site that
     silently reverts to a bare ``TextArea`` is still caught (mutation-verified
     at Inc-5: reverting ``#patch_paste_text`` to ``TextArea`` turns this RED).
+
+    Traces: R-TUI-044.2, R-PASTE.18.
     """
     import ast
     from pathlib import Path

@@ -583,7 +583,7 @@ def test_tc_b102_fb_04_escape_cancels_and_focus_starts_on_cancel(tmp_path: Path)
 @pytest.mark.parametrize("action", ["edit", "remove"], ids=["edit", "remove"])
 @pytest.mark.parametrize("raw", ["", "x", "9"], ids=["empty", "alpha", "out_of_range"])
 def test_tc_b102_fb_05_invalid_pick_paints_exact_notice(tmp_path: Path, action: str, raw: str) -> None:
-    """TC-B102-FB-05 (R-B102-FB-005) + ruling 1: for BOTH Edit and Remove, an
+    """TC-B102-FB-05 (R-B102-FB-005.1, R-B102-FB-005.2) + ruling 1: for BOTH Edit and Remove, an
     empty, non-numeric or out-of-range pick paints the exact notice
     ``Edit/Remove needs a block # between 1 and 2.`` (empty is INVALID for
     Edit/Remove — the ``last`` affordance stays Copy-only), opens no modal and

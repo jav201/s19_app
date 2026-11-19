@@ -405,7 +405,10 @@ def test_r003_element_datatype_and_unit_paint_exactly(
 # R-PICKER-CORRECT.004/3, R-PICKER-CORRECT.004/4.
 @pytest.mark.parametrize("case", [f"R-PICKER-CORRECT.004/{index}" for index in range(1, 5)], ids=lambda value: value)
 def test_r004_reader_refusals_keep_length_missing(tmp_path, case):
-    """R-PICKER-CORRECT.004/1-/4: refused R1-R4 never revive 1/2 bytes."""
+    """R-PICKER-CORRECT.004/1-/4: refused R1-R4 never revive 1/2 bytes.
+
+    Traces: R-PICKER-CORRECT.004.1, R-PICKER-CORRECT.004.2.
+    """
     refusal = f"R{case.rsplit('/', 1)[1]}"
     path = _refusal_a2l(tmp_path / f"{refusal}.a2l", refusal)
 

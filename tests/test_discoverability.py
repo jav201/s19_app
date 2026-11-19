@@ -31,6 +31,7 @@ from s19_app.tui.app import S19TuiApp
 
 
 def test_ac1_help_binding_is_present_and_visible() -> None:
+    """Traces: R-TUI-DISCOVER-001.1."""
     help_bindings = [
         b
         for b in S19TuiApp.BINDINGS
@@ -50,6 +51,7 @@ def test_ac1_help_binding_is_present_and_visible() -> None:
 
 
 def test_ac2_question_mark_opens_help_panel(tmp_path: Path) -> None:
+    """Traces: R-TUI-DISCOVER-001.1."""
     async def _drive() -> "tuple[int, int]":
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:

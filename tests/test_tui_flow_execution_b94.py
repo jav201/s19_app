@@ -200,6 +200,8 @@ def test_at_b94_02_rail_twelve_entries_mount_panels(tmp_path: Path) -> None:
     (C-3: sizes declared here, incl. the 80x24 rail-chrome arm — 12 entries
     inside the 21-row chrome budget); every entry mounts its panel through
     the rail-click path (no key is exercised — the R-1 closure).
+
+    Traces: R-TUI-021.1, R-FX-SCR.1.
     """
     expected_order = list(_DECLARED_RAIL_ORDER)
 
@@ -248,7 +250,7 @@ def test_at_b94_02_rail_twelve_entries_mount_panels(tmp_path: Path) -> None:
 
 
 def test_tc_b94_08_rail_entries_census_and_duplicate_rejection() -> None:
-    """TC-B94-08 (LLR-002.1, white-box): RAIL_ENTRIES_B94 declares 12 in the
+    """TC-B94-08 (R-TUI-021.1, white-box): RAIL_ENTRIES_B94 declares 12 in the
     preserved order (Check Editor after Patch Editor, Flow Execution after
     Flow Builder); SCREEN_IDS/SCREEN_KEYS move to 12; duplicate screen keys
     are rejected by construction (the key set has the census length).

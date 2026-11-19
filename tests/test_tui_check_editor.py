@@ -100,7 +100,7 @@ def _write_calls() -> tuple[list, object]:
 
 def test_tc_b94_06_composition_census(tmp_path: Path) -> None:
     """The Check Editor composes a collector, a memory table, write+validate,
-    and exactly ZERO apply actions; composes at 80x24 (LLR-001.1).
+    and exactly ZERO apply actions; composes at 80x24 (R-CHKED-022).
 
     Intent: TC-B94-06 — the ce_a two-column form: >=1 parameter collector,
     >=1 memory-location table, exactly 1 write action, exactly 1 validate
@@ -162,7 +162,7 @@ def test_tc_b94_06_composition_census(tmp_path: Path) -> None:
 
 def test_tc_b94_07_rail_mounting_and_write_routing(tmp_path: Path) -> None:
     """Selecting the entry mounts exactly 1 CheckEditorPanel; the write
-    message reaches the service handler (LLR-001.2).
+    message reaches the service handler (R-TUI-021.3, R-TUI-021.6).
 
     Intent: TC-B94-07 — mounting through the shipped rail path at 120x30 and
     the 80x24 boundary arm; the write action routes to the change writer with
@@ -174,7 +174,7 @@ def test_tc_b94_07_rail_mounting_and_write_routing(tmp_path: Path) -> None:
     or not `=` targets it (the binding mutation SURVIVED). The kill subject
     is the RAIL TARGET: after `=`, the Check Editor screen must be the
     visible one and the rail's single active marker must move to
-    ``check_editor`` (LLR-001.2's ``set_active`` seam).
+    ``check_editor`` (R-TUI-021.3, R-TUI-021.6's ``set_active`` seam).
     """
 
     async def _drive(size) -> tuple:
@@ -271,6 +271,8 @@ def test_tc_b94_07b_help_panel_lists_check_editor_binding(
     ``pdr_rail_key_probe.py`` source-of-truth check upgraded from
     ``active_bindings`` to the painted surface), and dismisses with a second
     `?` (the app's on/off toggle, N6).
+
+    Traces: R-TUI-DISCOVER-001.1.
     """
     from textual.widgets import HelpPanel
 
@@ -303,7 +305,7 @@ def test_tc_b94_07b_help_panel_lists_check_editor_binding(
 def test_at_b94_01_rail_selects_check_editor_mounts_twin(tmp_path: Path) -> None:
     """AT-B94-01 — rail selection mounts the Check Editor; Patch mounts Patch.
 
-    Intent (HLR-001): selecting "Check Editor" mounts exactly one Check
+    Intent (R-TUI-021.4, R-TUI-021.6, R-CHKED-022): selecting "Check Editor" mounts exactly one Check
     Editor panel exposing write/validate actions and 0 apply actions;
     selecting "Patch Editor" mounts the Patch Editor instead. The base-state
     probe recorded 0 ``checkeditor`` hits (P0 RC-1(b)) — the negative control

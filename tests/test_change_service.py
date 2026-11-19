@@ -62,7 +62,7 @@ def _service_with_image() -> tuple[ChangeService, dict[int, int], list[tuple[int
 def test_add_edit_remove_string_entry() -> None:
     """String entries mutate through the evolved both-kind methods.
 
-    Intent: LLR-003.4 — the service handles the v2 ``"string"`` kind
+    Intent: R-PE-021, R-PE-024, R-PE-026 — the service handles the v2 ``"string"`` kind
     natively: the declared value is encoded with the document encoding, an
     edit replaces the entry at its address, and a remove empties the list.
     """
@@ -88,7 +88,7 @@ def test_add_edit_remove_string_entry() -> None:
 def test_add_edit_remove_bytes_entry() -> None:
     """Bytes entries mutate through the evolved both-kind methods.
 
-    Intent: LLR-003.4 — the permissive TUI-input grammar (bare hex, commas,
+    Intent: R-PE-021, R-PE-024, R-PE-026 — the permissive TUI-input grammar (bare hex, commas,
     ``0x`` prefixes) feeds the ``"bytes"`` kind; edit replaces in place and
     remove deletes by address.
     """
@@ -110,6 +110,8 @@ def test_add_duplicate_address_is_rejected() -> None:
     Intent: the v2 file format keeps duplicate addresses as collisions, but
     the interactive add treats one as an operator mistake — Edit is the
     update path, so the table never silently grows a colliding twin.
+
+    Traces: R-PE-023.
     """
     service = ChangeService()
     service.add_entry("0x100", "", "AA")
@@ -118,7 +120,10 @@ def test_add_duplicate_address_is_rejected() -> None:
 
 
 def test_edit_or_remove_missing_address_raises_key_error() -> None:
-    """Edit / remove of an unknown address is a KeyError the app reports."""
+    """Edit / remove of an unknown address is a KeyError the app reports.
+
+    Traces: R-PE-028.
+    """
     service = ChangeService()
     with pytest.raises(KeyError):
         service.edit_entry("0x500", "", "AA")
@@ -174,6 +179,8 @@ def test_validate_flags_interactive_collision() -> None:
     Intent: LLR-003.4 validate recomputes the LLR-001.5 collision rule over
     the live entries — an interactively created overlap must surface as
     ERROR findings (one per colliding entry) and flip ``ok`` to False.
+
+    Traces: R-CHG-VAL.1, R-CHG-001.40.
     """
     service = ChangeService()
     service.add_entry("0x100", "", "01 02 03 04")
@@ -195,7 +202,7 @@ def test_validate_flags_interactive_collision() -> None:
 def test_clean_revalidate_clears_stale_collision_faults() -> None:
     """Removing the colliding entry and re-validating clears the faults.
 
-    Intent: LLR-002.8 — declaration faults persist until a clean
+    Intent: R-CHG-VAL.1 — declaration faults persist until a clean
     re-validate; once the collision is fixed, validate must leave zero
     issues (the panel's fault area then clears).
     """
@@ -219,7 +226,7 @@ def test_clean_revalidate_clears_stale_collision_faults() -> None:
 def test_apply_with_save_stamps_saved_path(tmp_path: Path) -> None:
     """Apply writes the image and save_patched stamps ``saved_path``.
 
-    Intent: LLR-002.7 service half — after a successful apply, persisting
+    Intent: R-CHG-003.8 service half — after a successful apply, persisting
     under an operator filename records the written path on the summary;
     the file lands inside the work area.
     """
@@ -250,6 +257,8 @@ def test_hex_save_stamps_verified_result_on_summary(tmp_path: Path) -> None:
     (refusal retired) and verify-on-save rides the back-compatible carrier:
     ``last_summary.verify_result`` is stamped ``verified`` on a faithful
     write, with ``save_patched``'s ChangeActionResult still ``ok``.
+
+    Traces: R-HEX-VERIFY-001.3.
     """
     service, mem_map, ranges = _service_with_image()
     service.add_entry("0x100", "", "AA BB")
@@ -278,6 +287,8 @@ def test_refused_save_leaves_verify_result_none(tmp_path: Path) -> None:
     Intent: §6.2 C-10 — verify is wired AFTER a successful write only; a
     refusal (here a ``"mac"`` source) returns early with no VerifyResult
     stamped on the summary.
+
+    Traces: R-CHG-003.16.
     """
     service, mem_map, ranges = _service_with_image()
     service.add_entry("0x100", "", "AA")
@@ -302,6 +313,8 @@ def test_declined_or_refused_save_leaves_saved_path_none(
     Intent: F-S-01 — the engine sanitizer's refusal must flow through the
     service unchanged: no file, ``saved_path`` stays ``None``, and the
     refusal arrives as a collected issue.
+
+    Traces: R-CHG-003.13.
     """
     service, mem_map, ranges = _service_with_image()
     service.add_entry("0x100", "", "AA")
@@ -410,6 +423,8 @@ def test_legacy_v1_load_rejected_with_single_error(tmp_path: Path) -> None:
 
     Intent: LLR-003.5 / LLR-001.8 — the v1 hard break flows through the
     service: one ERROR finding naming the v2 token, zero entries, no raise.
+
+    Traces: R-CHG-001.9, R-CHG-001.11.
     """
     v1 = tmp_path / "legacy.json"
     v1.write_text(
@@ -478,6 +493,8 @@ def test_run_checks_default_seam_is_real_engine() -> None:
     from the E3a pending-finding contract), so a check document executes
     with no injection and the status line states the three real aggregate
     counts.
+
+    Traces: R-PATCH-CHECKS-CLARITY-001.1, R-CHK-PE-003.
     """
     service, mem_map, ranges = _service_with_image()
     assert service.check_runner is run_check_document
@@ -509,6 +526,8 @@ def test_run_checks_with_injected_runner_shapes_display() -> None:
     per entry coloured pass→sev-ok / fail→sev-error /
     uncheckable→sev-warning, and the status message states the three
     aggregate counts.
+
+    Traces: R-CHK-PE-002, R-CHK-PE-003.
     """
     service, mem_map, ranges = _service_with_image()
     stub = SimpleNamespace(
@@ -560,6 +579,8 @@ def test_rows_render_kind_address_status_and_fault_marker() -> None:
 
     Intent: LLR-003.1 columns + the LLR-002.8 per-entry status arm — a row
     whose address carries an ERROR finding is suffixed `` / fault``.
+
+    Traces: R-CHG-004.4, R-PE-040.
     """
     service, _mem_map, ranges = _service_with_image()
     service.add_entry("0x100", "", "01 02 03 04")

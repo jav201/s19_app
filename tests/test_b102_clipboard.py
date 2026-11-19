@@ -570,7 +570,7 @@ def test_tc_b102_03_input_empty_selection_cut_skips_and_preserves_internal_clipb
 def test_tc_b102_04_powershell_read_rescue_uses_enlarged_timeout(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """TC-B102-04 (R-B102-CLIP-005): read rescue gets >= 2.0 s.
+    """TC-B102-04 (R-TUI-043.4): read rescue gets >= 2.0 s.
 
     ``subprocess.run`` is faked to record its ``timeout`` and return the
     bytes ``b"OK_FROM_PS\\r\\n"``; the tk/Win32 layers are irrelevant at
@@ -637,7 +637,7 @@ def test_tc_b102_04_powershell_read_rescue_uses_enlarged_timeout(
 def test_tc_b102_05_powershell_write_rescue_uses_enlarged_timeout_via_static_stdin_command(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """TC-B102-05 (R-B102-CLIP-005): write rescue — 2.0 s, UTF-8 stdin bytes.
+    """TC-B102-05 (R-PASTE.2): write rescue — 2.0 s, UTF-8 stdin bytes.
 
     The copied text must reach PowerShell through the ``input`` (stdin)
     kwarg as UTF-8 bytes, never interpolated into ``-Command`` or through

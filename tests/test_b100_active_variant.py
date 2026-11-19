@@ -676,7 +676,10 @@ def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
     settle loop notices it.
 
     Batch-101 Inc 3: the ``save-project`` parameter verifies R-PROJ-001.13;
-    its 0.8 s target is read from the QC-TM row, not asserted."""
+    its 0.8 s target is read from the QC-TM row, not asserted.
+
+    Traces: US-PROJ-SAVE-1.
+    """
     from s19_app.tui.app import SaveProjectPayload
 
     base = tmp_path / "app"

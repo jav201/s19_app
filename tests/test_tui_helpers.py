@@ -62,6 +62,7 @@ def test_find_repo_root_detects_marker(tmp_path):
 
 
 def test_resolve_input_path_prefers_base_dir(tmp_path):
+    """Traces: R-TUI-005.4."""
     base_dir = tmp_path / "base"
     base_dir.mkdir()
     target = base_dir / "examples" / "file.s19"
@@ -96,6 +97,7 @@ def test_render_hex_view_includes_focus_context():
 
 
 def test_render_hex_view_truncates_output():
+    """Traces: R-TUI-007.10."""
     mem_map = {addr: 0x41 for addr in range(0x2000, 0x2000 + (MAX_HEX_BYTES + 64))}
 
     output = render_hex_view(mem_map)
@@ -103,6 +105,7 @@ def test_render_hex_view_truncates_output():
 
 
 def test_render_hex_view_text_includes_rows_for_mac_overlay_addresses():
+    """Traces: R-TUI-004.3."""
     mem_map = {0x1000: 0x41}
 
     text = render_hex_view_text(
@@ -118,14 +121,17 @@ def test_render_hex_view_text_includes_rows_for_mac_overlay_addresses():
 
 
 def test_sanitize_project_name_allows_safe_chars():
+    """Traces: R-TUI-012.4."""
     assert sanitize_project_name("My_Project-1") == "My_Project-1"
 
 
 def test_sanitize_project_name_strips_invalid_chars():
+    """Traces: R-TUI-012.4."""
     assert sanitize_project_name("My Project!@#") == "MyProject"
 
 
 def test_sanitize_project_name_rejects_empty():
+    """Traces: R-TUI-012.8."""
     assert sanitize_project_name("   ") is None
 
 
@@ -147,6 +153,7 @@ def test_list_projects_ignores_temp(tmp_path):
 
 
 def test_validate_project_files_allows_single_data_and_a2l(tmp_path):
+    """Traces: R-TUI-014.2, R-TUI-014.3."""
     project = tmp_path / "project"
     project.mkdir()
     (project / "file.s19").write_text("S0", encoding="utf-8")
@@ -175,6 +182,7 @@ def test_validate_project_files_accepts_multiple_primary_variants(tmp_path):
 
 
 def test_validate_project_files_allows_primary_plus_mac(tmp_path):
+    """Traces: R-TUI-014.1."""
     project = tmp_path / "project"
     project.mkdir()
     (project / "one.s19").write_text("S0", encoding="utf-8")
@@ -187,6 +195,7 @@ def test_validate_project_files_allows_primary_plus_mac(tmp_path):
 
 
 def test_validate_project_files_rejects_multiple_a2l(tmp_path):
+    """Traces: R-TUI-014.2."""
     project = tmp_path / "project"
     project.mkdir()
     (project / "file.s19").write_text("S0", encoding="utf-8")
@@ -199,6 +208,7 @@ def test_validate_project_files_rejects_multiple_a2l(tmp_path):
 
 
 def test_setup_logging_creates_log_handler(tmp_path):
+    """Traces: R-TUI-015.1."""
     logger = setup_logging(tmp_path)
 
     assert logger.handlers
@@ -210,6 +220,7 @@ def test_setup_logging_creates_log_handler(tmp_path):
 
 
 def test_setup_logging_uses_rotating_file_handler(tmp_path):
+    """Traces: R-TUI-015.2, R-TUI-015.3."""
     logger = setup_logging(tmp_path)
     handler_types = {type(handler).__name__ for handler in logger.handlers}
 
@@ -217,6 +228,7 @@ def test_setup_logging_uses_rotating_file_handler(tmp_path):
 
 
 def test_parse_a2l_file_captures_sections(tmp_path):
+    """Traces: R-A2L-001.1."""
     a2l = tmp_path / "sample.a2l"
     a2l.write_text(
         "/begin PROJECT Demo\n"
@@ -234,6 +246,7 @@ def test_parse_a2l_file_captures_sections(tmp_path):
 
 
 def test_parse_a2l_file_reports_unclosed_section(tmp_path):
+    """Traces: R-A2L-001.6."""
     a2l = tmp_path / "bad.a2l"
     a2l.write_text("/begin PROJECT Demo\n", encoding="utf-8")
 
@@ -243,6 +256,7 @@ def test_parse_a2l_file_reports_unclosed_section(tmp_path):
 
 
 def test_render_a2l_view_shows_sections():
+    """Traces: R-A2L-076."""
     data = {
         "sections": [
             {"name": "PROJECT", "meta": "Demo", "start_line": 1, "end_line": 3, "children": []}
@@ -256,6 +270,7 @@ def test_render_a2l_view_shows_sections():
 
 
 def test_render_a2l_view_shows_nested_sections():
+    """Traces: R-A2L-076."""
     data = {
         "sections": [
             {
@@ -284,6 +299,7 @@ def test_render_a2l_view_shows_nested_sections():
 
 
 def test_render_a2l_view_shows_errors():
+    """Traces: R-A2L-075."""
     data = {"sections": [], "errors": ["Line 1: /end without /begin"]}
 
     output = render_a2l_view(data)
@@ -292,6 +308,7 @@ def test_render_a2l_view_shows_errors():
 
 
 def test_validate_a2l_tags_matches_memory():
+    """Traces: R-A2L-070."""
     tags = [
         {"section": "MEASUREMENT", "name": "A", "address": 0x1000, "length": 2},
         {"section": "MEASUREMENT", "name": "B", "address": 0x2000, "length": 2},
@@ -311,6 +328,7 @@ def test_validate_a2l_tags_matches_memory():
 
 
 def test_a2l_tag_filters_by_mode_and_field(tmp_path):
+    """Traces: R-A2L-007.7, R-A2L-007.1."""
     app = S19TuiApp(base_dir=tmp_path)
     tags = [
         {
@@ -367,17 +385,20 @@ def test_a2l_tag_filters_by_mode_and_field(tmp_path):
 
 
 def test_find_string_in_mem_finds_address():
+    """Traces: R-TUI-017.1."""
     mem_map = {0x1000 + i: b for i, b in enumerate(b"HELLO WORLD")}
     assert find_string_in_mem(mem_map, "WORLD") == 0x1006
     assert find_string_in_mem(mem_map, "world") == 0x1006
 
 
 def test_find_string_in_mem_returns_none_when_missing():
+    """Traces: R-TUI-017.9."""
     mem_map = {0x2000: 0x41, 0x2001: 0x42}
     assert find_string_in_mem(mem_map, "ZZ") is None
 
 
 def test_find_string_in_mem_supports_next_search():
+    """Traces: R-TUI-017.4."""
     mem_map = {0x3000 + i: b for i, b in enumerate(b"ABC ABC")}
     first = find_string_in_mem(mem_map, "ABC")
     second = find_string_in_mem(mem_map, "ABC", start_address=first + 1)

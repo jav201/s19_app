@@ -253,7 +253,7 @@ def test_at_b94_03_expanded_editor_primary_surface(tmp_path: Path) -> None:
 
 
 def test_at_b94_04_edit_json_valid_merges(tmp_path: Path) -> None:
-    """AT-B94-04 — confirming valid JSON merges every declared entry (HLR-004).
+    """AT-B94-04 — confirming valid JSON merges every declared entry (R-TUI-053.2).
 
     Intent: the expanded editor is the edit surface; the "Edit JSON" popup
     confirms through the shipped parse seam, and every valid entry lands in
@@ -286,7 +286,7 @@ def test_at_b94_04_edit_json_valid_merges(tmp_path: Path) -> None:
 def test_at_b94_05_edit_json_invalid_keeps_table(tmp_path: Path) -> None:
     """AT-B94-05 — invalid JSON shows errors and leaves the table unchanged.
 
-    Intent (HLR-004 invalid arm): confirming malformed text (and an unknown
+    Intent (R-TUI-053.3 invalid arm): confirming malformed text (and an unknown
     ``kind``) surfaces >=1 validation error and the entries table is
     byte-identical (row count before == after).
     """
@@ -980,6 +980,8 @@ def test_tc_b94_11_stale_variant_noop_and_single_binding(tmp_path: Path) -> None
     (rows and the dirty flag untouched). LLR-006.2's binding census is
     stated exactly: after load-A-then-load-B exactly ONE document is bound
     (B's two entries, 0 of A's orphaned).
+
+    Traces: R-CHG-004.1.
     """
 
     class VariantSelected(Message):

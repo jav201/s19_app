@@ -82,6 +82,8 @@ def test_at_s3_status_text_renders_hostile_filename_literally(tmp_path: Path) ->
 
     GREEN (post-fix, ``#status_text`` built ``markup=False``): the brackets
     survive verbatim through ``set_file_status`` → the mounted ``Label``.
+
+    Traces: R-WS-LOADED.17.
     """
     import asyncio
 
@@ -116,6 +118,8 @@ def test_at_s3_dynamic_notify_sites_pass_markup_false() -> None:
     enumerated sinks (verify-mismatch name, manifest-write issues, manifest
     verify drift/messages) without pinning line numbers, and leaves the two
     static-string notifies free.
+
+    Traces: R-TUI-103b.
     """
     tree = ps.package_tree("app")
 

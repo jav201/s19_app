@@ -79,7 +79,10 @@ def test_a2l_load_refreshes_loaded_panel_without_screen_switch(tmp_path: Path) -
     """Load an S19 image, then load the A2L through the standalone
     ``load_a2l_from_path`` path, and assert the Loaded panel's A2L slot shows the
     filename with NO ``action_show_screen`` in between. RED pre-N7 (the slot
-    stayed ``(none)`` until a screen switch refreshed the panel)."""
+    stayed ``(none)`` until a screen switch refreshed the panel).
+
+    Traces: R-WS-LOADED.3.
+    """
 
     async def _drive() -> tuple[str, str]:
         app = S19TuiApp(base_dir=tmp_path)

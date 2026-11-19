@@ -159,6 +159,7 @@ def test_evaluate_target_warn_proceeds_with_diagnostic() -> None:
 
 def test_evaluate_target_ignore_is_silent() -> None:
     # AT-E8-ignore: ignore policy → CRC computed, no diagnostic (conflict still recorded).
+    """Traces: R-CRC-PREVIEW-001.7."""
     ev = evaluate_target(_dirty_mem(), SEED_ALGORITHM, _dirty_fill_target("ignore"))
     assert ev.refused is False
     assert ev.crc == 0x2A8A3950

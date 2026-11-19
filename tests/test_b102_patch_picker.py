@@ -537,7 +537,7 @@ def test_tc_b102_pe_02_id_isolation_and_highlight_mode(tmp_path: Path) -> None:
 
 
 def test_tc_b102_pe_03_use_parameter_populates_inputs_without_document_mutation(tmp_path: Path) -> None:
-    """TC-B102-PE-03 (R-B102-PE-003, full): for sizes 1/2/4, ``Use parameter``
+    """TC-B102-PE-03 (R-PICKER-CORRECT.006, full): for sizes 1/2/4, ``Use parameter``
     with the highlighted row writes Address as ``0x%08X`` and Bytes as the
     current image bytes for the parameter size, and the patch document (entry
     count) and the dirty state are unchanged — 3/3 sizes.
@@ -699,7 +699,7 @@ def test_tc_b102_pe_05_reentry_preserves_filter_page_highlight(tmp_path: Path, m
 
 
 def test_tc_b102_pe_06_shared_grammar_surfaces(tmp_path: Path) -> None:
-    """TC-B102-PE-06 (R-B102-PE-006, full): the Patch A2L tab composes the
+    """TC-B102-PE-06 (R-PE-DEF.2, R-PE-DEF.10, full): the Patch A2L tab composes the
     shared picker grammar — filter input, paged ledger, full-name line, count /
     status line, page controls and the ``Use parameter`` action — every
     surface mounted and displayed.
@@ -772,7 +772,7 @@ def test_tc_b102_pe_06_empty_states_mirror_check(tmp_path: Path) -> None:
 
 
 def test_tc_b102_pe_06_hostile_parameter_name_reads_literally(tmp_path: Path) -> None:
-    """TC-B102-PE-06 (R-B102-PE-006, full; E3 ruling 11 carry-over): a hostile
+    """TC-B102-PE-06 (R-PICKER-CORRECT.017, full; E3 ruling 11 carry-over): a hostile
     parameter name renders literally in the Patch ledger — the sentinel kept
     verbatim, zero markup spans, zero control bytes: the name went through
     ``safe_text`` / literal ``Text``, never a markup path.

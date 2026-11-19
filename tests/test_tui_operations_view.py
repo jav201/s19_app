@@ -87,6 +87,8 @@ def test_operations_view_lists_registry_ids(tmp_path: Path) -> None:
     ``(operation_id, title)`` pairs equal to the literal registry order and
     labels each row with the operation title. LLR-004.2 guard: with no file
     loaded the action sets one status line and pushes no screen.
+
+    Traces: R-OPS-003.1, R-OPS-003.3, R-OPS-002.1.
     """
     s19_path = _write_s19(tmp_path)
 

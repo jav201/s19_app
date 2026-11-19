@@ -88,7 +88,7 @@ def _key_for(ch: str) -> str:
 
 
 def test_loadfilescreen_auto_focus_lands_on_input(tmp_path: Path) -> None:
-    """R-TUI-043-a: opening the modal must focus ``#load_path``, not a button.
+    """R-TUI-043.1: opening the modal must focus ``#load_path``, not a button.
 
     If this ever fails, typing into the field silently drops most letters
     to App-level bindings — the bug the user reported.
@@ -114,7 +114,7 @@ def test_loadfilescreen_auto_focus_lands_on_input(tmp_path: Path) -> None:
 def test_loadfilescreen_typing_a_realistic_path_is_not_truncated(
     tmp_path: Path,
 ) -> None:
-    """R-TUI-043-b: every char of a realistic path must land in the Input.
+    """R-TUI-031.1, R-DLG.1: every char of a realistic path must land in the Input.
 
     Fails on the pre-fix layout because letters that match App bindings
     (``s``, ``e``, ``r``, ``l``, ``p``, ``j``, ``g``, ``o``, ``k``, ``e``,
@@ -197,7 +197,7 @@ def test_loadfilescreen_typing_after_focus_stolen_by_button_reproduces_bug(
 
 
 def test_loadfilescreen_uses_os_clipboard_widget(tmp_path: Path) -> None:
-    """R-TUI-043-c: the Load dialog Input must be the OS-clipboard variant.
+    """R-TUI-044.1: the Load dialog Input must be the OS-clipboard variant.
 
     Fails if someone replaces ``OsClipboardInput`` with a stock ``Input``
     in the Load dialog's ``compose``, restoring the OS-clipboard-blind
@@ -224,7 +224,7 @@ def test_loadfilescreen_uses_os_clipboard_widget(tmp_path: Path) -> None:
 def test_loadfilescreen_ctrl_v_reads_from_os_clipboard(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """R-TUI-043-d: Ctrl+V must consult the OS clipboard, not just the internal buffer.
+    """R-TUI-043.4: Ctrl+V must consult the OS clipboard, not just the internal buffer.
 
     Uses monkeypatching on ``read_os_clipboard`` so the test does not
     depend on the real OS clipboard (which is shared with the developer's
@@ -258,7 +258,7 @@ def test_loadfilescreen_ctrl_v_reads_from_os_clipboard(
 def test_loadfilescreen_ctrl_v_falls_back_to_internal_clipboard(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """R-TUI-043-e: when the OS clipboard read fails, fall back to the internal buffer.
+    """R-TUI-043.6: when the OS clipboard read fails, fall back to the internal buffer.
 
     Regressions here would break paste on systems without Tk available or
     when another process is holding the clipboard exclusively.
@@ -340,7 +340,7 @@ def test_read_os_clipboard_happy_path_uses_only_first_strategy() -> None:
 
 
 def test_read_os_clipboard_cascades_tk_fail_to_ctypes() -> None:
-    """R-TUI-043-h: when tkinter returns None, the cascade tries ctypes next."""
+    """R-TUI-043.4: when tkinter returns None, the cascade tries ctypes next."""
     from s19_app.tui.os_clipboard_input import read_os_clipboard
 
     calls: list[str] = []
@@ -358,7 +358,7 @@ def test_read_os_clipboard_cascades_tk_fail_to_ctypes() -> None:
 
 
 def test_read_os_clipboard_cascades_tk_and_ctypes_fail_to_powershell() -> None:
-    """R-TUI-043-i: when tk AND ctypes fail, PowerShell is the last resort."""
+    """R-TUI-043.4: when tk AND ctypes fail, PowerShell is the last resort."""
     from s19_app.tui.os_clipboard_input import read_os_clipboard
 
     calls: list[str] = []
@@ -376,7 +376,7 @@ def test_read_os_clipboard_cascades_tk_and_ctypes_fail_to_powershell() -> None:
 
 
 def test_read_os_clipboard_returns_none_when_all_layers_fail() -> None:
-    """R-TUI-043-j: total cascade failure yields ``None`` (never raises)."""
+    """R-TUI-043.6: total cascade failure yields ``None`` (never raises)."""
     from s19_app.tui.os_clipboard_input import read_os_clipboard
 
     result = read_os_clipboard(
@@ -390,7 +390,7 @@ def test_read_os_clipboard_returns_none_when_all_layers_fail() -> None:
 
 
 def test_read_os_clipboard_swallows_strategy_exceptions() -> None:
-    """R-TUI-043-k: a strategy that raises must NOT propagate; cascade continues."""
+    """R-TUI-043.6: a strategy that raises must NOT propagate; cascade continues."""
     from s19_app.tui.os_clipboard_input import read_os_clipboard
 
     def boom() -> str:
@@ -409,7 +409,7 @@ def test_read_os_clipboard_swallows_strategy_exceptions() -> None:
 def test_ctrl_v_notifies_user_when_every_clipboard_source_is_empty(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """R-TUI-043-l: on total clipboard failure, the user gets a warning notification.
+    """R-TUI-043.7: on total clipboard failure, the user gets a warning notification.
 
     Without this the paste is a silent no-op and the user has no idea why
     Ctrl+V did nothing.
@@ -463,7 +463,7 @@ def test_ctrl_v_notifies_user_when_every_clipboard_source_is_empty(
 def test_powershell_layer_does_not_require_wt_or_windows_terminal(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """R-TUI-043-m: invoke system PowerShell with exact binary stdout transport.
+    """R-TUI-043.11: invoke system PowerShell with exact binary stdout transport.
 
     On a machine without Windows Terminal (``wt``) or the more modern
     ``pwsh``, the fallback must still work because ``powershell.exe``
@@ -524,7 +524,7 @@ def test_powershell_layer_does_not_require_wt_or_windows_terminal(
 def test_powershell_layer_swallows_timeout_expired(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """R-TUI-043-q: subprocess timeout must degrade to ``None``, never raise.
+    """R-TUI-043.6: subprocess timeout must degrade to ``None``, never raise.
 
     Without this guard, a hung ``powershell.exe`` would surface a bare
     ``TimeoutExpired`` inside ``action_paste`` and take down the paste
@@ -546,7 +546,7 @@ def test_powershell_layer_swallows_timeout_expired(
 def test_powershell_layer_swallows_file_not_found(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """R-TUI-043-r: absent ``powershell.exe`` must degrade to ``None``.
+    """R-TUI-043.6: absent ``powershell.exe`` must degrade to ``None``.
 
     On a stripped-down Windows install (or any machine where PowerShell
     was removed / renamed) the ``FileNotFoundError`` from the subprocess
@@ -569,7 +569,7 @@ def test_powershell_layer_swallows_file_not_found(
 def test_ctrl_v_preserves_unicode_from_clipboard(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """R-TUI-043-s: unicode paths survive Ctrl+V end-to-end.
+    """R-TUI-043.11: unicode paths survive Ctrl+V end-to-end.
 
     A Windows path can legitimately contain ``Ñ``, ``ö``, cyrillic, CJK
     or emoji. If the PowerShell fallback used the wrong subprocess
@@ -635,7 +635,7 @@ def test_ctypes_layer_returns_none_on_non_windows(
 def test_notification_message_mentions_ctrl_shift_v_workaround(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """R-TUI-043-p: the failure notification points the user at Ctrl+Shift+V.
+    """R-TUI-043.7: the failure notification points the user at Ctrl+Shift+V.
 
     The whole point of the notification is to route the user to the
     OS-level workaround. If the message stops mentioning it, the fix is

@@ -934,7 +934,7 @@ def test_tc_b102_file_04_import_external_ref_link_sources(tmp_path: Path) -> Non
 
 @pytest.mark.parametrize("attempt", ["external_path", "temp_candidate"])
 def test_tc_b102_file_05_no_project_refusal(tmp_path: Path, monkeypatch, attempt: str) -> None:
-    """TC-B102-FILE-05 (R-B102-FILE-005 + ruling 1): with no active project,
+    """TC-B102-FILE-05 (R-B102-FILE-005.1, R-B102-FILE-005.2 + ruling 1): with no active project,
     both an external-path submit and a temp-candidate pick refuse with the
     exact ``Load or create a project before importing an external file.``,
     copy nothing at all and leave the field unchanged.

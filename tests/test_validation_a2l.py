@@ -8,6 +8,7 @@ from s19_app.validation import validate_a2l_structure
 
 
 def test_validate_a2l_structure_detects_unrecognized_and_duplicate_symbols():
+    """Traces: R-VAL-032.1, R-VAL-031."""
     a2l_data = {
         "errors": [],
         "sections": [
@@ -26,6 +27,7 @@ def test_validate_a2l_structure_detects_unrecognized_and_duplicate_symbols():
 
 
 def test_validate_a2l_structure_detects_broken_references():
+    """Traces: R-VAL-033."""
     a2l_data = {
         "errors": [],
         "sections": [
