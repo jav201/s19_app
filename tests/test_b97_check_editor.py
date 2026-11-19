@@ -27,12 +27,10 @@ from s19_app.tui.app import S19TuiApp
 from tests.b97_fixtures import (
     CE_IDS_9C7BEAF,
     DEMO_A2L,
-    HOSTILE_CONTENT,
     HOSTILE_NAME,
     LONG_NAME,
     LONGEST_NAME,
     SIX_13A00,
-    hostile_a2l,
     long_name_a2l,
     open_check_editor,
 )
@@ -46,6 +44,35 @@ TABS = (
     ("check_tab_addendum", "check_pane_addendum"),
 )
 ADDRESS_RE = re.compile(r"0x[0-9A-F]{8}")
+
+#: The batch-97 hostile A2L parameter name re-pinned (G3 fix round, unit G5b):
+#: the original ``HOSTILE_CONTENT`` carried ``//`` inside its ``https://`` link
+#: target, which the A2L reader cuts as a line comment (the A.2 grammar
+#: ``comment ... from // to the end of the line``; R-A2L-READ.3 reads the
+#: comment start as a word break, R-A2L-READ.9 ends the line comment at the
+#: next line end) — the name the reader yielded ended at ``link=https:`` and
+#: never reached ``_visible_params``. This name keeps the markup and the
+#: control character while staying comment-free; R-A2L-READ.51 scrubs the
+#: control character on the rendered surfaces and R-A2L-READ.4 records it as
+#: a parse error, but the reader still creates the tag.
+HOSTILE_PARAM_NAME = "b97[bold]x[/]y[red]z[link=e.invalid]l[/link][@click=app.quit]q\x07"
+
+
+def _hostile_a2l(dest_dir: Path) -> Path:
+    """Write ``hostile.a2l``: the demo A2L with its first CHARACTERISTIC
+    renamed to the comment-free :data:`HOSTILE_PARAM_NAME` (re-pinned from the
+    frozen ``hostile_a2l`` builder, whose ``HOSTILE_CONTENT`` carried ``//``)."""
+    lines = DEMO_A2L.read_text(encoding="utf-8").splitlines(keepends=True)
+    for index, line in enumerate(lines):
+        if line.strip().startswith("/begin CHARACTERISTIC "):
+            old = line.split()[2]
+            lines[index] = line.replace(old, HOSTILE_PARAM_NAME, 1)
+            break
+    else:  # pragma: no cover - the demo file always holds one
+        raise AssertionError("no CHARACTERISTIC in the demo A2L")
+    path = dest_dir / "hostile.a2l"
+    path.write_text("".join(lines), encoding="utf-8")
+    return path
 
 
 # --------------------------------------------------------------------------- #
@@ -463,9 +490,9 @@ def test_tc_b97_12_hostile_names_render_literally(tmp_path: Path) -> None:
         app.action_show_screen("check_editor")
         await settle(pilot, 6)
         table = panel.query_one("#check_param_table", DataTable)
-        index = panel._visible_params.index(HOSTILE_CONTENT)
+        index = panel._visible_params.index(HOSTILE_PARAM_NAME)
         ledger_cell = table.get_row_at(index)[1]
-        await include(panel, pilot, HOSTILE_CONTENT)
+        await include(panel, pilot, HOSTILE_PARAM_NAME)
         lines = need(panel, "#check_fields_lines").render()
         await show_tab(panel, pilot, "check_tab_json")
         json_painted = "\n".join(painted_rows(app, panel.query_one("#check_preview")))
@@ -474,9 +501,9 @@ def test_tc_b97_12_hostile_names_render_literally(tmp_path: Path) -> None:
         option = [label for label, _v in select._options if "b97" in str(getattr(label, "plain", label))]
         return ledger_cell, lines, json_painted, doc, option
 
-    hostile = hostile_a2l(tmp_path)
+    hostile = _hostile_a2l(tmp_path)
     ledger_cell, lines, json_painted, doc, option = run(tmp_path, (118, 54), body, a2l=hostile)
-    assert doc is not None and [e["name"] for e in doc["entries"]] == [HOSTILE_CONTENT]
+    assert doc is not None and [e["name"] for e in doc["entries"]] == [HOSTILE_PARAM_NAME]
     surfaces = {
         "ledger": ledger_cell,
         "fields": lines,
@@ -1130,7 +1157,7 @@ def test_at_b97_05_hostile_parameter_reads_literally(tmp_path: Path) -> None:
         await pilot.press(*"b97")
         await _settled_delay(
             pilot,
-            lambda: panel._visible_params == [HOSTILE_CONTENT],
+            lambda: panel._visible_params == [HOSTILE_PARAM_NAME],
             "the filter isolates the hostile parameter",
         )
         await pilot.click("#check_param_include_button")
@@ -1146,7 +1173,7 @@ def test_at_b97_05_hostile_parameter_reads_literally(tmp_path: Path) -> None:
         out["fields_spans"] = need(panel, "#check_fields_lines").render().spans
         return out
 
-    out = run(tmp_path, (118, 54), body, a2l=hostile_a2l(tmp_path))
+    out = run(tmp_path, (118, 54), body, a2l=_hostile_a2l(tmp_path))
     for surface in ("ledger", "full_name", "fields", "json"):
         assert "b97[bold]x[/]y" in out[surface] or "[@click=app.quit]" in out[surface], (surface, out[surface])
         assert not [c for c in out[surface] if ord(c) < 0x20 and c != "\n"], surface

@@ -90,6 +90,12 @@ def test_at094_demo_parse_stable_after_dead_store_removal() -> None:
     char_type ASCII by luck, deposit garbage; now deposit resolves correctly).
     The 1→50 delta assertion lives in ``tests/test_a2l_multiline_headers.py``.
     These remain regression sentinels for the dead-store removal.
+
+    Inc 11/12 re-pin (R-A2L-READ.49, REQUIREMENTS.md:884): the meas-with-length
+    count is 25, not 24 — the V161 demo MEASUREMENT
+    ``ASAM.M.VIRTUAL.SCALAR.SWORD.PHYSICAL`` now derives length 2 (None→2)
+    under the approved Inc 11 reader rules, so every MEASUREMENT carries a
+    length. The pre-Inc-11 oracle pinned the old count of 24.
     """
     data = parse_a2l_file(_DEMO_A2L)
     tags = data["tags"]
@@ -103,8 +109,11 @@ def test_at094_demo_parse_stable_after_dead_store_removal() -> None:
     assert len(characteristics) == 50
 
     # header_meas propagation intact: MEASUREMENT length derivation still fires.
+    # Inc 11/12 re-pin (R-A2L-READ.49, REQUIREMENTS.md:884): the virtual
+    # MEASUREMENT ASAM.M.VIRTUAL.SCALAR.SWORD.PHYSICAL now derives length 2
+    # (None→2), so all 25 MEASUREMENTs carry a length (was 24).
     meas_with_length = [t for t in measurements if t.get("length") is not None]
-    assert len(meas_with_length) == 24
+    assert len(meas_with_length) == 25
     assert all(t.get("datatype") for t in meas_with_length)
 
     # header_char propagation intact: ASAM.C.VIRTUAL.ASCII keeps its char_type +

@@ -278,17 +278,19 @@ def test_tc135_axis_kind_census_completeness() -> None:
 
 # ---------------------------------------------------------------------------
 # TC-136 — post-axis-walk ordering: length derives only from populated axis_meta
-#          and never overrides an explicit LENGTH (LLR-P1b.4, R2).
+#          and a conflicting explicit LENGTH clears the length (R-A2L-READ.61).
 # ---------------------------------------------------------------------------
 
 
 def test_tc136_post_axis_pass_ordering_and_precedence(tmp_path: Path) -> None:
-    """The summer runs AFTER axis_meta is built, and never overrides a non-None length.
+    """The summer runs AFTER axis_meta is built; a conflicting explicit length clears.
 
     Intent: R2 ordering — ``_inline_axis_counts`` needs the populated
     ``axis_meta`` (built late in the walk), so a CURVE with NO AXIS_DESCR stays
-    None (nothing to sum) while one WITH an inline axis derives; and an explicit
-    ``LENGTH`` keeps precedence (the ``length is None`` guard).
+    None (nothing to sum) while one WITH an inline axis derives. An explicit
+    ``LENGTH`` that disagrees with the derived layout span now gives no length
+    under R-A2L-READ.61 (REQUIREMENTS.md:896) — the Inc 11/12 re-pin of the old
+    "explicit LENGTH keeps precedence" oracle (which asserted 999).
     """
     layout = ["NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 UBYTE", "FNC_VALUES 3 SWORD"]
     # inline axis present → derives (1 + 4×1 + 4×2 = 13)
@@ -304,13 +306,14 @@ def test_tc136_post_axis_pass_ordering_and_precedence(tmp_path: Path) -> None:
     )
     assert no_axis["axis_meta"] == []
     assert no_axis["length"] is None
-    # explicit LENGTH keeps precedence over the summer
+    # an explicit LENGTH that disagrees with the derived span (999 vs the
+    # summer's 13) gives no length (R-A2L-READ.61, REQUIREMENTS.md:896).
     explicit = _write_a2l(
         tmp_path, cname="C_L", char_type="CURVE", deposit="RL_L",
         layout_lines=layout, axes=[("STD_AXIS", 4)],
         extra_char_lines="      LENGTH 999\n", name="l.a2l",
     )
-    assert explicit["length"] == 999
+    assert explicit["length"] is None
 
 
 # ---------------------------------------------------------------------------

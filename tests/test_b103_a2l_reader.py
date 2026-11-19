@@ -1879,7 +1879,12 @@ def test_r_a2l_read_51_control_chars_as_fffd(tmp_path: Path) -> None:
 def test_at_b103_i11_2_commented_old_copy_changes_nothing(tmp_path: Path) -> None:
     """AT-B103-I11-2 (RP-B28) through the app: exactly one A2L Explorer row X
     at 0x1234, no ``A2L_DUPLICATE_SYMBOL`` issue on the Issues screen, and a
-    Workspace A2L summary that names one tag X at 0x1234 (never 0x9999)."""
+    Workspace A2L summary that names one tag X at 0x1234 (never 0x9999).
+
+    Inc 12 column-order re-pin (R-A2L-006.1, REQUIREMENTS.md:1010): the table's
+    first column is now Address, so the name is read from the ``Tag`` column by
+    its label, not by index.
+    """
     from textual.widgets import DataTable, Static
 
     from s19_app.tui.app import S19TuiApp
@@ -1935,16 +1940,21 @@ def test_at_b103_i11_2_commented_old_copy_changes_nothing(tmp_path: Path) -> Non
             "the A2L attach did not land",
         )
 
-        # A2L Explorer: exactly one row X, at 0x1234.
+        # A2L Explorer: exactly one row X, at 0x1234. The Inc 12 column order
+        # (R-A2L-006.1, REQUIREMENTS.md:1010) puts Address first, so read the
+        # name from the "Tag" column and the address from "Address" by LABEL.
         app.action_show_screen("a2l")
         for _ in range(6):
             await pilot.pause()
         table = app.query_one("#a2l_tags_list", DataTable)
+        labels = [str(col.label.plain) for col in table.ordered_columns]
+        name_col = labels.index("Tag")
+        addr_col = labels.index("Address")
         rows = [table.get_row_at(i) for i in range(table.row_count)]
-        names = [_strip_glyph(str(row[0])) for row in rows]
+        names = [_strip_glyph(str(row[name_col])) for row in rows]
         assert names == ["X"], f"expected exactly one X row, got {names!r}"
-        assert str(rows[0][1]) == "0x00001234", (
-            f"expected X at 0x00001234, got {str(rows[0][1])!r}"
+        assert str(rows[0][addr_col]) == "0x00001234", (
+            f"expected X at 0x00001234, got {str(rows[0][addr_col])!r}"
         )
 
         # Issues screen: no A2L_DUPLICATE_SYMBOL issue for X.

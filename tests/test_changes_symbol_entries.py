@@ -688,8 +688,10 @@ def test_tc718_battery_symbol_replaces_address_dropped_by_address_syntax() -> No
         ("Trippy", "10", (CHG_SYMBOL_VALUE, "not integral")),
         # raw out of range: (300 - 10) / 2 = 145 > SBYTE max 127
         ("Gain", "300", (CHG_SYMBOL_VALUE, "outside the SBYTE range")),
-        # length drift: DATA_SIZE 4 vs UWORD size 2
-        ("Drifty", "210", (CHG_SYMBOL_VALUE, "drifts")),
+        # length drift: DATA_SIZE 4 vs UWORD size 2 — R-A2L-READ.61 now
+        # gives the tag no length (the sizes disagree), so it refuses as
+        # unresolved, not as a value drift
+        ("Drifty", "210", (CHG_SYMBOL_UNRESOLVED, "without an address")),
         # arrays: MATRIX_DIM 2
         ("Arr", "210", (CHG_SYMBOL_VALUE, "array")),
         # unsupported conversion: FORM
@@ -704,7 +706,10 @@ def test_tc718_battery_refused_encode_limbs_named(
     a2l_payload: dict, symbol: str, value: str, limb_fragments: tuple[str, ...]
 ) -> None:
     """TC-718 (battery arm): every refused encode/value limb names itself in
-    the CHG-SYMBOL-VALUE finding; the add lands 0 entries."""
+    its finding; the add lands 0 entries. The DATA_SIZE/UWORD drift limb
+    (``Drifty``) is re-pinned to CHG-SYMBOL-UNRESOLVED: R-A2L-READ.61 gives
+    the tag no length when its sizes disagree, so it refuses as 'without an
+    address or length' instead of the (no longer reachable) drift limb."""
     result = resolve_symbol_entry(symbol, value, a2l_payload)
     assert not result.ok
     assert result.entry is None
