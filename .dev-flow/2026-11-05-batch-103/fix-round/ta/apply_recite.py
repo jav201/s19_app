@@ -171,7 +171,10 @@ def add_one(lines, node, case, ds, first_body, planned):
     if case in ("b", "c"):
         last_idx = ds.end_lineno - 1
         quote = quote_style(lines, ds)
-        content = (last_idx, lines[last_idx][: ds.end_col_offset - len(quote)])
+        # ast offsets are UTF-8 byte offsets: cut the bytes, then decode
+        # (slicing the str by a byte offset left stray quotes after non-ASCII text).
+        cut = lines[last_idx].encode("utf-8")[: ds.end_col_offset - len(quote)]
+        content = (last_idx, cut.decode("utf-8"))
         indent = " " * ds.col_offset
         return [content], (last_idx + 1, ["", indent + planned, indent + quote], 1)
     if first_body.lineno == node.lineno:
