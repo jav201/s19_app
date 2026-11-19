@@ -1535,6 +1535,19 @@ def test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path: Path) -> 
                 f"the stamped layout held {stamps[0][1]} problem rows; the panel ends with {rows}"
             )
             title = str(app.screen.query_one(".modal-title", Label).render())
+            # R2-F9: the summary log line is written by ``end_busy`` on a
+            # ``call_after_refresh`` scheduled AFTER the panel's install
+            # (project_load.py ``_install_prepared_project``), so under load
+            # ``log_lines`` can still lack it when the panel is laid out. Poll
+            # on the observable line (bound: 60 s) before reading it.
+            await wait_until(
+                pilot,
+                lambda: any(
+                    line.endswith("details: p") for line in app.log_lines
+                ),
+                "timed out waiting for the deferred end_busy summary line",
+                timeout=60.0,
+            )
             summary = [line for line in app.log_lines if line.endswith("details: p")]
             return timing, painted, rows, app._last_load_announcement, title, summary
 

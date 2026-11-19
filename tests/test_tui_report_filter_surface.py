@@ -71,7 +71,7 @@ from textual.widgets import Button, Input, Label, Select
 from tests.conftest import canonical_report_bytes
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens import ReportViewerScreen
-from s19_app.tui.screens_directionb import PatchEditorPanel
+from s19_app.tui.screens_directionb import AbDiffPanel, PatchEditorPanel
 
 # Two minimal valid S19 images (the test_tui_report_seam.py pair): 4 bytes
 # at 0x1000 / 4 bytes at 0x2000 — a real 2-variant project.
@@ -733,6 +733,9 @@ def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
     diff screen) is byte-identical (canonical form) to a no-filter A2B
     run under the same environment pin — the sticky selection observably
     does NOT leak into the always-complete diff report.
+
+    Drives both variant selects to the external-path entry (R-CMP-006.2
+    selects the first variant; BUG B7 refuses a same-file compare).
     """
     _pin_report_clocks(monkeypatch)
 
@@ -750,6 +753,16 @@ def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
                     await _select_filter_via_dropdown(app, pilot, "f.json")
                 app.action_show_screen("diff")
                 await pilot.pause()
+                # R-CMP-006.2 selects the first variant of each list, so with
+                # a project loaded both selects sit on variant "a" and the
+                # typed paths never reach the compare. Drive both selects to
+                # the external-path entry so the typed a.s19 / b.s19 are
+                # compared (BUG B7 refuses a same-file compare).
+                for select_id in ("#diff_select_a", "#diff_select_b"):
+                    app.query_one(select_id, Select).value = (
+                        AbDiffPanel._EXTERNAL_OPTION
+                    )
+                await pilot.pause()
                 app.query_one("#diff_path_a", Input).value = str(
                     project_dir / "a.s19"
                 )
@@ -758,7 +771,17 @@ def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
                 )
                 app.query_one("#diff_compare_button", Button).press()
                 await _flush(pilot)
+                status = str(app.query_one("#diff_status").render())
+                assert not status.startswith("Compare refused"), (
+                    "AT-056e: the compare must not be refused — "
+                    f"#diff_status read {status!r}"
+                )
                 app.query_one("#diff_report_button", Button).press()
+                await _flush(pilot)
+                # batch-68 N5: the diff report generators run on an off-thread
+                # worker; wait for it to complete before reading the reports
+                # folder (the same folder ``_reports(project_dir)`` reads).
+                await app.workers.wait_for_complete()
                 await _flush(pilot)
             return _reports(project_dir)
 
