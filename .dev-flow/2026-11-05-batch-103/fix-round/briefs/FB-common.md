@@ -6,7 +6,7 @@ You fix ONE unit of the s19_app "G3 fix round". Your unit brief (attached after 
 - Your tree is the current directory: a git clone, branch `work`, HEAD = `main` 3afebf90. The unit folder is `..` (it holds `REPORT.md`, `scratch/`, `state/`).
 - Python with the project's dependencies: `~/miniconda3/envs/s19ci/bin/python` (3.11). Never the system python.
 - EVERY pytest/python that imports `s19_app` uses exactly this (one line), from the tree root:
-  `S=$(realpath ../state); mkdir -p $S/home/runner_iso $S/tmp $S/x; timeout 300 env -i PATH=/usr/bin:/bin HOME=$S/home/runner_iso XDG_CONFIG_HOME=$S/x/config XDG_CACHE_HOME=$S/x/cache XDG_DATA_HOME=$S/x/data TMPDIR=$S/tmp PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 LANG=C.UTF-8 ~/miniconda3/envs/s19ci/bin/python -I -B -m pytest -p no:cacheprovider -q <nodes> < /dev/null`
+  `S=$(realpath ../state); mkdir -p $S/home/<runner-home> $S/tmp $S/x; timeout 300 env -i PATH=/usr/bin:/bin HOME=$S/home/<runner-home> XDG_CONFIG_HOME=$S/x/config XDG_CACHE_HOME=$S/x/cache XDG_DATA_HOME=$S/x/data TMPDIR=$S/tmp PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 LANG=C.UTF-8 ~/miniconda3/envs/s19ci/bin/python -I -B -m pytest -p no:cacheprovider -q <nodes> < /dev/null`
 - Run only the nodes/files of your unit, `-n 0` or `-n 4` as the brief says. NEVER the full suite, never the law files (an independent tester runs them), never `-x` on a whole directory.
 - A `timeout` exit (124) is not a PASS and not a FAIL: record it as TIMEOUT and move on.
 

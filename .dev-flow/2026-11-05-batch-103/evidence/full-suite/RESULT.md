@@ -1,3 +1,5 @@
+**STATE 2026-11-19 (operator decision D9, fix round): G3 BLOCKED.** The PASS-WITH-NOTES state recorded below is superseded: the independent review of 2026-11-19 found G3 defects (fix round: `../../fix-round/RECORD.md`). G3 stays BLOCKED until the close suite runs once after the fix round, on the reference Linux host.
+
 # Batch-103 full-suite gate
 
 **CURRENT STATE: G3 PASS-WITH-NOTES — `13b1e522` is complete RED/classified with 0 open regressions.**

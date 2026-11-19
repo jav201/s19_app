@@ -1914,8 +1914,19 @@ def test_r_tst_051_all_line_reader_counts_only_under_minus_one(tmp_path) -> None
 
 # A value that only names the kind of thing (a placeholder), never a real one.
 _PLACEHOLDER = re.compile(
-    r"<[^<>\s]*>|user|host|name|share|account|server|\.\.\.|\u2026|", re.IGNORECASE
+    # redacted_[a-z_]+: redaction markers written by the batch's own redaction step.
+    r"<[^<>\s]*>|user|host|name|share|account|server|\.\.\.|\u2026|redacted_[a-z_]+|",
+    re.IGNORECASE,
 )
+
+# Public GitHub-hosted Windows runner image account and host names, like the
+# Linux image's `runner`; reviewed 2026-11-19 fix round.
+_PUBLIC_RUNNER = re.compile(r"runneradmin|runnervm[a-z0-9]+", re.IGNORECASE)
+
+# Reviewed 2026-11-19 fix round: `home/Python` is prose in `b103-g3-recents/RESULT`;
+# `/home/end` quotes the Home/End keys in inc-8b/inc-9b law transcripts. Applied
+# only to the posix-home label in `_redaction_hits`.
+_REVIEWED_NOT_ACCOUNTS = frozenset({"end", "python"})
 
 _REDACTION_PATTERNS = [
     (
@@ -1954,7 +1965,9 @@ _REDACTION_PATTERNS = [
 
 
 def _is_placeholder(value: str) -> bool:
-    return all(_PLACEHOLDER.fullmatch(part) for part in re.split(r"[@.]", value))
+    return _PUBLIC_RUNNER.fullmatch(value) is not None or all(
+        _PLACEHOLDER.fullmatch(part) for part in re.split(r"[@.]", value)
+    )
 
 
 def _local_identity_names() -> set:
@@ -1999,7 +2012,13 @@ def _redaction_hits(root: Path, identity_names, skip=frozenset()) -> list:
         rel = path.relative_to(root).as_posix()
         for label, pattern in _REDACTION_PATTERNS:
             for match in pattern.finditer(text):
-                if not _is_placeholder(match.group("name")):
+                name = match.group("name")
+                if (
+                    label == "posix home path outside the runner image"
+                    and name.lower() in _REVIEWED_NOT_ACCOUNTS
+                ):
+                    continue
+                if not _is_placeholder(name):
                     hits.append(f"{rel}: {label}: {match.group(0).strip()}")
         for pattern in name_patterns:
             for match in pattern.finditer(text):
@@ -2081,6 +2100,36 @@ def test_r_tst_070_3_redaction_gate_names_each_leak_form(tmp_path) -> None:
     named = {hit.split(": ")[1] for hit in hits}
     assert named == set(_PLANTED_LEAKS), hits
     assert not [hit for hit in hits if hit.startswith(("clean.md", "blob.bin"))], hits
+
+
+def test_r_tst_070_2_reviewed_exemptions_stay_narrow(tmp_path) -> None:
+    """E5S-1 negative control for the fix-round exemptions (R-PASTE.36): the
+    reviewed non-identities are silent, but every near-miss of them is still
+    reported by name."""
+    still_reported = [
+        "/tmp/pytest-of-alice/pytest-3",  # real account, not a redaction marker
+        '<testsuite hostname="build-host-7">',  # real host, not the public runner
+        r"C:\Users\alice\proj",  # real user-profile path
+        "cd /home/alice/work",  # real posix home path
+        "cd /home/endgame/work",  # `endgame` is not the reviewed `end`
+        '<testsuite hostname="runneradmin2x">',  # near-miss of the public runner
+    ]
+    reviewed_exempt = [
+        "/tmp/pytest-of-REDACTED_ACCOUNT/pytest-3",  # batch redaction marker
+        '<testsuite hostname="runnervmm7ud1">',  # public Windows runner host
+        "cd /home/end/work",  # reviewed prose (Home/End keys)
+        "cd /home/Python/work",  # reviewed prose (home/Python paths)
+    ]
+    for index, line in enumerate(still_reported):
+        (tmp_path / f"reported{index}.txt").write_text(line + "\n", encoding="utf-8")
+    (tmp_path / "exempt.txt").write_text("\n".join(reviewed_exempt) + "\n", encoding="utf-8")
+    hits = _redaction_hits(tmp_path, frozenset())
+    assert not [hit for hit in hits if hit.startswith("exempt.txt")], hits
+    reported_files = {hit.split(":")[0] for hit in hits}
+    assert reported_files == {
+        f"reported{index}.txt" for index in range(len(still_reported))
+    }, hits
+    assert len(hits) == len(still_reported), hits
 
 
 # ---------------------------------------------------------------------------
