@@ -650,6 +650,9 @@ def emit_a2l(regions: dict[str, tuple[int, bytearray]], objects: list[dict]) -> 
         out.append(f"      BYTE_ORDER {bo}")
         if kind == "VAL_BLK":
             out.append(f"      LENGTH {VALBLK_LENGTH}")
+            out.append(
+                f"      MATRIX_DIM {VALBLK_LENGTH // DATATYPE_META[VALBLK_DATATYPE]['size']}"
+            )
         elif kind == "ASCII":
             out.append(f"      NUMBER {ASCII_LENGTH}")
         elif kind == "CURVE":

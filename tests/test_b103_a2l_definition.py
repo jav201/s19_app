@@ -1598,6 +1598,8 @@ def test_at_b103_i2_3_case08_builds_and_decodes_with_the_model(c08):
     """AT-B103-I2-3 - case 08 clean and issues, built and decoded; the 11 files of the 1 MiB case equal the pin.
 
     The 10 MiB half of the 22-file pin is R-A2L-DEF.59/2 (slow).
+
+    Re-pinned 2026-11-19: VAL_BLK MATRIX_DIM fix (R2-F4, R-A2L-READ.59/.61); content diff = MATRIX_DIM lines only.
     """
     names = _defined_names(c08)
     assert len(names) == 322

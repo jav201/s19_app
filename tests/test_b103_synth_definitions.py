@@ -65,12 +65,12 @@ CASE08_PIN_1MIB = {
     "firmware.s19": "f5592b511a561c463bf89679b784aea9d9fa552d5aa9b06a17f8e91cd87ea49b",
     "firmware.hex": "f0eb7556d01b31a54009608af0dd0b1c73f5faa4b077941e55e757540bd2e8f2",
     "firmware_v2.s19": "855cdd8434dc639e91732fb0b3ffc2d2f2977804546c8e7cbfae6dc25cf6ec21",
-    "firmware.a2l": "34900db01fee2d2f67252b675f1536a0a2213fa178496e1140019bf05b7f3e8f",
+    "firmware.a2l": "85893ad913701952f5ce500ed1beca17c7822eee497efd5e668c4f098cfc803c",
     "firmware.mac": "6f28961a896a253829b6188813192f0a43f05025a6662a038093fbda5ce19212",
     "demo_patch.changes.json": "46cfc7b200ecd0dea85c7e80fdf1b6bd3c8af3f756109a650831796393d2ac79",
     "demo_check.chk.json": "819bd4a0fa1290fc725ea368f541d2d909ac95936ecbeab82cae2bb6b8878451",
     "demo_check_fails.chk.json": "8bcefc106cb80cab4f7e381d421b72c881c71fec76b6cfbfd6c7a2633704ec92",
-    "firmware_issues.a2l": "bb1522da3e47c083a6705c69cb73da3c3179a760a01e65cac275a6f50498bb91",
+    "firmware_issues.a2l": "af66a17e7cc0a9fd5bd858fc5261ee470db870b69dfc4fd7f0821b20c596e93e",
     "firmware_issues.mac": "f52799cca08d72c461647a992723915fadd02c6dd90ddd5c33f2cd1449c443c0",
     "README.txt": "1ac1b52e1ddb13ffc0fcf45113ec01ce759992bde87730bfae63c647924506ed",
 }
@@ -78,12 +78,12 @@ CASE08_PIN_10MIB = {
     "firmware.s19": "cb0cd7f1a07488aecbcb0928d75b4ae57bb5373f2ff4c097147aac41e2a7c2d9",
     "firmware.hex": "2bd129e0ce59d30b70b93ad4660a45f3ff91525fc39fc14c907a587d0766184d",
     "firmware_v2.s19": "7a41b8c7c291b389fe588cc32615176f809cc9267fe547cb0800bd02c42ca906",
-    "firmware.a2l": "42ca7d40a8c3a1a4ee15abd6fb36ed9953554156c0bb1865e64b17615ba2d961",
+    "firmware.a2l": "c1d194c256a99e09aece0cdec5ef4d860ecb29fa881b9a5f5b6f2e63b2f98f88",
     "firmware.mac": "6f28961a896a253829b6188813192f0a43f05025a6662a038093fbda5ce19212",
     "demo_patch.changes.json": "e5ca0550cafef62222ab65f68126b6cf4b1bee76d389da7862052ff398153980",
     "demo_check.chk.json": "8ebd23b0e5afe12e14bffb72212c6202aa23eba7b8f7965a0329b62a0348594f",
     "demo_check_fails.chk.json": "a2151fae2f1be301662a18b16ae390eb2042f5fe045c058c9915fbd465b1f7fc",
-    "firmware_issues.a2l": "6f9362939936a01683756239b2b884bf9b69ece2d9dac62d3d0ef71651f71f36",
+    "firmware_issues.a2l": "fedea56b264640204623370aa350a6163ce57a32785bbc707e3ea8d4cc1cd74f",
     "firmware_issues.mac": "f52799cca08d72c461647a992723915fadd02c6dd90ddd5c33f2cd1449c443c0",
     "README.txt": "b01212e5cdde95a2975a92f64212a988d6f3dec6c35d5cf9e4cf11167d09bc62",
 }
@@ -151,7 +151,10 @@ def _defc_decode(m, obj: dict, a2l: dict, image: dict) -> list | None:
 
 
 def test_r_a2l_def_59_1_case08_at_1_mib_equals_its_pin(tmp_path):
-    """R-A2L-DEF.59/1 - seed 20260001, --size-mb 1, no case option: the 11 digests."""
+    """R-A2L-DEF.59/1 - seed 20260001, --size-mb 1, no case option: the 11 digests.
+
+    Re-pinned 2026-11-19: VAL_BLK MATRIX_DIM fix (R2-F4, R-A2L-READ.59/.61); content diff = MATRIX_DIM lines only.
+    """
     result = _run_cli(tmp_path / "c08", "--seed", str(SEED), "--size-mb", "1")
     assert result.returncode == 0, result.stderr
     assert case08_file_digests(tmp_path / "c08") == CASE08_PIN_1MIB
@@ -159,7 +162,10 @@ def test_r_a2l_def_59_1_case08_at_1_mib_equals_its_pin(tmp_path):
 
 @pytest.mark.slow
 def test_r_a2l_def_59_2_case08_at_10_mib_equals_its_pin(tmp_path):
-    """R-A2L-DEF.59/2 - --size-mb 10 (slow)."""
+    """R-A2L-DEF.59/2 - --size-mb 10 (slow).
+
+    Re-pinned 2026-11-19: VAL_BLK MATRIX_DIM fix (R2-F4, R-A2L-READ.59/.61); content diff = MATRIX_DIM lines only.
+    """
     result = _run_cli(tmp_path / "c08", "--seed", str(SEED), "--size-mb", "10")
     assert result.returncode == 0, result.stderr
     assert case08_file_digests(tmp_path / "c08") == CASE08_PIN_10MIB
@@ -546,6 +552,10 @@ def test_at_b103_i3_2_edit_arm_definitions_case(defc):
 
 
 def test_at_b103_i3_3_edit_arm_case08_arrays(arrays_c08):
+    """AT-B103-I3-3 - edit arm of the case 08 arrays; the 1 MiB files keep their pin.
+
+    Re-pinned 2026-11-19: VAL_BLK MATRIX_DIM fix (R2-F4, R-A2L-READ.59/.61); content diff = MATRIX_DIM lines only.
+    """
     m = _model()
     edited = 0
     for original in (arrays_c08["a2l"], arrays_c08["a2l_issues"]):
