@@ -30557,7 +30557,7 @@ E         evidence/full-suite/run_distributed.py: posix home path outside the ru
 E         evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
 E         evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
 E         evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
-E         inc-10/04-validation.md: pytest temp folder of an account: pytest-of-j
+E         inc-10/04-validation.md: pytest temp folder of an account: pytest-of-<user>
 E         inc-8b/04-validation.md: posix home path outside the runner image: [HOME]
 E         inc-8b/evidence/e5/runs/out-green/law-suite_hygiene.txt: posix home path outside the runner image: [HOME]
 E         inc-8b/evidence/e5/runs/out-green/law-suite_hygiene.txt: posix home path outside the runner image: [HOME]

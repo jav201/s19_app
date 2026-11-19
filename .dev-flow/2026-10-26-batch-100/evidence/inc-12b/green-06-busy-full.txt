@@ -144,7 +144,7 @@ ________ test_tc_b100_50_worker_raise_ends_the_action_first[file_load] ________
 │ │      │   │   a2l_cache=None                                              │ 
 │ │      │   ),                                                              │ 
 │ │      │                                                                   │ 
-│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-jjg… │ 
+│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<user>… │ 
 │ │      │   621208.6482636                                                  │ 
 │ │      )                                                                   │ 
 │ │ _k = {}                                                                  │ 
@@ -397,7 +397,7 @@ _________ test_tc_b100_50_worker_raise_ends_the_action_first[report] __________
 │ │          │   'project',                                                  │ 
 │ │          │   'proj',                                                     │ 
 │ │          │                                                               │ 
-│ │          '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jjgh… │ 
+│ │          '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<user>… │ 
 │ │          │   'ok'                                                        │ 
 │ │          )                                                               │ 
 │ │ kwargs = {'ok': True}                                                    │ 
@@ -665,7 +665,7 @@ _______ test_tc_b100_50_worker_raise_ends_the_action_first[diff_report] _______
 │ │          │   'diff',                                                     │ 
 │ │          │   '-',                                                        │ 
 │ │          │                                                               │ 
-│ │          '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jjgh… │ 
+│ │          '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<user>… │ 
 │ │          │   'ok'                                                        │ 
 │ │          )                                                               │ 
 │ │ kwargs = {'ok': True}                                                    │ 
@@ -838,7 +838,7 @@ ______ test_tc_b100_50_worker_raise_ends_the_action_first[before_after] _______
 │ │          │   'before-after',                                             │ 
 │ │          │   '-',                                                        │ 
 │ │          │                                                               │ 
-│ │          '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jjgh… │ 
+│ │          '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<user>… │ 
 │ │          │   'ok'                                                        │ 
 │ │          )                                                               │ 
 │ │ kwargs = {'ok': True}                                                    │ 
@@ -933,13 +933,13 @@ _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 │ │            │   a2l_cache=(                                               │ 
 │ │            │   │   (                                                     │ 
 │ │            │   │   │                                                     │ 
-│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<user>… │ 
 │ │            │   │   │   1793539716591557200,                              │ 
 │ │            │   │   │   1444                                              │ 
 │ │            │   │   ),                                                    │ 
 │ │            │   │   {                                                     │ 
 │ │            │   │   │   'path':                                           │ 
-│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<user>… │ 
 │ │            │   │   │   'sections': [                                     │ 
 │ │            │   │   │   │   {                                             │ 
 │ │            │   │   │   │   │   'name': 'PROJECT',                        │ 
@@ -1280,7 +1280,7 @@ _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 │ │            a2l_path=WindowsPath('<HOME>/AppData/Local/Temp/clau… │ 
 │ │            │   │   a2l_data={                                            │ 
 │ │            │   │   │   'path':                                           │ 
-│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<user>… │ 
 │ │            │   │   │   'sections': [                                     │ 
 │ │            │   │   │   │   {                                             │ 
 │ │            │   │   │   │   │   'name': 'PROJECT',                        │ 
@@ -1978,7 +1978,7 @@ _____________ test_tc_b100_50_project_raise_ends_the_action_first _____________
 │ │      │   │   entry_point=2147483648                                      │ 
 │ │      │   ),                                                              │ 
 │ │      │                                                                   │ 
-│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-jjg… │ 
+│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<user>… │ 
 │ │      │   621224.8082834                                                  │ 
 │ │      )                                                                   │ 
 │ │ _k = {}                                                                  │ 
@@ -2013,13 +2013,13 @@ ___ test_tc_b100_50_twelve_b_handler_raise_ends_the_run_first[project_load] ___
 │ │      project_dir=WindowsPath('<HOME>/AppData/Local/Temp/claude/… │ 
 │ │      │   │   │   data_files=(                                            │ 
 │ │      │   │   │   │                                                       │ 
-│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-jjg… │ 
+│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<user>… │ 
 │ │      │   │   │   │                                                       │ 
-│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-jjg… │ 
+│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<user>… │ 
 │ │      │   │   │   ),                                                      │ 
 │ │      │   │   │   a2l_files=(                                             │ 
 │ │      │   │   │   │                                                       │ 
-│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-jjg… │ 
+│ │      WindowsPath('<HOME>/AppData/Local/Temp/claude/C--Users-<user>… │ 
 │ │      │   │   │   ),                                                      │ 
 │ │      │   │   │   a2l_problem=None,                                       │ 
 │ │      │   │   │   a2l_cache=None,                                         │ 

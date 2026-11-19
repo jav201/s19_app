@@ -87,7 +87,7 @@ E     Use -v to get more diff
 │ │            a2l_path=WindowsPath('<HOME>/AppData/Local/Temp/clau… │ 
 │ │            │   a2l_data={                                                │ 
 │ │            │   │   'path':                                               │ 
-│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<user>… │ 
 │ │            │   │   'sections': [                                         │ 
 │ │            │   │   │   {                                                 │ 
 │ │            │   │   │   │   'name': 'PROJECT',                            │ 
@@ -451,13 +451,13 @@ E     Use -v to get more diff
 │ │            │   a2l_cache=(                                               │ 
 │ │            │   │   (                                                     │ 
 │ │            │   │   │                                                     │ 
-│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<user>… │ 
 │ │            │   │   │   1793542573730216300,                              │ 
 │ │            │   │   │   1444                                              │ 
 │ │            │   │   ),                                                    │ 
 │ │            │   │   {                                                     │ 
 │ │            │   │   │   'path':                                           │ 
-│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<user>… │ 
 │ │            │   │   │   'sections': [                                     │ 
 │ │            │   │   │   │   {                                             │ 
 │ │            │   │   │   │   │   'name': 'PROJECT',                        │ 
@@ -799,7 +799,7 @@ E     Use -v to get more diff
 │ │            a2l_path=WindowsPath('<HOME>/AppData/Local/Temp/clau… │ 
 │ │            │   │   a2l_data={                                            │ 
 │ │            │   │   │   'path':                                           │ 
-│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<user>… │ 
 │ │            │   │   │   'sections': [                                     │ 
 │ │            │   │   │   │   {                                             │ 
 │ │            │   │   │   │   │   'name': 'PROJECT',                        │ 
@@ -1155,7 +1155,7 @@ E     Use -v to get more diff
 │ │            a2l_path=WindowsPath('<HOME>/AppData/Local/Temp/clau… │ 
 │ │            │   │   a2l_data={                                            │ 
 │ │            │   │   │   'path':                                           │ 
-│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-jj… │ 
+│ │            '<HOME>\\AppData\\Local\\Temp\\claude\\C--Users-<user>… │ 
 │ │            │   │   │   'sections': [                                     │ 
 │ │            │   │   │   │   {                                             │ 
 │ │            │   │   │   │   │   'name': 'PROJECT',                        │ 

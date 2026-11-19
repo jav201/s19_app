@@ -21,7 +21,7 @@
 | Inc 10 retarget sites one by one (tree / base): TC-B100-14, -15, -58, -69; TC-B100-53 ×2 | 25 passed, 1 failed (TC-B100-58 mac attach, same on base) / same; 53: 2 passed / 2 passed | `logs/exact-b100-save-sites.txt`, `base-…`, `exact-b100-53{a,b}.txt`, `base-…` |
 | Laws (clone): docs_canon, b101_doc_hygiene, b101_help_legend_docs, no_private_tokens, filename_markup_safety, report_markup_safety, id_registry, deps_seam_law, engine_unchanged, requirements_canon, suite_hygiene | 384 passed, **1 failed = R-DOC-CANON.4** (expected, P-026) | `logs/laws.txt` |
 | Laws: `test_tui_directionb.py -k tc031` | 3 passed | `logs/laws-tc031.txt` |
-| Laws on the E5 records (clone of `9eadcf22`): suite_hygiene, no_private_tokens, id_registry, filename_markup_safety, docs_canon | 85 passed. The first run on `c6331a9e` failed R-TST-070.2 (pytest truncated an account folder to `pytest-of-j…` in four of these transcripts, past the fetch redaction); fixed forward in `9eadcf22` | `logs/laws-final.txt` |
+| Laws on the E5 records (clone of `9eadcf22`): suite_hygiene, no_private_tokens, id_registry, filename_markup_safety, docs_canon | 85 passed. The first run on `c6331a9e` failed R-TST-070.2 (pytest truncated an account folder to `pytest-of-<user>…` in four of these transcripts, past the fetch redaction); fixed forward in `9eadcf22` | `logs/laws-final.txt` |
 | Review probes P1–P3 | P1 0 differences; P2 control character kept (F-X10-3); P3 no mismatch | `probes/probe.txt` |
 
 Expected base failures seen: AT-B99-02, AT-076a, R-DOC-CANON.4. **Also seen, outside the brief's list and identical on base:** F-X10-4 (b100 load_question 4, save_image 9, workers timeout). Load-sensitive and kept visible: L-1.

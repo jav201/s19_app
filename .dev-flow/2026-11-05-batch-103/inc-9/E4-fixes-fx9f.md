@@ -4,7 +4,7 @@ Worker FX9f, claude-sonnet-5-5. Tree `b103-inc9`, start `7c8bda05`, commit `f60f
 fresh clone of a bundle, `s19_app.__file__` atop every transcript (`evidence-e5/fx9f/transcripts/`), scratch deleted (explicit list).
 
 ## Decision
-Javier, 2026-11-14: "Relaja el límite pero deja en el backlog el item." (`s19-PENDING.md` P-125/P-126, review-page item F-X9-2).
+The operator, 2026-11-14: "Relaja el límite pero deja en el backlog el item." (`s19-PENDING.md` P-125/P-126, review-page item F-X9-2).
 Orchestrator ruling (provisional, P-059): 1.0 s for R-PE-BENCH.29/2 and .82/1 only.
 
 ## Changes (wording old -> new)

@@ -1402,7 +1402,7 @@ is what the sealed design record has not seen (§0.4):
    today, M-7). Three fixed lines, as the design proposal specified.
 2. **The human-review marker, designed as a REVIEW-DEBT LEDGER rather than a boolean.** Every batch
    proceeds autonomously and **accrues** review debt; the marker **discharges** it. Recorded
-   fields: the reviewer's name (`Javier Granados`), an optional `reviewer-id` reserved for
+   fields: the reviewer's name (`<operator>`), an optional `reviewer-id` reserved for
    organisational context, the **date**, the **phase** at which review happened — which may be
    early or immediately before the final commit — and `authored-by` **alongside** `reviewed-by`, so
    a one-sided sign-off is visible at a glance rather than inferable. Anything the review turns up

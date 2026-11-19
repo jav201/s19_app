@@ -9,7 +9,7 @@ The tokens themselves must not be written here, so the test keeps only their
 sha256 digests and lengths: every tracked text file is split into words
 (letters, digits, ``_ . -``), each word of a listed length is hashed, and a
 digest match is a failure naming the file and line. A token glued to a longer
-word (``xjjgh8``) is not seen; the redaction covered every whole-word form
+word (``x<token>``) is not seen; the redaction covered every whole-word form
 found at the time, and new records are written with ``~`` / ``<user>`` /
 ``<host>`` placeholders.
 """

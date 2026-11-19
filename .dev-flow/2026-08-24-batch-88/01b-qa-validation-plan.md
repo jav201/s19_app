@@ -353,7 +353,7 @@ optional thing:
 
 | Field | Required | Example value |
 |---|---|---|
-| `reviewed-by` | yes | `Javier Granados` |
+| `reviewed-by` | yes | `<operator>` |
 | `reviewer-id` | **reserved, optional** — a stable operator handle for a future multi-reviewer world; absent is legal and MUST be distinguishable from present-and-empty | *(absent)* |
 | `date` | yes | an ISO `YYYY-MM-DD` |
 | `phase` | yes | the phase at which review happened — `P1`, `P2`, `P3`, `P4`, `P5` |
@@ -696,7 +696,7 @@ owed before Inc 5.
 | 3 | Edge cases include empty, boundary, invalid, error | ✓ | empty → `MARK-id-absent!=empty`, `CASE-nodir` (§2.6); boundary → §2.7's suffix and date table; invalid → `MARK-date-unparseable`, `MARK-phase-unknown`; error → §6.1's `UnicodeEncodeError`, reproduced. |
 | 4 | Regression checklist exists | ✓ | §2.2's mutants `m2`/`m3`/`m6`/`m11` are executed regression kills; §2.8 names the residual the `FALLBACK-survives` fixture cannot see. |
 | 5 | Exit criteria stated | ✓ | §3: a row missing any of the four columns is not shippable. §5.1: A-1 and A-2 and A-3, all three with transcripts. §5.2: A-1′ after Inc 4. |
-| 6 | No real PII / secrets | ✓ | The only name is the operator's own, `Javier Granados`, as the marker's declared `reviewed-by` value. No credentials, no tokens, no paths outside this machine's already-recorded roots. |
+| 6 | No real PII / secrets | ✓ | The only name is the operator's own, `<operator>`, as the marker's declared `reviewed-by` value. No credentials, no tokens, no paths outside this machine's already-recorded roots. |
 | 7 | Test results section left **blank** unless actually run | ✓ | §0 and §2.2 are results I **executed** and they carry their commands. §3, §4 and §5 are **pre-registered and unfilled** — no verdict is asserted for a run that has not happened. |
 | 8 | **Layer B (black-box):** deliverables observed through the SHIPPED surface | ✓ | Every §0 figure comes from running the shipped validator over the real repository, and §2.2 from its real `--selftest` entry point. No arm audited here was judged by reading it alone: **fourteen mutants were built and executed.** |
 | 9 | **Bidirectional surface-reachability** | ✓ **and this is the audit's core finding** | Measured in both directions and it **fails for 14 of the 29 arms**: the V22 trio and 11 of the 12 V23 arms never reach the handler — they assert against an expression the test itself recomputes (§2.4) or against the compiled pattern rather than the rule (§2.5). The marker rule in §4 is specified handler-first for exactly this reason. |

@@ -122,7 +122,7 @@ main	tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_hom
   evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
   evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
   evidence/full-suite/run_distributed.py: posix home path outside the runner image: [HOME]
-  inc-10/04-validation.md: pytest temp folder of an account: pytest-of-j
+  inc-10/04-validation.md: pytest temp folder of an account: pytest-of-<user>
   inc-8b/04-validation.md: posix home path outside the runner image: [HOME]
   inc-8b/evidence/e5/runs/out-green/law-suite_hygiene.txt: posix home path outside the runner image: [HOME]
   inc-8b/evidence/e5/runs/out-green/law-suite_hygiene.txt: posix home path outside the runner image: [HOME]

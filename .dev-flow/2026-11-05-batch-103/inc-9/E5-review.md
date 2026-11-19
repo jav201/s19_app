@@ -92,7 +92,7 @@ every transcript (`evidence-e5/fx9f/transcripts/`), scratch deleted.
 
 | Id | Disposition now |
 |---|---|
-| F-X9-2 | **Closed by operator decision** (Javier, 2026-11-14: "Relaja el límite pero deja en el backlog el item"; `s19-PENDING.md` P-125/P-126, review-page item F-X9-2). R-PE-BENCH.29/2 and .82/1 are now bounded at **1.0 s**; no other bound, timer or helper changed. Residual: O-A (encode in a separate process) and O-E (stepped shared refresh) stay in the backlog; 82_1's margin is thin (below). |
+| F-X9-2 | **Closed by operator decision** (the operator, 2026-11-14: "Relaja el límite pero deja en el backlog el item"; `s19-PENDING.md` P-125/P-126, review-page item F-X9-2). R-PE-BENCH.29/2 and .82/1 are now bounded at **1.0 s**; no other bound, timer or helper changed. Residual: O-A (encode in a separate process) and O-E (stepped shared refresh) stay in the backlog; 82_1's margin is thin (below). |
 | F-X9r-2 | Closed by FX9e (`E4-fixes-fx9e.md`); not re-run here beyond the laws. |
 | F-X9r-1, F-X9r-3, F-X9r-4, F-X9-3 ... F-X9-9 | unchanged (PENDING / MINOR). |
 

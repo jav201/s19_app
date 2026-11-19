@@ -101,7 +101,7 @@ batch dir is **2026-05-05**. Every absent id postdates it.
    debuts with zero real consumers.**
 6. **A human review marker is required**, framed as a **REVIEW-DEBT LEDGER**: each batch proceeds
    autonomously and ACCRUES review debt; the marker discharges it with reviewer name
-   **`Javier Granados`**, a reserved `reviewer-id` for organisational context, the DATE, the PHASE at
+   **`<operator>`**, a reserved `reviewer-id` for organisational context, the DATE, the PHASE at
    which review happened, and `authored-by` beside `reviewed-by` so a one-sided sign-off is visible.
    Findings go to the backlog. **The guard must not claim to verify the review's QUALITY.** Moved to
    batch-89 with Story B, whose PDR allocates its rule number.
