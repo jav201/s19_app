@@ -1,0 +1,3 @@
+# Unit CI — CI push-lane time limits back to the batch-101 values (operator 2026-11-19: «Back to 180/240»)
+Reverts the limit changes of 65fcaa3f (`.github/workflows/tui-ci.yml`: job 480 -> 240, push lane 1 360 -> 180, push lane 2 90 -> 45) and the matching asserts of b5968f23 (`tests/test_suite_hygiene.py::test_r_tst_015_016_017_ci_time_limits`). Canon rows R-TST-015 (lane 1: 180 push / 120 PR) and R-TST-016 (job: 240) already state these values (canon fold). Consequence told to the operator: the full push suite times out until it gets faster.
+Made by the orchestrator (6 lines, mechanical reverse of two recorded commits); checked on the Linux host.
