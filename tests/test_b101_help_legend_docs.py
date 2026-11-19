@@ -1978,3 +1978,81 @@ def test_r_doc_guide_2_2_no_other_row_marked() -> None:
     assert limits == []
     assert rows.get("F-43", "").startswith("limitation")
     assert rows.get("F-44", "").startswith("limitation")
+
+
+def test_r_tui_062_10_2_1_inspector_subtitle_names_only_handled_keys(tmp_path: Path) -> None:
+    """R-TUI-062.10.2/1: the inspector subtitle reads ``↑↓ move · ↵ inspect`` and
+    each key it names does that: Down moves the focus to the next region row, Enter
+    shows that region in the inspector and opens no other window.
+
+    Why: the old subtitle ``↑↓ · ↵ hex`` promised a hex jump that Enter never makes
+    (BL-I14-1). Mutant: the old text -> RED.
+    """
+    from s19_app.tui.screens_directionb import RegionRow
+    from tests.test_map_click_chain import _capture_nav, _map_ready
+
+    loaded = _image_f()
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        out: dict = {}
+        async with app.run_test(size=(120, 30)) as pilot:
+            panel = await _map_ready(app, loaded, pilot)
+            navs: List[int] = []
+            _capture_nav(panel, navs)
+            out["subtitle"] = str(app.query_one("#map_detail").border_subtitle)
+            rows = list(app.query(RegionRow))
+            assert len(rows) >= 2, "the image has four regions"
+            rows[0].focus()
+            await _pause(pilot)
+            await pilot.press("down")
+            await _pause(pilot)
+            out["down_moves_focus"] = app.focused is rows[1]
+            await pilot.press("enter")
+            await _pause(pilot)
+            detail = str(app.query_one("#map_detail_body").render())
+            out["enter_inspects"] = f"0x{rows[1].region_start:08X}" in detail
+            out["navs"] = list(navs)
+            out["screen"] = app._active_screen_key
+        return out
+
+    out = asyncio.run(_drive())
+    assert out["subtitle"] == "↑↓ move · ↵ inspect", out
+    assert out["down_moves_focus"] and out["enter_inspects"], out
+    assert out["navs"] == [] and out["screen"] == "map", out
+
+
+def test_r_tui_062_10_3_1_row_glyph_is_enter_and_enter_inspects(tmp_path: Path) -> None:
+    """R-TUI-062.10.3/1: every region row ends in the one key glyph ``↵`` and the
+    Memory Map handles that key: Enter on the last row shows that region in the
+    inspector and stays on the map.
+
+    Mutant: Enter no longer handled by the row -> RED.
+    """
+    from s19_app.tui.screens_directionb import RegionRow
+    from tests.test_map_click_chain import _capture_nav, _map_ready
+
+    loaded = _image_f()
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        out: dict = {}
+        async with app.run_test(size=(120, 30)) as pilot:
+            panel = await _map_ready(app, loaded, pilot)
+            navs: List[int] = []
+            _capture_nav(panel, navs)
+            rows = list(app.query(RegionRow))
+            out["glyph_ends"] = [str(row.render()).rstrip().endswith("↵") for row in rows]
+            rows[-1].focus()
+            await _pause(pilot)
+            await pilot.press("enter")
+            await _pause(pilot)
+            detail = str(app.query_one("#map_detail_body").render())
+            out["enter_inspects"] = f"0x{rows[-1].region_start:08X}" in detail
+            out["navs"] = list(navs)
+            out["screen"] = app._active_screen_key
+        return out
+
+    out = asyncio.run(_drive())
+    assert out["glyph_ends"] and all(out["glyph_ends"]), out
+    assert out["enter_inspects"] and out["navs"] == [] and out["screen"] == "map", out

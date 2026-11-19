@@ -246,7 +246,7 @@ class MemoryMapPanel(Container):
             ``Memory Map``, subtitle ``{N} regions · ░▒▓ k``) carries the 1-row
             band bar, the run-start ruler, the one-line glance chips and the
             scrollable region list; the ``#map_detail`` ``.db-pane`` (lit title
-            ``Inspector — 0x{selected:08X}``, subtitle ``↑↓ · ↵ hex``) carries
+            ``Inspector — 0x{selected:08X}``, subtitle ``↑↓ move · ↵ inspect``) carries
             the full-height aligned field block + 8-byte hex peek. The panes
             render side by side at or above the panel-measured stack threshold
             and stacked below it — the panel toggles its own ``width-narrow``
@@ -451,7 +451,7 @@ class MemoryMapPanel(Container):
         # carries the SELECTED region's start address.
         grid.border_title = "Memory Map"
         grid.border_subtitle = f"{len(runs)} regions · ░▒▓ k"
-        self.query_one("#map_detail").border_subtitle = "↑↓ · ↵ hex"
+        self.query_one("#map_detail").border_subtitle = "↑↓ move · ↵ inspect"
         self.call_after_refresh(self._resize_band_segments)
         # ``grid.mount()`` is DEFERRED, so the rows are not queryable here and
         # "after the rows are mounted" is not a synchronous point inside this

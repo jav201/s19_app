@@ -3047,7 +3047,7 @@ def test_tc656_chrome_pane_titles_and_subtitles(tmp_path: Path) -> None:
     assert got["grid_title"] == "Memory Map", got
     assert got["grid_sub"] == "9 regions · ░▒▓ k", got
     assert got["detail_title"] == "Inspector — 0x00000000", got
-    assert got["detail_sub"] == "↑↓ · ↵ hex", got
+    assert got["detail_sub"] == "↑↓ move · ↵ inspect", got
 
 
 # TC-657 — the cockpit stack order + the scrollbar's BEHAVIOR (HLR-126)
