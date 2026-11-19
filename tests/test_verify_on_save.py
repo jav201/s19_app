@@ -134,7 +134,10 @@ def test_dropped_byte_is_mismatch_only_a(file_type: str, tmp_path: Path) -> None
 
 def test_unsupported_file_type_raises(tmp_path: Path) -> None:
     """LLR-003.1 guard: a file_type the save-back never writes is a caller
-    programming error, surfaced as ValueError (not a silent empty diff)."""
+    programming error, surfaced as ValueError (not a silent empty diff).
+
+    Traces: R-HEX-VERIFY-001.7.
+    """
     written = _write_image(_INTENDED, "hex", tmp_path)
     with pytest.raises(ValueError):
         verify_written_image(written, _INTENDED, "mac")

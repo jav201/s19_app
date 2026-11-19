@@ -2074,6 +2074,8 @@ map sheet       Four boxes in one column, each a title and its lines:
 | R-VAL-016 | If | If a load has an integrity notice (S1 R-READ-005 … 008), then the system shall raise an ERROR issue whose code is the notice's code and whose message is the notice's text. |
 | R-VAL-017 | If | If a load records a line diagnostic (S1), then the system shall raise the ERROR issue `LOAD_LINE_DIAGNOSTIC` with the diagnostic's line number and message. |
 | R-VAL-018 | If | If a MAC file cannot be read, then the system shall raise the ERROR issue `MAC_READ_FAILED` with the read error as its message. |
+| R-VAL-055 | When | When the system builds the issue list for an A2L that has an enriched tag list, the system shall check the tags of that enriched list. |
+| R-VAL-056 | If | If the system builds the issue list for an A2L that has no enriched tag list, then the system shall check the A2L's parsed tags. |
 
 #### S3.2 · Issue producers (CTX-ISSUE)
 
@@ -4446,6 +4448,7 @@ mismatch summary  changed <r> run(s) / <b> byte(s), missing in file <r> run(s) /
 | R-HEX-VERIFY-001.4 | If | If the image read back differs from the saved image, then the system shall mark the save `mismatch`. |
 | R-HEX-VERIFY-001.5 | If | If the file read back has a diagnostic or an integrity notice, then the system shall mark the save `mismatch`. |
 | R-HEX-VERIFY-001.6 | If | If the save is marked `mismatch`, then the system shall keep the written file. |
+| R-HEX-VERIFY-001.7 | If | If the system is asked to verify a save-back file whose format is neither S19 nor Intel HEX, then the system shall raise an error instead of marking the save. |
 | R-HEX-VERIFY-002.1 | When | When the system marks a save `verified`, the system shall show the status `Saved + verified: <name><save suffix>`. |
 | R-HEX-VERIFY-002.2 | When | When the system marks a save `verified`, the system shall show no notice. |
 | R-HEX-VERIFY-002.4 | If | If the save is marked `mismatch`, then the system shall show the status `Verify MISMATCH: <name><save suffix>`. |

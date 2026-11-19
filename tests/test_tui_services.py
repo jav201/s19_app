@@ -58,6 +58,7 @@ def test_build_validation_report_uses_overlap_addresses():
 
 
 def test_build_validation_report_keeps_explicit_empty_enriched_tags(monkeypatch):
+    """Traces: R-VAL-055."""
     loaded = LoadedFile(
         path=Path("firmware.s19"),
         file_type="s19",
@@ -101,6 +102,7 @@ def test_build_validation_report_keeps_explicit_empty_enriched_tags(monkeypatch)
 
 
 def test_build_validation_report_falls_back_to_raw_tags_when_enriched_is_none(monkeypatch):
+    """Traces: R-VAL-056."""
     loaded = LoadedFile(
         path=Path("firmware.s19"),
         file_type="s19",
