@@ -88,6 +88,9 @@ batch-100 id    An HLR-<n> (with its letter) or LLR-<n>.<m> of batch-100's
                 HLR-178. It takes the same classes as a batch id (D0-13).
 AT-B100-NN,     The acceptance and test-case ids of batch-100 (tests/test_b100_*.py).
 TC-B100-NN
+batch-101 event An R-TST row of batch-101 (FORWARD-requirements-session.md, Inc 2 and
+row             Inc 15) whose obligation names one fixed CI run, merge or tree. It takes
+                the class retired (history; operator decision 2026-11-19).
 ```
 
 ---
@@ -109,6 +112,142 @@ CTX-CANON  The requirements file
                  outside a `code span`.
 ```
 
+#### CTX-RELEASE · Security policy, release notes and user guide (S0.4 … S0.6)
+
+```text
+security policy SECURITY.md at the root of the repository.
+release notes   CHANGELOG.md at the root of the repository: one "## <version>" section
+                per release, newest first.
+user guide      docs/user-guide/ch*.md.
+findings table  The table of docs/user-guide/DOSSIER.md §5.
+fixed mark      The text "fixed in 1.0.0" appended to the Kind cell of a findings-table
+                row; where 1.0.0 fixes the finding other than as its title reads, the
+                mark goes on with ": <what 1.0.0 does>".
+```
+
+#### CTX-DOCHYG · Repository documents and paths (S0.7 … S0.10)
+
+```text
+repository document   A tracked file whose name ends in .md, .txt or .rst, except a file
+                      under .dev-flow/, docs/requirements/, tests/goldens/ or
+                      tests/__snapshots__/, and except REQUIREMENTS.md (S0.3 owns it).
+tracked text file     A tracked file git does not mark binary, outside .dev-flow/ and
+                      docs/requirements/.
+repository path       A token in a repository document that starts with s19_app/, tests/,
+                      tools/, docs/, examples/, prototypes/, .fast-dev-flow/, .github/ or
+                      evidence/, preceded by no letter, digit, '.', '/' or '-', and running
+                      to the first space, backtick, quote, ')', ']' or ','; a trailing '.',
+                      ':', ';' or '/', a ':<line>' suffix and a '::<name>' suffix (a pytest
+                      node or a symbol) are not part of it.
+exists                A repository path exists when it names a tracked file or a folder
+                      that holds a tracked file; a path with '*' exists when it matches at
+                      least one tracked file (fnmatch; a trailing '/**' matches the folder).
+removal mark          One of the words removed, deleted, historic, superseded, legacy,
+                      no longer, moot, retired, moved, on the same line, any case. Per
+                      physical line: a Markdown paragraph is one line, so one mark excuses
+                      every token of its paragraph.
+retired folder        .fast-dev-flow/ (the retired fast-dev-flow workflow's records) and
+                      prototypes/ (removed 2026-11-05).
+retired-folder path   A token .fast-dev-flow/<...> or prototypes/<...> preceded by no
+                      letter, digit or '_'.
+exempt line           A line of the table EXEMPT below, by file and line text.
+s19tool shape         An occurrence of s19tool that is one of: .s19tool/ or .s19tool\ (the
+                      work-area folder), s19tool/ (a path), s19tool.egg-info,
+                      `pip <verb> s19tool`, or on a line that holds "Distribution name",
+                      "module-only", "runs only as a module", "No `s19tool` console
+                      script" or "what remains", or a removal mark.
+module table          The table under "## 10. Composition" of docs/architecture.md whose
+                      header holds "Paths it owns"; a module prefix is a `<folder>/**`
+                      token of its "Paths it owns" column.
+Python folder         A top-level folder that holds a tracked .py file.
+archive folder        .dev-flow/design/archive/
+local identity        A match of a form of _REDACTION_PATTERNS of
+                      tests/test_suite_hygiene.py (home path, user-profile path, pytest
+                      account folder, junit hostname, user@host prompt, UNC host path, LAN
+                      address), an account or host name of the machine running the suite,
+                      or a drive-letter path into a synced cloud folder
+                      (<letter>:/My Drive/, either slash, any case). A sample path such
+                      as C:\work\flash\app_v2.s19 is none of these.
+EXEMPT                Lines the retired-folder rows skip (file · line text):
+  X-1  .gitignore                  /prototypes/
+  X-2  AT-TC-REGISTRY.jsonl        line 1, "not_scanned": [
+  X-3  tools/seed_id_registry.py   "not_scanned": [  and
+                                   for folder in (".dev-flow", ".fast-dev-flow"):
+  X-4  tools/id_registry.py        for folder in (".dev-flow", ".fast-dev-flow"):
+  X-5  .gitattributes              # fast-dev-flow.md is LF)
+```
+
+#### CTX-DOCINDEX · The entries docs/README.md links (S0.8)
+
+```text
+entry           A top-level entry of docs/ other than docs/README.md itself and
+                docs/images/, or a root document: README.md, REQUIREMENTS.md,
+                CLAUDE.md, PROJECT_RULES.md, SECURITY.md, CHANGELOG.md. The entries are
+                taken from the tree. Today, in docs/: overview.md, architecture.md,
+                engineering-rules.md, CENSUS-BASELINE-canon-mirror.md, requirements/,
+                user-guide/.
+link to an entry  A link whose target is the entry or a path inside it.
+```
+
+#### CTX-SUBMOD · Sub-modules the architecture map declares (S0.9)
+
+```text
+sub-module      s19_app/render/hexview.py, s19_app/render/format.py and
+                s19_app/tui/flow_screens.py: the sub-modules inside product that the
+                archived batch-92 and batch-94 declarations created.
+facts           8: for each sub-module, what it encapsulates and what it exposes (6);
+                for each render/ module, that it imports no s19_app.tui module (2).
+                No import rule is a fact of flow_screens.py.
+```
+
+#### CTX-IFACE · Interface contracts of the architecture map (S0.9)
+
+```text
+contract        An interface contract of docs/architecture.md §11 that landed and is
+                not superseded.
+contracts       57: (a) 12 named contracts: the three Part B contracts (loaded_panel,
+                screen_workspace, workspace_body), the four batch-92 surfaces
+                (render.hexview, render.format, utils.safe_text, tui/__init__
+                re-export) and the five batch-94 surfaces
+                (PatchEditorPanel.ActionRequested, .chk.json artifact, flow_screens
+                module surface, flow template / chain-set artifacts, rail invariant);
+                (b) the 45 rows of the batch-97, batch-99 and batch-100 tables, named
+                in the one table by their source tags: B97-I-1 … B97-I-11 (10 rows;
+                the I-2/I-3 row carries two tags), B99-I1 … B99-I12 and B99-I2a (13
+                rows), B100-I1 … B100-I22 (22 rows); 46 tags. One row may carry
+                several tags.
+saved-file contract  A contract whose Shape cell says "saved file": .chk.json
+                artifact, flow template / chain-set artifacts, B100-I1 (project.json
+                envelope), B100-I16 (derived_from key), B100-I9 (recent-sources
+                store); 5.
+```
+
+#### CTX-ARCHIVE · Finished notes and their archive paths (S0.10)
+
+```text
+finished note   A note of the tree at c2cba35 that has an archive path:
+  PENDIENTES-batch96.md
+                .dev-flow/design/archive/PENDIENTES-batch96.md
+  docs/crc-algorithm-designer/01-requirements.md
+                .dev-flow/design/archive/crc-algorithm-designer-requirements-draft-2026-07-20.md
+  tools/synth/VERIFY.md
+                .dev-flow/design/archive/synth-case08-release-demo-VERIFY.md
+architecture archive  .dev-flow/design/archive/architecture-batch-declarations-88-100.md:
+                the §10–§11 amendment notes and the per-batch declarations of batches
+                88 … 100 of docs/architecture.md, as blocks copied verbatim.
+```
+
+#### CTX-REMOVED · Files the tree holds no longer (S0.10)
+
+```text
+removed file    A file the tree holds no longer (it stays in git history):
+  .fast-dev-flow/**                                  the retired workflow
+  docs/diagrams/architecture.md                      superseded
+  s19_app/tui/operations/requirements/REQ-crc.md     a second CRC source (S13 D13-17)
+  examples/case_00_public/from_source_input.txt,
+  examples/case_00_public/s19_sample.txt             read by no test, loader or tool
+```
+
 ### Requirements
 
 
@@ -123,7 +262,7 @@ CTX-CANON  The requirements file
 
 #### S0.2 · Retired batch ids: where each lives now (CTX-RETIRED)
 
-The table below replaces the earlier canon's table of batch ids. It holds no requirement: each line is a pointer. A second table after it points the batch-100 ids (D0-13).
+The table below replaces the earlier canon's table of batch ids. It holds no requirement: each line is a pointer. A second table after it points the batch-100 ids (D0-13). A third table keeps the batch-101 event rows as history (operator decision 2026-11-19). A fourth table points the batch-102 clipboard ids that batch-103 Inc 1a reconciled (`.dev-flow/2026-11-05-batch-103/inc-1a/E1-rulings.md` section 4).
 
 | Id | Where it lives now | Note |
 |---|---|---|
@@ -138,7 +277,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-009 · LLR-009.1 … .3 | **absorbed** · S9: R-CHKED-001 … R-CHKED-053 | The Check Editor, S9.4 (D9-3). |
 | HLR-010 · LLR-010.1, .2 | **absorbed** · S14: R-DIFF-CHK.1 … R-DIFF-CHK.11 | Check-spec addendum of the diff report, S14.6 (D14-6). |
 | HLR-011 · LLR-011.1, .2 | **absorbed** · S9: R-CHKED-048 | Plain text on the Check Editor (S1 CTX-TEXT). |
-| HLR-012 · LLR-012.1, .2 | **absorbed** · S3: R-VAL-032 | S3 replaces the INFO re-label: standard block names raise no issue (D3-12). |
+| HLR-012 · LLR-012.1, .2 | **absorbed** · S3: R-VAL-032.1 … .3 | S3 replaces the INFO re-label: standard block names raise no issue (D3-12). |
 | HLR-013 · LLR-013.1 … .3 | **retired** | Superseded by HLR-146 (one row of cards, S16 D16-3). LLR-013.3 (A2B diff block) is S15: R-FLOW-A2B.1 … .11. |
 | HLR-014 · LLR-014.1, .2 | **absorbed** · S15: R-FLOW-A2B.1 … R-FLOW-A2B.11; S16: R-FB-ADD.1 … R-FB-ADD.18 | A2B diff block inputs and provenance. |
 | HLR-015 · LLR-015.1, .2 | **absorbed** · S15: R-FLOW-FILE.1 … R-FLOW-FILE.10; S16: R-FB-SAVE.1 … R-FB-LOAD.11 | Flow files. |
@@ -151,14 +290,14 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-122 · LLR-122.1 … .5 | **retired** | Process: adopting existing tests into the id registry (batch-91). Its LLRs name behaviour the group files now hold (parsers S1 and S8, A2L and MAC S2, screens S4 … S12); LLR-122.4 is S13.6 … S13.8. |
 | HLR-123 | **absorbed** · S0: R-DOC-README.1 … R-DOC-README.4 | README part only; the developer documents are process (D0-7). |
 | HLR-124 · LLR-124.1, .2 | **retired** | Process: id-registry hygiene (AT-043, token renames, reserved id blocks). |
-| HLR-125 · LLR-125.1, .2 | **absorbed** · S4: R-TUI-074.2, R-TUI-062.10, R-MAP-PANE.1, R-MAP-PANE.2 | Inspector and map pane titles and subtitles; the pane look is design. |
+| HLR-125 · LLR-125.1, .2 | **absorbed** · S4: R-TUI-074.2, R-TUI-062.10.1 … .3, R-MAP-PANE.1, R-MAP-PANE.2 | Inspector and map pane titles and subtitles; the pane look is design. |
 | HLR-126 · LLR-126.1 … .4 | **absorbed** · S4: R-TUI-061.4 … .6, R-TUI-062.1 … .6, R-TUI-073.1, R-TUI-074.1 … .11 | Layout, first region selected, keyboard and mouse. |
 | HLR-127 · LLR-127.1 … .4 | **absorbed** · S4: R-TUI-073.1 … .4, R-TUI-062.1 … .5 | Region rows (CTX-MAP); aligned columns are No today (D4-23). |
 | HLR-128 · LLR-128.1 | **absorbed** · S4: R-TUI-074.6 … .8 | Peek rows. |
 | HLR-129 · LLR-129.1 … .3 | **absorbed** · S4: R-TUI-041.1 … .4, R-TUI-061.1 | Stats line (in view at every scroll position of the region list) and band chips. |
 | HLR-130 · LLR-130.1, .2 | **retired** | Test method: the wrap-audit harness. No-overflow rows are S4: R-TUI-103B.5, R-TUI-073.4. |
 | HLR-131 · LLR-131.1 … .3 | **absorbed** · S4: R-TUI-061.4 … .6, R-TUI-103B.1, R-TUI-074.7 | Reflow by panel width. |
-| HLR-132 · LLR-132.1 … .4 | **absorbed** · S3: R-LEGEND-MAP.1 … .5, R-LEGEND-MODAL-001.8; S4: R-TUI-062.10 | The Memory Map legend sheet (S3 CTX-LEGEND "map sheet", D3-27); its key line is S4's. |
+| HLR-132 · LLR-132.1 … .4 | **absorbed** · S3: R-LEGEND-MAP.1 … .5, R-LEGEND-MODAL-001.8; S4: R-TUI-062.10.1 | The Memory Map legend sheet (S3 CTX-LEGEND "map sheet", D3-27); its key line is S4's. |
 | HLR-133 · LLR-133.1 | **retired** | History: a rule on one batch's diff (no command bar on the map). Find and go-to windows are S6 CTX-KEYS, S4 R-TUI-040.1. |
 | HLR-134 | **absorbed** · S3: R-LEGEND-MAP.1 | Title `Map keys` of the sheet's fourth box (S3 CTX-LEGEND "map sheet"). |
 | HLR-135 · LLR-135.1 … .7 | **absorbed** · S17: R-SEG-OPEN.1 … .6, R-SEG-SRC.1 … .20, R-SEG-MAN.1 … .9, R-SEG-PREV.1 … .19 | Widths, colours, CSS and SVG frames are out (S17 D17-2). |
@@ -170,7 +309,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-141 · LLR-141.1, .2 | **absorbed** · S8: R-CHG-SYM.1 … R-CHG-SYM.10 | The Patch Editor symbol input (LLR-141.2) is deferred (S10 D10-13, D10-42). |
 | HLR-142 · LLR-142.1, .2 | **absorbed** · S15: R-FLOW-SRC.1 … .10, R-FLOW-PATCH.4; S16: R-FB-ADD.17 | The Builder's A2L field is prototype first (S16 D16-25). |
 | HLR-143 · LLR-143.1, .2 | **absorbed** · S15: R-FLOW-RPT.1 … .14; S14: R-DIFF-FLOWCHG.1 … .8 | Flow report and flow changes in the diff report. |
-| HLR-144 · LLR-144.1 … .12 | **absorbed** · S10: R-TUI-063.1 … R-TUI-049.3 | The Patch Editor, S10.1 … S10.8 (D10-3, D10-12). |
+| HLR-144 · LLR-144.1 … .12 | **absorbed** · S10: R-TUI-063.1 … R-TUI-049.3.2 | The Patch Editor, S10.1 … S10.8 (D10-3, D10-12). |
 | HLR-145 · LLR-145.1 … .10 | **absorbed** · S9: R-CHKED-001 … R-CHKED-053 | The Check Editor, S9.4. |
 | HLR-146 · LLR-146.1 … .14 | **absorbed** · S16: R-TUI-059.20 … R-FB-PIPE.5 | The Flow Builder, S16.1 … S16.3. |
 | HLR-147 · LLR-147.1 … .13 | **absorbed** · S16: R-FX-SCR.1 … R-FX-WAIT.13 | Flow Execution, S16.7 … S16.9. |
@@ -237,6 +376,30 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-177c · LLR-177.4c, .4e | **absorbed** · S6: R-QUIT.7 … .12 | Quit waits for the end; withdrawn on a failure or unsaved work. |
 | HLR-178 · LLR-178.1 … .3 | **absorbed** · S11: R-TUI-013.12, .13, R-LOADRES-1 … R-LOADRES-18; S7: R-LOADDLG.83; S3: R-LEGEND-010 | Problem rows bounded at 102 (S11 D11-54); the panel's colours are the S3 palette. The open project's preview of the last load result (LLR-178.3, last sentence) is not built at 570b4b5: S7 R-LOADDLG.83 reads No (S7 D7-35). |
 
+**Batch-101 event rows** (CTX-RETIRED "batch-101 event row"; operator decision 2026-11-19). One line per R-TST row of batch-101 whose obligation names one fixed CI run, merge or tree. Each line keeps the row's approved text (FORWARD's "Final text") and its source; none is a requirement.
+
+| Id | Where it lives now | Note |
+|---|---|---|
+| R-TST-008 | **retired** | History, batch-101 Inc 2 (fixed run, merge or tree): "When the release gate runs on the LAN Linux host at Inc 2's merge tree, the test suite shall report 0 failed timing arms over the two lanes." Source: `.dev-flow/2026-11-01-batch-101/inc-2/01-requirements.md:70`; hand-over `close/FORWARD-requirements-session.md:35`. |
+| R-TST-070 | **retired** | History, batch-101 Inc 2 (fixed run, merge or tree): "When CI run 41372953464 on `f72eef1` completes, the batch's CI record shall list each FAILED node of that run's `tui-ci` job, marked `known` when it is one of the known failures and otherwise `new` with the increment it is routed to." Source: `.dev-flow/2026-11-01-batch-101/inc-2/01-requirements.md:139`; hand-over `close/FORWARD-requirements-session.md:69`. |
+| R-TST-071 | **retired** | History, batch-101 Inc 2 (fixed run, merge or tree): "If CI run 41372953464 ends cancelled or timed out, then the batch's CI record shall state the conclusion and the last step reached, and owe the confirmation to the first push run after Inc 2's merge." Source: `.dev-flow/2026-11-01-batch-101/inc-2/01-requirements.md:140`; hand-over `close/FORWARD-requirements-session.md:70`. |
+| R-TST-072 | **retired** | History, batch-101 Inc 2 (fixed run, merge or tree): "When CI run 41372953464 has a concluded `snapshot` job, the batch's CI record shall state that job's conclusion and the result of each of the 29 density cells of LLR-173.2m." Source: `.dev-flow/2026-11-01-batch-101/inc-2/01-requirements.md:141`; hand-over `close/FORWARD-requirements-session.md:71`. |
+| R-TST-090 | **retired** | History, batch-101 Inc 2 (fixed run, merge or tree): "When Inc 2's own pull-request CI run completes, the batch's CI record shall give the wall time of each lane and of the job beside the serial baseline of run 41372953464 (`tui-ci` 4 h 53 min, 17 595 s)." Source: `.dev-flow/2026-11-01-batch-101/inc-2/01-requirements.md:147`; hand-over `close/FORWARD-requirements-session.md:75`. |
+| R-TST-091 | **retired** | History, batch-101 Inc 2 (fixed run, merge or tree): "When the first push CI run after Inc 2's merge completes, the CI workflow shall have run lane 1 and lane 2 of the `tui-ci` job within 150 minutes in total." Source: `.dev-flow/2026-11-01-batch-101/inc-2/01-requirements.md:148`; hand-over `close/FORWARD-requirements-session.md:76`. |
+| R-TST-156 | **retired** | History, batch-101 Inc 15 (fixed run, merge or tree): "When the TC-331, TC-B94-27, AT-030c and TC-051 save-back nodes run 20 times serially on the Windows host at the Inc 15 tree, the test suite shall report 0 failures." Source: `.dev-flow/2026-11-01-batch-101/inc-15/01-requirements.md:89`; hand-over `close/FORWARD-requirements-session.md:87`. |
+| R-TST-157 | **retired** | History, batch-101 Inc 15 (fixed run, merge or tree): "When the TC-331, TC-B94-27, AT-030c and TC-051 save-back nodes run on the LAN Linux host at the Inc 15 tree, the test suite shall report 0 failures in 3 serial runs and in the release gate's parallel lane." Source: `.dev-flow/2026-11-01-batch-101/inc-15/01-requirements.md:90`; hand-over `close/FORWARD-requirements-session.md:88`. |
+
+**Batch-102 clipboard ids** (batch-103 Inc 1a reconciliation; orchestrator decision 2026-11-19, fix round). Each line points a batch-102 row that never entered this file to the rows that hold its behaviour now, so the TC-B102 tests keep a resolvable reference.
+
+| Id | Where it lives now | Note |
+|---|---|---|
+| R-B102-CLIP-001 | **absorbed** · S7: R-TUI-043.4, R-TUI-044.3, R-TUI-044.2, R-PASTE.18 | Ctrl+V into single- and multi-line boxes, capped at 65,536 characters; the class names are design. |
+| R-B102-CLIP-002 | **absorbed** · S7: R-PASTE.2, R-PASTE.3, R-PASTE.4, R-PASTE.12 | Ctrl+C with a selection writes the OS and the app clipboard; the box stays unchanged. |
+| R-B102-CLIP-003 | **absorbed** · S7: R-PASTE.5 … R-PASTE.8 | Ctrl+X with a selection writes both clipboards and removes the text. |
+| R-B102-CLIP-004 | **absorbed** · S7: R-PASTE.9, R-PASTE.3, R-PASTE.10 | Every OS write fails: the app clipboard is kept, with the warning and the log line. |
+| R-B102-CLIP-005 | **retired** | Superseded by batch-103 Inc 1a (D-1 A, D-3 A): the 2.0 s PowerShell rescue is a design value; the observable bound is S7: R-TUI-043.10.2, R-PASTE.13 (2.5 s). |
+| R-B102-CLIP-006 | **absorbed** · S7: R-TUI-043.6 … R-TUI-043.8, R-PASTE.18 | No OS value: the app clipboard; both empty: the box text is selected and the paste failure warning shows. |
+
 
 #### S0.3 · The requirements file (CTX-CANON; from batch-101 Inc 1)
 
@@ -255,6 +418,165 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | R-DOC-CANON.11 | U | The system shall write each requirement sentence in `REQUIREMENTS.md` as one sentence. |
 
 
+
+#### S0.4 · The security policy (from batch-101 Inc 14)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-DOC-SECURITY.1 | U | The system shall include a `SECURITY.md` that gives a private path to report a vulnerability. |
+| R-DOC-SECURITY.2 | U | The system shall state in its `SECURITY.md` which versions receive security fixes. |
+
+#### S0.5 · The 1.0.0 release notes (from batch-101 Inc 14)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-DOC-RELNOTE.1 | U | The system shall state in the release notes of 1.0.0 that a CRC config with `reverse` true starts the CRC register at `init` as written. |
+| R-DOC-RELNOTE.2 | U | The system shall state in the release notes of 1.0.0 how to keep the CRC value that an earlier version gave for a config with `reverse` true. |
+| R-DOC-RELNOTE.3 | U | The system shall state in the release notes of 1.0.0 that the before/after report is titled `Before/after report` and names the loaded A2L and MAC. |
+| R-DOC-RELNOTE.4 | U | The system shall state in the release notes of 1.0.0 that a later flow block reads this run's copy of an external step's output. |
+| R-DOC-RELNOTE.5 | U | The system shall state in the release notes of 1.0.0 that the Markdown file of a diff report writes a backslash before each Markdown character of a name. |
+| R-DOC-RELNOTE.6 | U | The system shall state in the release notes of 1.0.0 that a diff report file holds every hex window whole. |
+| R-DOC-RELNOTE.7 | U | The system shall state in the release notes of 1.0.0 that a load into a project whose folder was deleted outside the app no longer re-creates that folder. |
+| R-DOC-RELNOTE.8 | U | The system shall state in the release notes of 1.0.0 that a confirmed external step whose relative log or output path climbs above the project folder stops the flow. |
+| R-DOC-RELNOTE.9 | U | The system shall state in the release notes of 1.0.0 that a confirmed external step reads a relative output path under the project folder. |
+| R-DOC-RELNOTE.10 | U | The system shall state in the release notes of 1.0.0 that the flow and chain-set reports name the external step's copy that a PATCH block read in place of its ref. |
+| R-DOC-RELNOTE.11 | U | The system shall state in the release notes of 1.0.0 the reasons a CRC config is refused with. |
+| R-DOC-RELNOTE.12 | U | The system shall state in the release notes of 1.0.0 that a failed write of a diff or before/after report leaves no partial report file and no Markdown file without its HTML file. |
+| R-DOC-RELNOTE.13 | U | The system shall state in the release notes of 1.0.0 that a diff or before/after report writes a control or direction-override character of a name as a visible replacement character. |
+| R-DOC-RELNOTE.14 | U | The system shall state in the release notes of 1.0.0 that an interrupted write of a diff or before/after report can leave a `.part` file that is safe to delete. |
+
+#### S0.6 · The user guide (from batch-101 Inc 14)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-DOC-GUIDE.1 | U | The system shall describe in its user guide no behaviour that the system does not provide. |
+| R-DOC-GUIDE.2 | U | The system shall mark each row of the user guide's findings table that 1.0.0 fixes with `fixed in 1.0.0`. |
+
+#### S0.7 · Paths and links in the repository documents (from batch-101 Inc 16)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-DOC-REF.1 | U | The system shall name in its repository documents only repository paths that exist, except on a line that carries a removal mark. |
+| R-DOC-REF.2 | U | The system shall link in its Markdown repository documents only to files and folders that exist. |
+| R-DOC-REF.3 | U | The system shall name a retired-folder path in no tracked text file, except on an exempt line. |
+| R-DOC-REF.4 | U | The system shall name the retired fast-dev-flow workflow in a tracked text file only on a line that carries a removal mark, except on an exempt line. |
+| R-DOC-REF.5 | U | The system shall present `s19tool` in its repository documents only in an s19tool shape. |
+| R-DOC-REF.6 | U | The system shall name CDFX in its repository documents only on a line that carries a removal mark. |
+
+#### S0.8 · The developer documents (from batch-101 Inc 16)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-DOC-DEV.1 | U | The system shall list in `CLAUDE.md` exactly the console scripts that `pyproject.toml` declares. |
+| R-DOC-DEV.2 | U | The system shall show each command-line example of the CLI in `CLAUDE.md` in the form `python -m s19_app.cli <command> <file>`. |
+| R-DOC-DEV.3 | U | The system shall state in `CLAUDE.md` the branches and the two test lanes that `.github/workflows/tui-ci.yml` runs. |
+| R-DOC-DEV.4 | U | The system shall name the hex renderer `s19_app/render/hexview.py` in `CLAUDE.md`, `PROJECT_RULES.md` and `docs/engineering-rules.md`. |
+| R-DOC-DEV.5 | U | The system shall state no size in lines of a source module in `CLAUDE.md`. |
+| R-DOC-DEV.6 | U | The system shall cite source code in `CLAUDE.md` without a line number. |
+| R-DOC-DEV.7 | U | The system shall cite in `docs/engineering-rules.md` no personal memory file as a source. |
+| R-DOC-DEV.8 | U | The system shall restate the runtime dependencies and the test markers that `pyproject.toml` declares where its developer documents state them: the dependencies in `requirements.txt` and in §8 of `docs/architecture.md`, the markers in §8 of `docs/architecture.md`. |
+| R-DOC-DEV.9 | U | The system shall link in `docs/README.md` each entry of CTX-DOCINDEX. |
+| R-DOC-DEV.10 | U | The system shall state in `docs/README.md` no branch, commit, test tally or batch list as the project's state. |
+| R-DOC-DEV.11 | U | The system shall name in `docs/overview.md` each window of CTX-README by its rail label. |
+| R-DOC-DEV.12 | U | The system shall state the number of rail windows as twelve in `docs/overview.md` and `docs/architecture.md`. |
+| R-DOC-DEV.13 | U | The system shall state no count of tests in `docs/overview.md` and `docs/architecture.md`. |
+| R-DOC-DEV.14 | U | The system shall state in `docs/overview.md` that the Operations modal lists `extract` and `split_by_segment` without running them. |
+| R-DOC-DEV.15 | U | The system shall list in `examples/case_00_public/MANIFEST.md` each example case folder of `examples/`. |
+
+#### S0.9 · The architecture map (from batch-101 Inc 16)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-DOC-ARCH.1 | U | The system shall declare in the module table of `docs/architecture.md` a module prefix for each Python folder. |
+| R-DOC-ARCH.2 | U | The system shall declare in the module table of `docs/architecture.md` no module prefix that matches no tracked file. |
+| R-DOC-ARCH.3 | U | The system shall hold in `docs/architecture.md` no amendment note and no per-batch declaration of batches 88 … 100. |
+| R-DOC-ARCH.4 | U | The system shall declare in §10 of `docs/architecture.md` each sub-module of CTX-SUBMOD with exactly the facts of CTX-SUBMOD. |
+| R-DOC-ARCH.5 | U | The system shall list the contracts of CTX-IFACE in one Interfaces table in §11 of `docs/architecture.md`. |
+| R-DOC-ARCH.6 | U | The system shall state in `docs/architecture.md` that an increment changes at most 4 source files. |
+
+#### S0.10 · Archived and removed files (from batch-101 Inc 16)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-DOC-ARCHIVE.1 | U | The system shall hold each finished note of CTX-ARCHIVE only at its archive path. |
+| R-DOC-ARCHIVE.2 | U | The system shall keep, in the architecture archive of CTX-ARCHIVE, each line that this increment removes from §10 and §11 of `docs/architecture.md` and from its amendment notes. |
+| R-DOC-ARCHIVE.3 | U | The system shall hold none of the files of CTX-REMOVED. |
+| R-DOC-ARCHIVE.4 | U | The system shall hold no local identity in the files of the archive folder. |
+
+#### S0.11 · Test suite: timing arms, waits, margins and CI (from batch-101 Inc 2)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-TST-001 | U | The system shall register the pytest marker `serial_timing` with the description `a wall-clock timing arm; run apart and serially (-m serial_timing)`. |
+| R-TST-002 | U | The system shall carry the `serial_timing` marker on every timing arm. |
+| R-TST-003 | If | If a timing arm does not carry the `serial_timing` marker, then the system shall fail its marker guard with the text `timing arm without serial_timing: <file>::<test>`. |
+| R-TST-004 | If | If a test that is not a timing arm carries the `serial_timing` marker, then the system shall fail its marker guard with the text `serial_timing on a test that is not a timing arm: <file>::<test>`. |
+| R-TST-005 | U | The system shall treat as a timing arm each test that matches a static form of *Timing arm* (Definitions). |
+| R-TST-006 | U | The system shall not treat as a timing arm a test whose clock interval no ordering assert reads. |
+| R-TST-007 | U | The system shall give in its test conventions the release gate as the parallel lane `pytest -n 8 -m "not serial_timing"` followed by the serial lane `pytest -m serial_timing`, both on the LAN Linux host. |
+| R-TST-009 | When | When the release gate runs on the LAN Linux host, the system shall finish both lanes within 75 min of wall time in total. |
+| R-TST-010 | When | When a pull request runs the CI workflow, the system shall run `pytest -v -rs -n auto -m "not slow and not serial_timing"` and then `pytest -q -rs -m "serial_timing and not slow"` in that workflow. |
+| R-TST-011 | When | When a push runs the CI workflow, the system shall run `pytest -v -rs -n auto -m "not serial_timing"` and then `pytest -q -rs -m serial_timing` in that workflow. |
+| R-TST-012 | If | If the first lane of a CI run fails, then the system shall still run the serial lane of that CI run and mark the job failed. |
+| R-TST-013 | U | The system shall check out the repository with its full history in the `tui-ci` job of its CI workflow. |
+| R-TST-014 | When | When the CI workflow runs, the system shall run the 6 history arms without skipping them. |
+| R-TST-015 | U | The system shall stop lane 1 of its CI workflow at the lane's time limit: 180 minutes on a push, 120 minutes on a pull request. |
+| R-TST-016 | U | The system shall stop the `tui-ci` job of its CI workflow after 240 minutes. |
+| R-TST-017 | If | If lane 1 of a push run reaches its time limit, then the system shall still run lane 2 of that run. |
+| R-TST-018 | U | The system shall install pytest-xdist 3.8.0 in the `tui-ci` job of its CI workflow. |
+| R-TST-020 | U | The system shall bound the wait of each shared wait helper by the wall clock, 60 s by default. |
+| R-TST-021 | U | The system shall make each shared wait helper yield the event loop for at least 0.05 s between two checks of its predicate. |
+| R-TST-022 | U | The system shall make the `settled` shared wait let the app process one pause before its first check of the predicate. |
+| R-TST-023 | U | The system shall make each shared wait helper accept every call it accepted at `b3bf42e`, with the same parameter names, order and defaults for the positional parameters. |
+| R-TST-024 | If | If a shared wait's condition does not hold within its bound, then the system shall make the shared wait helper raise `AssertionError` with its text from table W. |
+| R-TST-025 | When | When the shared project-load helper measures a project load, the system shall stop the clock when the app's project install callback returns. |
+| R-TST-030 | U | The system shall state in its test conventions the post-press rule: `An arm that checks the state a key press leaves while a real worker runs holds the worker at a forced slow step or records the state at the product hook; it never samples after the press.` |
+| R-TST-031 | U | The system shall verify the quit-confirm half of AT-B100-18 with the save worker held at a forced slow step, and the parse half of AT-B100-17 from the states recorded at the progress hook. |
+| R-TST-032 | U | The system shall verify that a new set run restarts the confirm dwell with an injected dwell clock, independent of host speed. |
+| R-TST-040 | U | The system shall pass each upper timing bound of a timing arm through the margin reporter, which returns the bound unchanged. |
+| R-TST-041 | If | If an upper timing bound of a timing arm is not a margin-reporter call, then the system shall fail its margin guard with the text `timing bound without report_margin: <file>:<line>`. |
+| R-TST-042 | When | When a timing arm reports a margin, the system shall attach the margin report to that test's item as the property `qc_tm`, so that its call report, its teardown report and the junit XML carry it. |
+| R-TST-043 | When | When a test session that recorded at least one margin report ends, the system shall print a section titled `QC-TM timing margins` with one row per margin report of a call-phase test report, `<margin>%  <measured> s / <bound> s  <label>  <nodeid>`, in ascending margin order. |
+| R-TST-044 | If | If a reported margin is below 20 %, then the system shall begin that row of the QC-TM section with `LOW `. |
+| R-TST-045 | When | When the test suite prints the QC-TM section, the system shall end it with the line `QC-TM: <n> bounds, <k> under 20 % margin`. |
+| R-TST-046 | If | If a timing arm's measured interval exceeds its bound, then the system shall record its margin report, with a negative margin, before the arm's assertion fails. |
+| R-TST-047 | U | The system shall state in its test conventions the clock rule: `A timing arm stops its clock at a stamp the product emits (a commit handler, a painted line, an install callback), never when a poll notices.` |
+| R-TST-048 | U | The system shall state in its test conventions the margin rule: `A margin under 20 % in the serial lane's QC-TM section is a gate finding; the finding gives the base tree's time beside it.` |
+| R-TST-049 | If | If a function that a change wraps as a timing arm (a `serial_timing` marker or a `report_margin` call added against the merge-base with main) differs from its base version by anything other than that marker and the `report_margin(label, measured, bound)` wraps, then the system shall fail its wrap guard with the text `wrapped timing arm changed beyond marker and report_margin: <file>::<function>`. |
+| R-TST-050 | U | The system shall give status oracles every status line the app paints after a mark, in paint order and without a cap. |
+| R-TST-051 | If | If a test file holds more newest-line waits than its newest-line baseline (0 for a file absent from it), then the system shall fail its oracle guard with the text `newest-line wait added in <file>: <count> > baseline <n>; collect the painted lines with StatusLog.since(mark)`. |
+| R-TST-052 | U | The system shall state in its test conventions the oracle rule: `A test that waits on a painted outcome collects the lines painted since its trigger (StatusLog.since(mark)) and asserts the one it needs; it never waits on the newest line alone.` |
+| R-TST-060 | U | The system shall state in its test conventions the census rule: `When an increment changes the order or the source of an observable, its gate greps tests/ for every node that asserts that observable and runs them, whatever module they sit in.` |
+| R-TST-080 | U | The system shall hold the tool-version token, and no tool version, wherever a report golden records the tool version. |
+| R-TST-081 | When | When a report golden test compares a report with its golden, the system shall put the package's version, as `s19_app.version` gives it at run time, in place of the tool-version token. |
+| R-TST-082 | If | If a report prints a tool version other than the package's version, then the system shall fail the report golden test. |
+
+#### S0.12 · Test suite: panel and append timing arms (from batch-101 Inc 3)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-TST-110 | When | When a panel arm measures the paint of the Load-result panel, the system shall start the clock at the install stamp. |
+| R-TST-111 | When | When a panel arm measures the paint of the Load-result panel, the system shall stop the clock at the panel paint stamp. |
+| R-TST-112 | When | When an append arm measures the variant append, the system shall stop the clock at the outcome-line stamp. |
+| R-TST-113 | U | The system shall hold 1 second as the bound of every panel-paint and variant-append interval of the panel arms and the append arms. |
+
+#### S0.13 · Test suite: waits of the Windows-only arms (from batch-101 Inc 15)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-TST-150 | When | When the TC-331 arm requests the load of a change file, the system shall read the state of Edit JSON only after the change document's source path names that file. |
+| R-TST-151 | When | When the TC-331 arm presses Parse pasted, the system shall read the state of Edit JSON only after the change document has no source path. |
+| R-TST-152 | When | When the TC-B94-27 arm presses Bind with the ref lane A already reads, the system shall read lane A's bindings only after the panel has handled that press. |
+| R-TST-153 | When | When the TC-B94-27 arm presses Bind with `variant_b.hex` on lane A, the system shall read both lanes' bindings, lane B's box and lane B's painted cards only after the panel has handled that press. |
+| R-TST-154 | If | If the app has not handled the press within the shared wait's bound, then the system shall fail the arm with the text `did not settle: <description>`, the description from table D. |
+| R-TST-155 | U | The system shall make each wait of R-TST-150 … R-TST-153, R-TST-159 … R-TST-162 and R-TST-164 (D9) through the shared wait. |
+| R-TST-158 | U | The system shall state in its test conventions the handled-press rule: `A new or changed arm that checks the state a press, a value it sets or a posted action leaves waits through a shared wait for a sign that the app handled it, also when it asserts that nothing changed; it never reads after fixed pauses alone.` |
+| R-TST-159 | When | When the AT-030c arm sets the change-file dropdown to `dropped.json`, the system shall read the change document's entries only after the change document's source path names `dropped.json`. |
+| R-TST-160 | When | When the TC-051 arm requests an apply, the system shall act on the save-back prompt only after the prompt is shown. |
+| R-TST-161 | When | When the TC-051 arm presses Don't save, the system shall read the prompt, the saved path and the work area only after the save-back prompt is hidden again. |
+| R-TST-162 | When | When the TC-051 arm presses Write file with a typed name, the system shall read the saved path and the work-area files only after the save-back prompt is hidden again. |
+| R-TST-163 | U | The system shall place each wait of R-TST-150 … R-TST-153, R-TST-159 … R-TST-162 and R-TST-164 (D9) as the statement that directly follows its table-D trigger. |
+| R-TST-164 | When | When the TC-B94-27 arm imports the template `base` a second time, the system shall read lane B's bindings and lane B's box only after the panel's lane names read `["base", "base_2"]` and lane B's box `#fx_in_1_0` is mounted with a non-empty screen region. |
 
 <a id="s1"></a>
 
@@ -529,6 +851,26 @@ A2L load steps  The steps the progress line (S6) names for an A2L load, in order
                 1 Copy into the work area · 2 Parse · 3 Build the tag table.
 ```
 
+#### CTX-A2L-BLOCKS · ASAM block names (S2.1; S3.2)
+
+```text
+ASAM block name The names that open a /begin block in ASAM MCD-2 MC 1.7 (62 names):
+                A2ML, ANNOTATION, ANNOTATION_TEXT, AR_COMPONENT, AXIS_DESCR,
+                AXIS_PTS, BIT_OPERATION, BLOB, CALIBRATION_HANDLE, CALIBRATION_METHOD,
+                CHARACTERISTIC, COMPU_METHOD, COMPU_TAB, COMPU_VTAB, COMPU_VTAB_RANGE,
+                DEF_CHARACTERISTIC, DEPENDENT_CHARACTERISTIC, FIX_AXIS_PAR_LIST,
+                FORMULA, FRAME, FUNCTION, FUNCTION_LIST, GROUP, HEADER, IF_DATA,
+                IN_MEASUREMENT, INSTANCE, LOC_MEASUREMENT, MAP_LIST, MEASUREMENT,
+                MEMORY_LAYOUT, MEMORY_SEGMENT, MOD_COMMON, MOD_PAR, MODULE,
+                OUT_MEASUREMENT, OVERWRITE, PROJECT, RECORD_LAYOUT, REF_CHARACTERISTIC,
+                REF_GROUP, REF_MEASUREMENT, STRUCTURE_COMPONENT, SUB_FUNCTION,
+                SUB_GROUP, TRANSFORMER, TRANSFORMER_IN_OBJECTS, TRANSFORMER_OUT_OBJECTS,
+                TYPEDEF_AXIS, TYPEDEF_BLOB, TYPEDEF_CHARACTERISTIC, TYPEDEF_MEASUREMENT,
+                TYPEDEF_STRUCTURE, UNIT, USER_RIGHTS, VAR_ADDRESS, VAR_CHARACTERISTIC,
+                VAR_CRITERION, VAR_FORBIDDEN_COMB, VARIANT_CODING, VIRTUAL,
+                VIRTUAL_CHARACTERISTIC.
+```
+
 #### CTX-A2L-TAG · What a tag declares (S2.2)
 
 ```text
@@ -555,6 +897,28 @@ source          formula: the tag names a conversion method other than NO_COMPU_M
                 or has a FORMULA line. assigned: otherwise.
 axis            An AXIS_DESCR of a CURVE or MAP: its points are either in the same
                 record (inline) or in another section (AXIS_PTS_REF, external).
+record words    Of a MEMORY_SEGMENT block: the words of its /begin line after
+                /begin MEMORY_SEGMENT, then the words of each of its own lines (never
+                a line of a nested block), in file order. A quoted text is one word,
+                without its quotes, and is a quoted word ("" is the empty quoted
+                word); a " left open ends its quoted text at the end of its line (the
+                quote state starts closed on each line). Outside a quoted text, a
+                comment (/* … */, which may span lines, or // to the end of the line)
+                gives no word.
+Number          An unquoted word that matches, in ASCII only, an optional sign + or -
+                followed by either 1 to 10 decimal digits 0-9 (leading zeros allowed:
+                0400 is 400) or 0x / 0X and 1 to 8 hex digits 0-9, A-F, a-f; its
+                value is that signed decimal or hex integer (0x16000, 4096, -1). No
+                other word is a Number: not a quoted word, not a word with _, not a
+                0o / 0b word, not a word with a non-ASCII digit, not a longer digit
+                run.
+address word    Of a MEMORY_SEGMENT block: the first record word after the name that
+                is not a quoted word and starts with an ASCII digit, + or -.
+program-type word  CALIBRATION_VARIABLES, CODE, DATA, EXCLUDE_FROM_FLASH,
+                OFFLINE_DATA, RESERVED, SERAM, VARIABLES.
+memory-type word  EEPROM, EPROM, FLASH, NOT_IN_ECU, RAM, REGISTER, ROM.
+program type, memory type  The segment's usage and its kind; the memory region
+                above reads them.
 ```
 
 #### CTX-A2L-VALUE · From bytes to a physical value (S2.3)
@@ -636,6 +1000,13 @@ name width      The width left minus 4 cells for Tag padding, glyph and space (w
 painted tag name  Characters outside U+0021 … U+007E become U+FFFD before the
                 middle cut of R-TUI-042a.3/.5; the Tag cell is the scoped exception
                 to R-TUI-103a and R-TUI-103.1. The detail card keeps the full name.
+first shown row The tag table's top viewport row, the first row painted at the
+                table's scroll position.
+axis value      A point of a CURVE's point table has an axis value when the CURVE's
+                axis points were read for the point's position.
+point-table rows  The lines of the description window from the table header
+                "x   y" to the last point line; each carries the table's two-space
+                indent.
 ```
 
 #### CTX-A2L-LIST · List of labels (S2.5; batch-103 Inc 7)
@@ -936,12 +1307,18 @@ Replaces: the "RECORD_LAYOUT Interpretation" block, the byte-order precedence, t
 | R-A2L-033 | U | The system shall read a conversion method's unit from its conversion line, whether that line is the /begin line or a later one. |
 | R-A2L-034 | U | The system shall give each tag the memory region of the MEMORY_SEGMENT that holds its address. |
 | R-A2L-035 | If | If no MEMORY_SEGMENT holds a tag's address, then the system shall give the tag the memory region unknown. |
-| R-A2L-036.1 | When | When the system reads a MEMORY_SEGMENT block, the system shall take the first word after `/begin MEMORY_SEGMENT` as the segment's name. |
-| R-A2L-036.2 | When | When the system reads a MEMORY_SEGMENT block, the system shall take as its record line the first line that splits into at least five words, a quoted text counting as one word. |
-| R-A2L-036.3 | When | When the system reads a MEMORY_SEGMENT record line, the system shall take its fourth word as the segment's base and its fifth word as the segment's size. |
-| R-A2L-036.4 | If | If the base word of a MEMORY_SEGMENT record line is not a number, then the system shall give the segment no base and no size. |
-| R-A2L-036.5 | If | If the size word of a MEMORY_SEGMENT record line is not a number, then the system shall give the segment no size. |
-| R-A2L-036.6 | When | When a MEMORY_SEGMENT record line has a sixth word that is a number, the system shall take it as the segment's offset. |
+| R-A2L-036.1 | When | When the system reads a MEMORY_SEGMENT block, the system shall take its first record word as the segment's name. |
+| R-A2L-036.2 | When | When the system reads a MEMORY_SEGMENT block whose address word is a Number of at least 0, whose record word after the address word is a Number above 0, and whose two Numbers sum to at most 2^32 (0x100000000), the system shall take the address word's value as the segment's base. |
+| R-A2L-036.3 | When | When the system reads a MEMORY_SEGMENT block that has a base, the system shall take as the segment's size the value of the record word after its address word. |
+| R-A2L-036.4 | If | If a MEMORY_SEGMENT block has no address word, or its address word is not a Number of at least 0, or the record word after its address word is not a Number above 0, or the two Numbers sum to more than 2^32 (0x100000000, R-A2L-036.13), then the system shall give the segment no base and no size. |
+| R-A2L-036.6 | When | When the record word after a segment's size is a Number, the system shall take it as the segment's offset. |
+| R-A2L-036.7 | If | If a MEMORY_SEGMENT block has no record words, then the system shall give the segment no name. |
+| R-A2L-036.8 | When | When the system reads a MEMORY_SEGMENT block that has a base, the system shall take as the segment's program type the last program-type word before its base. |
+| R-A2L-036.9 | When | When the system reads a MEMORY_SEGMENT block that has a base, the system shall take as the segment's memory type the last memory-type word before its base. |
+| R-A2L-036.10 | If | If no record word before a segment's base is a program-type word, then the system shall give the segment no program type. |
+| R-A2L-036.11 | If | If no record word before a segment's base is a memory-type word, then the system shall give the segment no memory type. |
+| R-A2L-036.12 | If | If a MEMORY_SEGMENT block has no base, then the system shall give the segment no program type and no memory type. |
+| R-A2L-036.13 | If | If the sum of a MEMORY_SEGMENT block's address word and the record word after it, both Numbers, exceeds 2^32 (0x100000000), then the system shall give the segment no base and no size. |
 
 #### S2.3 · From bytes to a physical value (CTX-A2L-VALUE)
 
@@ -957,6 +1334,8 @@ Replaces: the "Raw Memory Extraction", "Raw Value Decoding" and "COMPU_METHOD Ex
 | R-A2L-045 | U | The system shall read FLOAT16_IEEE, FLOAT32_IEEE and FLOAT64_IEEE as IEEE 754 binary16, binary32 and binary64. |
 | R-A2L-046 | If | If a tag has no datatype the system can read, then the system shall give the tag no raw value. |
 | R-A2L-047 | If | If a tag is a multi-value tag, then the system shall give it one raw value per element. |
+| R-A2L-048 | When | When the system writes bytes into the loaded image in place, the system shall show in the tag table each tag's raw and physical values read from the written bytes. |
+| R-A2L-049 | When | When the system writes bytes into the loaded image in place, the system shall keep the tag table's first shown row. |
 | R-A2L-050 | If | If a tag has no raw value, then the system shall give it the conversion status missing. |
 | R-A2L-051 | If | If a tag has no conversion method, then the system shall give it a physical value equal to its raw value. |
 | R-A2L-052 | If | If a tag has no conversion method, then the system shall give it the conversion status identity. |
@@ -1022,7 +1401,7 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 | R-TUI-068.1 | When | When the system shows the tag table, the system shall shade every other row. |
 | R-TUI-068.2 | When | When the system shows the tag table, the system shall show under it the summary `Page <p>/<P> \| tags <a>-<b> / <T> (page size <S>; +/- to change page)  ·  <K> in image`, where K counts the filtered tags that are in image. |
 | R-TUI-068.3 | If | If no A2L file is loaded, then the system shall show `No A2L tags.` as the summary. |
-| R-TUI-068.4 | If | If the filter matches no tag, then the system shall show `No tag matches the filter.` as the summary. |
+| R-TUI-068.4 | If | If the filter text matches no tag in text mode with mode `All`, then the system shall show `No A2L tags match '<short text of the filter text>'.` as the summary. |
 
 **Row colour** (colour names are the palette of S3 CTX-LEGEND; today the A2L and MAC tables use terminal colours instead, S3 D3-18)
 
@@ -1105,6 +1484,8 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 | R-A2L-102 | If | If the selected tag has no length, then the system shall highlight 1 byte. |
 | R-A2L-103 | When | When the operator selects a tag row, the system shall show the status `Tag at <address>`. |
 | R-A2L-104 | If | If the selected tag has no address, then the system shall leave the hex pane unchanged. |
+| R-A2L-105 | When | When the system writes bytes into the loaded image in place, the system shall keep the tag table's highlighted row. |
+| R-A2L-106 | When | When the system writes bytes into the loaded image in place, the system shall keep the tags the tag table lists. |
 
 **Export to JSON**
 
@@ -1131,6 +1512,10 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 | R-A2L-118 | If | If the tag is not a CURVE or MAP, then the system shall show its value after `Scalar value:` and the line `(this characteristic is not a CURVE/MAP - no point table)`. |
 | R-A2L-119 | If | If the point table of a CURVE or MAP cannot be built, then the system shall show `Status: <reason> - point table unavailable`. |
 | R-A2L-119a | When | When the operator presses `Close` or Esc in the description window, the system shall close the window. |
+| R-A2L-120 | If | If a point of a CURVE's point table has no axis value, then the system shall show the point's index, counted from 0, as its x. |
+| R-A2L-121 | If | If a CURVE's point table holds at least one point and no point has an axis value, then the system shall show the line `x: point index (axis points unavailable)` once, directly above the table header. |
+| R-A2L-122 | If | If a CURVE's point table holds at least one point and no point has an axis value, then the system shall show each point-table row without a note. |
+| R-A2L-123 | If | If some, but not all, points of a CURVE's point table have an axis value, then the system shall end each point-table row whose point has no axis value with `   (index (axis points unavailable))`. |
 | R-TUI-042a.4 | U | The system shall show the Address and Length cells of every tag table row painted whole at every horizontal scroll position. |
 | R-TUI-042a.5 | While | While the name width *w* of the tag table is less than 34 cells, the system shall show a tag name longer than *w* characters in the Tag cell as its *painted tag name*: its first ⌊(*w* − 1)/2⌋ characters, `…` and its last ⌈(*w* − 1)/2⌉ characters. |
 | R-TUI-042a.6 | If | If a tag name holds a character outside U+0021 … U+007E, then the system shall show each such character that the Tag cell's *painted tag name* keeps as U+FFFD. |
@@ -1370,7 +1755,8 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-DEF.150 | U | The system shall decode each element in a time and a retained size that do not grow with the size of the conversion table it names. |
 | R-A2L-DEF.151 | U | The system shall write a file word into a refusal message as at most its first 256 characters, each character outside U+0021 … U+007E written as U+FFFD, and an operator text as at most its first 256 characters with every control character replaced by U+FFFD while spaces and all other Unicode characters are preserved, and `…` after either when it is longer, and a number into a refusal message or a kind text in decimal (an address as `0x` and upper-case hexadecimal digits) when its magnitude is at most 2^64 − 1, else as `0x` (`-0x` when negative) and its upper-case hexadecimal digits written as such a file word. |
 | R-A2L-DEF.152 | If | If the A2L payload holds one or more parse errors, then the system shall refuse the encode with the refusal `A2L-DEF-PARSE` and the message `<name>: the A2L cannot be edited while it has parse errors — the first is <error>`. |
-| R-A2L-DEF.153 | When | When the system encodes a definition of kind number, enum or text through `encode_values`, the system shall accept exactly position `(0,)` and apply the scalar encode rules to it, and shall refuse every other position with `A2L-DEF-INDEX`. |
+| R-A2L-DEF.153.1 | When | When the system encodes a definition of kind number, enum or text through `encode_values`, the system shall accept exactly position `(0,)` and apply the scalar encode rules to it. |
+| R-A2L-DEF.153.2 | If | If the system encodes a definition of kind number, enum or text through `encode_values` at a position other than `(0,)`, then the system shall refuse that position with `A2L-DEF-INDEX`. |
 | R-A2L-DEF.154 | If | If an axis declares a monotony rule the system cannot read, then the system shall refuse an edit of one of its points with `A2L-DEF-MONOTONY` and the message `<axis point name>: the monotony rule <rule> is not supported`. |
 | R-A2L-DEF.155 | If | If the system cannot evaluate a point needed to check an edited axis's monotony, then the system shall give that point's decode refusal or, when the point decodes and breaks the rule, `A2L-DEF-MONOTONY` with its bounded display text. |
 
@@ -1577,6 +1963,14 @@ shared address  A MAC address that two or more valid MAC records name. Its kind:
 coverage        MAC→S19 = MAC records in the image / valid MAC records.
                 A2L→S19 = checked tags in image / checked tags.
                 A2L↔MAC = A2L↔MAC matches (S2 CTX-MAC) / names in both files.
+section name    The word after /begin (S2 CTX-A2L-FILE section), compared and
+                reported in upper case; <NAME> in the message of R-VAL-032.1.
+inside an IF_DATA block  A section with an IF_DATA section among its enclosing
+                sections, at any depth, as the section tree nests it (a one-line
+                /begin IF_DATA … /end IF_DATA stays open in that tree). The IF_DATA
+                section itself is not inside.
+severity rank   ERROR, then WARNING, then INFO; a severity other than these three
+                (OK, NEUTRAL) ranks after INFO.
 ```
 
 #### CTX-ISSUES-SCREEN · The Issues screen (S3.3)
@@ -1652,8 +2046,10 @@ map sheet       Four boxes in one column, each a title and its lines:
   Map anatomy   For the band bar, the ruler, the band chips and the stats line of S4
                 CTX-MAP: a sample line, then one line that says what it shows.
   Region row    A sample region row (S4 CTX-MAP), then the field line
-                "glyph · start · size · size vs largest · A2L sym · band · ↵ opens hex".
-  Map keys      The Memory Map's key line (S4 R-TUI-062.10).
+                "glyph · start · size · size vs largest · A2L sym · band · ↵ <what
+                Enter does on a region row>" (today ↵ inspect; S4 D4-21).
+  Map keys      The Memory Map's key line (S4 R-TUI-062.10.1):
+                "↑↓ move · click / ↵ inspect · double-click open hex · Esc close".
 ```
 
 ---
@@ -1694,7 +2090,9 @@ map sheet       Four boxes in one column, each a title and its lines:
 |---|---|---|
 | R-VAL-030 | If | If the A2L file has a parse error (S2 R-A2L-001.4 … 001.6), then the system shall raise the ERROR issue `A2L_STRUCTURE_ERROR` with the parse error as its message. |
 | R-VAL-031 | If | If two or more tags have the same name, ignoring case, then the system shall raise one ERROR issue `A2L_DUPLICATE_SYMBOL` with the message `A2L symbol '<name>' is defined multiple times.` |
-| R-VAL-032 | If | If an A2L section's name is not a block name of ASAM MCD-2 MC, then the system shall raise the WARNING issue `A2L_UNRECOGNIZED_BLOCK` with the section's line number and the message `Unrecognized A2L block '<NAME>'.` |
+| R-VAL-032.1 | If | If an A2L section's name is not an ASAM block name and the section is not inside an IF_DATA block, then the system shall raise the WARNING issue `A2L_UNRECOGNIZED_BLOCK` with the section's line number and the message `Unrecognized A2L block '<NAME>'.` |
+| R-VAL-032.2 | U | The system shall raise no `A2L_UNRECOGNIZED_BLOCK` issue for an A2L section whose name is an ASAM block name. |
+| R-VAL-032.3 | U | The system shall raise no `A2L_UNRECOGNIZED_BLOCK` issue for an A2L section inside an IF_DATA block. |
 | R-VAL-033 | If | If a GROUP or FUNCTION refers, inline or in a child REF_CHARACTERISTIC, REF_MEASUREMENT, DEF_CHARACTERISTIC, IN_MEASUREMENT or OUT_MEASUREMENT block, to a name that no tag has, then the system shall raise the WARNING issue `A2L_BROKEN_REFERENCE` with the message `<GROUP\|FUNCTION> references unknown symbol '<name>'.` |
 | R-VAL-034 | U | The system shall compare a reference with tag names respecting case. |
 | R-VAL-035 | If | If a tag's schema is not complete (S2 R-A2L-072) and no ERROR A2L issue names it, then the system shall raise the ERROR issue `A2L_TAG_SCHEMA_INCOMPLETE` with the message `A2L tag '<name>' is schema-incomplete: <reason>.` |
@@ -1740,6 +2138,8 @@ Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED-
 | R-TUI-042b.2 | When | When the system shows a group, the system shall head it with its group header, counting the issues of that severity in the whole filtered list. |
 | R-TUI-042b.3 | If | If an issue page holds no issue of a severity, then the system shall show no header for that severity. |
 | R-TUI-042b.4 | When | When the system shows an issue, the system shall show its issue row in the colour of its severity. |
+| R-TUI-042b.5 | U | The system shall order the filtered list by severity rank, keeping the order of the issue list among issues of the same severity. |
+| R-TUI-042b.6 | U | The system shall show no text between a group header and the group's first issue row. |
 | R-ISSUES-RELATED-001 | When | When the system shows an issue row, the system shall show the issue's related artifacts joined by `, `, or `-` when it has none. |
 | R-TUI-025.4 | When | When the operator presses `Issues: All`, the system shall show every issue. |
 | R-TUI-025.5 | When | When the operator presses `Errors`, the system shall show only ERROR issues. |
@@ -1790,7 +2190,7 @@ Replaces: the A2L and MAC colour blocks (their rules are S2 R-A2L-080 … 088 an
 
 **The map sheet** (from S0 HLR-132, HLR-134)
 
-Focus on `Close` and closing with Esc: R-LEGEND-MODAL-001.11, .12 (tested on the sheet: `test_esc_dismisses_the_sheet`). The keys the `Map keys` box names: S4 R-TUI-062.10 (D4-21). No text from a file appears in the sheet.
+Focus on `Close` and closing with Esc: R-LEGEND-MODAL-001.11, .12 (tested on the sheet: `test_esc_dismisses_the_sheet`). The keys the `Map keys` box names: S4 R-TUI-062.10.1 (D4-21). No text from a file appears in the sheet.
 
 | Id | Form | Requirement |
 |---|---|---|
@@ -1826,7 +2226,7 @@ row format      <marker><address>  <16 × "XX ">|<16 text characters>|
                 text: the byte as a character when it is 0x20-0x7E, else ".".
                 A byte not in the image: three spaces in hex, one space in text.
 byte class      00 or FF: grey #969aad · 0x20-0x7E: cyan #7dd3fc · other: light #e9e9e9.
-hex page        A run of consecutive present rows; its size is the hex page size
+hex page        A run of consecutive view rows; its size is the hex page size
                 (25, 50, 100, 150 or 200 rows, set in the viewer settings).
 target          The address a go-to, a search hit or a selection asks a hex view to show.
 target row      The present row that holds the target, or, when none does, the first
@@ -1838,6 +2238,19 @@ notice line     A line above the rows that explains the window:
                 ... showing from <address> ...
                 ... address <address> not present ...
 address input   The text typed in a go-to box.
+jump            A hex view showing a new target: a go-to hit, a search hit, or a
+                selection of a section, an A2L tag (select or tag find), a MAC record
+                or a Memory Map cell.
+view rows       The rows a hex view can show, in address order: the present rows and
+                the rows R-TUI-004.3 adds for MAC records outside the image. Windows,
+                pages and the row above a target are counted in view rows; the target
+                row itself is a present row (target row above).
+first view row  The first of the view rows.
+second row      The second hex row of the view, below its notice lines.
+next hex page   The hex page that starts at the first view row after the shown window.
+last page shown The shown window holds the last view row.
+shown window    Of a hex view: its first hex row together with its scroll position
+                (scroll_x, scroll_y).
 ```
 
 #### CTX-ENTROPY · The entropy model (S4.7)
@@ -1905,6 +2318,9 @@ memory strip    The one-row band above the Workspace panes: the whole image span
 | R-TUI-004.4 | If | If an address of a shown row is not in the image, then the system shall show it as blank in both the hex and the text column. |
 | R-TUI-004.5 | U | The system shall colour each byte of the hex column by its byte class. |
 | R-TUI-004.6 | U | The system shall show image bytes as plain text, never as markup. |
+| R-TUI-004.7 | When | When the system writes bytes into the loaded image in place, the system shall show the written bytes in the main, A2L and MAC hex views. |
+| R-TUI-004.8 | When | When the system shows the written bytes of R-TUI-004.7, the system shall keep each hex view's shown window. |
+| R-TUI-004.9 | When | When the system shows the written bytes of R-TUI-004.7, the system shall keep each hex view's `> ` marker. |
 
 #### S4.2 · Window and paging
 
@@ -1932,7 +2348,7 @@ memory strip    The one-row band above the Workspace panes: the whole image span
 | R-TUI-040.1 | When | When the operator presses `g` on the Workspace, the A2L Explorer or the MAC View, the system shall put the focus in that screen's go-to box. |
 | R-TUI-040.2 | When | When the operator presses `Goto` or Enter in a go-to box, the system shall go to the address typed in it. |
 | R-TUI-040.3 | U | The system shall read an address input as hexadecimal, with or without a `0x` or `0X` prefix. |
-| R-TUI-040.4 | If | If the address is in the image, then the system shall show its target row second from the top of the hex view. |
+| R-TUI-040.4 | If | If the address is in the image, then the system shall show its target row as R-TUI-018.1 and R-TUI-018.4 place it. |
 | R-TUI-040.5 | If | If the address is in the image, then the system shall mark its row with `> `. |
 | R-TUI-040.6 | If | If the address is in the image, then the system shall show the status `Goto <address>`. |
 | R-TUI-040.7 | If | If the address is not in the image, then the system shall show the status `Address <address> not in loaded file.` |
@@ -1965,9 +2381,10 @@ Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC-054 … 
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-TUI-018.1 | When | When a hex view jumps to a target, the system shall show the target row second from the top. |
-| R-TUI-018.2 | When | When a hex view jumps to a target, the system shall scroll the view back to its left edge. |
+| R-TUI-018.1 | When | When the main, A2L or MAC hex view jumps to a target row other than its first view row, the system shall show the target row as the second row of the view. |
+| R-TUI-018.2 | When | When the main, A2L or MAC hex view jumps to a target, the system shall scroll the view to its first line and its left edge. |
 | R-TUI-018.3 | If | If no present row holds the target, then the system shall use the target row of CTX-HEX (the next present row, or the last). |
+| R-TUI-018.4 | When | When the main, A2L or MAC hex view jumps to a target row that is its first view row, the system shall show the target row as the first row of the view. |
 | R-TUI-009.1 | When | When the operator selects a range in the Workspace section list, the system shall jump the main hex view to the range's start. |
 | R-TUI-009.2 | When | When the operator selects a range in the Workspace section list, the system shall show the status `Section at <address>`. |
 | R-HEX-MARK.1 | When | When the system shows the main, A2L or MAC hex view, the system shall draw the MAC mark on the byte at each valid MAC record's address. |
@@ -2063,7 +2480,9 @@ Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC-054 … 
 | R-TUI-041.2 | If | If the stats line is narrower than 84 columns, then the system shall show its compact form. |
 | R-TUI-041.3 | U | The system shall count in the stats line's issues every issue of the issue list (S3). |
 | R-TUI-041.4 | U | The system shall keep the Memory Map's stats line in view at every scroll position of the region list. |
-| R-TUI-062.10 | U | The system shall name in the Memory Map's key line, inspector subtitle and row glyphs only keys that the Memory Map handles. |
+| R-TUI-062.10.1 | U | The system shall name in the Memory Map's key line only keys that the Memory Map handles. |
+| R-TUI-062.10.2 | U | The system shall name in the Memory Map's inspector subtitle only keys that the Memory Map handles. |
+| R-TUI-062.10.3 | U | The system shall name in the Memory Map's row glyphs only keys that the Memory Map handles. |
 
 **Memory strip** (shown on the Workspace)
 
@@ -2326,6 +2745,9 @@ R-TUI-029.5 (keep the left pane visible with no file loaded) is retired: the Loa
 | R-WS-LOADED.14 | If | If nothing is loaded when the operator asks to unload, then the system shall show the status `Nothing to unload.` |
 | R-WS-LOADED.15 | U | The system shall show file names in the status line and the loaded panel without control characters. |
 | R-WS-LOADED.17 | U | The system shall show file names in the status line and the loaded panel as plain text, never as markup. |
+| R-WS-LOADED.18 | When | When the system unloads files, the system shall show its unload status of R-WS-LOADED.13 as the file status. |
+| R-WS-LOADED.19 | While | While no S19 or HEX image is loaded, the system shall write no S19 or HEX file at the top level of a project the operator saves. |
+| R-WS-LOADED.20 | While | While a MAC file is loaded, no S19 or HEX image is loaded and no project is open, the system shall title the load question `Replace <MAC file name>?`. |
 
 #### S5.8 · Open-folder chips (CTX-CHIPS; from S0 HLR-139, LLR-139.x, LLR-148.x)
 
@@ -2536,8 +2958,14 @@ rail key        The key of a rail item.
 wide, narrow    Wide: the terminal is 120 columns or more. Narrow: less than 120.
 focus target    The widget a window gives the focus to:
   Workspace         Workarea Files list      Patch Editor     the editor panel
-  A2L Explorer      tag table                Check Editor     the editor panel
-  MAC View          record table             A2B Diff         Compare button
+  A2L Explorer      tag table after a load   Check Editor     the editor panel
+                    or an unload; the ? chip
+                    (window_help_a2l) after
+                    a window switch
+  MAC View          record table after a     A2B Diff         Compare button
+                    load or an unload;
+                    mac_page_prev_button
+                    after a window switch
   Memory Map        map panel (then the      Flow Builder     the builder panel
                     selected region row)     Flow Execution   the execution panel
   Issues Report     grouped issue list       Checks           grouped check list
@@ -2556,8 +2984,8 @@ status bar      Three parts:
   status text   While a long action runs: the progress line of the shown action
                 (CTX-BUSY). Otherwise: the file status.
   file status   The last file status the system set (a load's load status, S5
-                CTX-FILES; a project load's project line, S11). "Ready." until the
-                first.
+                CTX-FILES; an unload's unload status, S5 R-WS-LOADED.13; a project
+                load's project line, S11). "Ready." until the first.
   progress bar  0 to 100 %, with the percentage beside it (bar value: CTX-BUSY).
   message lines The 4 newest messages, the newest at the bottom. "Show the status
                 <text>", in every chapter, means: add <text> as the newest message.
@@ -2573,6 +3001,9 @@ context fit     B = floor((terminal width - 4) x 0.7) - 5 columns.
                 whole and the project gets the rest; else the project gets P and
                 the A2L gets B - P. A shortened name ends with "…".
                 Widths count terminal columns (a CJK character is 2).
+state of a window  An arrangement of a window that the operator reaches through its
+                keys and controls: a tab chosen, a kind chip pressed, a list opened, a
+                notice shown, a lane waiting.
 ```
 
 #### CTX-KEYS · The global keys (S6.3)
@@ -2608,6 +3039,22 @@ PgDn , PgUp    Page+ , Page-          Issues Report, A2L Explorer,     S3, S2
 Ctrl+Z, Ctrl+Y Undo, Redo             Patch Editor                     S10
 c              Confirm                Flow Execution                   S16
 Ctrl+P         palette (Textual's)    every window                     S6 (D6-13)
+
+action         A named command of the system: what a key, a palette command, a button
+               or a link runs.
+reach          What runs an action from an operator path: the action's exact action
+               string in one of four positions (the action of a key binding, the
+               action of a palette command, a literal argument of run_action, the
+               target of an @click= link); a binding that the terminal toolkit
+               declares on a toolkit class the action's class derives from, such as
+               ctrl+x → cut in a text box; or a call or reference of the action from a
+               reached function (a button reaches an action this way, through its
+               handler). The same text in any other position (a widget id, a
+               comparison, a dictionary key) is not an action string. The words of a
+               message, a docstring or a comment are never a reach.
+reached function  An action that has a reach, a handler the toolkit runs by its name
+               (a message handler, compose, a watcher, a validator), or a function
+               that a reached function calls or passes on.
 ```
 
 #### CTX-THEME · Colours and sizes (S6.6)
@@ -2749,6 +3196,7 @@ unsaved-work line  A line of a completed Save project (S11) that names Patch Edi
 |---|---|---|
 | R-SHELL-KEYS.1 | When | When the operator presses a key of CTX-KEYS outside a text box, the system shall run its command on the windows CTX-KEYS names. |
 | R-SHELL-KEYS.2 | If | If the operator presses `+`, `-`, `,`, `.` or `c` on a window that CTX-KEYS does not name for it, then the system shall do nothing. |
+| R-SHELL-KEYS.3 | U | The system shall give every action at least one reach. |
 | R-TUI-031.1 | While | While a text box has the focus, the system shall type every printable key into it. |
 | R-TUI-031.2 | While | While a text box of the shown window has the focus, the system shall run the commands of Ctrl+K, Ctrl+D, Ctrl+L and Ctrl+S. |
 | R-TUI-033.1 | When | When the operator presses `/` on the Workspace, the A2L Explorer or the MAC View, the system shall put the focus in that window's search box. |
@@ -2757,8 +3205,8 @@ unsaved-work line  A line of a completed Save project (S11) that names Patch Edi
 | R-TUI-033.4 | When | When the operator presses Escape in a search box or a go-to box, the system shall take the focus out of the box. |
 | R-SHELL-FOCUS.1 | When | When the system starts, the system shall put the focus on the active rail item. |
 | R-SHELL-FOCUS.2 | When | When the operator shows another window with a key, the system shall put the focus on that window's focus target. |
-| R-SHELL-FOCUS.3 | When | When a load completes or is cancelled while the focus behind any dialog is on a widget that is hidden, has no size, or sits in a hidden window, the system shall put the focus on the shown window's focus target. |
-| R-SHELL-FOCUS.4 | When | When a load completes or is cancelled while the focus is on a shown widget of the shown window or on a frame widget, the system shall keep the focus there. |
+| R-SHELL-FOCUS.3 | When | When a load completes, a load is cancelled or an unload ends while the focus behind any dialog is on a widget that is hidden, has no size, sits in a hidden window or is removed, the system shall put the focus on the shown window's focus target. |
+| R-SHELL-FOCUS.4 | When | When a load completes, a load is cancelled or an unload ends while the focus is on a shown widget of the shown window or on a frame widget the operator chose, the system shall keep the focus there. |
 | R-SHELL-FOCUS.5 | If | If the shown window's focus target is not shown, then the system shall put the focus on the first shown widget of that window that takes the focus and is not a text box. |
 | R-SHELL-FOCUS.6 | If | If the shown window has no such widget, then the system shall put the focus on the active rail item. |
 | R-SHELL-FOCUS.7 | While | While a dialog is open, the system shall keep the dialog's focus when a load ends. |
@@ -2800,6 +3248,7 @@ R-SHELL-FOCUS.3 and .4 above now cover a cancelled load as well (D6-39). The Loa
 | R-SHELL-STATUS.4 | U | The system shall show the message lines as plain text, never as markup. |
 | R-SHELL-STATUS.5 | U | The system shall show the message lines without control characters. |
 | R-SHELL-STATUS.6 | When | When a long action begins, the system shall set the progress bar to 0 %. |
+| R-SHELL-STATUS.7 | U | The system shall show the file status without characters of the Unicode categories Cc, Cf, Zl and Zp. |
 | R-TUI-036.1 | U | The system shall show the context line at the right of the status line on every window. |
 | R-TUI-016.1 | U | The system shall name the open project in the context line in the form of CTX-SHELL. |
 | R-TUI-016.2 | U | The system shall name the loaded A2L file in the context line. |
@@ -2960,10 +3409,18 @@ dialogs today (owner = the chapter of the content):
     modified S19 under the work area?              Confirm · Cancel
   Operations:                               S13    Load config · Execute ·          operation list  no
                                                    Write CRC · Close
-  Reports (project '<name>'):               S12    Generate new report · Close      report list     no
+  Reports (project '<name>'):               S12    Generate new report · Close      report list     yes
+                                                                                    (the ? chip
+                                                                                    when the
+                                                                                    project has no
+                                                                                    report)
   Classification legend                     S3     Close                            Close           yes
   Parameter: <name>                         S2     Close                            Close           yes
   <help section title>                      S7     Close  esc                       Close           yes
+opener          A key, a button, a palette command, or a control of another dialog or
+                window, whose use opens a dialog. A construction of the dialog counts
+                as an opener only inside a reached function (S6 CTX-KEYS).
+dropdown list   The list of choices that a dropdown shows under itself while it is open.
 ```
 
 #### CTX-LOADDLG · The Load dialog (S7.2; from batch-100 HLR-172a, HLR-173 … HLR-173e)
@@ -3230,6 +3687,12 @@ help window     A dialog:
                                       key-bar row 2 (CTX-KEYBAR), no go keys
                   [Close  esc]
 key panel       The panel that lists the keys active on the focused widget (S6).
+Markdown mark   ** or __ anywhere, or one * or _ directly before and after a word
+                (*why*). A code span in backticks is not a Markdown mark: it marks a
+                key, a path or a value as typed, as the key bar does.
+reference       A name in a help step that points at a window, a folder, a file, a
+                document, a design change (change 1, change 2) or a requirement or
+                ruling id (LLR-003.7, E3 ruling 1).
 ```
 
 #### CTX-KEYBAR · The key bar (S7.5)
@@ -3275,7 +3738,7 @@ window keys and go keys, today:
 | Id | Form | Requirement |
 |---|---|---|
 | R-DLG.1 | While | While a dialog is open, the system shall act on no key of the window behind it. |
-| R-DLG.2 | When | When the operator presses Escape in a dialog, the system shall do what the dialog's Cancel or Close button does. |
+| R-DLG.2 | When | When the operator presses Escape in a dialog while none of its dropdown lists is open, the system shall do what the dialog's Cancel or Close button does. |
 | R-DLG.3 | When | When the operator presses Enter in a confirm box, the system shall do what its dialog's confirm button does. |
 | R-DLG.4 | When | When the operator presses Enter on an item of a dialog's list, the system shall do what the confirm button does for that item. |
 | R-DLG.5 | When | When a text dialog opens, the system shall put the focus in its first text box. |
@@ -3287,6 +3750,8 @@ window keys and go keys, today:
 | R-DLG.11 | U | The system shall show on each dialog button the key that presses it. |
 | R-DLG.12 | When | When the operator presses the key a dialog button shows, the system shall press that button. |
 | R-DLG.13 | U | The system shall show file and folder names in dialogs as plain text, never as markup. |
+| R-DLG.14 | U | The system shall give every dialog at least one opener. |
+| R-DLG.15 | When | When the operator presses Escape while a dropdown list of a dialog is open, the system shall close only that dropdown list. |
 
 #### S7.2 · The Load dialog: opening, layout and keys (CTX-LOADDLG; from batch-100 HLR-173, HLR-173e)
 
@@ -3528,6 +3993,15 @@ Where the help window's focus starts and how it closes: R-DLG.8, R-DLG.2, R-DLG.
 | R-WHELP.14 | U | The system shall write help sections without Markdown marks. |
 | R-WHELP.16 | U | The system shall state in the Patch Editor's help section that each Bytes token is a hex byte of 1–2 digits with an optional `0x`, and that decimals are not accepted. |
 | R-WHELP.17 | U | The system shall state in the Flow Builder's help section that a run pauses at an external step until the step is confirmed in Flow Execution. |
+| R-WHELP.18 | U | The system shall state in the Reports help section that Generate new report writes one Markdown file, `<time>-report.md`, into the project's `reports\` folder. |
+| R-WHELP.19 | U | The system shall state in the Reports help section that the Declared regions box starts with the regions saved with the open project and keeps the lines of the last Generate. |
+| R-WHELP.20 | U | The system shall state in the A2L Explorer help section that `/` puts the cursor in the search box of the A2L Explorer's hex pane. |
+| R-WHELP.21 | U | The system shall state in the Split / Join / Export help section that the window exports parts of the loaded image. |
+| R-WHELP.22 | U | The system shall state in the Split / Join / Export help section that split writes `‹stem›_‹segment›.‹ext›` per range and join writes one `‹stem›_joined.‹ext›`. |
+| R-WHELP.23 | U | The system shall state in the Checks help section that the list groups the entries by outcome: failed, then uncheckable, then passed. |
+| R-WHELP.24 | U | The system shall state in the CRC Designer help section that coverage computes its CRCs over the ranges typed in Ranges. |
+| R-WHELP.25 | U | The system shall state in the Flow Builder help section that the CRC template field names the CRC config file a CRC block reads. |
+| R-WHELP.26 | U | The system shall state in the Flow Builder help section that a CRC block refuses a template the CRC Designer saves. |
 | R-WHELP.15 | When | When the operator opens the Patch Editor's help window, the system shall include the steps of the Changes file notation section. |
 
 #### S7.5 · The key bar (CTX-KEYBAR)
@@ -3631,6 +4105,19 @@ Entry defects, in check order:
   C-13 (bytes) there are more tokens than the run ceiling.
   C-14 the symbol's tag has another address, or another length than the encoded bytes.
 collision         Two entries whose spans share an address.
+session read      A read of a change or check document that the operator starts in
+                  the session, one of six: (1) a Patch Editor file load (the File
+                  dropdown pick, the typed-path Load, the accept of the unsaved-changes
+                  popup); (2) a Patch Editor paste (Parse paste); (3) a whole-document
+                  Edit JSON confirm (its validity pre-check and the paste it posts);
+                  (4) a per-entry Edit JSON confirm (S10 R-TUI-058.2; the entry text
+                  read as R-CHG-001.44 says); (5) a Check Editor Spec dropdown pick;
+                  (6) an A2B Diff check-spec dropdown pick. Not a session read: the
+                  project-load reopen of the recorded document (S11 R-PROJ-DOC) and
+                  the flow PATCH and CHECK blocks (S15).
+loaded A2L        The A2L the session holds at the moment of the read (the one the A2L
+                  Explorer shows); none after an unload or a project close.
+project's A2L file  The project file (S11 CTX-PROJECT) of kind A2L.
 ```
 
 #### CTX-FINDING · Findings and status texts (S8.1 … S8.8)
@@ -3814,8 +4301,11 @@ mismatch summary  changed <r> run(s) / <b> byte(s), missing in file <r> run(s) /
 | R-CHG-SYM.6 | If | If an entry has defect C-14, then the system shall record the finding `CHG-SYMBOL-VALUE` with the message `the symbol <tag> resolves to address 0x<T> length <L>, which drifts from the declared address 0x<A> / <n> encoded bytes — the entry was skipped`. |
 | R-CHG-SYM.7 | When | When the system resolves a symbol, the system shall match tag names without regard to case. |
 | R-CHG-SYM.8 | When | When the system resolves a symbol, the system shall store the tag's own spelling as the entry's symbol. |
-| R-CHG-SYM.9 | When | When the operator loads or pastes a change document while an A2L is loaded, the system shall use that A2L as the declared A2L. |
-| R-CHG-SYM.10 | If | If no A2L is loaded when the operator loads or pastes a change document, then the system shall read the document with no declared A2L. |
+| R-CHG-SYM.9 | When | When the system makes a session read while an A2L is loaded, the system shall use that A2L as the declared A2L. |
+| R-CHG-SYM.10 | If | If no A2L is loaded when the system makes a session read, then the system shall read the document with no declared A2L. |
+| R-CHG-SYM.11 | When | When the system reads a document to run it on a variant, the system shall use the project's A2L file as the declared A2L. |
+| R-CHG-SYM.12 | If | If the project has no A2L file when the system reads a document to run it on a variant, then the system shall read the document with no declared A2L. |
+| R-CHG-SYM.13 | When | When the system reads a document of at most 1 000 symbol entries against a declared A2L of at most 220 040 tags, the system shall finish the read within 1.0 seconds. |
 
 #### S8.4 · Writing and saving a change document (CTX-CHGDOC)
 
@@ -4010,8 +4500,15 @@ check glyph      ✓ pass · ✗ fail · ◐ uncheckable · · not checked
 patch strip      Line 1: ✓<p> ✗<f> ◐<u>. Line 2: an 8-cell bar filled in proportion
                  to passed / all entries; empty when the run has no entry.
 current run      The last run started from the Patch Editor, while the document's
-                 entries (type, address, bytes, in order) and the loaded image are
-                 the ones it ran over. Undo and redo end it.
+                 entries (type, address, bytes, in order) are the ones it ran over
+                 and, since the run, no image load, MAC load or project load has
+                 completed and no in-place write (S13 CTX-DESIGNER: an apply, a
+                 save-back, a Save project that writes the image) has happened. Undo
+                 and redo end it.
+image load       A file load (Ctrl+L, a variant pick, a project's variant) that installs
+                 a new S19 or Intel HEX image. A MAC load that keeps the loaded image
+                 is not an image load.
+MAC load         A file load of a MAC file.
 ```
 
 #### CTX-CHECKS-SCREEN · The Checks screen (S9.3)
@@ -4047,7 +4544,8 @@ memory row       Address (0x and hex digits, or decimal digits), Label (free tex
                  Size in bytes (1–8; empty means 1).
 field            An included parameter (its address and byte size) or a memory row.
                  Order: included parameters in inclusion order, then memory rows.
-declared field   A field whose whole range has bytes in the loaded image.
+declared field   A field loaded from a spec, or a field included in this session whose
+                 whole range has bytes in the loaded image.
 spec             The check document Write writes: one bytes entry per declared field,
                  in field order, kind check (S8 wire form). Expected bytes: D9-11.
 check home       With an open project: <project>/checks/. Without: workarea/patches/
@@ -4061,9 +4559,48 @@ Fields tab       Head line: <n> field(s): <p> param(s) · <m> memory row(s).
 Addendum tab     "## Checks", then "· <n> fields → A2B diff report · apply: n/a —
                  check spec", then up to 6 lines "· 0x<address> <name>", then
                  "  … <k> more".
-spec list        Every change document (*.json, not a link) of the check home, sorted
-                 by name, each labelled " CHECK" (name ends .chk.json) or " PATCH".
+spec list        Without an open project: every change document (*.json, not a link)
+                 of the check home, named by its file name, sorted by name. With an
+                 open project: every such file of the check home, named
+                 checks/<file name>, sorted by name; then every such file of
+                 workarea/patches/, named library/<file name>, sorted by name. Each is
+                 labelled " CHECK" (name ends .chk.json) or " PATCH".
 legend           ✓ included   ◆ parameter field   ▪ memory-row field
+field set        The fields of the Check Editor: the included parameters in inclusion
+                 order, then the memory rows in table order.
+field loaded from a spec  A field that stands for one entry of the last picked spec (its
+                 spec entry) and has stayed in the field set since with its spec
+                 entry's address and byte count: a field the pick created, or the
+                 memory row the system put in place of such a parameter when the
+                 loaded A2L changed (R-CHKED-056). Its expected bytes belong to that
+                 address and byte count. A parameter excluded and included again, and
+                 a memory row removed and added again, are fields included in this
+                 session.
+field included in this session  Any field of the field set that is not a field
+                 loaded from a spec.
+still lists      After the loaded A2L changes, the loaded A2L still lists an included
+                 parameter when it lists the parameter's name and, for a field loaded
+                 from a spec, gives that name its spec entry's address and byte count.
+                 A parameter loaded from a spec that the loaded A2L lists at another
+                 address or with another byte count, or does not list, is no longer
+                 listed.
+in-place write   As S13 CTX-DESIGNER defines it.
+validation results  The verdict rows Validate paints in the Fields tab and the status
+                 line above them. Cleared: 0 verdict rows and the status line
+                 "Validate compares fields to the image".
+named parameter of a spec entry  The parameter of the loaded A2L whose name is the
+                 entry's symbol, when the loaded A2L lists it with the entry's address
+                 and byte count; when the entry has no symbol, or a symbol the loaded
+                 A2L does not list, the one parameter of the loaded A2L whose address
+                 and declared length are the entry's address and byte count, when
+                 exactly one has them. An entry has no named parameter when no A2L is
+                 loaded; when its symbol names a listed parameter with another address
+                 or byte count (the address rule is not tried then); when no parameter
+                 or more than one has its address and byte count (and no symbol names
+                 one of them); or when an earlier entry of the same spec has the same
+                 named parameter. The entry's symbol is the tag spelling the read
+                 records when it resolves the entry through the loaded A2L (S8
+                 R-CHG-SYM.9).
 ```
 
 ---
@@ -4144,7 +4681,7 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-CHKED-001 | When | When the operator opens the Check Editor, the system shall list in the ledger every parameter of the loaded A2L, one row each. |
+| R-CHKED-001 | When | When the operator opens the Check Editor, the system shall list in the ledger's pages every parameter of the loaded A2L, one row each. |
 | R-CHKED-002 | If | If no A2L is loaded, then the system shall show the line `No A2L parameters — load an A2L (^L) to list them.` under the ledger. |
 | R-CHKED-003 | When | When the operator types in Filter, the system shall list only the parameters whose name contains the filter text, ignoring case. |
 | R-CHKED-004 | If | If no parameter matches the filter, then the system shall show the line `No parameter matches the filter.` under the ledger. |
@@ -4175,7 +4712,7 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-CHKED-029 | When | When the operator writes a spec, the system shall name it after the Write as input, or `spec.chk.json` when the input is empty. |
 | R-CHKED-030 | If | If the Write as name does not end with `.chk.json`, then the system shall append `.chk.json` to it. |
 | R-CHKED-031 | When | When the operator writes a spec, the system shall place it in the check home. |
-| R-CHKED-032 | When | When a spec is written, the system shall show the status `Check Editor: wrote <name> (<n> fields, kind=check).` |
+| R-CHKED-032 | When | When a spec is written, the system shall show the status `Check Editor: wrote <listed name> (<n> fields, kind=check).`, where `<listed name>` is the written file's value in the Spec list: `checks/<name>` with a project open, `<name>` without one. |
 | R-CHKED-033 | When | When a spec is written, the system shall refresh the spec lists of the Check Editor, the Patch Editor and the A2B Diff screen. |
 | R-CHKED-034 | If | If the writer refuses a spec, then the system shall show the status `Check Editor: spec NOT written.` |
 | R-CHKED-035 | If | If the writer refuses a spec, then the system shall show `Write refused: <codes>.` as the Fields status. |
@@ -4183,8 +4720,10 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-CHKED-037 | When | When a Validate run ends, the system shall show one result row per entry, coloured by outcome, under the memory form. |
 | R-CHKED-038 | When | When a Validate run ends, the system shall show `validation complete` as the Fields status. |
 | R-CHKED-039 | When | When a Validate run ends, the system shall write its count line to the status log. |
-| R-CHKED-040 | When | When the operator opens the Check Editor or writes a spec, the system shall fill the Spec dropdown with the spec list. |
-| R-CHKED-041 | When | When the operator picks a spec, the system shall replace the included parameters and the memory rows with one memory row per entry of the spec. |
+| R-CHKED-040 | When | When the operator opens the Check Editor, writes a spec, or a project load or a Save project completes, the system shall fill the Spec dropdown with the spec list. |
+| R-CHKED-041.1 | When | When the operator picks a spec, the system shall replace the field set with one field per entry of the spec. |
+| R-CHKED-041.2 | When | When the operator picks a spec, the system shall include the named parameter of each entry that has one, in entry order. |
+| R-CHKED-041.3 | If | If an entry of a picked spec has no named parameter, then the system shall load it as a memory row with no label. |
 | R-CHKED-042 | When | When the operator picks a spec, the system shall set the Write as input to the spec's name ending in `.chk.json`. |
 | R-CHKED-043 | When | When the operator picks a spec, the system shall show the status `Check Editor: loaded '<name>' (<n> fields).` |
 | R-CHKED-044 | If | If the picked file is a link or lies outside its folder, then the system shall refuse it with the status `Check Editor: file '<name>' is outside the patches folder — not loaded.` |
@@ -4197,6 +4736,11 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-CHKED-051 | U | The system shall show every Check Editor button as a one-row chip. |
 | R-CHKED-052 | U | The system shall give Write .chk.json the only filled style of the Check Editor. |
 | R-CHKED-053 | U | The system shall show the Check Editor legend of CTX-CHECK-EDITOR under the action row. |
+| R-CHKED-054 | When | When the system writes a spec, the system shall keep the field set unchanged. |
+| R-CHKED-055 | If | If the loaded A2L no longer lists a parameter included in this session when the operator returns to the Check Editor, then the system shall drop that parameter from the field set. |
+| R-CHKED-056 | If | If the loaded A2L no longer lists a parameter loaded from a spec when the operator returns to the Check Editor, then the system shall replace that parameter in the field set with a memory row with no label that has the address, byte count and expected bytes of its spec entry. |
+| R-CHKED-057 | When | When the system makes an in-place write to the loaded image, the system shall clear the Check Editor's validation results. |
+| R-CHKED-058 | U | The system shall show every widget with an id of the Check Editor in at least one state of the Check Editor. |
 
 
 
@@ -4208,11 +4752,13 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-PICKER-CORRECT.001 | When | When either editor populates its parameter picker, the system shall store each row's declared length as its size without consulting enriched `byte_size`. |
 | R-PICKER-CORRECT.002 | When | When either editor lists an array, value block, curve/map or text object, the system shall report the object's whole declared byte length. |
 | R-PICKER-CORRECT.003 | When | When either editor paints a parameter's `Fmt · Unit`, the system shall show the definition's element format and unit rather than deriving format from total byte length. |
-| R-PICKER-CORRECT.004 | If | If a listed parameter has no declared length, then the system shall retain its size as missing and shall not substitute one byte or enriched `byte_size`. |
+| R-PICKER-CORRECT.004.1 | If | If a listed parameter has no declared length, then the system shall retain its size as missing. |
+| R-PICKER-CORRECT.004.2 | If | If a listed parameter has no declared length, then the system shall not substitute one byte or enriched `byte_size` for its size. |
 | R-PICKER-CORRECT.005 | If | If the operator activates `Use parameter` on a row whose length is missing, then the system shall clear Bytes, leave the document unchanged and paint `Parameter has no length — Bytes not prefilled.` |
 | R-PICKER-CORRECT.006 | When | When the operator activates `Use parameter` on a fully mapped multi-byte object, the system shall populate Address and every declared byte in ascending address order without modifying the document. |
 | R-PICKER-CORRECT.007 | If | If any byte of a multi-byte object is unavailable in the current image, then the system shall clear Bytes and paint `Parameter address loaded; image bytes unavailable.` without zero-filling or modifying the document. |
-| R-PICKER-CORRECT.008 | If | If a declared length exceeds `MAX_A2L_DECODE_BYTES`, then the system shall skip byte iteration and paint the existing over-cap status; at exactly the cap it shall attempt the full read. |
+| R-PICKER-CORRECT.008.1 | If | If a declared length exceeds `MAX_A2L_DECODE_BYTES`, then the system shall skip byte iteration and paint the existing over-cap status. |
+| R-PICKER-CORRECT.008.2 | When | When a declared length equals `MAX_A2L_DECODE_BYTES`, the system shall attempt the full read. |
 | R-PICKER-CORRECT.009 | When | When a Check spec entry names a loaded parameter, the system shall match it only when both the entry address and entry byte count equal the picker's declared address and full length. |
 | R-PICKER-CORRECT.010 | When | When a changed A2L generation repopulates Check, the system shall apply the existing spec demotion rule using the new full declared length. |
 | R-PICKER-CORRECT.011 | When | When the Patch Editor is shown, the system shall present the shared pick-mode selector with include and `Add list` controls and no duplicate Check ids. |
@@ -4226,6 +4772,39 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-PICKER-CORRECT.019 | When | When a 13,990-object A2L populates a picker, the system shall finish its single batch describe within 2.0 seconds and perform no describes during filter/page rebuilds. |
 | R-PICKER-CORRECT.020 | When | When the Patch Editor uses its pick controls, the system shall keep its filter row, Use parameter row and use-status line contained at supported widths. |
 | R-PICKER-CORRECT.021 | If | If any included Check parameter has no declared length, then the system shall refuse Validate and Write with `Check Editor: parameter has no length — validate/write refused.` before posting an action or reading image bytes. |
+
+#### S9.6 · Parameter bulk add (from batch-102 Inc 4; the Patch half is S9.5)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-B102-BULK-001 | When | When the operator activates the parameter bulk-add control, the system shall open a modal containing a multiline text area, the instruction `Separate names with new lines, commas, semicolons or spaces.`, an include action and a close action. |
+| R-B102-BULK-002 | When | When the operator confirms a bulk list, the system shall split the text on new lines, commas, semicolons and whitespace, trim each token and ignore empty tokens. |
+| R-B102-BULK-003.1 | When | When one or more parsed names exactly match available A2L parameter names, the system shall include each matching name once, preserving the list order and existing picks. |
+| R-B102-BULK-003.2 | When | When one or more parsed names exactly match available A2L parameter names, the system shall add no second pick of a name that is already included. |
+| R-B102-BULK-004.1 | When | When a bulk list that parses to at least one parameter name completes, the system shall paint the summary `Included <n> · already included <n> · not found <n>`. |
+| R-B102-BULK-004.2 | If | If a completed bulk list has a non-zero not-found count, then the system shall append ` — first missing: <name>` to the summary. |
+| R-B102-BULK-005.1 | If | If the pasted buffer parses to zero parameter names, then the system shall paint `No listed parameters found.` |
+| R-B102-BULK-005.2 | If | If the pasted buffer parses to zero parameter names, then the system shall leave the included parameters unchanged. |
+| R-B102-BULK-005.3 | If | If a bulk list's parsed names match no available A2L parameter name, then the system shall name the first missing parameter in the summary of R-B102-BULK-004.1. |
+| R-B102-BULK-006.1 | U | The system shall treat the names pasted into the bulk-add modal as literal text. |
+| R-B102-BULK-006.2 | U | The system shall paint file-derived names in the bulk-add modal with zero markup spans. |
+| R-B102-BULK-007.1 | When | When the operator closes the bulk-add modal after a successful include, the system shall update the Check Editor preview and picked count. |
+| R-B102-BULK-007.2 | If | If the parameter ledger page content is unchanged when the operator closes the bulk-add modal, then the system shall keep the parameter ledger page without a rebuild. |
+
+#### S9.7 · Paged parameter picker (from batch-102 Inc 3 and Inc 5; refined by S9.5)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-B102-PE-005 | When | When the operator re-enters the Patch Editor while the same A2L signature remains active, the system shall preserve the picker filter, page and highlighted parameter. |
+| R-B102-SEL-001 | When | When the Check Editor receives A2L parameters, the system shall store them in the shared picker and render at most 200 parameter rows for the current filter and page. |
+| R-B102-SEL-002.1 | When | When the operator changes the parameter filter, the system shall debounce the rebuild for 150 ms and then render the first matching page. |
+| R-B102-SEL-002.2 | While | While the filtered result has more than 200 parameters, the system shall render the count `<shown> of <total> shown — refine filter.` |
+| R-B102-SEL-003 | When | When the operator activates include on a highlighted picker row, the system shall toggle only that row's mark and refresh the collected-fields preview without rebuilding the parameter ledger. |
+| R-B102-SEL-004.1 | When | When the operator reopens the Check Editor with the same A2L signature, the system shall preserve the current filter page and included parameters. |
+| R-B102-SEL-004.2 | When | When the operator reopens the Check Editor with the same A2L signature, the system shall not repopulate the picker. |
+| R-B102-SEL-005.1 | When | When a filtered result has more than 200 rows and the operator activates next or previous, the system shall render the adjacent page. |
+| R-B102-SEL-005.2 | While | While the picker shows its first page, the system shall disable previous. |
+| R-B102-SEL-005.3 | While | While the picker shows its last page, the system shall disable next. |
 
 <a id="s10"></a>
 
@@ -4281,8 +4860,12 @@ session action  A file load, an A2L load, a project load or a Save project while
                 (S6, the busy refusal).
 change home     With an open project: <project>/patches/ for kind change,
                 <project>/checks/ for kind check. Without: workarea/patches/ (S5).
-change list     Every *.json file of the change home that is not a link, sorted by
-                name.
+change list     Without an open project: every *.json file of workarea/patches/ that is
+                not a link, named by its file name, sorted by name. With an open
+                project: every such file of <project>/checks/ and of <project>/patches/,
+                named checks/<file name> and patches/<file name>, sorted by name; then
+                every such file of workarea/patches/, named library/<file name>, sorted
+                by name.
 findings list   "Declaration faults: <n>", then one line per finding of the document:
                 [<code>] <severity>: <message>
 finding line    The status line [<code>] <severity>: <message> (one per finding).
@@ -4290,6 +4873,9 @@ history         Up to 20 earlier copies of the document (undo steps) and the cop
                 that undo stepped over (redo steps).
 history strip   ↶ <b> back  ↷ <f> fwd  <b+f>/20, then the line ctrl+z / ctrl+y
                 (b, f = undo and redo steps).
+linked folder   A folder that is a symbolic link or, on Windows, a junction, at any
+                level from the work area down to the file, also when it points inside
+                the open project.
 ```
 
 #### CTX-PE-INPUT · The entry form (S10.3)
@@ -4729,10 +5315,10 @@ Reading the file, the load status and the finding lines are S8's (R-CHG-001.19 �
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-PATCH-DOC-DROPDOWN-001.1 | When | When the Patch Editor is opened, or a Save or a Refresh ends, the system shall fill the File dropdown with the change list. |
-| R-PATCH-DOC-DROPDOWN-001.2 | If | If the change home holds no change document, then the system shall show the dropdown with its prompt `Change files in patches/` and no option. |
+| R-PATCH-DOC-DROPDOWN-001.1 | When | When the Patch Editor is opened, a Save or a Refresh ends, or a project load or a Save project completes, the system shall fill the File dropdown with the change list. |
+| R-PATCH-DOC-DROPDOWN-001.2 | If | If the change list is empty, then the system shall show the dropdown with its prompt `Change files in patches/` and no option. |
 | R-PATCH-DOC-DROPDOWN-001.3 | When | When the operator picks a file in the dropdown, the system shall load it as the document. |
-| R-PATCH-DOC-DROPDOWN-001.4 | If | If the picked file is a link or lies outside its folder, then the system shall refuse it with the status `Patch Editor: change file '<name>' is outside the patches folder — not loaded.` |
+| R-PATCH-DOC-DROPDOWN-001.4 | If | If the picked file is a link, lies under a linked folder, or lies outside its folder, then the system shall refuse it with the status `Patch Editor: change file '<name>' is outside the patches folder — not loaded.` |
 | R-TUI-054.1 | U | The system shall show the path input placeholder `or type a path to the same change-set JSON (alternative to the patches/ dropdown)`. |
 | R-PE-010 | When | When the operator presses Load, the system shall load the file the path input names as the document (S8 reader). |
 | R-PE-011 | If | If the path input is empty when Load acts, then the system shall show the status `Patch Editor: enter a change-file path to load.` |
@@ -4866,6 +5452,7 @@ Reading the file, the load status and the finding lines are S8's (R-CHG-001.19 �
 | R-TUI-058.6 | U | The system shall keep the per-entry Edit JSON enabled for every document. |
 | R-TUI-058.7 | When | When the system shows the entry JSON popup, the system shall title it `Edit entry JSON:`. |
 | R-TUI-058.8 | When | When the system shows the entry JSON popup, the system shall offer the buttons `Confirm` and `Cancel` (focus and Esc: S7.1). |
+| R-TUI-058.9 | If | If a per-entry Edit JSON confirm records the R-CHG-SYM.2 finding, then the system shall show the status `Patch Editor: the entry names an A2L symbol and no A2L is loaded - load the A2L, then edit the entry again.` |
 
 #### S10.8 · Validate, Apply, Save, save-back (CTX-PE)
 
@@ -4878,7 +5465,8 @@ S8 owns what these controls do: Validate (R-CHG-VAL.1 … .4), the apply and its
 | R-PE-093 | When | When a Save succeeds, the system shall make the written file the document's source. |
 | R-TUI-049.1 | When | When a save-back succeeds, the system shall show the before/after control as a shown widget whichever inspector tab is shown. |
 | R-TUI-049.2 | When | When the operator presses Write before/after report, the system shall write the before/after report as the `b` key does (S14 R-BEFORE-AFTER-REPORT-001.2). |
-| R-TUI-049.3 | When | When the document is replaced by a load, a paste, undo or redo, the system shall hide the before/after control and the save-back prompt. |
+| R-TUI-049.3.1 | When | When the document is replaced by a load, a project load, a paste, undo or redo, or an image load completes, the system shall hide the before/after control. |
+| R-TUI-049.3.2 | When | When the document is replaced by a load, a project load, a paste, undo or redo, or an image load completes, the system shall hide the save-back prompt. |
 
 **(from batch-100 HLR-177a: LLR-177.3e; E3 S12b-04)** The busy line, its text and the end of the refusals are S6's.
 
@@ -5637,6 +6225,7 @@ patched name     <variant id>-patched.s19 (S19 variant) · <variant id>-patched.
 | R-PROJ-001.5 | If | If the file's name is taken in the project folder by a different content, then the system shall place the file under the lowest free numbered name. |
 | R-PROJ-001.11 | If | If check C-18 fails, then the system shall refuse the save with the refusal text `'<painted target name>' already has a MAC file (<painted list>) — choose another name.` |
 | R-PROJ-001.12 | If | If check C-19 fails, then the system shall refuse the save with the refusal text `'<painted target name>' already has an A2L file (<painted list>) — choose another name.` |
+| R-PROJ-001.13 | When | When the operator confirms Save project into the open project at the T2 composition, the system shall show the status `Project saved + manifest verified` within 1 second of the confirm. |
 | R-PROJ-001.6 | When | When the system saves a project, the system shall make the saved image's variant the active variant. |
 | R-PROJ-001.7 | When | When the system saves a project, the system shall make it the open project. |
 | R-PROJ-001.10 | When | When the system saves a project, the system shall write the manifest (S11.10). |
@@ -5680,6 +6269,8 @@ patched name     <variant id>-patched.s19 (S19 variant) · <variant id>-patched.
 | R-PROJ-GATHER.9 | If | If a used file cannot be gathered, then the system shall go on with the save. |
 | R-PROJ-GATHER.10 | If | If the system copies into the project a file whose name project.json cannot record, then the system shall show the status `<painted name> was copied but not recorded in project.json (<why>) — rename it in the common folder, select the new name, then Save project.`, why being `Windows reserves that name` for a device name and `the name is not one project.json records` otherwise. |
 | R-PROJ-GATHER.11 | If | If more than 10 copied files are not recorded, then the system shall show the status `and <k> more files not recorded in project.json` after the first 10. |
+| R-PROJ-GATHER.12 | When | When the system gathers composition documents, the system shall check each distinct composition document name against the project folder once. |
+| R-PROJ-GATHER.13 | If | If the project folder holds a link loop at a composition document's name, then the system shall look that name up in the common patches library by its last part. |
 
 #### The Patch Editor document (from batch-100 HLR-170, HLR-167)
 
@@ -5799,6 +6390,7 @@ patched name     <variant id>-patched.s19 (S19 variant) · <variant id>-patched.
 | R-PROJ-002.11 | When | When the system has made a placed file the open project's active variant and rewritten project.json, the system shall show the status `Project '<project name>' now opens <file name>`. |
 | R-PROJ-002.12 | If | If the open project's folder cannot be read or no longer exists when the system adds an S19, Intel HEX or MAC file to it, then the system shall show the status `Project sync NOT done: project '<painted project name>' could not be read — check that the folder can be opened, then load again.` |
 | R-PROJ-002.13 | If | If the open project's folder cannot be read or no longer exists when the system adds an A2L file to it, then the system shall show the status `A2L sync NOT done: project '<painted project name>' could not be read — check that the folder can be opened, then load again.` |
+| R-PROJ-002.14 | If | If the open project's folder no longer exists when the system adds an S19, Intel HEX, MAC or A2L file to it, then the system shall create no folder at that folder's path. |
 
 #### Writes into the open project (from batch-100 HLR-168)
 
@@ -6707,6 +7299,10 @@ stage words       check   compute and compare with the stored value; changes not
                   verify  read the written file back (S8.8)
                   self-test  the CRC Designer's comparison of Check with the CRC of
                           "123456789" (not the S9 Checks)
+KAT message       The 9 ASCII bytes "123456789" (0x31 … 0x39), the input of every check
+                  value.
+bit-symmetric init  An init whose 32 bits read the same in both directions
+                  (0x00000000, 0xFFFFFFFF, 0x0FF00FF0).
 ```
 
 #### CTX-CRCCONFIG · The CRC config (S13.3)
@@ -6740,7 +7336,7 @@ example config    The text the config editor starts with (a copy is
                           [0x20000, 0x2FFFC) → field at 0x2FFFC;
                   one group of [0x30000, 0x34000) and [0x40000, 0x42000) → field at
                   0x42000, 4 bytes.
-rule texts        The <rule text> of R-CRC-CONFIG-001.10. <where> is "region <i>" or
+rule texts        The <rule text> of R-CRC-CONFIG-001.9. <where> is "region <i>" or
                   "group <k> span <j>"; i, k and j count from 1.
   field 'reverse' must be a boolean
   field 'regions' must be a list
@@ -6759,6 +7355,24 @@ rule texts        The <rule text> of R-CRC-CONFIG-001.10. <where> is "region <i>
   region <i> / group <k>: 'output_address' must be non-negative
   region <i> / group <k>: output window [0x<address>, 0x<address>+<N>) exceeds the 32-bit address space
   config declares <n> spans, over the 4096-span ceiling
+  a CRC Designer template is not a CRC config - it has no regions or groups
+required field    polynomial, init, reverse, final_xor; each region's start, end,
+                  output_address; each group's regions, output_address; each group
+                  span's start, end.
+number field      polynomial, init, final_xor; each region's start, end,
+                  output_address; each group's output_address; each group span's
+                  start, end. (output_bytes keeps its own rule text.)
+<name>            In R-CRC-CONFIG-001.10 and .11: the field's key as the config writes
+                  it (start), without its region or group.
+<value>           In R-CRC-CONFIG-001.11: the field's value as JSON text: a string in
+                  double quotes ("zz"), true, false, null, a fraction (1.5), a list or
+                  an object as JSON. Clipped: a JSON text longer than 64 characters is
+                  its first 64 characters followed by … (U+2026); a shorter one is
+                  given whole.
+Designer template shape  A JSON object that has the key algorithm and does not have
+                  the key polynomial (the template file of CTX-DESIGNER has this shape).
+nesting too deep  A config text whose arrays or objects nest deeper than the JSON
+                  reader can follow.
 ```
 
 #### CTX-CRCRESULT · What the result area shows (S13.4, S13.5)
@@ -6851,6 +7465,53 @@ template reasons  CRC template path could not be resolved: '<path>'
                   CRC template is structurally invalid: <rule>
                     (rules: a non-empty name; width 8 to 64; refin and refout true or
                     false; every algorithm field present)
+loaded image changes  The session's loaded image (S5 CTX-FILES) is set, replaced or
+                  cleared (a load, a project load, an unload), or the system makes an
+                  in-place write into it.
+in-place write    One of three writes into the loaded image: a Patch Editor apply
+                  (whether it ends with its `Apply: …` status or with a
+                  `Patch Editor: <error>` status), a Patch Editor save-back (the operator
+                  confirms Save patched image as, whatever its outcome), or a Save
+                  project commit that writes the image. The loaded image is kept; its
+                  bytes change. S2, S4, S9 and S17 use this term too.
+recompute         One refresh of every result surface from the current form and the
+                  loaded image.
+text field        A one-line text field of the CRC Designer: Width, Polynomial, Init,
+                  XOR out, Check, Name, Aliases, Address, Bytes, Ranges, Pad byte,
+                  Vector, Load path.
+toggle or dropdown  Reflection in, Reflection out, Preset, Intra gap, Join gaps, On
+                  conflict, Store endianness, Mode.
+displayed         The CRC Designer is displayed while it is the shown window (S6
+                  CTX-SHELL; key 0); it is not displayed while another window is shown.
+stale coverage    The loaded image changed while the CRC Designer was not displayed,
+                  and no recompute has run since.
+pending change    An operator edit of a text field, a change of the loaded image while
+                  the CRC Designer is displayed, or the CRC Designer becoming displayed
+                  while its coverage is stale, made after the system last recomputed.
+quiet time        150 ms.
+edit burst        Two or more operator edits of text fields, each less than the quiet
+                  time after the one before, with no toggle or dropdown change, no
+                  preset pick and no template load between them.
+ascending address order  Of Ranges: each range starts at or after the end of the
+                  range written before it (a range's end is exclusive).
+coverage size     The byte count of the coverage's widest window: the sum of the range
+                  sizes plus each gap from the end of one range to the start of the
+                  range written after it, where that start lies above that end (the
+                  window of Join gaps fill and Intra gap fill).
+coverage cap      16777216 bytes (16 MiB).
+demo image        The image of the shipped 10 MB demo case
+                  (examples/case_08_release_demo/README.txt;
+                  tools/synth/make_release_case.py, seed 20260001, size 10 MB): four
+                  ranges, boot 0x00000000+0x10000, app 0x00040000+0x2C9FA0, cal
+                  0x00800000+0x131FC0, config 0x00C00000+0x1000.
+F-23 CRC scene    The demo image is loaded; the CRC Designer is shown with the form it
+                  first shows (CRC-32/ISO-HDLC, Join gaps concat, Intra gap skip, Pad
+                  byte 0xFF, On conflict abort); Ranges holds
+                  0x00800000-0x00931FBF, 0x00C00000-0x00C00FFF; no change is pending.
+F-23 template     A template file with CRC-16/MODBUS parameters, Check 0x4B37, Name
+                  demo-modbus, Aliases "a, b". It differs from the first-shown form in
+                  every algorithm field except Reflection in and Reflection out (on in
+                  both).
 ```
 
 ---
@@ -6882,6 +7543,7 @@ template reasons  CRC template path could not be resolved: '<path>'
 |---|---|---|
 | R-CRC-ENGINE-001.1 | U | The system shall compute each CRC of the CRC operation by the parametric model of CTX-CRC, with width 32 and the parameters of the CRC config. |
 | R-CRC-ENGINE-002.1 | U | The system shall give, for the parameters of each 32-bit algorithm of CTX-CRC, that algorithm's check value as the CRC of "123456789". |
+| R-CRC-ENGINE-002.2 | U | The system shall give in the CRC operation, for each polynomial, init, final XOR and reverse, the CRC that the CRC Designer gives for width 32, that polynomial, init and final XOR as xorout, and refin and refout equal to reverse. |
 | R-CRC-ENGINE-001.2 | U | The system shall take into the CRC input of a span only the span's present bytes. |
 | R-CRC-ENGINE-001.3 | U | The system shall take the present bytes of a span in ascending address order. |
 | R-CRC-ENGINE-001.4 | U | The system shall add no byte to the CRC input for an absent byte. |
@@ -6921,6 +7583,8 @@ template reasons  CRC template path could not be resolved: '<path>'
 | R-CRC-CONFIG-001.13 | If | If a region breaks a span rule of CTX-CRCCONFIG, then the system shall reject the config with that rule's text. |
 | R-CRC-CONFIG-001.14 | If | If polynomial, init or final_xor is outside the parameter range, then the system shall give the reason `CRC config is structurally invalid: field '<name>' must be 0x0..0xFFFFFFFF`. |
 | R-CRC-CONFIG-001.15 | If | If the config declares more spans than the span limit, then the system shall give the reason `CRC config is structurally invalid: config declares <n> spans, over the 4096-span ceiling`. |
+| R-CRC-CONFIG-001.16 | If | If the config text is a JSON object of the Designer template shape, then the system shall give the reason `CRC config is structurally invalid: a CRC Designer template is not a CRC config - it has no regions or groups`. |
+| R-CRC-CONFIG-001.17 | If | If the config text nests too deep, then the system shall give the reason `CRC config is not valid JSON: nesting too deep`. |
 
 #### S13.4 · The CRC check (CTX-CRCRESULT)
 
@@ -6993,7 +7657,8 @@ template reasons  CRC template path could not be resolved: '<path>'
 | R-CRC-PRESET-001.7 | When | When the operator picks a preset, the system shall keep Address and Store endianness as they are. |
 | R-CRC-PRESET-001.8 | When | When the operator edits a field filled from a preset, the system shall leave the preset unchanged. |
 | R-CRC-DESIGNER-001.1 | U | The system shall compute every CRC of the CRC Designer by the parametric model of CTX-CRC. |
-| R-CRC-DESIGNER-001.2 | When | When the operator changes a field of the CRC Designer, the system shall recompute every result surface of CTX-DESIGNER. |
+| R-CRC-DESIGNER-001.2.1 | When | When the operator changes a toggle or a dropdown of the CRC Designer, the system shall recompute every result surface of CTX-DESIGNER. |
+| R-CRC-DESIGNER-001.2.2 | When | When the quiet time has passed since the last pending change, the system shall recompute every result surface of CTX-DESIGNER. |
 | R-CRC-DESIGNER-002.1 | While | While Check holds the CRC of "123456789" under the form's algorithm, the system shall show the verdict `✓ MATCH`. |
 | R-CRC-DESIGNER-002.2 | While | While Check holds another value, the system shall show the verdict `✗ MISMATCH`. |
 | R-CRC-DESIGNER-002.3 | While | While Check is empty, the system shall show the verdict `○ NO-EXPECTED`. |
@@ -7021,6 +7686,13 @@ template reasons  CRC template path could not be resolved: '<path>'
 | R-CRC-PREVIEW-001.8 | If | If a coverage field breaks a coverage rule of CTX-DESIGNER, then the system shall show `Invalid coverage: <reason>` in the coverage preview and the coverage window. |
 | R-CRC-PREVIEW-001.9 | U | The system shall change no byte of the loaded image from the CRC Designer. |
 | R-CRC-PREVIEW-001.10 | U | The system shall write no image file from the CRC Designer. |
+| R-CRC-PREVIEW-001.11 | If | If the coverage size exceeds the coverage cap, then the system shall show `Cannot preview: coverage exceeds 16777216 bytes` in the coverage preview and the coverage window. |
+| R-CRC-PREVIEW-001.12 | If | If the Ranges are not in ascending address order, then the system shall draw line 1 of the coverage window with at most 48 glyphs per range or gap. |
+| R-CRC-PREVIEW-002.1 | When | When the loaded image changes while the CRC Designer is displayed, the system shall recompute every result surface of CTX-DESIGNER. |
+| R-CRC-PREVIEW-002.2 | When | When the operator changes Join gaps from concat to fill in the F-23 CRC scene, the system shall show the recomputed coverage window within 3 seconds. |
+| R-CRC-PREVIEW-002.3 | When | When the operator loads the F-23 template in the F-23 CRC scene, the system shall show the recomputed coverage window within 3 seconds. |
+| R-CRC-PREVIEW-002.4 | When | When the quiet time has passed since the operator's last edit of Ranges in the F-23 CRC scene, the system shall show the recomputed coverage window within 3 seconds. |
+| R-CRC-PREVIEW-002.5 | When | When the CRC Designer becomes displayed while its coverage is stale, the system shall recompute every result surface of CTX-DESIGNER. |
 
 #### S13.8 · The CRC Designer: templates (CTX-DESIGNER; from S0 LLR-122.4 and HLR-139)
 
@@ -7054,6 +7726,9 @@ template reasons  CRC template path could not be resolved: '<path>'
 | R-TUI-100.4 | U | The system shall place no toggle of the CRC Designer directly below another toggle. |
 | R-TUI-100.5 | While | While the terminal is narrow, the system shall stack the top row and the three bench columns one under the other. |
 | R-CRC-DESIGNER-006.1 | U | The system shall show file-derived text in the CRC Designer as plain text, never as markup. |
+| R-CRC-DESIGNER-007.1 | When | When the operator makes an edit burst, the system shall recompute every result surface once. |
+| R-CRC-DESIGNER-007.2 | When | When the operator loads a template, the system shall recompute every result surface once. |
+| R-CRC-DESIGNER-007.3 | When | When the operator picks a preset, the system shall recompute every result surface once. |
 
 
 
@@ -7139,7 +7814,8 @@ file name       <ts>-diff-report.md and <ts>-diff-report.html; <ts> = UTC time a
 destination     With an open project: <project>/reports/. With none: the folder typed
                 in the report destination box.
 sections        In this order:
-  header        "# Diff report"; "Generated (UTC)"; "Tool version"; per image: label,
+  header        "# Diff report" (the before/after report: CTX-BEFOREAFTER title);
+                "Generated (UTC)"; "Tool version"; per image: label,
                 [source kind and variant id], path, parse-errors=<n>; per image:
                 "artifacts: summary=<s>; a2l=<status> (<covered>/<total>); mac=…"
   Statistics    Classification · Runs · Bytes, one row per kind.
@@ -7163,6 +7839,22 @@ report status   Diff report written: <md path>  |  <html path>
                 HTML report refused: <reason>
 diff report progress line  The progress line (S6) of a diff report: label
                 `Writing the diff report`; steps 1 `Write Markdown`, 2 `Write HTML`.
+label field     In either file of a diff report: an image label and a variant id in the
+                header's image lines; each symbol name in the Runs table, the
+                Change-entry linkage table and the Flow change attribution section;
+                each change-document reference in the Flow change attribution section;
+                the filter file name in the "## Report filter applied" block.
+path field      In either file of a diff report: the image path in each header image
+                line (path=…), and the original image, saved patched image and change
+                document paths of the "## Before/after provenance" section.
+refusal message The message of a refusal line in the Flow change attribution section:
+                an issue message of the change document.
+visible text    The value after S12 CTX-RPT-TEXT steps 1 and 2: each tab, CR and LF
+                becomes one space, and each character of Unicode category Cc, Cf, Cs,
+                Zl or Zp becomes U+FFFD (this covers C0, DEL, C1, the bidi controls,
+                U+2028 and lone surrogates).
+file write      The staging name of a report file: <name>.<16 random hex digits>.part
+                in the destination folder.
 ```
 
 #### CTX-BEFOREAFTER · The before/after report (S14.9)
@@ -7189,6 +7881,9 @@ status          Before/after report written: <md path> | <html path>
                 Before/after report failed: <error type>: <message>
 before/after progress line  The progress line (S6) of a before/after report: label
                 `Writing the before/after report`; one step, `Compose the report`.
+title           "# Before/after report" (Markdown line 1); "Before/after report" as the
+                HTML <title> and first <h1>. Every other part of the header is
+                CTX-DIFFREPORT's.
 ```
 
 ---
@@ -7281,11 +7976,11 @@ before/after progress line  The progress line (S6) of a before/after report: lab
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-DIFF-CHK.1 | When | When the A2B Diff is shown, the system shall list in the check-spec list the `.json` files of the folder where the Check Editor saves check specs, by name, links left out. |
+| R-DIFF-CHK.1 | When | When the A2B Diff is shown, or a project load or a Save project completes, the system shall fill the check-spec list with the spec list. |
 | R-DIFF-CHK.2 | U | The system shall label a file ending in `.chk.json` as `<name> CHECK` and any other file as `<name> PATCH`. |
-| R-DIFF-CHK.3 | If | If the check-spec folder holds no `.json` file, then the system shall leave out the check row. |
+| R-DIFF-CHK.3 | If | If the spec list is empty, then the system shall leave out the check row. |
 | R-DIFF-CHK.4 | When | When the operator picks `(no check spec)`, the system shall show the status `Check spec: none — the report gains no addendum.` |
-| R-DIFF-CHK.5 | If | If the picked file is a link or lies outside the check-spec folder, then the system shall show the status `Check spec: '<name>' is outside the patches folder — not loaded.` |
+| R-DIFF-CHK.5 | If | If the picked file is a link, lies under a linked folder, or lies outside its folder, then the system shall show the status `Check spec: '<name>' is outside the patches folder — not loaded.` |
 | R-DIFF-CHK.6 | If | If reading the picked file gives errors, then the system shall show the status `Check spec not loaded — <first three findings as [<code>] <severity>: <message>, separated by "; ">`. |
 | R-DIFF-CHK.7 | If | If the picked document is not a check document, then the system shall show the status `Check spec: '<name>' is a kind='<kind>' document, not a check spec — the report gains no addendum.` |
 | R-DIFF-CHK.8 | When | When a check spec loads, the system shall show the status `Check spec '<name>' loaded — <n> declared field(s) will ride the report.` |
@@ -7317,11 +8012,14 @@ before/after progress line  The progress line (S6) of a before/after report: lab
 | R-CMP-004.6 | If | If both images have no byte, then the system shall write `Memory maps unavailable - hex windows omitted.` in place of the hex windows. |
 | R-CMP-004.7 | U | The system shall write the HTML file as CTX-DIFFREPORT HTML form. |
 | R-CMP-004.8 | U | The system shall HTML-escape every value it embeds in the HTML file. |
-| R-CMP-004.9 | U | The system shall write image labels, paths and symbol names into the Markdown file as inert text. |
+| R-CMP-004.9.1 | U | The system shall write each label field and each refusal message into the Markdown file of a diff report as report-safe text (S12 CTX-RPT-TEXT) with its field limit. |
+| R-CMP-004.9.2 | U | The system shall write each path field into the Markdown file of a diff report as path text (S12 CTX-RPT-TEXT). |
 | R-CMP-004.10 | U | The system shall write no report content to the log. |
 | R-CMP-004.11 | U | The system shall write the diff report files as S12 R-TUI-097.1 states: UTF-8 with LF line ends on every host. |
 | R-CMP-004.12 | When | When both diff report files are written, the system shall log at INFO `report kind=diff source=<source> output=<md path>\|<html path> outcome=ok`, with <source> the open project's folder name, else the typed destination, else `-`. |
 | R-CMP-004.13 | If | If the diff report is refused or fails, then the system shall log at WARNING `report kind=diff source=<source> output=- outcome=<refused, refused (html) or failed: <error type>>`. |
+| R-CMP-004.14 | U | The system shall write every row of each hex window, from the window's first address to its end, into each diff report file. |
+| R-CMP-004.15 | U | The system shall write each label field, path field and refusal message into the HTML file of a diff report as visible text, HTML-escaped. |
 | R-CMP-005.12 | U | The system shall write the A2B Diff report without the report filter (S12 CTX-RPT-FILTER). |
 
 **(from batch-100 HLR-176: LLR-176.2c)** The progress line's format, spinner, elapsed time and end rules are S6's.
@@ -7331,6 +8029,8 @@ before/after progress line  The progress line (S6) of a before/after report: lab
 | R-CMP-005.13 | When | When the system starts a diff report, the system shall show the diff report progress line at step 1. |
 | R-CMP-005.14 | When | When the system has written the Markdown file of a diff report, the system shall move the diff report progress line to step 2. |
 | R-CMP-005.15 | When | When a diff report ends, the system shall also write its report status to the status log. |
+| R-CMP-005.16 | If | If writing a diff report file fails, then the system shall leave no file under that file's name, and no temporary file, in the destination folder. |
+| R-CMP-005.17 | If | If writing the HTML file of a diff report fails or is refused after its Markdown file was written, then the system shall remove that Markdown file. |
 
 #### S14.8 · Flow changes in the diff report (from S0 LLR-143.2)
 
@@ -7371,7 +8071,7 @@ R-TUI-049.2 (S10) gives the Patch Editor's Write before/after report control the
 | R-BEFORE-AFTER-REPORT-001.18 | U | The system shall write the before/after report with the provenance and linkage sections of CTX-BEFOREAFTER. |
 | R-BEFORE-AFTER-REPORT-001.19 | U | The system shall list every entry of the last apply in the linkage table, whatever its disposition. |
 | R-BEFORE-AFTER-REPORT-001.20 | If | If an entry had no prior bytes, then the system shall write `(none - created into hole)` in its Before cell. |
-| R-BEFORE-AFTER-REPORT-001.21 | U | The system shall remove control characters from the provenance and linkage values in both files. |
+| R-BEFORE-AFTER-REPORT-001.21 | U | The system shall write the provenance and linkage values in both files as visible text. |
 | R-BEFORE-AFTER-REPORT-001.22 | U | The system shall escape `\|` in the Markdown linkage cells. |
 | R-BEFORE-AFTER-REPORT-001.23 | When | When a report filter is set (S12), the system shall apply it to the before/after report. |
 | R-BEFORE-AFTER-REPORT-001.24 | U | The system shall fill the run table's Symbols column of the before/after report from the loaded A2L and MAC. |
@@ -7382,6 +8082,11 @@ R-TUI-049.2 (S10) gives the Patch Editor's Write before/after report control the
 | R-BEFORE-AFTER-REPORT-001.29 | When | When both before/after files are written, the system shall log at INFO `report kind=before-after source=<loaded file name> output=<md path>\|<html path> outcome=ok`. |
 | R-BEFORE-AFTER-REPORT-001.30 | If | If the before/after report is refused or fails, then the system shall log at WARNING `report kind=before-after source=<loaded file name> output=- outcome=<refused or failed: <error type>>`. |
 | R-BEFORE-AFTER-REPORT-001.31 | When | When the system starts a before/after report, the system shall show the before/after progress line. |
+| R-BEFORE-AFTER-REPORT-001.32 | U | The system shall write `# Before/after report` as the first line of the before/after report's Markdown file. |
+| R-BEFORE-AFTER-REPORT-001.33 | U | The system shall write `<title>Before/after report</title>` in the head of the before/after report's HTML file. |
+| R-BEFORE-AFTER-REPORT-001.34 | U | The system shall write `<h1>Before/after report</h1>` as the first heading of the before/after report's HTML file. |
+| R-BEFORE-AFTER-REPORT-001.35 | When | When the system writes the before/after report, the system shall compute both images' artifact lines against the loaded A2L and the loaded MAC. |
+| R-BEFORE-AFTER-REPORT-001.36 | If | If no project is open when a save-back succeeds, then the system shall show no before/after offer. |
 
 
 
@@ -7422,6 +8127,24 @@ written files   The files WRITE-OUT blocks and confirmed external steps wrote; r
 integrity codes The integrity notices of S1 (S19 and Intel HEX).
 funnel          Up to 32 pairs NAME = value; NAME is [A-Z0-9_], 1 to 32 characters;
                 value 1 to 256 characters. A placeholder is the exact text ${NAME}.
+output file name  The last part of an external step's output path
+                (step_patch.changes.json), the name the copy of R-FLOW-EXT.5 asks for.
+the copy        The file the copy of R-FLOW-EXT.5 landed on: the output file name, the
+                lowest free numbered name (S5 R-TUI-006.2), or a file with the same
+                content that is reused (S5 R-TUI-006.1, .5).
+names           A project ref names a file when it resolves (project ref) to that
+                file's path; compared ignoring case on Windows.
+in place of     A block reads the copy in place of a ref when the copy is another file
+                than the one the ref names. This depends on the name only: it also
+                holds on a first run when the project folder already held a different
+                file under the output file name (the copy then has a numbered name).
+run             One execution of one flow: one chain of a chain set.
+read suffix     The text " · read <copy file name> in place of <ref>": <copy file
+                name> is the copy's last path part, <ref> the project ref as the
+                block carries it (as typed).
+climbs above    A relative log or output path climbs above the open project folder
+                when, joined to that folder and with . and .. removed by text (no
+                link followed), it is not inside the folder.
 ```
 
 #### CTX-FLOWFILE · Flow files (S15.12)
@@ -7454,6 +8177,13 @@ load findings   Each refused rule gives one finding, code then message:
   FLOW-UNSAFE-OUTPUT-NAME an output_name with a separator, "..", an absolute path or a
                           leading "."
   MANIFEST-PATH-ESCAPE    a read ref that S11's rules refuse
+file stem       A flow file's or chain-set file's name without .json: the saved name,
+                with its _<N> when a clash gave one.
+passes through a link  One of these is a link (S5 CTX-WORKAREA): the home folder,
+                any folder from it up to and including the work-area folder
+                (.s19tool/workarea), or the work area's .s19tool folder.
+exists          The home folder holds an entry of that name: a file, a folder or a
+                link, also a link whose target is missing.
 ```
 
 #### CTX-CHAIN · Chain sets (S15.13 … S15.15)
@@ -7473,6 +8203,8 @@ chain-set file  <flowsets home>/<name>.json: name and, per lane: chain (lane nam
                 Saved name and clash rule as a flow file. Refusal codes: CHAIN-SET-SIZE-CAP,
                 CHAIN-SET-JSON-PARSE, CHAIN-SET-BAD-STRUCTURE, CHAIN-SET-SCHEMA-UNSUPPORTED,
                 CHAIN-SET-BAD-FIELD, CHAIN-SET-UNSAFE-REF.
+confirm re-run  The run of one lane that a confirm starts (R-FLOW-CHAIN.9; S16
+                R-FX-WAIT.5: c or Confirm). It is not a run of the chain set.
 ```
 
 #### CTX-FLOWREPORT · The flow report and the chain-set report (S15.11, S15.14)
@@ -7498,7 +8230,9 @@ report limits   A cell at most 240 characters; at most 200 findings per block, t
                 "*<k> more findings omitted (per-block cap 200).*"; the document at most
                 S12's report byte budget, then "> **Truncated:** … omitted section(s): …".
 chain-set report  <ts>-chain-set-report.md (clash: <ts>-<NN>-chain-set-report.md).
-                "# Chain-set report — <set name>", Generated, Mode, Chains; then the
+                "# Chain-set report — <set name>", Generated, Mode ("- **Mode:**
+                <mode>": sequential or parallel for a run of the set, the switch's
+                mode; confirm re-run for a confirm re-run), Chains; then the
                 sections Chain ledger (# · Chain · Template · Status · Blocks · Elapsed),
                 Input provenance ("- Chain <lane> input <j>: <ref> [bound] path=`<path>`"),
                 Written files, Not applied, Refusals, Notices — each lane "none" when it
@@ -7574,14 +8308,15 @@ flow-A2B report  <ts>-flow-a2b.md: a diff report (S14 CTX-DIFFREPORT), Markdown 
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-FLOW-CRC.1 | When | When a CRC block runs, the system shall compute its CRCs as S13.2 computes them, from a template read as S13 CTX-CRCCONFIG, over the working image as it stands after the blocks before it. |
+| R-FLOW-CRC.1 | When | When a CRC block runs, the system shall compute its CRCs as S13.2 computes them, from the CRC config file the block names, read as S13 CTX-CRCCONFIG, over the working image as it stands after the blocks before it. |
 | R-FLOW-CRC.2 | When | When a CRC block writes a CRC outside the image's ranges, the system shall add those addresses to the working image. |
-| R-FLOW-CRC.3 | If | If the CRC template is refused or does not exist, then the system shall stop the flow with the summary `config unresolved` and the cause `crc config not found or not inside the project`. |
-| R-FLOW-CRC.4 | If | If the CRC template is invalid, then the system shall stop the flow with the summary `config malformed` and the cause `crc config invalid: <first three errors, separated by "; ">`. |
+| R-FLOW-CRC.3 | If | If the CRC config file is refused or does not exist, then the system shall stop the flow with the summary `config unresolved` and the cause `crc config not found or not inside the project`. |
+| R-FLOW-CRC.4 | If | If the CRC config file is not a valid CRC config, then the system shall stop the flow with the summary `config malformed` and the cause `crc config invalid: <first three errors, separated by "; ">`. |
 | R-FLOW-CRC.5 | If | If a CRC region holds no image byte, then the system shall stop the flow, writing no CRC, with the cause `CRC region 0x<start>-0x<end> holds 0 image bytes - nothing written`. |
 | R-FLOW-CRC.6 | If | If a CRC region holds some but not all of its bytes, then the system shall end the block notices with the finding `CRC: <k> of <n> region bytes absent (0x<start>-0x<end>) - the CRC covers present bytes only`. |
 | R-FLOW-CRC.7 | If | If a CRC block comes before every PATCH block, or the flow has none, then the system shall end it notices with the finding `CRC before PATCH: the image is finalized before any patch is applied`. |
 | R-FLOW-CRC.8 | When | When a CRC block ends with no notice, the system shall end it ok with the summary `injected <n> CRC regions` (`region` for one). |
+| R-FLOW-CRC.9 | If | If the CRC config file is larger than the read limit of CTX-CRCCONFIG, then the system shall stop the flow with the summary `config malformed` and the cause `crc config invalid: CRC config file is <n> bytes, over the 268435456-byte read cap — the file was not read`. |
 
 #### S15.6 · WRITE-OUT (from S0 LLR-155.6; the writing is S8.7)
 
@@ -7624,6 +8359,12 @@ flow-A2B report  <ts>-flow-a2b.md: a diff report (S14 CTX-DIFFREPORT), Markdown 
 | R-FLOW-EXT.6 | If | If the copy is refused, then the system shall stop the flow with the summary `external step copy failed` and the cause `<error type>: <message>`. |
 | R-FLOW-EXT.7 | When | When the copy succeeds, the system shall end the block ok with the summary `log '<log file>' received · output copied to <copy name> (session)`. |
 | R-FLOW-EXT.8 | U | The system shall leave the working image unchanged by an external step. |
+| R-FLOW-EXT.9 | When | When a confirmed external step has copied its output, the system shall read that copy in place of the file named by each project ref of a later block of the same run that names `<project folder>/<output file name>`. |
+| R-FLOW-EXT.10 | When | When a PATCH block reads an external step's copy in place of its change document ref or of its effective A2L ref, the system shall give the copy's file name in place of that ref in each report that lists the block's changes. |
+| R-FLOW-EXT.11 | When | When a confirmed external step copies an output whose content differs from the file under the output file name, the system shall leave that file's name and content unchanged. |
+| R-FLOW-EXT.12 | When | When a block reads an external step's copy in place of a ref, the system shall end that block's summary with the read suffix, once for each such ref in the order the block reads its refs, placed before the final token `unresolved` when the summary ends with that token. |
+| R-FLOW-EXT.13 | When | When a LOAD block of a chain reads an external step's copy in place of its image ref, the system shall write that input's line of the chain-set report's Input provenance as `- Chain <name> input <j>: <ref> [bound] path=` + the copy's path in a code span + the read suffix. |
+| R-FLOW-EXT.14 | If | If a confirmed step's relative log path or relative output path climbs above the open project folder, then the system shall stop the flow with the summary `external step refused` and the cause `<log or output> '<path as given>' climbs above the project folder - give an absolute path for a file outside the project`. |
 
 #### S15.9 · Run status (CTX-FLOW)
 
@@ -7673,7 +8414,10 @@ flow-A2B report  <ts>-flow-a2b.md: a diff report (S14 CTX-DIFFREPORT), Markdown 
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-FLOW-FILE.11 | If | If the flows home resolves to a folder outside the work area, then the system shall save no flow file. |
+| R-FLOW-FILE.11 | If | If the flows home passes through a link or resolves to a folder outside the work area, then the system shall save no flow file. |
+| R-FLOW-FILE.12 | When | When the operator saves a flow under a file stem of at most 64 characters, the system shall write that file stem as the flow file's `name`. |
+| R-FLOW-FILE.13 | If | If the file stem of a flow being saved is longer than 64 characters, then the system shall write the first 64 characters of the file stem as the flow file's `name`. |
+| R-FLOW-FILE.14 | If | If a link in the flows home has the name of a flow file that the save would write, then the system shall write no byte through that link. |
 
 #### S15.12 · Chain-set runs (CTX-CHAIN; from S0 HLR-019, LLR-018.2, LLR-019.1, LLR-019.2, LLR-155.5)
 
@@ -7702,6 +8446,8 @@ flow-A2B report  <ts>-flow-a2b.md: a diff report (S14 CTX-DIFFREPORT), Markdown 
 | R-FLOW-CHAIN.16 | U | The system shall show each lane's status in the Chain ledger with the mark `✓` ok, `◈` completed-with-issues, `✗` error or `□` paused. |
 | R-FLOW-CHAIN.17 | U | The system shall write every lane name, set name, ref and message into the chain-set report as inert Markdown. |
 | R-FLOW-CHAIN.18 | If | If the chain-set report cannot be written, then the system shall keep the lanes' outcomes and give the reason `chain-set report write failed: <error type>: <message>`. |
+| R-FLOW-CHAIN.19 | When | When a lane's confirm re-run ends, the system shall write a chain-set report of that lane alone into `<project>/reports/`. |
+| R-FLOW-CHAIN.20 | When | When a lane's confirm re-run ends, the system shall record the line `- **Mode:** confirm re-run` in that run's chain-set report. |
 
 #### S15.14 · Chain-set files (CTX-CHAIN; from S0 HLR-021, LLR-021.1, LLR-021.2)
 
@@ -7718,7 +8464,10 @@ flow-A2B report  <ts>-flow-a2b.md: a diff report (S14 CTX-DIFFREPORT), Markdown 
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-FLOW-SET.7 | If | If the flowsets home resolves to a folder outside the work area, then the system shall save no chain-set file. |
+| R-FLOW-SET.7 | If | If the flowsets home passes through a link or resolves to a folder outside the work area, then the system shall save no chain-set file. |
+| R-FLOW-SET.8 | If | If a link in the flowsets home has the name of a chain-set file that the save would write, then the system shall write no byte through that link. |
+| R-FLOW-SET.9 | When | When the operator saves a chain set under a file stem of at most 64 characters, the system shall write that file stem as the chain-set file's `name`. |
+| R-FLOW-SET.10 | If | If the file stem of a chain set being saved is longer than 64 characters, then the system shall write the first 64 characters of the file stem as the chain-set file's `name`. |
 
 
 
@@ -7902,6 +8651,7 @@ dwell           0.5 s: how long the attention lane must have waited before c con
 |---|---|---|
 | R-TUI-059.23 | When | When the operator presses Run, the system shall run the chain once over the open project as S15 states. |
 | R-TUI-059.24 | If | If no project is open when the operator presses Run, then the system shall show a FAILED result with `no project loaded - load a project first`. |
+| R-TUI-059.25 | U | The system shall show every widget with an id of the Flow Builder in at least one state of the Flow Builder. |
 | R-FB-RUN.1 | If | If the chain is empty when the operator presses Run, then the system shall show the notice `No blocks to run — add a block first.` |
 | R-FB-RUN.2 | When | When a run ends, the system shall show the result of CTX-BUILDER. |
 | R-FB-RUN.3 | If | If a run completed with issues and no block ended error, then the system shall show the banner NOTICES. |
@@ -7921,6 +8671,7 @@ dwell           0.5 s: how long the attention lane must have waited before c con
 | R-FB-SAVE.5 | When | When a flow is saved, the system shall show its saved name on the ribbon with `· saved`. |
 | R-FB-SAVE.6 | If | If the typed name is empty after cleaning, then the system shall show the status `Flow name is empty after sanitising - not saved.` |
 | R-FB-SAVE.7 | If | If no project is open when the operator presses Save… or Load…, then the system shall show a FAILED result with `no project loaded - load or save a project first`. |
+| R-FB-SAVE.8 | If | If a flow is not saved because its flows home passes through a link or resolves outside the work area (S15 R-FLOW-FILE.11), then the system shall show the status `Flow not saved - the project's flows folder is a link or is outside the work area.` |
 | R-FB-LOAD.1 | When | When the operator presses Load…, the system shall open the dialog `Load flow:` of CTX-BUILDER. |
 | R-FB-LOAD.2 | When | When the operator presses Load on a listed flow, the system shall load that flow file into the Builder. |
 | R-FB-LOAD.3 | If | If the flow has unsaved changes when a flow loads, then the system shall ask `Discard unsaved flow edits?` first. |
@@ -7940,6 +8691,7 @@ dwell           0.5 s: how long the attention lane must have waited before c con
 | R-FX-SCR.1 | U | The system shall offer the Flow Execution of CTX-FXSCREEN as a rail window. |
 | R-FX-SCR.2 | U | The system shall show the parts of the Flow Execution in the order of CTX-FXSCREEN. |
 | R-FX-SCR.3 | U | The system shall show every lane name, set name, ref, command and path on the Flow Execution as plain text, never as markup. |
+| R-FX-SCR.4 | U | The system shall show every widget with an id of Flow Execution in at least one state of Flow Execution. |
 | R-FX-LANE.1 | When | When the operator presses Import…, the system shall open the dialog `Load flow:` of CTX-BUILDER. |
 | R-FX-LANE.2 | When | When the operator loads a flow from that dialog, the system shall add a lane for it below the others. |
 | R-FX-LANE.3 | If | If a lane of that name exists, then the system shall name the new lane `<name>_<N>` with the lowest free N from 1. |
@@ -8010,8 +8762,34 @@ dwell           0.5 s: how long the attention lane must have waited before c con
 | R-FX-SET.12 | When | When a chain set loads, the system shall show the notice `<n> chain(s) restored`. |
 | R-FX-SET.13 | If | If a loaded lane's bound ref names no file, then the system shall show the pending line `▪ '<ref>' missing - re-bind` on that lane. |
 | R-FX-SET.14 | When | When a chain set loads, the system shall show every lane as not run. |
+| R-FX-SET.15 | If | If a chain set is not saved because its flowsets home passes through a link or resolves outside the work area (S15 R-FLOW-SET.7), then the system shall show the status `Chain set not saved - the project's flowsets folder is a link or is outside the work area.` |
 
 
+
+#### S16.11 · Edit and remove a block (CTX-BUILDER clip row; from batch-102 Inc 6)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-B102-FB-001 | When | When the operator activates edit with a valid block number, the system shall open a modal initialized with that block's kind and current field values. |
+| R-B102-FB-002 | When | When the operator saves an edited block, the system shall validate the replacement against the current flow, replace only the selected block, refresh pipeline/ribbon and set the dirty flag. |
+| R-B102-FB-003 | If | If an edited block fails validation, then the system shall keep the original block, paint the refusal in the modal and leave the flow unchanged. |
+| R-B102-FB-004 | When | When the operator confirms remove for a valid block, the system shall remove only that block, preserve variables and clipboard, refresh pipeline/ribbon and set the dirty flag. |
+| R-B102-FB-005.1 | If | If the block number is empty, non-numeric or outside `1..N` when the operator activates edit or remove, then the system shall paint `Edit/Remove needs a block # between 1 and <N>.` |
+| R-B102-FB-005.2 | If | If the block number is empty, non-numeric or outside `1..N` when the operator activates edit or remove, then the system shall not open a modal or remove anything. |
+| R-B102-FB-006 | U | The system shall render file-derived refs and instructions on the block edit and remove surfaces as literal text with zero markup spans. |
+
+#### S16.12 · File refs: resolution source and Browse (from batch-102 Inc 7)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-B102-FILE-001 | U | The system shall show on each file-bearing block card the reference with its resolution source, one of `project`, `temp`, `loaded`, `external` or `missing`. |
+| R-B102-FILE-002 | When | When the operator activates Browse beside a ref field, the system shall open a chooser listing project files, temp/workarea files and loaded artifacts, plus an external-path input. |
+| R-B102-FILE-003 | When | When the operator picks a candidate, the system shall write the corresponding ref field and close the chooser without adding/editing the block. |
+| R-B102-FILE-004 | When | When the operator submits an external path, the system shall verify the file exists and is readable, copy it into the active workarea `external/` folder and write the workarea-relative ref into the field. |
+| R-B102-FILE-005.1 | If | If there is no active project/workarea when the operator submits an external path, then the system shall refuse external import with `Load or create a project before importing an external file.` |
+| R-B102-FILE-005.2 | If | If there is no active project/workarea when the operator submits an external path, then the system shall not copy anything. |
+| R-B102-FILE-006 | If | If an external file cannot be read, then the system shall paint `External file not readable: <name>` and leave the ref field unchanged. |
+| R-B102-FILE-007 | U | The system shall render file-derived names and paths in the chooser and the card annotations as literal text with zero markup spans. |
 
 <a id="s17"></a>
 
@@ -8047,6 +8825,10 @@ destination     project: <work area>/<project>/splits/
 stem            The name of the loaded file without its extension.
 export request  The e key, or the EXPORT button.
 confirm         A second export request that the system asks for (CTX-SJE-PLAN).
+F-23 Split/Join scene  The demo image (S13 CTX-DESIGNER) is loaded; Split / Join /
+                Export is open on ranges(4); range_00 and range_02 are ticked; mode
+                join, gaps concat, pad byte 0x00, format S19. range_01 (the app
+                region, unticked) lies in the join gap.
 ```
 
 #### CTX-SJE-PLAN · What an export holds (S17.5, S17.6, S17.8)
@@ -8183,6 +8965,7 @@ The palette entry and closing by a rail key are S6's (R-TUI-021.10, R-TUI-021.11
 | R-SEG-OPEN.4 | When | When the loaded file changes, the system shall clear the selections of the ranges and a2l sources. |
 | R-SEG-OPEN.5 | When | When the loaded file changes, the system shall keep the text of the manual box. |
 | R-SEG-OPEN.6 | While | While the window is hidden, the system shall keep the focus out of it. |
+| R-SEG-OPEN.7 | While | While the window is hidden, the system shall run no action of the window's keys. |
 
 #### S17.2 · Sources and the table (from S0 LLR-135.7)
 
@@ -8265,6 +9048,9 @@ The palette entry and closing by a rail key are S6's (R-TUI-021.10, R-TUI-021.11
 | R-SEG-PREV.17 | While | While join concat is chosen with a row selected, the system shall show the concat summary of CTX-SJE-TEXT. |
 | R-SEG-PREV.18 | While | While join fill is chosen with a row selected, the system shall show the fill summary of CTX-SJE-TEXT. |
 | R-SEG-PREV.19 | While | While join mode is chosen with no row selected, the system shall show the summary `Join mode — select at least one range to join`. |
+| R-SEG-PREV.20 | When | When the operator presses `g` in the F-23 Split/Join scene, the system shall show the updated preview within 2.5 seconds. |
+| R-SEG-PREV.21 | When | When the system writes bytes into the loaded image in place while the window is displayed, the system shall show the preview band, the stats line and the state line of the written bytes. |
+| R-SEG-PREV.22 | When | When the system shows the preview of written bytes (R-SEG-PREV.21), the system shall keep the focus where it is. |
 
 #### S17.6 · What an export holds (from S0 HLR-136, HLR-137, LLR-160.3)
 
@@ -8335,6 +9121,7 @@ The palette entry and closing by a rail key are S6's (R-TUI-021.10, R-TUI-021.11
 | R-SEG-EXP.12 | When | When every file of an export is written or reused, the system shall show the status `Exported <n> file(s): <written list> → <destination folder>`. |
 | R-SEG-EXP.13 | When | When every file of an export is written or reused, the system shall show the notification `Exported <n> file(s): <written list>`. |
 | R-SEG-EXP.14 | If | If an export fails for a reason that no other row of S17.7 or S17.8 names, then the system shall show the notice `Export failed: <error>`. |
+| R-SEG-EXP.15 | When | When the system writes bytes into the loaded image in place, the system shall disarm the confirm. |
 
 | Id | Statement | Owning batch | Status |
 |---|---|---|---|

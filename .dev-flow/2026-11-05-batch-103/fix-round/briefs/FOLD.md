@@ -1,0 +1,4 @@
+# Unit FOLD — apply the requirements canon fold (trace audit, P-172..P-177)
+Source: `TA/fold/REQUIREMENTS.final2.md` (outside the repo; built by FOLD-1 [deepseek-v4-pro] `fold_forward.py`, reviewed and completed by F2a and F2a-2 [opus], rebuild scripts `F2a-fold.py`, `F2a2-fold.py`, `F2a2_ctx.py`). Folds batch-101's FORWARD hand-over (never applied: `.dev-flow/2026-11-01-batch-101/05-close.md:36`), the left-out batch-102 rows after a congruence review per row (operator rule P-173), batch-101 CTX terms, and moves the 8 batch-101 event rows to S0.2 history (operator P-175). Canon 3317 -> 3571 rows (F2a-2 count).
+Orchestrator addition (decision P-177, DF-02): a fourth S0.2 table pointing R-B102-CLIP-001..006 to the rows that absorbed them (batch-103 `inc-1a/E1-rulings.md` section 4), so the TC-B102 tests keep a resolvable reference; CLIP-005 is retired (superseded by batch-103 Inc 1a).
+Open for the operator: 3 CTX terms (`case 08`, `base reference`, `guard probe`).
