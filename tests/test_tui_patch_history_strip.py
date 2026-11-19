@@ -555,17 +555,27 @@ def test_tc081_2_strip(tmp_path: Path) -> None:
     )
 
     # §2.4-10 — bind the literal to the class FIRST, then ask the collision
-    # question. `vars()` (not `dir()`) reads the class's OWN namespace, so an
-    # inherited attribute of the same name cannot satisfy it.
+    # question. The batch-modular split moved the strip's members onto the
+    # zone mixins `PatchEditorPanel` inherits (e.g. `ActionsMixin`), so the
+    # lookup walks the class MRO but only counts a member when its defining
+    # class lives inside the `patch_editor` package — a member inherited from
+    # Textual does not satisfy the arm.
     new_members = {
         "_history_strip_text",
         "_HISTORY_HINT",
         "_HISTORY_OFF",
         "_HISTORY_STRIP_BUDGET_COLS",
     }
-    assert new_members <= set(vars(PatchEditorPanel)), (
-        "the strip's members must exist on PatchEditorPanel itself; missing "
-        f"{new_members - set(vars(PatchEditorPanel))!r}"
+    in_package_members = {
+        name
+        for klass in PatchEditorPanel.__mro__
+        if klass.__module__.startswith("s19_app.tui.screens_directionb.patch_editor")
+        for name in vars(klass)
+    }
+    assert new_members <= in_package_members, (
+        "the strip's members must be provided by a class inside the "
+        "patch_editor package (found through the MRO); missing "
+        f"{new_members - in_package_members!r}"
     )
     assert not (new_members & set(dir(Widget))), (
         f"new members collide with Textual Widget internals: "

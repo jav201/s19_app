@@ -499,17 +499,24 @@ def test_r017_2_hostile_unit_is_replaced_literally(tmp_path):
         results = {}
         for editor in ("check", "patch"):
             panel = await _show_panel(app, pilot, editor)
-            panel.set_a2l_parameters(
-                [{
-                    "name": "HOSTILE_UNIT",
-                    "address": 0x1000,
-                    "length": 2,
-                    "byte_size": 2,
-                    "datatype": "UWORD",
-                    "compu_method_unit": unit,
-                }],
-                ("hostile-unit", editor),
-            )
+            rows = [{
+                "name": "HOSTILE_UNIT",
+                "address": 0x1000,
+                "length": 2,
+                "byte_size": 2,
+                "datatype": "UWORD",
+                "compu_method_unit": unit,
+            }]
+            if editor == "patch":
+                # C-7 (batch G2): the Patch panel no longer reaches self.app —
+                # set_a2l_parameters takes the parsed A2L data from the caller,
+                # the way app/patch.py threads it. The Check panel still reads
+                # self.app, so its arm stays on the no-a2l_data seam.
+                panel.set_a2l_parameters(
+                    rows, ("hostile-unit", editor), a2l_data=app.current_a2l_data
+                )
+            else:
+                panel.set_a2l_parameters(rows, ("hostile-unit", editor))
             await _settle(pilot)
             # Inc 8 R-PE-DEF.2: the Patch Editor's full-name line is mounted but not shown; the name
             # and unit its operator sees are the staging sheet's formula bar (name label, tail).

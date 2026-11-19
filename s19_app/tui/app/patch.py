@@ -15,7 +15,7 @@ from ..changes.io import (
     serialize_change_document,
 )
 from ..models import LoadedFile, ProjectVariantSet
-from ..screens import ChangeSetJsonScreen, EntryJsonScreen
+from ..screens import BulkParameterAddScreen, ChangeSetJsonScreen, EntryJsonScreen
 from ..screens_directionb import (
     CheckEditorPanel,
     LoadGuardScreen,
@@ -38,6 +38,7 @@ from . import deps
 from .shared import (_SAVEBACK_S0_MAX_BYTES)
 
 if TYPE_CHECKING:
+    from ..a2l_parameter_picker import A2LParameterPicker
     from ..screens_directionb.patch_editor.sheet import StagingSheet
 
 
@@ -1857,7 +1858,28 @@ class PatchMixin:
         measurable = [
             tag for tag in tags if isinstance(tag.get("address"), int)
         ]
-        panel.set_a2l_parameters(measurable, self._a2l_enriched_key)
+        panel.set_a2l_parameters(
+            measurable, self._a2l_enriched_key, a2l_data=self.current_a2l_data
+        )
+
+    def on_a2l_parameter_picker_bulk_add_requested(
+        self, event: A2LParameterPicker.BulkAddRequested
+    ) -> None:
+        """Push the shared bulk modal for the Patch picker (R-B102-BULK-001).
+
+        The Patch picker's own ``BulkAddRequested`` bubbles to the app (the
+        Check Editor stops its own copy at the panel), so the Patch panel
+        stays presentational (C-7) — it never reaches for the app nor pushes
+        a screen. The app owns the screen stack and pushes
+        :class:`BulkParameterAddScreen` bound to the Patch picker, with the
+        panel's ``_on_bulk_add_closed`` as the dismiss callback. User-visible
+        behaviour is unchanged.
+        """
+        event.stop()
+        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        self.push_screen(
+            BulkParameterAddScreen(panel._a2l_picker), panel._on_bulk_add_closed
+        )
 
     def _note_image_bytes_written(self) -> None:
         """

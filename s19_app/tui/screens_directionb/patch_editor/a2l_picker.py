@@ -8,7 +8,6 @@ from textual.containers import Horizontal
 from textual.widgets import Button, DataTable, Input, Static
 from ...a2l import MAX_A2L_DECODE_BYTES
 from ...a2l_parameter_picker import A2LParameterPicker
-from ...screens import BulkParameterAddScreen
 from ....utils import safe_text
 from ..shared import CheckLayout, check_layout
 from .sheet import StagingSheet
@@ -23,22 +22,21 @@ class A2lPickerMixin:
     # ------------------------------------------------------------------
 
     def set_a2l_parameters(
-        self, rows: Sequence[dict], signature: object = None
+        self, rows: Sequence[dict], signature: object = None, *, a2l_data=None
     ) -> None:
         """Populate the A2L picker (R-B102-PE-001, R-B102-PE-005).
 
-        Delegates rows, the app's safe ``_a2l_enriched_key`` signature and its
-        current parsed A2L data to the embedded picker: it mounts at most one
-        200-row page and preserves the filter, page, highlight and picks while
-        the signature is unchanged, in which case this shim returns without
-        touching the layout. On a real (re)population the cached ``Fmt · Unit``
-        width may change, so the derived widths are invalidated and re-derived
-        on the next layout pass. A headless panel or an app without parsed A2L
-        data supplies ``None``.
+        Delegates rows, the app's safe ``_a2l_enriched_key`` signature and the
+        caller-supplied parsed A2L data to the embedded picker: it mounts at
+        most one 200-row page and preserves the filter, page, highlight and
+        picks while the signature is unchanged, in which case this shim
+        returns without touching the layout. On a real (re)population the
+        cached ``Fmt · Unit`` width may change, so the derived widths are
+        invalidated and re-derived on the next layout pass. The app passes its
+        parsed A2L data through ``a2l_data``; a headless panel or an app
+        without parsed A2L data supplies ``None`` — the panel never reaches
+        for the app itself (C-7).
         """
-        a2l_data = (
-            getattr(self.app, "current_a2l_data", None) if self.is_mounted else None
-        )
         if not self._a2l_picker.set_parameters(rows, signature, a2l_data=a2l_data):
             return
         self._a2l_layout = None
@@ -103,21 +101,6 @@ class A2lPickerMixin:
             table.update_cell(name, keys[1], cells[1], update_width=(index == 0))
             table.update_cell(name, keys[3], cells[3])
         self._a2l_picker.refresh_full_name()
-
-    def _on_a2l_parameter_picker_bulk_add_requested(
-        self, event: A2LParameterPicker.BulkAddRequested
-    ) -> None:
-        """The picker's bulk-add control was activated: push the shared bulk
-        modal for this panel's picker. The host owns the screen stack; bulk
-        inclusion never creates a Patch document action."""
-        event.stop()
-        self._open_parameter_bulk_add()
-
-    def _open_parameter_bulk_add(self) -> None:
-        """Push :class:`BulkParameterAddScreen` bound to the Patch picker."""
-        self.app.push_screen(
-            BulkParameterAddScreen(self._a2l_picker), self._on_bulk_add_closed
-        )
 
     def _on_bulk_add_closed(self, summary: Optional[dict]) -> None:
         """Bulk modal dismissed without rebuilding the ledger or changing the
