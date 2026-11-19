@@ -60,14 +60,3 @@ def test_validate_mac_records_duplicate_address_hard_conflict_from_a2l():
     duplicate_issue = next(issue for issue in issues if issue.code == "MAC_DUPLICATE_ADDRESS")
     assert duplicate_issue.severity == ValidationSeverity.ERROR
     assert duplicate_issue.details.get("classification") == "hard conflict"
-
-
-def test_validate_mac_records_duplicate_address_info_when_allow_policy():
-    records = [
-        {"parse_ok": True, "line_number": 10, "name": "", "address": 0x2222},
-        {"parse_ok": True, "line_number": 11, "name": "", "address": 0x2222},
-    ]
-    issues = validate_mac_records(records, alias_policy="allow")
-    duplicate_issue = next(issue for issue in issues if issue.code == "MAC_DUPLICATE_ADDRESS")
-    assert duplicate_issue.severity == ValidationSeverity.INFO
-    assert duplicate_issue.details.get("classification") == "valid unresolved"

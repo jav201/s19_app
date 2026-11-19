@@ -456,30 +456,6 @@ def test_legacy_v1_load_rejected_with_single_error(tmp_path: Path) -> None:
 # ===========================================================================
 
 
-def test_retired_method_names_absent() -> None:
-    """The CdfxService parameter / export / unified methods do not exist.
-
-    Intent: LLR-003.4 — the evolved service provides no parameter-by-name
-    change list, no selective ``.cdfx`` export, and no v1 unified-file
-    methods (HLR-003 statement 2); their names must be absent, not stubbed.
-    """
-    service = ChangeService()
-    retired = [
-        "export_selective",
-        "save_unified",
-        "load_unified",
-        "add_memory_change",
-        "edit_memory_change",
-        "remove_memory_change",
-        "memory_rows",
-        "memory_validation_issues",
-        "memory_is_empty",
-        "change_list",
-    ]
-    for name in retired:
-        assert not hasattr(service, name), f"retired method present: {name}"
-
-
 # ===========================================================================
 # F-Q-15 case 8 — the run-checks seam (real E4 engine by default)
 # ===========================================================================

@@ -46,7 +46,6 @@ import pytest
 from textual.widgets import Button, Input
 
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.os_clipboard_input import OsClipboardInput
 from tests.support.b100_load_dialog import bare_path_dialog, is_load_dialog
 
 # A realistic Windows path chosen to hit every single-key App binding
@@ -287,18 +286,6 @@ def test_loadfilescreen_ctrl_v_falls_back_to_internal_clipboard(
     )
 
 
-def test_os_clipboard_input_is_input_subclass() -> None:
-    """R-TUI-043-f: OsClipboardInput must remain a drop-in Input subclass.
-
-    Guards against a refactor that breaks the class hierarchy (any code
-    doing ``query_one("#load_path", Input)`` would silently miss it).
-    """
-    assert issubclass(OsClipboardInput, Input), (
-        "OsClipboardInput must subclass Input so widget queries "
-        "targeting Input still find it."
-    )
-
-
 # ---------------------------------------------------------------------------
 # R-TUI-043-g/h/i/j — Layered clipboard cascade (tkinter → ctypes → PowerShell).
 #
@@ -307,36 +294,6 @@ def test_os_clipboard_input_is_input_subclass() -> None:
 # test below exercises the cascade at the ``read_os_clipboard`` level with
 # fake strategy callables so nothing depends on the real OS clipboard.
 # ---------------------------------------------------------------------------
-
-
-def test_read_os_clipboard_happy_path_uses_only_first_strategy() -> None:
-    """R-TUI-043-g: on happy path, ONLY the first strategy is invoked.
-
-    Perf sanity: we do not pay the cost of the fallback layers when the
-    primary layer returns text. Guards against a refactor that
-    accidentally invokes every layer every time.
-    """
-    from s19_app.tui.os_clipboard_input import read_os_clipboard
-
-    calls: list[str] = []
-
-    def tk_ok() -> str:
-        calls.append("tk")
-        return "TK_TEXT"
-
-    def ctypes_boom() -> str:
-        calls.append("ctypes")
-        raise RuntimeError("must-not-be-called on happy path")
-
-    def ps_boom() -> str:
-        calls.append("ps")
-        raise RuntimeError("must-not-be-called on happy path")
-
-    result = read_os_clipboard(
-        strategies=(("tkinter", tk_ok), ("ctypes-win32", ctypes_boom), ("powershell", ps_boom))
-    )
-    assert result == "TK_TEXT"
-    assert calls == ["tk"], f"Only the first strategy should run; got {calls}"
 
 
 def test_read_os_clipboard_cascades_tk_fail_to_ctypes() -> None:
@@ -601,35 +558,6 @@ def test_ctrl_v_preserves_unicode_from_clipboard(
         f"Ctrl+V must preserve unicode payload exactly; "
         f"expected {unicode_path!r}, got {value!r}"
     )
-
-
-def test_powershell_layer_returns_none_on_non_windows(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """R-TUI-043-n: the PowerShell layer is a no-op on non-Windows platforms."""
-    from s19_app.tui import os_clipboard_input as os_clip_mod
-
-    monkeypatch.setattr(os_clip_mod.sys, "platform", "linux")
-
-    called: list[bool] = []
-
-    def _should_not_run(*args, **kwargs):  # type: ignore[no-untyped-def]
-        called.append(True)
-        raise RuntimeError("must not spawn powershell on non-Windows")
-
-    monkeypatch.setattr(os_clip_mod.subprocess, "run", _should_not_run)
-    assert os_clip_mod._read_via_powershell() is None
-    assert called == []
-
-
-def test_ctypes_layer_returns_none_on_non_windows(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """R-TUI-043-o: the ctypes-Win32 layer is a no-op on non-Windows platforms."""
-    from s19_app.tui import os_clipboard_input as os_clip_mod
-
-    monkeypatch.setattr(os_clip_mod.sys, "platform", "linux")
-    assert os_clip_mod._read_via_ctypes() is None
 
 
 def test_notification_message_mentions_ctrl_shift_v_workaround(

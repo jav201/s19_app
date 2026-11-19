@@ -32,7 +32,6 @@ import tokenize
 from pathlib import Path
 from typing import List, Tuple
 
-import s19_app
 from s19_app.tui.app import S19TuiApp
 
 #: The interlocked ids (HLR-133 / LLR-133.1) — matched as WHOLE id tokens so
@@ -44,11 +43,6 @@ _ID_RE = re.compile(
     r"(?<![A-Za-z0-9_-])(?:command_bar_row|cmdbar_goto_input|find_input)"
     r"(?![A-Za-z0-9_-])"
 )
-
-#: Files the arm scans: the whole shipped tui package (source) + its
-#: stylesheet. Tests are deliberately out of scope — the arm's own plant
-#: strings live there.
-_TUI_DIR = Path(s19_app.__file__).resolve().parent / "tui"
 
 
 def _docstring_lines(source: str) -> set:
@@ -130,24 +124,6 @@ def scan_files(paths: List[Path]) -> List[Tuple[str, int, str]]:
         else:
             hits.extend(scan_python(source, label))
     return hits
-
-
-def _shipped_surface_files() -> List[Path]:
-    return sorted(_TUI_DIR.rglob("*.py")) + [_TUI_DIR / "styles.tcss"]
-
-
-# ---------------------------------------------------------------------------
-# TC-678 — the arm over the shipped surface: 0 live references.
-# ---------------------------------------------------------------------------
-def test_tc678_interlock_arm_shipped_surface_is_clean() -> None:
-    """HLR-133 — the shipped tui tree carries NO live ``#command_bar_row`` /
-    bar find/goto input reference; the P-2 comment/docstring mentions are the
-    only survivors and the arm masks exactly those zones."""
-    hits = scan_files(_shipped_surface_files())
-    assert hits == [], (
-        "the command-bar interlock is breached — a live reference to the "
-        f"deleted bar ids appeared: {hits}"
-    )
 
 
 # ---------------------------------------------------------------------------

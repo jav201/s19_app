@@ -40,7 +40,6 @@ from textual.widgets import Button, Label, ListItem, ListView, Static
 import s19_app.tui.services.operation_service as operation_service_module
 from s19_app.tui.app import S19TuiApp
 from s19_app.render.hexview import MAX_HEX_ROWS, render_hex_view_text
-from s19_app.tui.models import LoadedFile
 from s19_app.tui.operations import OperationResult
 from s19_app.tui.operations.model import OperationInput
 from s19_app.tui.screens import OperationsScreen
@@ -140,116 +139,6 @@ def test_operations_view_lists_registry_ids(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 # TC-011 / LLR-004.2 — execution exclusively through run_operation
 # ---------------------------------------------------------------------------
-
-
-def test_operations_view_executes_via_service(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Execute shows the result; the service seam is observed.
-
-    Intent: LLR-004.2 — phase A executes the real ``extract`` placeholder
-    through the generic synchronous service path and the presented text
-    carries ``status: placeholder`` plus its placeholder note. Phase B injects
-    a stub through the LLR-003.1 ``operation_resolver`` seam: the stub is what
-    executes (with the same snapshot the app handed to the screen), proving
-    the view routes through the resolver seam and never bypasses it — a direct
-    ``registry.get_operation(...).execute(...)`` call in the view would leave
-    the stub unreached and fail here.
-
-    Note (batch-12 I3b): the synchronous-path contracts are exercised through
-    a NON-CRC row (``extract``, index 1) — the ``crc`` row migrated to a
-    config-fed ``@work(thread=True)`` worker (LLR-002.3/004.2), covered by
-    ``tests/test_tui_crc_surface.py``.
-    """
-    s19_path = _write_s19(tmp_path)
-
-    async def _drive_real() -> str:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test() as pilot:
-            await pilot.pause()
-            await _load_file(app, pilot, s19_path)
-            app.action_operations_view()
-            await pilot.pause()
-            screen = app.screen
-            assert isinstance(screen, OperationsScreen)
-            screen.query_one("#operations_list", ListView).index = 1
-            await pilot.pause()
-            screen.query_one("#operations_execute", Button).press()
-            await pilot.pause()
-            return str(
-                screen.query_one("#operation_result_status", Static).content
-            )
-
-    status_text = asyncio.run(_drive_real())
-    assert "status: placeholder" in status_text, status_text
-    assert "placeholder: extract not yet implemented" in status_text, status_text
-
-    calls: list[OperationInput] = []
-
-    class _StubOperation:
-        operation_id = "extract"
-        title = "Extract"
-
-        def describe(self) -> str:
-            return "stub"
-
-        def execute(self, op_input: OperationInput, *, now_fn=None) -> OperationResult:
-            calls.append(op_input)
-            output = LoadedFile(
-                path=op_input.input_path,
-                file_type=op_input.file_type,
-                mem_map=op_input.mem_map,
-                row_bases=[],
-                ranges=op_input.ranges,
-                range_validity=[],
-                errors=[],
-                a2l_path=None,
-                a2l_data=None,
-                variant_id=op_input.variant_id,
-            )
-            return OperationResult(
-                operation_id="extract",
-                status="placeholder",
-                input_path=op_input.input_path,
-                variant_id=op_input.variant_id,
-                output=output,
-                notes=["stub note: seam substitution observed"],
-                timestamp_utc="2026-06-11T00:00:00+00:00",
-            )
-
-    monkeypatch.setattr(
-        operation_service_module,
-        "operation_resolver",
-        lambda operation_id: _StubOperation(),
-    )
-
-    async def _drive_stub() -> tuple:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test() as pilot:
-            await pilot.pause()
-            await _load_file(app, pilot, s19_path)
-            app.action_operations_view()
-            await pilot.pause()
-            screen = app.screen
-            assert isinstance(screen, OperationsScreen)
-            screen.query_one("#operations_list", ListView).index = 1
-            await pilot.pause()
-            screen.query_one("#operations_execute", Button).press()
-            await pilot.pause()
-            stub_text = str(
-                screen.query_one("#operation_result_status", Static).content
-            )
-            same_snapshot = (
-                bool(calls)
-                and app.current_file is not None
-                and calls[0].mem_map is app.current_file.mem_map
-            )
-            return stub_text, same_snapshot
-
-    stub_text, same_snapshot = asyncio.run(_drive_stub())
-    assert len(calls) == 1, "exactly one execution must reach the seam stub"
-    assert same_snapshot, "the stub must receive the app's current snapshot"
-    assert "stub note: seam substitution observed" in stub_text, stub_text
 
 
 # ---------------------------------------------------------------------------

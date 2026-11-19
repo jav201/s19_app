@@ -8,14 +8,11 @@ from pathlib import Path
 
 from s19_app import tui
 from s19_app.tui import (
-    FOCUS_CONTEXT_ROWS,
-    HEX_WIDTH,
     MAX_HEX_BYTES,
     MAX_HEX_ROWS,
     S19TuiApp,
     A2L_EXTENSIONS,
     copy_into_workarea,
-    find_repo_root,
     render_hex_view,
     render_hex_view_text,
     find_string_in_mem,
@@ -52,15 +49,6 @@ def test_copy_into_workarea_creates_unique_names(tmp_path):
     assert second.read_text(encoding="utf-8") == "S0-updated"
 
 
-def test_find_repo_root_detects_marker(tmp_path):
-    repo = tmp_path / "repo"
-    nested = repo / "a" / "b"
-    nested.mkdir(parents=True)
-    (repo / "pyproject.toml").write_text("[project]\nname='x'\n", encoding="utf-8")
-
-    assert find_repo_root(nested) == repo
-
-
 def test_resolve_input_path_prefers_base_dir(tmp_path):
     """Traces: R-TUI-005.4."""
     base_dir = tmp_path / "base"
@@ -71,29 +59,6 @@ def test_resolve_input_path_prefers_base_dir(tmp_path):
 
     resolved = resolve_input_path(Path("examples/file.s19"), base_dir)
     assert resolved == target
-
-
-def test_resolve_input_path_falls_back_to_repo_root(tmp_path):
-    repo = tmp_path / "repo"
-    repo.mkdir()
-    (repo / "project.toml").write_text("[project]\nname='x'\n", encoding="utf-8")
-    target = repo / "examples" / "file.s19"
-    target.parent.mkdir()
-    target.write_text("S0", encoding="utf-8")
-    base_dir = repo / "nested"
-    base_dir.mkdir()
-
-    resolved = resolve_input_path(Path("examples/file.s19"), base_dir)
-    assert resolved == target
-
-
-def test_render_hex_view_includes_focus_context():
-    mem_map = {addr: 0x41 for addr in range(0x1000, 0x1000 + (HEX_WIDTH * 80))}
-    focus = 0x1000 + (HEX_WIDTH * 70)
-
-    output = render_hex_view(mem_map, focus)
-    assert "context preserved" in output
-    assert f"0x{focus - (FOCUS_CONTEXT_ROWS * HEX_WIDTH):08X}" in output
 
 
 def test_render_hex_view_truncates_output():

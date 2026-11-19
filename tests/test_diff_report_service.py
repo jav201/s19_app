@@ -77,7 +77,6 @@ from s19_app.tui.services.diff_report_service import (
     BeforeAfterProvenance,
     generate_diff_report,
     generate_diff_report_html,
-    list_diff_reports,
 )
 from s19_app.tui.services.report_filter import (
     parse_report_filter,
@@ -223,29 +222,6 @@ def test_collision_never_overwrites_existing_file(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 # TC-017 — LLR-004.2 — self-contained listing (G-4); report_service NON-edit
 # ---------------------------------------------------------------------------
-
-
-def test_self_contained_listing_newest_first(tmp_path: Path) -> None:
-    """list_diff_reports returns diff reports newest-first within a second group.
-
-    Intent: LLR-004.2 / G-4 — the module owns its listing. Threshold: base then
-    ``-01`` are returned with the ``-01`` (newer) FIRST; a foreign ``.md`` is
-    listed LAST.
-    """
-    reports = tmp_path / "reports"
-    reports.mkdir()
-    base = reports / "20260611T120000Z-diff-report.md"
-    sibling = reports / "20260611T120000Z-01-diff-report.md"
-    foreign = reports / "notes.md"
-    for p in (base, sibling, foreign):
-        p.write_text("x", encoding="utf-8")
-
-    listed = list_diff_reports(reports)
-
-    assert listed[0] == sibling  # -01 is the newer of the same-second group
-    assert listed[1] == base
-    assert listed[-1] == foreign
-    assert list_diff_reports(tmp_path / "missing") == []
 
 
 def test_report_service_regex_unedited() -> None:

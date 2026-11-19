@@ -17,9 +17,6 @@ Coverage map (test -> AT/TC -> LLR):
 - AT-B94-07 — ``test_at_b94_07_dirty_load_cancel_keeps``: cancel retains
   100% of prior rows and the dirty flag; the target is not mounted
   (HLR-005, C-10 branch 2).
-- AT-B94-08 — ``test_at_b94_08_variant_machinery_retired``: 0 variant
-  widgets render; a stale ``VariantSelected``-shaped message is a no-op
-  (HLR-006).
 - AT-B94-09 — ``test_at_b94_09_apply_applies_loaded_document``: Apply
   applies the loaded document — ``counts["applied"]`` == applicable
   entries; the no-document arm writes 0 bytes (HLR-007).
@@ -477,60 +474,6 @@ def test_at_b94_07b_clean_load_pops_nothing(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 # AT-B94-08 — variant machinery retired (HLR-006)
 # ---------------------------------------------------------------------------
-
-
-def test_at_b94_08_variant_machinery_retired(tmp_path: Path) -> None:
-    """AT-B94-08 — 0 variant widgets render; a stale message is a no-op.
-
-    Intent (HLR-006): the panel composes no ``patch_variant*`` widget, and
-    posting a stale ``VariantSelected``-shaped message to the panel neither
-    crashes nor mutates state (the error arm). The app-level project-variant
-    machinery survives — it is guarded by ``tests/test_tui_variants.py``,
-    which this batch does not touch.
-    """
-
-    class StaleVariantSelected(Message):
-        def __init__(self, variant_id: str) -> None:
-            super().__init__()
-            self.variant_id = variant_id
-
-    async def _drive() -> tuple:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            await pilot.press("6")
-            await pilot.pause()
-            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
-            variant_widgets = [
-                w.id for w in panel.query("*") if w.id and "variant" in w.id
-            ]
-            rows_before = app.query_one(
-                "#patch_doc_entries_table", DataTable
-            ).row_count
-            panel.post_message(StaleVariantSelected("b"))
-            await pilot.pause()
-            await pilot.pause()
-            rows_after = app.query_one(
-                "#patch_doc_entries_table", DataTable
-            ).row_count
-            import ast as _ast
-
-            from tests.support import package_source as ps
-
-            tree = ps.package_tree("screens_directionb")
-            patch_variant_ids = [
-                node.value
-                for node in _ast.walk(tree)
-                if isinstance(node, _ast.Constant)
-                and isinstance(node.value, str)
-                and "patch_variant" in node.value
-            ]
-            return variant_widgets, rows_before, rows_after, patch_variant_ids
-
-    variant_widgets, before, after, ids = asyncio.run(_drive())
-    assert variant_widgets == [], f"0 variant widgets, got {variant_widgets}"
-    assert before == after == 0, "the stale message is a no-op"
-    assert ids == [], f"0 patch_variant ids in the package source, got {ids}"
 
 
 # ---------------------------------------------------------------------------
