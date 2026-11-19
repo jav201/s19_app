@@ -32,7 +32,6 @@ from .insight_style import (
     DEPTH_BG,
     DEPTH_BORDER,
     DEPTH_ODD_ROW,
-    DEPTH_PANEL,
     DGRAY,
     GREEN,
     HILITE,
@@ -53,7 +52,8 @@ _NOTICE = YELLOW
 _SELECTED_GROUND = "#1c2547"
 _ODD_GROUND = DEPTH_ODD_ROW
 _EXPANDED_GROUND = DEPTH_BORDER
-_CARD_GROUND = DEPTH_PANEL
+# The framed editor card sits on the expanded ground, as in the approved prototype capture D.off.sheet.220x60.
+_CARD_GROUND = _EXPANDED_GROUND
 _KEY_INK = DEPTH_BG
 _STAGED_STYLE = f"bold {_STAGED}"
 _PENDING_STYLE = f"bold {_PENDING}"

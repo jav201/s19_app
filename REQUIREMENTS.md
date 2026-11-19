@@ -5129,7 +5129,7 @@ sheet styles     The style of each element the sheet paints; the table under thi
 | key hint | `enter stage ↓` of the formula tail | bold DEPTH_BG #0a0e1b on HILITE | the words |
 | mask mark | `■` of the bit table | bold HILITE | `■` against `·` |
 | expanded ground | every expanded-object line | ground DEPTH_BORDER #1b233a | the `┊` bar |
-| card ground | inside the card frame | ground DEPTH_PANEL #0f1525 | the frame |
+| card ground | inside the card frame | ground DEPTH_BORDER #1b233a (the expanded ground; operator verdict V8b-14, 2026-11-19) | the frame |
 | verdict hue | inside `#patch_editor_panel`: GREEN = `✓` passed or `●` staged; YELLOW = `▲` notice or partial; RED = `✗` failed or refused | GREEN #54efae, YELLOW #f6ff8f, RED #fd8383, only on a line that carries the glyph | `✓` / `●` / `▲` / `✗` |
 
 #### CTX-PE-BENCH · CURVE / MAP / VAL_BLK benches (S10.11; batch-103 Inc 8b/9/9b)

@@ -224,6 +224,19 @@ def test_r_pe_def_33_2_after_choosing_run_the_mark_moves_to_run(defc):
     assert at(lines, 1).startswith(BAR + OT["E.card.ENUM_0001.line0"]), "the frame does not move with the choice"
 
 
+def test_r_pe_def_97_12_the_card_is_on_the_expanded_ground(defc):
+    """R-PE-DEF.97/12 (CTX-PE-DEF card ground): the card interior is on the expanded ground (operator verdict V8b-14)."""
+    row, pv = with_pending(defc, "MASK_FIELD_0001", "255")
+    lines = painted(row, pv)
+    assert len(lines) == 7, [ln.plain for ln in lines]  # the definition line, then the six card lines
+    for line in lines[2:6]:  # the card's middle rows: bit, before, mask, after
+        plain = line.plain
+        card = plain[len(BAR):].rstrip()  # the card without the ground padding
+        assert card[0] == card[-1] == "│", plain
+        grounds = {hex_of(style_at(line, len(BAR) + i).bgcolor) for i in range(1, len(card) - 1)}
+        assert grounds == {EXPANDED_GROUND}, (plain, grounds)
+
+
 # ============================================================================== R-PE-DEF.34, .102, .109 - the bit table
 
 
