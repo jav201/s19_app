@@ -1026,6 +1026,28 @@ def _help_lines(key: str, keys_text: str = "") -> dict:
     return lines
 
 
+#: Canon names of the compact picker's glyph-only page buttons, keyed on the
+#: raw label text. Used ONLY when the stripped label is empty (REQUIREMENTS.md
+#: CTX "filter row" ~:4943-4945: "the compact filter row paints Prev, Next and
+#: Include parameter `<`, `>` and `▽ Pick`"). Any other glyph-only button
+#: still yields `''` (stays RED).
+_COMPACT_GLYPH_NAMES = {"<": "Prev", ">": "Next"}
+
+
+#: Widget ids whose derived label is empty because the widget is labelled by
+#: its row kind (the ``new =`` / ``field =`` / ``text =`` ``label — effect``
+#: help lines in ``s19_app/tui/window_help.py``), not by a row-adjacent
+#: ``Label``: the staging-sheet formula input (REQUIREMENTS.md CTX
+#: "staging sheet" :4946 — "the formula bar on its last line" — and CTX
+#: "formula bar" :5092-5093: "label: number and enum `new =`, bit mask
+#: `field =`, text `text =`"). With no A2L loaded the staging sheet has no
+#: rows (CTX "row fill" :5007 exists only for a selected row), so the input
+#: paints no label. The harvest skips a widget ONLY when its id is in this
+#: set AND its derived label is `''`; every other empty label is still
+#: collected (RED).
+_ROW_LABELLED_INPUTS = frozenset({"patch_sheet_input"})
+
+
 def _control_label(screen, widget) -> str:
     """D20 normalisation: a button up to its first ``:``; an input or select by
     the ``Label`` on its own row to its left (``:`` stripped), else its
@@ -1033,7 +1055,10 @@ def _control_label(screen, widget) -> str:
     from textual.widgets import Button, Label as _Label
 
     if isinstance(widget, Button):
-        return _strip_glyph(str(widget.label)).split(":", 1)[0].strip()
+        label = _strip_glyph(str(widget.label)).split(":", 1)[0].strip()
+        if not label:
+            label = _COMPACT_GLYPH_NAMES.get(str(widget.label), "")
+        return label
     row = [
         str(lab.render()).strip()
         for lab in screen.query(_Label)
@@ -1052,6 +1077,10 @@ def test_tc_b97_32_patch_help_names_every_label(tmp_path: Path) -> None:
     ``PATCH_GLYPHS``. The floor is derived over ``PE_IDS_9C7BEAF`` by the type
     tuple Button · Input · Select and equals 26; the count of covered control
     WIDGETS is at least that floor; the one ``Edit JSON`` line names both tabs.
+    The formula input's ``new =`` / ``field =`` / ``text =`` row labels paint
+    only with a loaded A2L (a sheet row selected) and are verified there by
+    ``test_r_pe_def_37_n_the_bar_shows_the_row_name_and_its_kind_label``
+    (tests/test_b103_inc8_s2_sheet_formula.py).
 
     RED on main (P-21): 6 of 19 labels named. Mutation: a body line without
     `` — effect``; coverage from one tab only; the ``TextArea`` put back in
@@ -1082,7 +1111,10 @@ def test_tc_b97_32_patch_help_names_every_label(tmp_path: Path) -> None:
                         continue
                     if any(not a.display for a in widget.ancestors if hasattr(a, "display")):
                         continue
-                    seen[widget] = _control_label(screen, widget)
+                    label = _control_label(screen, widget)
+                    if widget.id in _ROW_LABELLED_INPUTS and label == "":
+                        continue
+                    seen[widget] = label
 
             for tab in PATCH_TABS:
                 if panel.query(f"#{tab}"):

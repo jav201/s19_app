@@ -109,17 +109,20 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "Edit — replaces the entry at the typed address with the form's "
             "value.",
             "Remove — removes the entry at the typed address.",
-            "Edit JSON — on the Inspector tab, edits the highlighted entry as "
-            "JSON; on the JSON tab, opens the paste buffer full size. Both "
-            "are off for a document loaded from a file.",
+            "Edit JSON — on the Inspector tab, edits the highlighted entry "
+            "as JSON, enabled for every document; on the JSON tab, opens the "
+            "paste buffer full size, disabled while the document is "
+            "file-backed.",
             "Parse pasted — loads the paste buffer as the document.",
-            "Undo — steps the document back one edit (a pasted or typed "
-            "document only).",
+            "Undo — steps the document back one edit, enabled for every "
+            "document.",
             "Redo — steps it forward again.",
             "Scope — cycles which variants Execute scope runs over.",
             "Execute scope — applies the document over the chosen variants.",
             "Save patched image as — the file name an applied image is "
             "written under.",
+            "Format — toggles the output format between S19 and Intel HEX "
+            "and shows the current format name; Width shows only for S19.",
             "Width — cycles the S19 record width of that file (32 or 16 "
             "bytes per line).",
             "Write file — writes the patched image.",
