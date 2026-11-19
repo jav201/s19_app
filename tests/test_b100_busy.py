@@ -1472,12 +1472,13 @@ def test_tc_b100_50_a2l_raise_ends_the_action_first(tmp_path: Path, monkeypatch:
 
 
 def test_tc_b100_50_project_raise_ends_the_action_first(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """LLR-176.1l (A12-45), re-pinned at Inc 12b (P1-34, census P1-C9: the
-    12a target ``_install_project_image`` is retired): ``_apply_loaded_file``
-    — the main-thread install — raising → one effective end
-    ``("project_load", g, "Loading project P failed")`` with 0 timers left
-    at that end, and the ``RuntimeError`` still surfaces (loud, as the same
-    defect is on the base inside a synchronous load).
+    """LLR-176.1l (A12-45), re-pinned to the shared install seam (the 12a
+    target ``_install_project_image`` is retired, and batch-103 moved the
+    project path off ``_apply_loaded_file``): ``_apply_prepared_load`` — the
+    install ``_install_prepared_project`` now calls — raising → one effective
+    end ``("project_load", g, "Loading project P failed")`` with 0 timers
+    left at that end, and the ``RuntimeError`` still surfaces (loud, as the
+    same defect is on the base inside a synchronous load).
 
     Why: a project load that crashes must not leave the indicator up.
     Negative control: the install's guard removed → the run stays open with
@@ -1485,7 +1486,7 @@ def test_tc_b100_50_project_raise_ends_the_action_first(tmp_path: Path, monkeypa
     base = tmp_path / "app"
     _project_p(base)
     seam = Seam(monkeypatch)
-    monkeypatch.setattr(S19TuiApp, "_apply_loaded_file", _boom)
+    monkeypatch.setattr(S19TuiApp, "_apply_prepared_load", _boom)
 
     async def start(app, pilot):
         app._handle_load_project("P")
@@ -1580,27 +1581,28 @@ CENSUS = [
     ("load_from_path", "begin", "file_load", None, 1),
     ("load_from_path", "end", "file_load", None, 1),
     ("load_from_path", "step", "file_load", 2, 1),
-    ("load_a2l_from_path", "begin", "a2l_load", None, 1),
+    ("_start_a2l_load", "begin", "a2l_load", None, 1),
     # Inc 12b re-key (X12b-14, C12b-51): the A2L ends move to the main-thread
     # handlers and the parse step to the worker (posted through call_from_thread).
     ("_install_attached_a2l", "end", "a2l_load", None, 1),
     ("_on_a2l_attach_failed", "end", "a2l_load", None, 1),
     ("_a2l_attach_worker", "step", "a2l_load", 2, 1),
-    ("_start_load_worker", "end", "file_load", None, 1),
+    ("_complete_prepared_load", "end", "file_load", None, 1),
     ("_handle_load_error", "end", "file_load", None, 1),
 ]
 
 
 def _seam_events(node) -> list:
     """(event, key, step) for every seam call in ``node`` — direct, or as
-    the first argument of ``call_from_thread`` (nested defs included)."""
+    the first argument of ``call_from_thread`` / ``call_after_refresh``
+    (nested defs included)."""
     out = []
     for inner in ast.walk(node):
         if not isinstance(inner, ast.Call):
             continue
         name = _callee(inner.func)
         args = list(inner.args)
-        if name == "call_from_thread" and args:
+        if name in ("call_from_thread", "call_after_refresh") and args:
             name = _callee(args[0])
             args = args[1:]
         event = {"_busy_begin_action": "begin", "begin_busy": "begin", "step_busy": "step", "end_busy": "end"}.get(name)
@@ -2602,7 +2604,7 @@ TWELVE_B_SITES = [
     ("_save_project_files", "step", "save_project", 3),
     ("_save_project_files", "step", "save_project", 4),
     ("_on_project_saved", "end", "save_project", None),
-    ("load_a2l_from_path", "begin", "a2l_load", None),
+    ("_start_a2l_load", "begin", "a2l_load", None),
     ("_a2l_attach_worker", "step", "a2l_load", 2),
     ("_on_a2l_attached", "step", "a2l_load", 3),
     ("_install_attached_a2l", "end", "a2l_load", None),

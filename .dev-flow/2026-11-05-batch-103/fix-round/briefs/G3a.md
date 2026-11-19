@@ -1,0 +1,7 @@
+# Unit G3a — busy-seam tests lost their oracle after the batch-103 refactor (R2-F8)
+Fixed diagnosis:
+1. `test_tc_b100_50_project_raise_ends_the_action_first` patches `S19TuiApp._apply_loaded_file`, but project load now runs `_install_prepared_project` → `_apply_prepared_load` (`s19_app/tui/app/project_load.py:1558-1690`), whose `except BaseException: self._busy_fail(...)` is at `:1690`; the load therefore succeeds ("Loaded project 'P' …") instead of "Loading project P failed". Re-pin the raise injection to the current install seam.
+2. and 3. the two `test_tc_b100_51_*` AST censuses look for busy seam calls in `load_a2l_from_path`, `_install_attached_a2l`, `_start_load_worker`; the product now calls `_busy_begin_action("a2l_load", …)` in `_start_a2l_load` (`s19_app/tui/app/file_load.py:787`). Re-pin the census to the current functions, keeping the same counts and meaning.
+Files you may edit: `tests/test_b100_busy.py`.
+Negative controls: (1) in a scratch copy replace the `_busy_fail(...)` call at `project_load.py:~1690` with `raise` → RED; (2)(3) delete the `_busy_begin_action("a2l_load", …)` call at `file_load.py:787` → both RED.
+Nodes (`-n 0`): `tests/test_b100_busy.py::test_tc_b100_50_project_raise_ends_the_action_first`, `::test_tc_b100_51_every_baseline_bar_site_maps_to_a_seam_event`, `::test_tc_b100_51_twelve_b_seam_sites_sit_in_the_workers_and_handlers`; then the whole file.
