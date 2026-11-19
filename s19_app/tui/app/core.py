@@ -222,8 +222,9 @@ class S19TuiApp(ComposeScreensMixin, FlowMixin, SaveCommitMixin, ReportsMixin, P
         Binding("pageup", "page_up_context", "Page-", show=False),
         # batch-40 S2 (US-068a discoverability): ctrl+z / ctrl+y reach the
         # patch-editor change-set undo/redo without scrolling to the buttons.
-        # The actions self-guard (patch screen active + A-01 source_path None),
-        # so a press on any other screen / file-backed doc is a safe no-op.
+        # D10-23 (R-TUI-057.8): the actions self-guard on the patch screen only
+        # (R-TUI-057.7), so a press on any other screen is a safe no-op and the
+        # keys stay enabled for every document.
         Binding("ctrl+z", "patch_undo", "Undo", show=False),
         Binding("ctrl+y", "patch_redo", "Redo", show=False),
         # batch-97 Inc-6 (D10 amended, PC-13): `c` confirms the Flow
@@ -733,7 +734,6 @@ class S19TuiApp(ComposeScreensMixin, FlowMixin, SaveCommitMixin, ReportsMixin, P
         # This is the MJ-1 shape exactly: that census also counted three
         # `refresh_entries` sites and missed a mount-time fourth.
         self.query_one("#patch_editor_panel", PatchEditorPanel).set_undo_redo_enabled(
-            self._change_service.document.source_path is None,
             self._change_service.history_depths(),
         )
         # Keep startup focus off the command-bar inputs so the unmodified

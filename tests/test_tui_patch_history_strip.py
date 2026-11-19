@@ -190,7 +190,8 @@ async def _drive_history(
 
     ``ctrl+z`` (not the Undo button) because AT-081a names the batch-40 S2
     binding and C-16 says drive the real key. Both routes share
-    ``action_patch_undo``, so this also exercises the A-01 guard.
+    ``action_patch_undo``, so this also exercises the always-enabled history
+    path (D10-23, R-TUI-057.8).
     """
     app.action_show_screen("patch")
     await pilot.pause()
@@ -563,7 +564,6 @@ def test_tc081_2_strip(tmp_path: Path) -> None:
     new_members = {
         "_history_strip_text",
         "_HISTORY_HINT",
-        "_HISTORY_OFF",
         "_HISTORY_STRIP_BUDGET_COLS",
     }
     in_package_members = {
@@ -589,12 +589,12 @@ def test_tc081_2_strip(tmp_path: Path) -> None:
 
 
 def test_tc081_3_sites(tmp_path: Path) -> None:
-    """Every `set_undo_redo_enabled` call site pushes depths; A-01 stays consistent.
+    """Every `set_undo_redo_enabled` call site pushes depths; R-TUI-057.9 in step.
 
-    Intent (LLR-081.3): the strip answers "is a step back available?" and the
-    buttons' enabled state answers the same question. If one site updated the
-    buttons without the depths, the two would disagree on screen — the batch-38
-    Inc-4 F1 stale-panel defect that batch-40 S1 fixed.
+    Intent (LLR-081.3 / R-TUI-057.9): the strip answers "is a step back
+    available?", which is what the depths answer. If one site updated the
+    buttons without the depths, the strip would freeze at its previous numbers
+    — the batch-38 Inc-4 F1 stale-panel defect that batch-40 S1 fixed.
 
     ⚠ **The LLR names THREE sites; there are FOUR, and the fourth was a real
     defect.** All three named sites are ACTION sites, so none fires before the
@@ -609,11 +609,9 @@ def test_tc081_3_sites(tmp_path: Path) -> None:
     matches the method name inside docstrings (this file's own prose names it),
     and an oracle keyed to prose certifies documentation.
 
-    The behavioural arm is the A-01 boundary: a FILE-BACKED document disables
-    both buttons, and the strip must render the disabled state rather than
-    advertising ``ctrl+z`` — the same guard makes that key inert
-    (``_patch_history_action_allowed``), so a hint there is a wrong answer, not
-    decoration.
+    The behavioural arm is the D10-23 (R-TUI-057.8/.9) boundary: a FILE-BACKED
+    document keeps both buttons ENABLED, and the strip renders the position
+    (with the key hints) rather than a muted disabled line.
     """
     from tests.support import package_source as ps
 
@@ -632,18 +630,18 @@ def test_tc081_3_sites(tmp_path: Path) -> None:
         "push the depths, or the strip and the buttons will disagree there."
     )
     for site in call_sites:
-        passes_depths = len(site.args) >= 2 or any(
+        passes_depths = len(site.args) >= 1 or any(
             kw.arg == "depths" for kw in site.keywords
         )
         assert passes_depths, (
             f"{ps.source_file_of(site).name}:{site.lineno}: this site updates "
-            "the buttons without pushing the depths — the strip would freeze "
-            "at its previous numbers while the buttons moved around it "
-            "(LLR-081.3)"
+            "the strip without pushing the depths — the strip would freeze "
+            "at its previous numbers (R-TUI-057.9)"
         )
 
-    # A-01 behavioural arm: a file-backed document -> buttons disabled AND the
-    # strip in its disabled state. Zero disagreement.
+    # R-TUI-057.8 behavioural arm: a file-backed document -> buttons ENABLED
+    # and the strip in its position state (one undo step: the load). Zero
+    # disagreement with the always-enabled controls.
     doc_path = _write_v2_document(
         tmp_path / "doc.json", [{"type": "bytes", "address": "0x100", "bytes": "00"}]
     )
@@ -665,18 +663,18 @@ def test_tc081_3_sites(tmp_path: Path) -> None:
 
     strip, undo_disabled, redo_disabled = asyncio.run(_drive())
 
-    assert (undo_disabled, redo_disabled) == (True, True), (
-        "fixture integrity: a file-backed document must disable both history "
-        f"controls (the A-01 guard); got undo={undo_disabled} redo={redo_disabled}"
+    assert (undo_disabled, redo_disabled) == (False, False), (
+        "a file-backed document must keep both history controls ENABLED "
+        f"(R-TUI-057.8); got undo={undo_disabled} redo={redo_disabled}"
     )
-    assert strip.plain == PatchEditorPanel._HISTORY_OFF, (
-        "with the controls disabled the strip must render the disabled state, "
-        f"not a position; got {strip.plain!r}"
+    assert strip.plain == _expect_position(1, 0, _HISTORY_MAX), (
+        "with the controls enabled the strip must render the position (one "
+        f"undo step: the load), not a muted line; got {strip.plain!r}"
     )
     for key in ("ctrl+z", "ctrl+y"):
-        assert key not in strip.plain, (
-            f"the disabled strip must NOT advertise {key!r}: the same A-01 "
-            f"guard makes the key inert; got {strip.plain!r}"
+        assert key in strip.plain, (
+            f"the enabled strip must advertise {key!r} (R-TUI-057.8); "
+            f"got {strip.plain!r}"
         )
 
 
@@ -866,7 +864,7 @@ def test_tc081_5_strip_geometry_painted() -> None:
             panel.query_one("#patch_tab_json").press()
             await pilot.pause()
             panel.set_undo_redo_enabled(
-                True, {"back": _HISTORY_MAX, "forward": 0, "bound": _HISTORY_MAX}
+                {"back": _HISTORY_MAX, "forward": 0, "bound": _HISTORY_MAX}
             )
             await pilot.pause()
             strip = app.query_one("#patch_history_strip", Static)
@@ -922,18 +920,12 @@ def test_tc081_6_builder_returns_text() -> None:
     """
     panel = PatchEditorPanel.__new__(PatchEditorPanel)
 
-    text = panel._history_strip_text(True, {"back": 2, "forward": 1, "bound": 20})
+    text = panel._history_strip_text({"back": 2, "forward": 1, "bound": 20})
     assert text.plain == _expect_position(2, 1, 20)
 
     # `None` depths render the honest empty state rather than raising — the
     # defaulted-parameter contract from TC-081.2 has to mean something.
-    assert panel._history_strip_text(True, None).plain == _expect_position(0, 0, 0)
-
-    # Disabled ignores the depths entirely: there is no step to take.
-    assert (
-        panel._history_strip_text(False, {"back": 9, "forward": 9, "bound": 20}).plain
-        == PatchEditorPanel._HISTORY_OFF
-    )
+    assert panel._history_strip_text(None).plain == _expect_position(0, 0, 0)
 
     # No span carries a verdict hue. The panel's hue namespace is FULL and
     # GREEN/YELLOW/RED are RESERVED for verdicts inside `#patch_editor_panel`

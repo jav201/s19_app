@@ -398,7 +398,7 @@ class ActionsMixin:
         self.query_one("#patch_before_after_row", Container).add_class("hidden")
 
     def _history_strip_text(
-        self, enabled: bool, depths: Optional[Mapping[str, int]]
+        self, depths: Optional[Mapping[str, int]] = None
     ) -> Text:
         """Build the history strip's renderable (LLR-081.2).
 
@@ -410,17 +410,11 @@ class ActionsMixin:
                 ``↶ 1 back  ↷ 1 fwd  2/20``
                 ``ctrl+z / ctrl+y``
 
-            When the controls are DISABLED the strip renders a single muted
-            ``history off`` line and NO key hints, because the keys are inert:
-            ``ctrl+z``/``ctrl+y`` route through the same ``_patch_history_
-            action_allowed`` A-01 guard that disables the buttons. Printing a
-            hint for a key that does nothing is a wrong answer, not chrome.
+            D10-23 (R-TUI-057.8/.9): the old ``history off`` disabled line is
+            dropped — Undo/Redo stay enabled for every document, so the strip
+            always renders the position and the key hints.
 
         Args:
-            enabled (bool): The Undo/Redo controls' enabled state, so the strip
-                and the buttons cannot disagree about whether a step exists
-                (LLR-081.3). The panel is told the STATE, never the reason: it
-                is a view, and "file-backed" is the caller's A-01 rationale.
             depths (Optional[Mapping[str, int]]): ``ChangeService.
                 history_depths()`` — ``back`` / ``forward`` / ``bound``.
                 Duck-typed so this view widget imports nothing from the service
@@ -433,9 +427,8 @@ class ActionsMixin:
             vocabulary only (C-17).
 
         Data Flow:
-            - Disabled → the muted ``history off`` line, nothing else.
-            - Else → glyph + count per direction, ``back+forward`` against
-              ``bound``, then the key-hint line.
+            - Glyph + count per direction, ``back+forward`` against ``bound``,
+              then the key-hint line.
             - Counts are rendered VALUE when non-zero and DGRAY at zero, so
               "no step that way" reads as absent rather than as a number. No
               new hue: the strip is chrome, not a verdict (GREEN/YELLOW/RED
@@ -443,7 +436,7 @@ class ActionsMixin:
 
         Dependencies:
             Uses:
-                - ``_HISTORY_HINT`` / ``_HISTORY_OFF`` ; ``insight_style``
+                - ``_HISTORY_HINT`` ; ``insight_style``
                   ``LABEL`` / ``VALUE`` / ``DGRAY``
             Used by:
                 - :meth:`set_undo_redo_enabled`
@@ -451,13 +444,10 @@ class ActionsMixin:
         Example:
             >>> panel = PatchEditorPanel.__new__(PatchEditorPanel)
             >>> panel._history_strip_text(
-            ...     True, {"back": 1, "forward": 1, "bound": 20}
+            ...     {"back": 1, "forward": 1, "bound": 20}
             ... ).plain
             '↶ 1 back  ↷ 1 fwd  2/20\\nctrl+z / ctrl+y'
         """
-        if not enabled:
-            return Text(self._HISTORY_OFF, style=DGRAY)
-
         counts = depths or {}
         back = int(counts.get("back", 0))
         forward = int(counts.get("forward", 0))
@@ -483,32 +473,27 @@ class ActionsMixin:
         return text
 
     def set_undo_redo_enabled(
-        self, enabled: bool, depths: Optional[Mapping[str, int]] = None
+        self, depths: Optional[Mapping[str, int]] = None
     ) -> None:
-        """Toggle the Undo/Redo controls + render the history strip (US-068a / LLR-081.2).
+        """Enable the Undo/Redo controls + render the history strip (US-068a / LLR-081.2).
 
         Summary:
-            Enable or disable ``#patch_undo_button`` and ``#patch_redo_button``
-            together so change-set undo/redo is available ONLY for a
-            paste-authored / empty document — the LLR-068a.4 data-loss guard.
-            The app calls this after every action with
-            ``enabled = document.source_path is None``: a file-backed document
-            (``source_path is not None``) disables both controls so a
-            file-backed change document can never be silently mutated or
-            replaced through the history path (batch-37 ``set_edit_json_enabled``
-            precedent).
+            Keep ``#patch_undo_button`` and ``#patch_redo_button`` enabled for
+            every document (D10-23, R-TUI-057.8) and render the history strip
+            from the live depths (R-TUI-057.9). The old LLR-068a.4 A-01 guard
+            that disabled both controls for a file-backed document is dropped:
+            Add/Edit/Remove still change a file-loaded document, so those
+            changes must be undoable.
 
             **batch-48 (LLR-081.2/.3): this is ALSO the history strip's seam**,
             deliberately — the strip answers "is a step back available?", which
-            is the same question the enable state answers. Rendering both from
-            ONE call means the strip and the buttons cannot disagree; a
-            separate ``refresh_history`` would be a second seam that a future
-            call site could forget, which is exactly the batch-38 Inc-4 F1
-            stale-panel defect.
+            is the same question the depths answer. Rendering both from ONE
+            call means the strip and the buttons cannot disagree; a separate
+            ``refresh_history`` would be a second seam that a future call site
+            could forget, which is exactly the batch-38 Inc-4 F1 stale-panel
+            defect.
 
         Args:
-            enabled (bool): ``True`` to enable both controls (paste-authored /
-                empty document); ``False`` to disable them (file-backed).
             depths (Optional[Mapping[str, int]]): ``ChangeService.
                 history_depths()`` — threaded in as a PARAMETER so the panel
                 keeps importing nothing from the service layer and never
@@ -523,10 +508,10 @@ class ActionsMixin:
                 - ``S19TuiApp`` Patch Editor action / change-file / history
                   handlers (all THREE push the depths — LLR-081.3)
         """
-        self.query_one("#patch_undo_button", Button).disabled = not enabled
-        self.query_one("#patch_redo_button", Button).disabled = not enabled
+        self.query_one("#patch_undo_button", Button).disabled = False
+        self.query_one("#patch_redo_button", Button).disabled = False
         self.query_one("#patch_history_strip", Static).update(
-            self._history_strip_text(enabled, depths)
+            self._history_strip_text(depths)
         )
 
     def _compose_action_bar(self) -> ComposeResult:

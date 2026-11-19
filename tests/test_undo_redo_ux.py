@@ -8,9 +8,10 @@ Covers two small patch-editor fixes shipped in batch-40 Increment 1:
   view`` re-renders the (now cleared) Checks panel through the existing
   ``refresh_check_results`` seam.
 - **S2 (AC-2.1 / AC-2.2)** — ``ctrl+z`` / ``ctrl+y`` reach the same guarded
-  undo/redo path as the on-screen buttons (C-16 real key), and MUST respect the
-  A-01 data-loss guard (no-op for a file-backed document, and a crash-free no-op
-  on any other screen / with an empty history stack).
+  undo/redo path as the on-screen buttons (C-16 real key). D10-23 (R-TUI-057.8)
+  dropped the old LLR-068a.4 A-01 file-backed guard: the keys now undo/redo a
+  file-backed document too, and remain crash-free no-ops on any other screen
+  (R-TUI-057.7) / with an empty history stack (R-TUI-057.6).
 
 Helpers are reused from ``test_tui_patch_editor_v2`` so the surface idioms
 (paste-authored seed, entries-table read, Add button) stay identical.
@@ -226,21 +227,24 @@ def test_ac2_1_ctrl_z_y_undo_redo_via_real_key(tmp_path: Path) -> None:
 
 
 # ===========================================================================
-# S2 — AC-2.2: the ctrl+z/ctrl+y binding respects the A-01 data-loss guard
+# S2 — AC-2.2: ctrl+z/ctrl+y undo every document; off-screen / empty are no-ops
 # ===========================================================================
 
 
 def test_ac2_2_ctrl_z_respects_a01_guard_and_is_crash_free(
     tmp_path: Path,
 ) -> None:
-    """``ctrl+z`` is a safe no-op for a file-backed doc / off-screen (AC-2.2).
+    """``ctrl+z`` undoes a file-backed doc; off-screen / empty-stack are no-ops.
 
-    Intent (batch-40 S2, A-01 data-loss guard, C-10 discriminator): the key
-    binding MUST mirror the disabled buttons — pressing ``ctrl+z`` against a
-    FILE-backed document (``source_path`` not None) must NOT undo/clobber it
-    (the loaded entry survives); pressing it on a NON-patch screen and with an
-    EMPTY history stack are crash-free no-ops. RED counterfactual (guard
-    bypassed): ``ctrl+z`` would pop the load snapshot and clear the entries.
+    Intent (batch-40 S2, D10-23 R-TUI-057.6/.7/.8, C-10 discriminator): D10-23
+    dropped the old LLR-068a.4 A-01 source-path guard, so the key binding now
+    mirrors the always-enabled buttons — pressing ``ctrl+z`` against a
+    FILE-backed document (``source_path`` not None) MUST undo the load (the
+    loaded entry is replaced by the pre-load empty document); pressing it on a
+    NON-patch screen (R-TUI-057.7) and with an EMPTY history stack
+    (R-TUI-057.6) are crash-free no-ops. RED counterfactual (old guard kept):
+    ``ctrl+z`` would be inert for the file-backed document and the loaded
+    entry would survive.
     """
     doc_path = _write_v2_document(
         tmp_path / "loaded.json",
@@ -253,21 +257,22 @@ def test_ac2_2_ctrl_z_respects_a01_guard_and_is_crash_free(
         async with app.run_test(size=(160, 50)) as pilot:
             await pilot.pause()
 
-            # (a) NON-patch screen + empty history → crash-free no-op.
+            # (a) NON-patch screen + empty history → crash-free no-op (R-TUI-057.7).
             app.action_show_screen("workspace")
             app.set_focus(None)
             await pilot.press("ctrl+z")
             await pilot.pause()
 
-            # (b) Patch screen, fresh (empty-stack) document → crash-free no-op.
+            # (b) Patch screen, fresh (empty-stack) document → crash-free no-op
+            # (R-TUI-057.6).
             app.action_show_screen("patch")
             app.set_focus(None)
             await pilot.press("ctrl+z")
             await pilot.pause()
             outcomes["fresh_entries"] = _entry_addresses(app)
 
-            # (c) FILE-backed document (source_path not None) → guard blocks the
-            # key so the loaded entry is NOT clobbered.
+            # (c) FILE-backed document (source_path not None) → ctrl+z UNDOES
+            # the load (R-TUI-057.8): the pre-load empty document is restored.
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
             _set_entry_inputs(app, path_text=str(doc_path))
             panel.request_action("load_doc")
@@ -285,13 +290,14 @@ def test_ac2_2_ctrl_z_respects_a01_guard_and_is_crash_free(
 
     outcomes = asyncio.run(_drive())
     assert outcomes["fresh_entries"] == [], (
-        "ctrl+z on a fresh empty-stack patch doc must be a crash-free no-op"
+        "ctrl+z on a fresh empty-stack patch doc must be a crash-free no-op "
+        "(R-TUI-057.6)"
     )
     assert outcomes["file_source_set"] is True, "the doc must be file-backed"
     assert outcomes["file_entries_before"] == ["0x100"], (
         "the file load must populate the entry (precondition)"
     )
-    assert outcomes["file_entries_after"] == ["0x100"], (
-        "ctrl+z must NOT undo/clobber a file-backed document (A-01 guard); "
+    assert outcomes["file_entries_after"] == [], (
+        "ctrl+z must UNDO a file-backed document's load (R-TUI-057.8); "
         f"got {outcomes['file_entries_after']!r}"
     )

@@ -3050,8 +3050,8 @@ def test_tc328_refresh_uses_source_path_not_widget_and_noops_when_unloaded(
 
 
 # ===========================================================================
-# US-064b — JSON popup change-set editor + A-01 disable-guard
-# (AT-064b, AT-064c, TC-329, TC-331 / LLR-064b.1/.2/.3/.4)
+# US-064b — JSON popup change-set editor + A-01 disable-guard (KEPT)
+# (AT-064b, AT-064c, TC-329, TC-331 / LLR-064b.1/.2/.3 + R-TUI-053.5)
 # ===========================================================================
 
 
@@ -3074,7 +3074,7 @@ def _seed_via_paste(app: S19TuiApp, text: str) -> None:
 
     Sets ``#patch_paste_text`` and presses the real Parse pasted button so
     ``ChangeService.load_text`` replaces the document — exactly the Q-07
-    fixture path (paste-authored, so the LLR-064b.4 guard leaves Edit-JSON
+    fixture path (paste-authored, so the R-TUI-053.5 guard leaves Edit-JSON
     enabled).
     """
     from textual.widgets import Button, TextArea
@@ -3381,7 +3381,7 @@ def test_at064c_edit_json_disabled_for_file_backed_document(
 ) -> None:
     """Edit JSON is DISABLED for a file-backed doc → no popup, no clobber.
 
-    Intent (AT-064c, US-064b / LLR-064b.4, A-01 data-loss guard): after a
+    Intent (AT-064c, US-064b / R-TUI-053.5, A-01 data-loss guard): after a
     FILE load (``source_path is not None``) the Edit-JSON control is disabled
     and the popup cannot open — so the stale ``DUMMY_CHANGESET_TEXT`` buffer
     can never be Confirmed to ``load_text``-REPLACE the loaded document. The
@@ -3590,7 +3590,7 @@ def test_tc331_disable_guard_predicate_tracks_source_path(
 ) -> None:
     """The disable-guard predicate tracks ``source_path`` live (TC-331).
 
-    Intent (TC-331, LLR-064b.4): the Edit-JSON control's disabled state tracks
+    Intent (TC-331, R-TUI-053.5): the Edit-JSON control's disabled state tracks
     ``ChangeService.document.source_path`` across the file→paste transition —
     fresh (None) → enabled; after a file load (not None) → disabled; after a
     subsequent paste (None) → enabled again.
@@ -3657,7 +3657,7 @@ def test_tc331_disable_guard_predicate_tracks_source_path(
 
 # ===========================================================================
 # US-068a (B-19a) — patch-editor change-set undo/redo through the surface
-# (AT-068a, TC-344 / LLR-068a.3/.4)
+# (AT-068a, TC-344 / LLR-068a.3 + R-TUI-057.8)
 # ===========================================================================
 
 
@@ -3771,15 +3771,15 @@ def test_at068a_undo_redo_roundtrip_through_surface(tmp_path: Path) -> None:
 def test_tc344_undo_redo_disabled_for_file_backed_document(
     tmp_path: Path,
 ) -> None:
-    """Undo/Redo are DISABLED for a file-backed doc → no clobber (TC-344).
+    """Undo/Redo stay ENABLED for a file-backed doc (TC-344, R-TUI-057.8).
 
-    Intent (TC-344, US-068a / LLR-068a.4, A-01 data-loss guard, batch-37
-    AT-064c precedent): after a FILE load (``source_path is not None``) the
-    Undo and Redo controls are DISABLED so a file-backed document can never be
-    silently mutated/replaced through the history path; for a paste-authored
-    document (``source_path is None``) both controls are ENABLED. The two states
-    are asserted in ONE node so the guard is a real discriminator (C-10), not a
-    constant.
+    Intent (TC-344, US-068a / R-TUI-057.8, D10-23): the old LLR-068a.4 A-01
+    data-loss guard is dropped — after a FILE load (``source_path is not None``)
+    the Undo and Redo controls stay ENABLED so a change made to a file-backed
+    document can be undone; for a paste-authored document (``source_path is
+    None``) both controls are ENABLED too. Both document kinds are asserted in
+    ONE node so the always-enabled contract (every document) is pinned, not a
+    constant for one fixture.
     """
     from textual.widgets import Button
 
@@ -3800,17 +3800,17 @@ def test_tc344_undo_redo_disabled_for_file_backed_document(
             await pilot.pause()
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
 
-            # (a) FILE-backed document → source_path not None → disabled.
+            # (a) FILE-backed document → source_path not None → still enabled.
             _set_entry_inputs(app, path_text=str(doc_path))
             panel.request_action("load_doc")
             await pilot.pause()
             outcomes["file_source"] = (
                 app._change_service.document.source_path is not None
             )
-            outcomes["undo_disabled_when_file"] = app.query_one(
+            outcomes["undo_enabled_when_file"] = not app.query_one(
                 "#patch_undo_button", Button
             ).disabled
-            outcomes["redo_disabled_when_file"] = app.query_one(
+            outcomes["redo_enabled_when_file"] = not app.query_one(
                 "#patch_redo_button", Button
             ).disabled
 
@@ -3834,11 +3834,11 @@ def test_tc344_undo_redo_disabled_for_file_backed_document(
 
     outcomes = asyncio.run(_drive())
     assert outcomes["file_source"] is True
-    assert outcomes["undo_disabled_when_file"] is True, (
-        "Undo must be DISABLED when a file-backed document is loaded"
+    assert outcomes["undo_enabled_when_file"] is True, (
+        "Undo must be ENABLED when a file-backed document is loaded (R-TUI-057.8)"
     )
-    assert outcomes["redo_disabled_when_file"] is True, (
-        "Redo must be DISABLED when a file-backed document is loaded"
+    assert outcomes["redo_enabled_when_file"] is True, (
+        "Redo must be ENABLED when a file-backed document is loaded (R-TUI-057.8)"
     )
     assert outcomes["paste_source_none"] is True
     assert outcomes["undo_enabled_when_paste"] is True, (
@@ -3859,7 +3859,7 @@ def _make_paste_service(entries: list[dict]) -> "object":
 
     Loads the entries through the real ``load_text`` paste seam so
     ``source_path`` stays ``None`` (paste-authored) — the per-entry-JSON edit
-    is enabled only for such documents (LLR-068b.4).
+    is enabled for every document (R-TUI-058.6).
     """
     service = change_service_module.ChangeService()
     result = service.load_text(_changeset_text(entries))
@@ -4072,14 +4072,15 @@ def test_at068b_per_entry_json_popup_edits_only_selected_entry(
 def test_tc345_entry_edit_json_disabled_for_file_backed_document(
     tmp_path: Path,
 ) -> None:
-    """The per-entry JSON control is DISABLED for a file-backed doc (TC-345).
+    """The per-entry JSON control stays ENABLED for a file-backed doc (TC-345).
 
-    Intent (TC-345, US-068b / LLR-068b.4, A-01 data-loss guard, batch-37
-    AT-064c precedent): after a FILE load (``source_path is not None``) the
-    ``#patch_entry_edit_json_button`` is DISABLED so a per-entry edit can never
-    silently mutate a file-backed document; for a paste-authored document
-    (``source_path is None``) it is ENABLED. Both states are asserted in ONE
-    node so the guard is a real discriminator (C-10), not a constant.
+    Intent (TC-345, US-068b / R-TUI-058.6, D10-23): the old LLR-068b.4 A-01
+    data-loss guard is dropped — after a FILE load (``source_path is not None``)
+    the ``#patch_entry_edit_json_button`` stays ENABLED so a per-entry edit can
+    be applied and undone for a file-backed document; for a paste-authored
+    document (``source_path is None``) it is ENABLED too. Both document kinds
+    are asserted in ONE node to pin the always-enabled contract (every
+    document).
     """
     from textual.widgets import Button
 
@@ -4100,14 +4101,14 @@ def test_tc345_entry_edit_json_disabled_for_file_backed_document(
             await pilot.pause()
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
 
-            # (a) FILE-backed document -> source_path not None -> disabled.
+            # (a) FILE-backed document -> source_path not None -> still enabled.
             _set_entry_inputs(app, path_text=str(doc_path))
             panel.request_action("load_doc")
             await pilot.pause()
             outcomes["file_source"] = (
                 app._change_service.document.source_path is not None
             )
-            outcomes["disabled_when_file"] = app.query_one(
+            outcomes["enabled_when_file"] = not app.query_one(
                 "#patch_entry_edit_json_button", Button
             ).disabled
 
@@ -4128,10 +4129,86 @@ def test_tc345_entry_edit_json_disabled_for_file_backed_document(
 
     outcomes = asyncio.run(_drive())
     assert outcomes["file_source"] is True
-    assert outcomes["disabled_when_file"] is True, (
-        "the per-entry JSON control must be DISABLED for a file-backed document"
+    assert outcomes["enabled_when_file"] is True, (
+        "the per-entry JSON control must be ENABLED for a file-backed document "
+        "(R-TUI-058.6)"
     )
     assert outcomes["paste_source_none"] is True
     assert outcomes["enabled_when_paste"] is True, (
         "the per-entry JSON control must be ENABLED for a paste-authored document"
+    )
+
+
+def test_r_tui_058_6_per_entry_json_works_for_file_backed_document(
+    tmp_path: Path,
+) -> None:
+    """The per-entry JSON popup opens and edits a file-backed doc (R-TUI-058.6).
+
+    Intent (R-TUI-058.6, D10-23): the old LLR-068b.4 guard refused to push the
+    per-entry popup for a file-backed document; D10-23 drops it. After a FILE
+    load the operator opens the per-entry JSON popup for the loaded entry,
+    edits it, and Confirms — the change document (read via the entries table)
+    reflects ONLY that entry's edit, so a file-backed document's per-entry edit
+    works end-to-end (and is itself an undoable history step, R-TUI-057.1).
+    """
+    from textual.widgets import Button, TextArea
+
+    from s19_app.tui.screens import EntryJsonScreen
+
+    doc_path = _write_v2_document(
+        tmp_path / "loaded.json",
+        [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
+    )
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            _set_entry_inputs(app, path_text=str(doc_path))
+            panel.request_action("load_doc")
+            await pilot.pause()
+            outcomes["file_source"] = (
+                app._change_service.document.source_path is not None
+            )
+
+            # Drive the handler directly: the popup must OPEN (the old
+            # LLR-068b.4 guard refused it with a status line).
+            panel.post_message(PatchEditorPanel.EntryEditJsonRequested(0))
+            await _settled(
+                pilot,
+                lambda: isinstance(app.screen, EntryJsonScreen),
+                "per-entry JSON popup for a file-backed document",
+            )
+            outcomes["popup_opens"] = isinstance(app.screen, EntryJsonScreen)
+            seed = app.screen.query_one("#entry_json_text", TextArea).text
+            outcomes["seed_address"] = json.loads(seed)["address"]
+
+            app.screen.query_one("#entry_json_text", TextArea).text = json.dumps(
+                {"type": "bytes", "address": "0x100", "bytes": "BE EF"}
+            )
+            app.screen.query_one("#entry_json_confirm", Button).press()
+            await _settled(
+                pilot,
+                lambda: not isinstance(app.screen, EntryJsonScreen),
+                "per-entry JSON popup dismiss",
+            )
+            outcomes["after"] = _entry_addr_values(app)
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    assert outcomes["file_source"] is True, "the doc must be file-backed"
+    assert outcomes["popup_opens"] is True, (
+        "the per-entry JSON popup must open for a file-backed document "
+        "(R-TUI-058.6)"
+    )
+    assert outcomes["seed_address"] == "0x100", (
+        f"the popup must seed the loaded entry, got {outcomes['seed_address']!r}"
+    )
+    assert outcomes["after"] == [("0x100", "BE EF")], (
+        f"the confirmed per-entry edit must change only the loaded entry, "
+        f"got {outcomes['after']!r}"
     )

@@ -175,12 +175,6 @@ class PatchEditorPanel(
     #: ``Binding(show=True)``, so the hint is panel-local text and C-28's
     #: shared-chrome census does not fire (LLR-081.4).
     _HISTORY_HINT = "ctrl+z / ctrl+y"
-    #: The history strip's DISABLED line. Shown whenever the Undo/Redo buttons
-    #: are disabled — today the batch-38 A-01 file-backed guard, but the panel
-    #: is a view and is told the STATE, not the reason, so this text names
-    #: neither. It carries no key hints: the same guard gates the bindings, so
-    #: the keys are inert and a hint for them would be a wrong answer.
-    _HISTORY_OFF = "history off"
 
     #: The history strip's TWO-LINE shape — position on line 1, key hints on
     #: line 2 — is intentional, and the C-29 budget it is measured against is
@@ -375,7 +369,7 @@ class PatchEditorPanel(
             popup (``ChangeSetJsonScreen``) over the current paste buffer
             (LLR-064b.1). Carries the ``#patch_paste_text`` contents so the app
             can seed the popup without a second query. The button is DISABLED
-            whenever a file-backed document is loaded (LLR-064b.4 A-01
+            whenever a file-backed document is loaded (R-TUI-053.5 A-01
             data-loss guard), so this message is only posted for a
             paste-authored / empty document; the app re-checks the guard
             predicate defensively before pushing the popup.
@@ -462,11 +456,10 @@ class PatchEditorPanel(
             ``#patch_entry_edit_button``. Carries the SELECTED row index of
             ``#patch_doc_entries_table`` so ``app.py`` seeds ``EntryJsonScreen``
             with that one entry's JSON and routes Confirm through the validated
-            per-entry apply (``ChangeService.edit_entry_json``). The button is
-            DISABLED whenever a file-backed document is loaded (LLR-068b.4 A-01
-            data-loss guard), so this message is only posted for a
-            paste-authored / empty document; with no rows the panel posts
-            nothing (no selection is a no-op).
+            per-entry apply (``ChangeService.edit_entry_json``). D10-23
+            (R-TUI-058.6): the old LLR-068b.4 file-backed disable-guard is
+            dropped, so the button stays enabled for every document; with no
+            rows the panel posts nothing (no selection is a no-op).
 
         Args:
             index (int): The zero-based index of the selected entry row.

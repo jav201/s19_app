@@ -331,23 +331,18 @@ class PatchMixin:
         # document's source, which this refresh may have changed.
         self.refresh_bindings()
         panel.refresh_issues(service.issue_lines())
-        # US-064b / LLR-064b.4 A-01 guard: the JSON popup opens ONLY for a
-        # paste-authored / empty document — disable Edit-JSON whenever the
-        # document is file-backed (``source_path is not None``) so a stale
+        # US-064b / R-TUI-053.5 A-01 guard (STAYS): the JSON popup opens ONLY
+        # for a paste-authored / empty document — disable Edit-JSON whenever
+        # the document is file-backed (``source_path is not None``) so a stale
         # buffer can never Confirm-clobber a loaded document.
         panel.set_edit_json_enabled(service.document.source_path is None)
-        # US-068a / LLR-068a.4 A-01 guard: undo/redo is available ONLY for a
-        # paste-authored / empty document — disable both controls whenever the
-        # document is file-backed so the history path cannot clobber it.
-        # batch-48 LLR-081.3: the same call renders the history strip, so the
-        # strip and the buttons read ONE state (writer census, site 1 of 3).
-        panel.set_undo_redo_enabled(
-            service.document.source_path is None, service.history_depths()
-        )
-        # US-068b / LLR-068b.4 A-01 guard: the per-entry JSON edit is available
-        # ONLY for a paste-authored / empty document — disable it whenever the
-        # document is file-backed so a per-entry edit cannot clobber it.
-        panel.set_entry_edit_json_enabled(service.document.source_path is None)
+        # R-TUI-057.8 (D10-23): Undo/Redo stay enabled for EVERY document —
+        # the old LLR-068a.4 file-backed guard is dropped. batch-48 LLR-081.3:
+        # the same call renders the history strip (writer census, site 1 of 3).
+        panel.set_undo_redo_enabled(service.history_depths())
+        # R-TUI-058.6 (D10-23): the per-entry JSON edit stays enabled for EVERY
+        # document — the old LLR-068b.4 file-backed guard is dropped.
+        panel.set_entry_edit_json_enabled(True)
 
     def on_staging_sheet_stage_requested(
         self, event: "StagingSheet.StageRequested"
@@ -708,7 +703,7 @@ class PatchMixin:
             (US-068a) — the shared tail of :meth:`on_patch_editor_panel_undo_
             requested` / :meth:`on_patch_editor_panel_redo_requested`. Mirrors
             the entries/issues/enable-sync tail of the action handler so the
-            entries table, declaration-fault area, and both A-01 disable guards
+            entries table, declaration-fault area, and the enable states
             reflect the restored document.
 
         Data Flow:
@@ -717,8 +712,8 @@ class PatchMixin:
               panel from the restored (now check-less) document
               (``refresh_check_results`` — ``undo``/``redo`` reset
               ``last_check_result`` so ``check_rows`` returns the cleared state,
-              batch-40 S1), and re-sync the Edit-JSON + Undo/Redo enable state
-              from the restored document's ``source_path`` (LLR-068a.4).
+              batch-40 S1), and re-sync the Edit-JSON (R-TUI-053.5) + Undo/Redo
+              (R-TUI-057.8) enable state from the restored document.
             - batch-48 LLR-081.3: the same ``set_undo_redo_enabled`` call
               re-renders the history strip from ``history_depths()``. This is
               THE site that moves the history, so the depths it pushes are the
@@ -845,10 +840,8 @@ class PatchMixin:
         # the depths this pushes are the whole point of the strip — an omission
         # here would freeze it at its pre-move numbers while the buttons updated
         # around it (the batch-38 Inc-4 F1 stale-panel shape).
-        panel.set_undo_redo_enabled(
-            service.document.source_path is None, service.history_depths()
-        )
-        panel.set_entry_edit_json_enabled(service.document.source_path is None)
+        panel.set_undo_redo_enabled(service.history_depths())
+        panel.set_entry_edit_json_enabled(True)
 
     def on_patch_editor_panel_undo_requested(
         self, event: PatchEditorPanel.UndoRequested
@@ -859,10 +852,9 @@ class PatchMixin:
             route the payload-free Undo button trigger through the shared
             :meth:`action_patch_undo` path (the same one the ``ctrl+z`` key
             binding drives). An empty undo history is a no-op inside the
-            service, so this handler is crash-free even with no history. The
-            Undo control is disabled for a file-backed document (LLR-068a.4),
-            so this message is only posted for a paste-authored / empty
-            document.
+            service, so this handler is crash-free even with no history. D10-23
+            (R-TUI-057.8): the Undo control is enabled for every document —
+            the old LLR-068a.4 file-backed disable-guard is dropped.
 
         Args:
             event (PatchEditorPanel.UndoRequested): The payload-free trigger.
@@ -910,32 +902,30 @@ class PatchMixin:
     def _patch_history_action_allowed(self) -> bool:
         """
         Summary:
-            The A-01 guard shared by the ``ctrl+z`` / ``ctrl+y`` history key
-            bindings (batch-40 S2): change-set undo/redo is reachable ONLY
-            while the Patch Editor screen is active AND the owned document is
-            paste-authored (``source_path is None``) — the exact enable-state
-            :meth:`PatchEditorPanel.set_undo_redo_enabled` gives the Undo/Redo
-            buttons. A key press on any other screen, or against a file-backed
-            document, is a safe no-op so the binding can never bypass the
-            LLR-068a.4 data-loss guard.
+            The guard shared by the ``ctrl+z`` / ``ctrl+y`` history key
+            bindings (batch-40 S2): change-set undo/redo is reachable while
+            the Patch Editor screen is active. D10-23 (R-TUI-057.8) dropped
+            the old LLR-068a.4 source-path arm — the keys are enabled for
+            every document — so only the screen-active check remains. A key
+            press on any other screen is a safe no-op (R-TUI-057.7).
 
         Returns:
-            bool: ``True`` when a history action may run (patch screen active
-            and paste-authored document); ``False`` otherwise.
+            bool: ``True`` when a history action may run (patch screen
+            active); ``False`` otherwise.
 
         Data Flow:
             - Read the ``#screen_patch`` container's ``hidden`` class (active
-              iff not hidden), then the owned document's ``source_path``.
+              iff not hidden).
 
         Dependencies:
             Uses:
-                - ``ChangeService.document``
+                - ``query_one`` (``#screen_patch``)
             Used by:
                 - ``action_patch_undo`` / ``action_patch_redo``
         """
         if self.query_one("#screen_patch").has_class("hidden"):
             return False
-        return self._change_service.document.source_path is None
+        return True
 
     def action_patch_undo(self) -> None:
         """
@@ -944,8 +934,8 @@ class PatchMixin:
             the shared body behind both the ``ctrl+z`` key binding and the
             ``#patch_undo_button`` trigger. Guarded by
             :meth:`_patch_history_action_allowed`, so it is a no-op unless the
-            Patch Editor is active and the document is paste-authored (the
-            A-01 guard); an empty undo history is itself a service-level no-op.
+            Patch Editor is active (R-TUI-057.7); an empty undo history is
+            itself a service-level no-op.
 
         Returns:
             None
@@ -978,9 +968,8 @@ class PatchMixin:
             Re-apply the most-recently-undone change-set (US-068a /
             LLR-068a.2/.3), the shared body behind both the ``ctrl+y`` key
             binding and the ``#patch_redo_button`` trigger. Guarded by
-            :meth:`_patch_history_action_allowed` (patch screen active +
-            paste-authored A-01 guard); an empty redo stack is a service-level
-            no-op.
+            :meth:`_patch_history_action_allowed` (patch screen active,
+            R-TUI-057.7); an empty redo stack is a service-level no-op.
 
         Returns:
             None
@@ -1014,7 +1003,7 @@ class PatchMixin:
         Summary:
             Open the full-size JSON popup (:class:`ChangeSetJsonScreen`) over
             the paste buffer (US-064b / LLR-064b.1), seeded from the message's
-            ``paste_text``. Re-checks the LLR-064b.4 A-01 disable-guard
+            ``paste_text``. Re-checks the R-TUI-053.5 A-01 disable-guard
             defensively — even though ``#patch_edit_json_button`` is disabled
             for a file-backed document, this handler refuses to push the popup
             whenever ``ChangeService.document.source_path is not None`` so a
@@ -1031,7 +1020,7 @@ class PatchMixin:
 
         Data Flow:
             - ``source_path is not None`` → status-line refusal, no push
-              (A-01 guard, LLR-064b.4).
+              (A-01 guard, R-TUI-053.5).
             - else → ``push_screen(ChangeSetJsonScreen(seed),
               _apply_changeset_json_edit)``.
 
@@ -1134,13 +1123,11 @@ class PatchMixin:
             selected entry (US-068b / LLR-068b.1/.2), seeded with ONLY that
             entry's JSON via ``ChangeService.entry_seed_json`` — a single
             entry, distinct from the whole-set :class:`ChangeSetJsonScreen`.
-            Re-checks the LLR-068b.4 A-01 disable-guard defensively — even
-            though ``#patch_entry_edit_json_button`` is disabled for a
-            file-backed document, this handler refuses to push the popup
-            whenever ``source_path is not None`` so a stale index can never
-            mutate a loaded document. Bounds-checks the index (a stale message
-            after a shrink is a no-op). The popup's Confirm result is applied
-            by :meth:`_apply_entry_json_edit` for the same index.
+            D10-23 (R-TUI-058.6): the old LLR-068b.4 A-01 disable-guard is
+            dropped — the popup opens for a file-backed document too.
+            Bounds-checks the index (a stale message after a shrink is a
+            no-op). The popup's Confirm result is applied by
+            :meth:`_apply_entry_json_edit` for the same index.
 
         Args:
             event (PatchEditorPanel.EntryEditJsonRequested): Carries the
@@ -1150,8 +1137,6 @@ class PatchMixin:
             None
 
         Data Flow:
-            - ``source_path is not None`` → status-line refusal, no push
-              (A-01 guard, LLR-068b.4).
             - index out of range → no-op.
             - else → ``push_screen(EntryJsonScreen(seed), callback)`` where the
               callback binds the index for :meth:`_apply_entry_json_edit`.
@@ -1166,12 +1151,6 @@ class PatchMixin:
         if self._refuse_if_busy():
             return
         service = self._change_service
-        if service.document.source_path is not None:
-            self.set_status(
-                "Patch Editor: per-entry Edit JSON is available only for a "
-                "pasted change-set, not a file-loaded document."
-            )
-            return
         if event.index < 0 or event.index >= len(service.document.entries):
             return
         seed = service.entry_seed_json(event.index)
@@ -1772,9 +1751,10 @@ class PatchMixin:
 
         Refreshes the entries table (with the loaded image's memory map for
         the before/after card) and the declaration-fault listing, then
-        re-applies the three A-01 file-backed guards (Edit-JSON, Undo/Redo
-        with the history strip, per-entry Edit-JSON) — one tail, three call
-        sites, no drift.
+        re-applies the enable states — the whole-set Edit-JSON A-01 guard
+        (R-TUI-053.5, which STAYS draft-only), Undo/Redo with the history
+        strip (R-TUI-057.8/.9, always enabled), and the per-entry Edit-JSON
+        (R-TUI-058.6, always enabled) — one tail, three call sites, no drift.
         """
         service = self._change_service
         loaded = self.current_file
@@ -1791,16 +1771,14 @@ class PatchMixin:
         # document's source, which this refresh may have changed.
         self.refresh_bindings()
         panel.refresh_issues(service.issue_lines())
-        # US-064b / LLR-064b.4 A-01 guard: a file-backed document disables
-        # Edit-JSON (no clobber path).
+        # US-064b / R-TUI-053.5 A-01 guard (STAYS): a file-backed document
+        # disables Edit-JSON (no clobber path).
         panel.set_edit_json_enabled(service.document.source_path is None)
-        # US-068a / LLR-068a.4 A-01 guard: same for Undo/Redo, with the
-        # history-strip render (batch-48 LLR-081.3 writer census).
-        panel.set_undo_redo_enabled(
-            service.document.source_path is None, service.history_depths()
-        )
-        # US-068b / LLR-068b.4 A-01 guard: same for the per-entry JSON edit.
-        panel.set_entry_edit_json_enabled(service.document.source_path is None)
+        # R-TUI-057.8 (D10-23): Undo/Redo stay enabled for every document,
+        # with the history-strip render (batch-48 LLR-081.3 writer census).
+        panel.set_undo_redo_enabled(service.history_depths())
+        # R-TUI-058.6 (D10-23): the per-entry JSON edit stays enabled.
+        panel.set_entry_edit_json_enabled(True)
         # Inc 6 (R-CHK-PE-009 … -012): a load replaces the document, so any
         # completed run is no longer current — render ``no run yet``.
         self._refresh_patch_checks_tab(panel)
