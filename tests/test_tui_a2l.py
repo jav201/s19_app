@@ -4,6 +4,7 @@ Batch-91 contract adoption (HLR-122):
 # TC-625 — this module pins the A2L engine's tag extraction behind the TUI viewer (LLR-122.2).
 """
 
+import re
 from pathlib import Path
 
 import pytest
@@ -168,14 +169,20 @@ def test_render_a2l_view_shows_out_of_image_status():
 
 
 def test_parse_a2l_file_emits_stage_logs(tmp_path: Path, caplog: pytest.LogCaptureFixture):
+    """Traces: R-A2L-READ.71, R-A2L-READ.72."""
     a2l = tmp_path / "stage.a2l"
     a2l.write_text("/begin PROJECT Demo\n/end PROJECT\n", encoding="utf-8")
 
     with caplog.at_level("INFO"):
         parse_a2l_file(a2l)
 
-    assert any("A2L section tree built:" in message for message in caplog.messages)
-    assert any("A2L parse stages:" in message for message in caplog.messages)
+    tree_line = re.compile(r"A2L section tree built: path=.+ lines=\d+ root_sections=\d+ errors=\d+")
+    stages_line = re.compile(
+        r"A2L parse stages: path=.+ total_seconds=\d+\.\d{3} tag_extract_seconds=\d+\.\d{3}"
+        r" tags=\d+ measurement=\d+ characteristic=\d+ errors=\d+"
+    )
+    assert any(tree_line.fullmatch(message) for message in caplog.messages), caplog.messages
+    assert any(stages_line.fullmatch(message) for message in caplog.messages), caplog.messages
 
 
 def test_render_a2l_view_supports_tag_line_truncation():

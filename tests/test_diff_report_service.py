@@ -292,6 +292,8 @@ def test_generation_is_deterministic_fixed_clock(tmp_path: Path) -> None:
 
     Intent: LLR-004.3 — deterministic output. Threshold: the two files' text
     is equal after stripping the filename difference (collision counter).
+
+    Traces: R-CMP-004.16.
     """
     a = tmp_path / "one"
     b = tmp_path / "two"

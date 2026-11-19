@@ -122,7 +122,10 @@ def test_tc001u_one_ledger_row_per_block_derived() -> None:
 
 
 def test_tc001u_composition_is_deterministic() -> None:
-    """HLR-001 says deterministic — same state + same instant ⇒ byte-identical."""
+    """HLR-001 says deterministic — same state + same instant ⇒ byte-identical.
+
+    Traces: R-FLOW-RPT.15.
+    """
     assert compose_flow_report(_state(), _AT) == compose_flow_report(_state(), _AT)
 
 

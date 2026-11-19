@@ -1274,6 +1274,8 @@ R-A2L-004.5 was retired at the batch-103 fold: R-A2L-REFRESH.020 replaces its te
 | R-A2L-READ.68 | If | If the argument word of a BYTE_ORDER keyword of a MEASUREMENT, CHARACTERISTIC, RECORD_LAYOUT or MOD_COMMON section is not a byte-order word, then the system shall record the parse error `Line <n>: BYTE_ORDER <word> is not a byte order`. |
 | R-A2L-READ.69 | If | If a tag's address word is above 0xFFFFFFFFFFFFFFFF, then the system shall give the tag no address. |
 | R-A2L-READ.70 | If | If an A2L file ends before a BLOB, INSTANCE or typedef section used to construct a declared span is closed, then the system shall give every affected declared span no address and no length. |
+| R-A2L-READ.71 | When | When the system has built the sections of an A2L file, the system shall write the INFO log line `A2L section tree built: path=<path> lines=<n> root_sections=<s> errors=<e>`. |
+| R-A2L-READ.72 | When | When the system has parsed an A2L file, the system shall write the INFO log line `A2L parse stages: path=<path> total_seconds=<t> tag_extract_seconds=<x> tags=<n> measurement=<m> characteristic=<c> errors=<e>`. |
 
 #### S2.2 · What a tag declares (CTX-A2L-TAG)
 
@@ -1542,6 +1544,7 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-MAC-009 | If | If a MAC file cannot be read, then the system shall record the diagnostic `Failed to read file: <reason>`. |
 | R-MAC-010 | When | When a MAC file loads without a primary image, the system shall show the status `Loaded <file name> (MAC only)`. |
 | R-MAC-011 | When | When a MAC file loads with a primary image, the system shall show the status `Loaded <image name> (S19+MAC: <MAC file name>)`. |
+| R-MAC-012 | When | When the system has read a MAC file, the system shall write the INFO log line `MAC parse summary: path=<path> rows=<n> parse_ok=<k> diagnostics=<d> valid_addresses=<a>`. |
 
 **Status of a MAC record**
 
@@ -8027,6 +8030,7 @@ title           "# Before/after report" (Markdown line 1); "Before/after report"
 | R-CMP-004.13 | If | If the diff report is refused or fails, then the system shall log at WARNING `report kind=diff source=<source> output=- outcome=<refused, refused (html) or failed: <error type>>`. |
 | R-CMP-004.14 | U | The system shall write every row of each hex window, from the window's first address to its end, into each diff report file. |
 | R-CMP-004.15 | U | The system shall write each label field, path field and refusal message into the HTML file of a diff report as visible text, HTML-escaped. |
+| R-CMP-004.16 | When | When the system writes the diff report of the same compare twice with the same clock reading, the system shall write the same Markdown text both times. |
 | R-CMP-005.12 | U | The system shall write the A2B Diff report without the report filter (S12 CTX-RPT-FILTER). |
 
 **(from batch-100 HLR-176: LLR-176.2c)** The progress line's format, spinner, elapsed time and end rules are S6's.
@@ -8401,6 +8405,7 @@ flow-A2B report  <ts>-flow-a2b.md: a diff report (S14 CTX-DIFFREPORT), Markdown 
 | R-FLOW-RPT.10 | If | If the flow report cannot be written, then the system shall end the REPORT block error with the summary `report write failed` and keep the flow running. |
 | R-FLOW-RPT.11 | When | When the flow report is written, the system shall end the REPORT block ok with the summary `wrote reports/<file>`. |
 | R-FLOW-RPT.12 | U | The system shall write the flow report and the chain-set report as S12 R-TUI-097.1 states: UTF-8 with LF line ends on every host. |
+| R-FLOW-RPT.15 | When | When the system composes the flow report of the same run state twice at the same instant, the system shall produce the same report text both times. |
 
 #### S15.11 · Flow files (CTX-FLOWFILE; from S0 HLR-015, LLR-015.1, LLR-015.2)
 
