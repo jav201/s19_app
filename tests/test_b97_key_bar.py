@@ -795,9 +795,10 @@ def _dim(app, row: str, region, piece: str) -> bool:
 
 def test_tc_b97_69_dimmed_entries_follow_their_condition(tmp_path: Path) -> None:
     """TC-B97-69 dim arms (PC-23): no image → Workspace ``, . U`` dimmed, lit
-    once an image loads; a file-backed change-set → Patch ``^z ^y`` dimmed,
-    lit after a paste-authored one; no variant set → ``v`` dimmed, lit once a
-    set exists. Each flip paints within the repaint bound (no timer).
+    once an image loads; ``^z ^y`` lit on the Patch for a file-backed and for
+    a paste-authored change-set (R-TUI-057.8, D10-23); no variant set → ``v``
+    dimmed, lit once a set exists. Each flip paints within the repaint bound
+    (no timer).
 
     RED on main: no row 2. Mutation: a writer without ``refresh_bindings``
     (the unload arm: unloading moves no focus, so only the writer's refresh
@@ -864,7 +865,7 @@ def test_tc_b97_69_dimmed_entries_follow_their_condition(tmp_path: Path) -> None
     assert out["image"] == (False, False, False), out
     assert out["unloaded"] == (True, True, True), out
     assert out["no_variants"] == (True,), out
-    assert out["file_backed"] == (True, True), out
+    assert out["file_backed"] == (False, False), out
     assert out["pasted"] == (False, False), out
     assert out["variants"] == (False,), out
 
@@ -1244,9 +1245,10 @@ def test_tc_b97_72_clicks_run_the_action_and_type_nothing(tmp_path: Path, monkey
     palette's) a click on ``9 Checks`` shows Checks and a click on ``q`` calls
     ``action_help_quit`` once without calling ``action_quit``, the input staying
     empty; with the focus inside the Patch Editor a click on ``? Help`` opens
-    the stock help panel, not the window help; a click on the dimmed ``^z Undo``
-    (file-backed document) changes nothing and rings one bell; a click on the
-    tag changes nothing.
+    the stock help panel, not the window help; a click on the dimmed
+    ``v Select variant`` (no variant set) changes nothing and rings one bell —
+    ``^z Undo`` is lit for every document (R-TUI-057.8, D10-23) so it no
+    longer serves as the dimmed token; a click on the tag changes nothing.
 
     Mutation: project the click to ``action_quit`` or ``app.simulate_key``
     (types ``q`` / ``9`` into the input); dimmed tokens clickable."""
@@ -1261,6 +1263,12 @@ def test_tc_b97_72_clicks_run_the_action_and_type_nothing(tmp_path: Path, monkey
     async def _drive():
         app = S19TuiApp(base_dir=tmp_path)
         out = {}
+
+        def dims(*texts):
+            region = bar_regions(app)[1]
+            row = bar_rows(app)[1]
+            return tuple(_dim(app, row, region, t) for t in texts)
+
         async with app.run_test(size=(220, 60)) as pilot:
             original_bell = app.bell
             app.bell = lambda: bells.append(1) or original_bell()
@@ -1271,10 +1279,11 @@ def test_tc_b97_72_clicks_run_the_action_and_type_nothing(tmp_path: Path, monkey
             await click_bar(pilot, _token_offset(app, 1, _tag("patch")))
             await settle(pilot, 2)
             out["tag"] = app._active_screen_key
-            # dimmed ^z: nothing, one bell
-            await click_bar(pilot, _token_offset(app, 1, "^z Undo"))
+            # dimmed `v Select variant` (no variant set): nothing, one bell
+            assert dims("v Select variant") == (True,), "the clicked token is dimmed"
+            await click_bar(pilot, _token_offset(app, 1, "v Select variant"))
             await settle(pilot, 2)
-            out["undo"] = (
+            out["dimmed"] = (
                 app._active_screen_key,
                 (app._change_service.document.source_path, len(app._change_service.document.entries)) == doc,
                 len(bells),
@@ -1306,7 +1315,7 @@ def test_tc_b97_72_clicks_run_the_action_and_type_nothing(tmp_path: Path, monkey
 
     out = asyncio.run(_drive())
     assert out["tag"] == "patch", out
-    assert out["undo"] == ("patch", True, 1), out
+    assert out["dimmed"] == ("patch", True, 1), out
     assert out["help"] == (True, False), out
     assert out["focused"], "the palette input held the focus"
     assert out["typed"] == ("checks", "", 1, 0), out
@@ -1475,8 +1484,8 @@ def test_at_b97_26_keys_only_help_and_hidden_view(tmp_path: Path) -> None:
     address; ``6`` and ``tab`` into the Patch Editor (focus inside its
     section): row 1 holds ``? Help`` and ``?`` opens that window's help;
     ``.`` and ``+`` pressed there; ``1`` again: the first painted hex address
-    is unchanged; with the file-backed document ``^z ^y`` are dimmed, and lit
-    after a paste-authored document parsed by key.
+    is unchanged; ``^z ^y`` are lit with the file-backed document and after a
+    paste-authored document parsed by key (R-TUI-057.8, D10-23).
 
     RED on main (P-61, P-63): no ``? Help`` with the focus in the window; ``.``
     on the Patch Editor advances the hidden hex view.
@@ -1540,8 +1549,8 @@ def test_at_b97_26_keys_only_help_and_hidden_view(tmp_path: Path) -> None:
             await settle(pilot, 2)
             out["addr_after"] = first_address(app)
             assert out["addr_after"] == out["addr_before"], out
-            # Undo / Redo: the file-backed document dims them; a paste-authored
-            # one lights them. The texts are placed in the fields; Load and
+            # Undo / Redo: lit for the file-backed and for a paste-authored
+            # document (R-TUI-057.8, D10-23). The texts are placed in the fields; Load and
             # Parse pasted are pressed by key (enter on the focused chip).
             focus_rail(app)
             await pilot.press("6")
@@ -1576,5 +1585,5 @@ def test_at_b97_26_keys_only_help_and_hidden_view(tmp_path: Path) -> None:
     assert "? Help" in out["row1"], out["row1"]
     assert out["help"] == (True, "patch"), out["help"]
     assert out["addr_after"] == out["addr_before"], out
-    assert out["file_backed"] == (True, True), out
+    assert out["file_backed"] == (False, False), out
     assert out["pasted"] == ((False, False), 2), out
