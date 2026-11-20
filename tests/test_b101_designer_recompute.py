@@ -906,6 +906,43 @@ class _StripInsertedWaits(ast.NodeTransformer):
         return node
 
 
+def _is_docstring_stmt(node: ast.stmt) -> bool:
+    """True when ``node`` is a docstring: an ``Expr`` of a string constant."""
+    return (
+        isinstance(node, ast.Expr)
+        and isinstance(node.value, ast.Constant)
+        and isinstance(node.value.value, str)
+    )
+
+
+def _strip_first_docstring(body: list) -> list:
+    """``body`` without its leading docstring, when its first statement is one."""
+    return body[1:] if body and _is_docstring_stmt(body[0]) else body
+
+
+class _StripDocstrings(ast.NodeTransformer):
+    """Remove the docstring (the first statement when it is a string constant
+    ``Expr``) from the module body and from every function, async function and
+    class body. A docstring is not behaviour (D-2), so a later re-cite (TR-02)
+    that changes one is not a drift."""
+
+    def visit_Module(self, node):
+        node.body = _strip_first_docstring(node.body)
+        return self.generic_visit(node)
+
+    def visit_FunctionDef(self, node):
+        node.body = _strip_first_docstring(node.body)
+        return self.generic_visit(node)
+
+    def visit_AsyncFunctionDef(self, node):
+        node.body = _strip_first_docstring(node.body)
+        return self.generic_visit(node)
+
+    def visit_ClassDef(self, node):
+        node.body = _strip_first_docstring(node.body)
+        return self.generic_visit(node)
+
+
 def _top_key(node: ast.stmt):
     if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         return ("def", node.name)
@@ -920,11 +957,12 @@ def _top_key(node: ast.stmt):
 
 def _d2_drift(base_src: str, head_src: str) -> List[str]:
     """Names of base statements (a test, a helper, a module constant, an import)
-    that are missing or different at head once the inserted waits and the
-    module-level additions of the D-2 decision are removed. A statement that is
-    new at head is not a drift."""
+    that are missing or different at head once the inserted waits, the
+    module-level additions of the D-2 decision and every docstring are removed.
+    A docstring is not behaviour (D-2). A statement that is new at head is not
+    a drift."""
     base = ast.parse(base_src)
-    head = _StripInsertedWaits().visit(ast.parse(head_src))
+    head = _StripInsertedWaits().visit(_StripDocstrings().visit(ast.parse(head_src)))
     base_has_pytest = any(
         isinstance(s, ast.Import) and any(a.name == "pytest" for a in s.names)
         for s in base.body
@@ -940,10 +978,11 @@ def _d2_drift(base_src: str, head_src: str) -> List[str]:
         )
 
     head_by_key = {_top_key(s): s for s in head.body if not allowed_addition(s)}
-    # Once the increment is merged the base holds the same waits and module-level
-    # additions: strip them from the base too, so the comparison still covers every
-    # other statement (before the merge both steps are no-ops on the base).
-    base = _StripInsertedWaits().visit(base)
+    # Once the increment is merged the base holds the same waits, module-level
+    # additions and docstrings: strip them from the base too, so the comparison
+    # still covers every other statement (before the merge both steps are no-ops
+    # on the base).
+    base = _StripDocstrings().visit(_StripInsertedWaits().visit(base))
     drift = []
     for stmt in base.body:
         if allowed_addition(stmt):
@@ -979,10 +1018,12 @@ def test_inc13_d2_touched_nodes_differ_from_base_only_by_the_waits() -> None:
     """Every statement of ``tests/test_crc_designer_view.py`` at the merge-base
     with main equals its body at head once the inserted ``recomputes_before =
     designer_recomputes()`` / ``await wait_designer_recompute(...)`` statements,
-    the module-level fixture import, ``import pytest`` and ``pytestmark`` are
-    removed (the whole module is compared, E3 round 2 N-1: a deleted or renamed
-    test and a changed module constant are named too). A skip is NOT a pass
-    (N-5): without a merge-base the node is reported not-run.
+    the module-level fixture import, ``import pytest``, ``pytestmark`` and every
+    docstring are removed (the whole module is compared, E3 round 2 N-1: a
+    deleted or renamed test and a changed module constant are named too).
+    Docstrings are excluded because they are not behaviour (D-2); a later
+    re-cite (TR-02) that changes one is allowed. A skip is NOT a pass (N-5):
+    without a merge-base the node is reported not-run.
 
     Why: the existing nodes were edited by the author of the increment's tests,
     and a wait is the only change decision D-2 allows. After the merge the diff
@@ -1035,6 +1076,56 @@ async def test_a():
     assert app.other == 2
 '''
 
+_D2_DOC_BASE = '''
+"""base module doc."""
+
+
+LIMIT = 4
+
+
+class Box:
+    """base box doc."""
+    pass
+
+
+def helper(x):
+    """base helper doc."""
+    return x + LIMIT
+
+
+async def test_a():
+    """base test doc."""
+    app = make()
+    app.field.value = "1"
+    assert helper(app.field.value) == 5
+    assert app.other == 2
+'''
+
+_D2_DOC_HEAD = '''
+"""head module doc."""
+
+
+LIMIT = 4
+
+
+class Box:
+    """head box doc."""
+    pass
+
+
+def helper(x):
+    """head helper doc."""
+    return x + LIMIT
+
+
+async def test_a():
+    """head test doc."""
+    app = make()
+    app.field.value = "1"
+    assert helper(app.field.value) == 5
+    assert app.other == 2
+'''
+
 
 def test_inc13_d2_check_names_a_dropped_assertion_a_constant_and_a_deleted_test() -> None:
     """Control for the check above (it must be able to FAIL): the clean head has
@@ -1049,6 +1140,15 @@ def test_inc13_d2_check_names_a_dropped_assertion_a_constant_and_a_deleted_test(
     assert _d2_drift(_D2_BASE, deleted) == ["missing at head: def test_a"]
     added = _D2_HEAD_CLEAN + "\n\ndef test_new():\n    assert True\n"
     assert _d2_drift(_D2_BASE, added) == []
+
+
+def test_inc13_d2_check_ignores_docstring_only_changes() -> None:
+    """Docstrings are not behaviour (D-2): a base/head pair that differs only
+    in its module, class and function docstrings gives no drift, and the same
+    head with one changed non-wait statement still names the function."""
+    assert _d2_drift(_D2_DOC_BASE, _D2_DOC_HEAD) == []
+    changed = _D2_DOC_HEAD.replace("    return x + LIMIT\n", "    return x + LIMIT + 1\n")
+    assert _d2_drift(_D2_DOC_BASE, changed) == ["changed at head: def helper"]
 
 
 def test_inc13_d2_check_names_a_snapshot_bound_to_another_name() -> None:

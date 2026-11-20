@@ -132,7 +132,7 @@ repository document   A tracked file whose name ends in .md, .txt or .rst, excep
                       under .dev-flow/, docs/requirements/, tests/goldens/ or
                       tests/__snapshots__/, and except REQUIREMENTS.md (S0.3 owns it).
 tracked text file     A tracked file git does not mark binary, outside .dev-flow/ and
-                      docs/requirements/.
+                      docs/requirements/, and other than REQUIREMENTS.md (S0.3 owns it).
 repository path       A token in a repository document that starts with s19_app/, tests/,
                       tools/, docs/, examples/, prototypes/, .fast-dev-flow/, .github/ or
                       evidence/, preceded by no letter, digit, '.', '/' or '-', and running

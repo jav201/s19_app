@@ -119,7 +119,9 @@ def _repository_documents() -> list[str]:
 
 
 def _is_text_file_path(rel: str) -> bool:
-    return not rel.startswith((".dev-flow/", "docs/requirements/"))
+    # CTX-DOCHYG "tracked text file": outside .dev-flow/ and docs/requirements/,
+    # and other than REQUIREMENTS.md (S0.3 owns it).
+    return not rel.startswith((".dev-flow/", "docs/requirements/")) and rel != "REQUIREMENTS.md"
 
 
 # =============================================================================
