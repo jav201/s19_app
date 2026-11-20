@@ -1,0 +1,3 @@
+Warning: Node.js 24.15.0 can cause high temporary memory usage during shell safety checks. Upgrade to Node.js 26.12.1. Qwen Code will continue normally. See https://github.com/QwenLM/qwen-code/issues/15165
+⚠ SAFE MODE — all customizations disabled (hooks, extensions, skills, MCP servers, QWEN.md). Restart without --safe-mode to resume normal operation.
+Run aborted: wall-clock budget of 150s exceeded (--max-wall-time).

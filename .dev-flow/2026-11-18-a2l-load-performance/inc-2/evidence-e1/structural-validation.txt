@@ -1,0 +1,13 @@
+known_bad_requirement=RED ['R-A2L-REFRESH.029 not single-shall system sentence']
+known_bad_result=RED ['R-A2L-REFRESH.029/1 result verified']
+new_requirements=10
+preserved_requirements=14
+source_files=4
+planned_alternatives=34
+full_product_route=33 partial_static=1
+planned_black_box_ATs=3
+planned_collected_items=37
+trace_TEST_requirement_gaps=10 trace_EVID_gaps=1 other_gaps=[]
+codewire_nodes=6 unread=[]
+errors=[]
+E1 structural validation=PASS

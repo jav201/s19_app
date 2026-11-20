@@ -43,7 +43,7 @@ python -m s19_app.cli dump firmware.s19 --start 0x7AF0 --length 64
 python -m s19_app.cli patch-hex firmware.s19 --addr 0x80040000 --bytes "01 02 03 04" --save-as out.s19
 ```
 
-CI (`.github/workflows/tui-ci.yml`) runs pytest on Python 3.11 for pushes and pull requests to `main` and `main-tui`, in two lanes: lane 1 in parallel (`-m "not serial_timing"`) and lane 2 the timing arms serially (`-m serial_timing`); pull requests also leave out the `slow` tests in both lanes.
+CI (`.github/workflows/tui-ci.yml`) runs pytest on Python 3.11 for pushes and pull requests to `main` and `main-tui`, in two lanes: lane 1 in parallel (`-m "not serial_timing"`) and lane 2 the timing arms serially (`-m serial_timing`), except the `slow` timing arms, which a push runs in the separate `tui-ci-heavy` job (`-m "slow and serial_timing"`); pull requests leave out the `slow` tests altogether.
 
 ## Architecture
 

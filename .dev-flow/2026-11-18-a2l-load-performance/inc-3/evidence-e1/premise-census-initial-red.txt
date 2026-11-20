@@ -1,0 +1,42 @@
+P01 TRUE HEAD=d5cb80cee8ba22d6c5c046ef528a48375c368ed2 base_ancestor=f44e8bc4266b6dead6ff24adef71fdb0b7b0154c
+P02 TRUE preserved_canon_rows={'002': 1, '003': 1, '004': 1, '005': 1, '014': 1, '023': 1, '026': 1, '028': 1} new_id_collisions=0
+CENSUS scope=s19_app/**/*.py python_files=132
+CALL PreparedLoad count=5
+  s19_app/tui/app/file_load.py:1275 _apply_loaded_file:PreparedLoad
+  s19_app/tui/app/file_load.py:1417 _prepare_load_payload:PreparedLoad
+  s19_app/tui/app/file_load.py:1529 _start_load_worker:PreparedLoad
+  s19_app/tui/app/project_load.py:1590 _install_prepared_project:PreparedLoad
+  s19_app/tui/app/project_load.py:1593 _install_prepared_project:PreparedLoad
+CALL _apply_prepared_load count=4
+  s19_app/tui/app/file_load.py:1275 _apply_loaded_file:_apply_prepared_load
+  s19_app/tui/app/file_load.py:1594 _complete_prepared_load:_apply_prepared_load
+  s19_app/tui/app/project_load.py:1633 _install_prepared_project:_apply_prepared_load
+  s19_app/tui/app/project_load.py:1643 _install_prepared_project:_apply_prepared_load
+CALL _prepare_load_payload count=1
+  s19_app/tui/app/file_load.py:1515 _start_load_worker:_prepare_load_payload
+CALL _refresh_a2l_dependent_views count=4
+  s19_app/tui/app/file_load.py:887 _install_attached_a2l:_refresh_a2l_dependent_views
+  s19_app/tui/app/loaded_state.py:418 _apply_unload:_refresh_a2l_dependent_views
+  s19_app/tui/app/loaded_state.py:827 _apply_prepared_load:_refresh_a2l_dependent_views
+  s19_app/tui/app/project_load.py:1653 _install_prepared_project:_refresh_a2l_dependent_views
+CALL _replace_current_a2l count=5
+  s19_app/tui/app/file_load.py:881 _install_attached_a2l:_replace_current_a2l
+  s19_app/tui/app/loaded_state.py:394 _apply_unload:_replace_current_a2l
+  s19_app/tui/app/loaded_state.py:726 _apply_prepared_load:_replace_current_a2l
+  s19_app/tui/app/project_load.py:963 _reset_project_session:_replace_current_a2l
+  s19_app/tui/app/project_load.py:1619 _install_prepared_project:_replace_current_a2l
+CALL enrich_tags_and_render count=6
+  s19_app/tui/app/a2l_view.py:809 _compute_a2l_enriched_tags:enrich_tags_and_render
+  s19_app/tui/app/file_load.py:1353 _prepare_load_payload:enrich_tags_and_render
+  s19_app/tui/app/patch.py:2083 _refresh_a2l_values_after_write:enrich_tags_and_render
+  s19_app/tui/services/compare_service.py:305 _a2l_addresses:enrich_tags_and_render
+  s19_app/tui/services/flow_execution_service.py:399 run_flow:enrich_tags_and_render
+  s19_app/tui/services/variant_execution_service.py:2553 _execute_one_variant:enrich_tags_and_render
+CENSUS_CONTROL TRUE known_present=1 known_absent=0
+Traceback (most recent call last):
+  File "<repo>\.dev-flow\2026-11-18-a2l-load-performance\inc-3\evidence-e1\premise_census.py", line 299, in <module>
+    main(fault)
+  File "<repo>\.dev-flow\2026-11-18-a2l-load-performance\inc-3\evidence-e1\premise_census.py", line 168, in main
+    assert len(parse_reads) == 3 and len(start_reads) == expected_start_reads
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

@@ -1,0 +1,221 @@
+...F...........F................x.....................F................. [ 86%]
+...........                                                              [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_53_every_a2l_attach_route_parses_on_a_worker __________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40315/test_tc_b100_53_every_a2l_atta0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FA830131D0>
+
+    def test_tc_b100_53_every_a2l_attach_route_parses_on_a_worker(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """LLR-177.1b, HLR-177 (C12b-29): a typed ``.a2l`` path in the Load
+        dialog, a Workarea Files pick of ``c.a2l`` (in place) and the start-up
+        ``load_path`` → the parse runs off the main thread on each route (3 of
+        3); the two copying routes copy off the main thread; the pick makes 0
+        copies. Each ends with ``A2L loaded: <name>``.
+    
+        Why: the attach is the slowest action of all (8.76 s for case_06); a
+        route left synchronous keeps the freeze on that route.
+        Negative control (P12b-4, executed): ``ran on main thread True`` → RED.
+        The recent-entry route of the example is not driven here (declared in
+        the tester notes)."""
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir()
+        for name in ("cal.a2l", "cal3.a2l"):
+            shutil.copyfile(CASE01 / "firmware.a2l", src / name)
+        temp = W(base) / WORKAREA_TEMP
+        temp.mkdir(parents=True)
+        shutil.copyfile(CASE01 / "firmware.a2l", temp / "c.a2l")
+        parses = Spy(monkeypatch, app_module.deps, "parse_a2l_file")
+        copies = Spy(monkeypatch, app_module.deps, "copy_into_workarea")
+    
+        def by_name(spy, name):
+            return [c.thread for c in spy.calls if c.args and Path(c.args[0]).name == name]
+    
+        async def typed_and_pick(app, pilot, log):
+            main = _main_ident()
+            await ld.load_path_through_dialog(
+                pilot, app, src / "cal.a2l",
+                until=lambda: app.current_a2l_path is not None and Path(app.current_a2l_path).name == "cal.a2l",
+                what="the typed attach of cal.a2l",
+            )
+            await settle_workers(pilot)
+            typed_copies = list(copies.calls)
+            app._load_workarea_file("c.a2l")
+            await settle_workers(pilot)
+            await wait(pilot, lambda: Path(app.current_a2l_path or "").name == "c.a2l", "the pick of c.a2l")
+            pick_copies = copies.calls[len(typed_copies):]
+            return main, [c.thread for c in typed_copies], len(pick_copies), log_tail(app)[0]
+    
+        main1, typed_copy_threads, pick_copy_count, last = run(base, typed_and_pick)
+    
+        async def startup(app, pilot, log):
+            main = _main_ident()
+            await wait(pilot, lambda: Path(app.current_a2l_path or "").name == "cal3.a2l", "the start-up attach")
+            await settle_workers(pilot)
+            return main
+    
+        copies_before = len(copies.calls)
+        main2 = run(tmp_path / "app2", startup, load_path=src / "cal3.a2l")
+        startup_copy_threads = [c.thread for c in copies.calls[copies_before:]]
+        routes = {
+            "typed": (by_name(parses, "cal.a2l"), main1),
+            "pick": (by_name(parses, "c.a2l"), main1),
+            "startup": (by_name(parses, "cal3.a2l"), main2),
+        }
+        assert all(threads for threads, _ in routes.values()), {k: len(v[0]) for k, v in routes.items()}
+        on_main = sorted(route for route, (threads, main) in routes.items() if main in threads)
+        assert on_main == [], f"A2L parsed on the main thread on: {on_main}"
+        assert typed_copy_threads and main1 not in typed_copy_threads, typed_copy_threads
+        assert startup_copy_threads and main2 not in startup_copy_threads, startup_copy_threads
+        assert pick_copy_count == 0, pick_copy_count
+>       assert last == "A2L loaded: c.a2l", last
+E       AssertionError: A2L loaded: cal.a2l
+E       assert 'A2L loaded: cal.a2l' == 'A2L loaded: c.a2l'
+E         
+E         - A2L loaded: c.a2l
+E         + A2L loaded: cal.a2l
+E         ?              ++
+
+tests\test_b100_workers.py:701: AssertionError
+__ test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install ___
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40315/test_tc_b100_53_reset_runs_aft0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FAD40FF390>
+
+    def test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """LLR-177.1g, LLR-165.1 (P1-29): a call-order spy over the end of the
+        worker step (``_prepare_project_load``), ``_reset_project_session`` and
+        ``_apply_loaded_file`` → ``["worker_end", "reset@main", "install",
+        "install"]`` for ``P2``; a ``PermissionError`` forced into
+        ``read_project_manifest`` → 0 resets and the session kept.
+    
+        Why: a reset before the worker leaves an empty session when the worker
+        fails (LLR-177.2); a reset after the first install wipes it.
+        Negative control: a reset in ``_handle_load_project`` before the
+        worker → the failure arm leaves ``current_file is None`` → RED; the
+        base (no worker step) → no ``worker_end`` → RED."""
+        base = tmp_path / "app"
+        trio(W(base) / "P2")
+        trio(W(base) / "PF")
+        events: list = []
+        main_box = [threading.get_ident()]
+    
+        def _end(*_a, **_k):
+            events.append("worker_end" if threading.get_ident() != main_box[0] else "worker_end@main")
+    
+        def _reset(*_a, **_k):
+            events.append("reset@main" if threading.get_ident() == main_box[0] else "reset@worker")
+    
+        Spy(monkeypatch, S19TuiApp, "_prepare_project_load", after=_end)
+        Spy(monkeypatch, S19TuiApp, "_reset_project_session", before=_reset)
+        Spy(monkeypatch, S19TuiApp, "_apply_loaded_file", before=lambda *_a, **_k: events.append("install"))
+        real_manifest = app_module.deps.read_project_manifest
+    
+        def _manifest(project_dir, *a, **k):
+            if Path(project_dir).name == "PF":
+                raise PermissionError("synthetic")
+            return real_manifest(project_dir, *a, **k)
+    
+        monkeypatch.setattr(app_module.deps, "read_project_manifest", _manifest)
+    
+        async def scenario(app, pilot, log):
+            await open_trio_project(app, pilot, "P2")
+            ok = list(events)
+            events.clear()
+            try:
+                app._handle_load_project("PF")
+            except Exception:  # noqa: BLE001 — the base raises in the request frame
+                pass
+            await settle_workers(pilot)
+            return ok, list(events), app.current_project, app.current_file is not None
+    
+        ok, failed, project, has_image = run(base, scenario)
+>       assert ok == ["worker_end", "reset@main", "install", "install"], ok
+E       AssertionError: ['worker_end', 'reset@main']
+E       assert ['worker_end', 'reset@main'] == ['worker_end'...l', 'install']
+E         
+E         Right contains 2 more items, first extra item: 'install'
+E         Use -v to get more diff
+
+tests\test_b100_workers.py:1416: AssertionError
+_ test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size] _
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40315/test_tc_b100_54_a2l_attach_ref1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FAC827F8D0>
+gone = 'a2l_size'
+
+    @pytest.mark.parametrize("gone", ["project_folder", "a2l_size"])
+    def test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, gone: str
+    ) -> None:
+        """CR12b-2 / SE5-12b-2 (ruling E5, split by subject): before any busy
+        run begins, ``load_a2l_from_path`` reads the open project's folder
+        (``validate_project_files``) and the A2L's size (``stat``).
+        - ``project_folder``: the open project ``gone`` was removed outside the
+          app -> 1 line ``A2L NOT loaded: project 'gone' could not be read —
+          check that the folder can be opened, then load again.``;
+        - ``a2l_size``: the size ``stat`` raises ``OSError`` -> 1 line ``A2L
+          file not found: <typed>``.
+        Both: nothing raised out of the request, 0 begins, no run left, the app
+        running.
+    
+        Why: from the Load dialog or a deferred callback the raise ends the app
+        and the unsaved session is lost; a size read as 0 would skip the
+        over-cap rule. Negative control (81ac4c0): both calls are unguarded ->
+        ``FileNotFoundError`` / ``OSError`` leaves the request -> RED."""
+        base = tmp_path / "app"
+        a2l = tmp_path / "src" / "firmware.a2l"
+        a2l.parent.mkdir(parents=True)
+        shutil.copyfile(CASE01 / "firmware.a2l", a2l)
+        begins = Spy(monkeypatch, S19TuiApp, "_busy_begin_action")
+        if gone == "a2l_size":
+            real_stat = pathlib.Path.stat
+    
+            def _stat(self, *args, **kwargs):
+                if sys._getframe(1).f_code.co_name == "load_a2l_from_path":
+                    raise OSError(5, "synthetic size read failure")
+                return real_stat(self, *args, **kwargs)
+    
+            monkeypatch.setattr(pathlib.Path, "stat", _stat)
+    
+        async def scenario(app, pilot, log):
+            if gone == "project_folder":
+                app.current_project = "gone"
+                app.current_project_dir = app.workarea / "gone"
+            mark = len(log.messages)
+            try:
+                app.load_a2l_from_path(a2l)
+                raised = None
+            except BaseException as exc:  # noqa: BLE001 — the RED shape
+                raised = type(exc).__name__
+            for _ in range(3):
+                await pilot.pause()
+            return raised, log.since(mark), list(app._busy.runs), running(app)
+    
+        raised, lines, runs, alive = run(base, scenario)
+        expected = (
+            "A2L NOT loaded: project 'gone' could not be read — check that the folder "
+            "can be opened, then load again."
+            if gone == "project_folder"
+            else f"A2L file not found: {a2l}"
+        )
+        assert raised is None, f"{raised} left load_a2l_from_path"
+>       assert lines == [expected], lines
+E       AssertionError: []
+E       assert [] == ['A2L file no...firmware.a2l']
+E         
+E         Right contains one more item: 'A2L file not found: C:\\Users\\<user>\\AppData\\Local\\Temp\\pytest-of-<user>\\pytest-40315\\test_tc_b100_54_a2l_attach_ref1\\src\\firmware.a2l'
+E         Use -v to get more diff
+
+tests\test_b100_workers.py:3277: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_workers.py::test_tc_b100_53_every_a2l_attach_route_parses_on_a_worker
+FAILED tests/test_b100_workers.py::test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install
+FAILED tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size]
+3 failed, 79 passed, 1 xfailed in 1436.68s (0:23:56)
+EXIT=1

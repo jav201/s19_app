@@ -1,0 +1,25 @@
+## Findings
+
+**F-1 — Node count does not reconcile (`E1-slice.md:90`)**
+"12 baseline function nodes; dataclass data nodes P1/P2 and new F1 are intentionally not extractor functions." With the 13-node map (`E1-slice.md:13,21-33`), the base function nodes are F2–F6 (5) + P3–P5 (3) + L1 (1) = **9**; counting S1 as a function gives 10. Since P1/P2 are excluded by the same sentence, 12 is unreachable. 12 equals the *existing node-name* count in `E1-slice.md:85`, so the number appears carried over from §5.1 into the Code-Wire baseline claim (same 12 repeated in `baseline-lint/marks/extract` bullets, `E1-slice.md:91-93`, and echoed in `E1-rulings.md:17`).
+
+**F-2 — Stage row with no covering case (`E1-slice.md:47`, `E1-rulings.md:47`)**
+"Project image+A2L without MAC: image after reset `(A+2,I+1)`, F5 through Inc 2, once" is a distinct branch (`E1-slice.md:30`, P4) but no ledger row in `02-test-cases.md` exercises it: .039/3 and .041 use P-PAIR (image+MAC+A2L, `(A+2,I+1)` → `(A+3,I+2)`), .039/2 is loose image+A2L `(A+1,I+1)`. This contradicts `02-test-cases.md:65` "27 full, 0 partial" and the .039 threshold "4/4 routes" (`01-requirements.md:75`), which never names the image+A2L-without-MAC route even though the slice and D-3 both specify it.
+
+**F-3 — "one distinct on-disk node" claim (`02-test-cases.md:65`)**
+"Each case maps to exactly one distinct planned on-disk node" is false at function level: 27 cases map to 10 distinct test functions (e.g. .039/1–4 all → `test_r039_shared_snapshot_interface`; .043/1–3 and .048/1–6 likewise). Only the parameterized collected-id reading (`02-test-cases.md:65` second clause; `E1-slice.md:105`) is true. Wording needs to say "collected node id".
+
+**F-4 — US budget never quantified (`01-requirements.md:11`)**
+US-ALP-01 requires loading "within a measured budget", but .039–.048 set no total load-duration threshold; .040–.042 measure only UI-timer lateness (`01-requirements.md:76-78`, definitions `:49-50`). Traceability is incomplete: no requirement states the budget number.
+
+**F-5 — L1 requirement mapping query (`E1-slice.md:32`)**
+L1 (`_apply_prepared_load`) maps `.039, .040, .041, .044, .045, .048` — it includes .041 (a project-pair route) yet omits .042 (A2L-only), although `E1-slice.md:45-48` assigns all project publication to P5. Either .041's inclusion or the .042 omission is unexplained; confirm whether project installs traverse L1.
+
+## Checked counts
+
+- IDs: 10/10 present, contiguous 039–048, no gaps or duplicates; P02 no-collision claim (`01-requirements.md:54`) consistent.
+- Cases: 27/27 ledger rows; per-requirement 4/1/1/1/3/3/2/2/4/6 = 27, matching `02-test-cases.md:53-64`, `01-requirements.md:98`, `E1-slice.md:105` (24+3), `E1-rulings.md:99`; 27 distinct example IDs; classification 15 normal + 3 performance + 9 robustness = 27.
+- Thresholds: 10/10 numeric, 10/10 with a named negative control; threshold case counts agree with ledger counts 10/10.
+- Four-source slice: 4/4 consistent (`01-requirements.md:98`, `E1-slice.md:9-13`, `E1-rulings.md:26-30`); no file double-owned; 13 nodes = 12 changed + 1 new consistent at `E1-slice.md:13` and `E1-rulings.md:31` — only the derived "12 function nodes" fails (F-1).
+- Snapshot/generation pairs: 6/6 stage rows identical in `E1-slice.md:43-48` and `E1-rulings.md:43-48`; ledger pairs in .039/1-4 and .048/1-6 match 6/6; publication counts .044=3, .045=2, .046=2 match; "exactly one producer call per load" (.039 + D-1 + F5/P4) consistent.
+- Execution status: 0 results in all four files; no result column in the ledger.

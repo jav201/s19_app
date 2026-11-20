@@ -1,0 +1,8 @@
+INTEGRATION_PARSED_COUNTS source={'Nodes': 12, 'Entities': 14, 'Edges': 23, 'Findings': 13, 'examples': 97} output={'Nodes': 12, 'Entities': 12, 'Edges': 23, 'Findings': 13, 'examples': 97}
+Traceback (most recent call last):
+  File "<repo>\.dev-flow\2026-11-18-a2l-load-performance\inc-3\evidence-e2\integrated\integrate_graph.py", line 190, in <module>
+    main(fault)
+  File "<repo>\.dev-flow\2026-11-18-a2l-load-performance\inc-3\evidence-e2\integrated\integrate_graph.py", line 144, in main
+    assert {block.splitlines()[0] for block in blocks(parse_sections(integrated)["Nodes"])} == EXPECTED_NODES
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

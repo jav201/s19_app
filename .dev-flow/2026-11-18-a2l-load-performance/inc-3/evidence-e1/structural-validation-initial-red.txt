@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "<repo>\.dev-flow\2026-11-18-a2l-load-performance\inc-3\evidence-e1\validate_e1.py", line 203, in <module>
+    main(fault)
+  File "<repo>\.dev-flow\2026-11-18-a2l-load-performance\inc-3\evidence-e1\validate_e1.py", line 37, in main
+    assert [row[0] for row in requirements] == expected_ids
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

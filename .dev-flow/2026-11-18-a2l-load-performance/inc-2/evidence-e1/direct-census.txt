@@ -1,0 +1,125 @@
+root=<repo>  # redacted at generation
+qwen_attribution=none; Qwen exited 55 before producing a census
+source_budget=4
+slice_file=s19_app/tui/app/file_load.py exists=True
+slice_file=s19_app/tui/a2l_parameter_picker.py exists=True
+slice_file=s19_app/tui/screens_directionb/check_editor.py exists=True
+slice_file=s19_app/tui/screens_directionb/patch_editor/a2l_picker.py exists=True
+
+DEFINITIONS
+s19_app/tui/app/file_load.py:42-53 ClassDef A2LAttachRequest
+s19_app/tui/app/file_load.py:56-64 ClassDef A2LAttachResult
+s19_app/tui/app/file_load.py:728-804 FunctionDef _start_a2l_load
+s19_app/tui/app/file_load.py:806-841 FunctionDef _a2l_attach_worker
+s19_app/tui/app/file_load.py:843-846 FunctionDef _on_a2l_attached
+s19_app/tui/app/file_load.py:848-916 FunctionDef _install_attached_a2l
+s19_app/tui/app/file_load.py:918-935 FunctionDef _on_a2l_attach_failed
+s19_app/tui/a2l_parameter_picker.py:590-665 FunctionDef set_parameters
+s19_app/tui/screens_directionb/check_editor.py:201-234 FunctionDef set_a2l_parameters
+s19_app/tui/screens_directionb/patch_editor/a2l_picker.py:25-45 FunctionDef set_a2l_parameters
+s19_app/tui/app/a2l_view.py:732-769 FunctionDef _replace_current_a2l
+s19_app/tui/app/a2l_view.py:771-818 FunctionDef _compute_a2l_enriched_tags
+s19_app/tui/app/a2l_view.py:1191-1261 FunctionDef _refresh_a2l_dependent_views
+s19_app/tui/app/a2l_view.py:1263-1332 FunctionDef update_a2l_view
+s19_app/tui/app/checks_diff.py:79-101 FunctionDef _prefill_check_editor
+s19_app/tui/app/patch.py:1841-1860 FunctionDef _prefill_patch_editor
+s19_app/tui/a2l_definition.py:610-879 FunctionDef describe_definitions
+
+REVERSE_CALLS
+_start_a2l_load count=2 sites=s19_app/tui/app/file_load.py:625, s19_app/tui/app/file_load.py:713
+_a2l_attach_worker count=1 sites=s19_app/tui/app/file_load.py:801
+_on_a2l_attached count=0 sites=
+_install_attached_a2l count=0 sites=
+_on_a2l_attach_failed count=0 sites=
+_replace_current_a2l count=5 sites=s19_app/tui/app/file_load.py:881, s19_app/tui/app/loaded_state.py:394, s19_app/tui/app/loaded_state.py:726, s19_app/tui/app/project_load.py:963, s19_app/tui/app/project_load.py:1619
+_compute_a2l_enriched_tags count=12 sites=s19_app/tui/app/a2l_view.py:1323, s19_app/tui/app/checks_diff.py:97, s19_app/tui/app/checks_diff.py:200, s19_app/tui/app/checks_diff.py:719, s19_app/tui/app/patch.py:1856, s19_app/tui/app/patch.py:166, s19_app/tui/app/patch.py:2069, s19_app/tui/app/patch.py:581, s19_app/tui/app/reports.py:215, s19_app/tui/app/reports.py:196, s19_app/tui/app/reports.py:651, s19_app/tui/app/save_plan.py:1126
+_refresh_a2l_dependent_views count=4 sites=s19_app/tui/app/file_load.py:887, s19_app/tui/app/loaded_state.py:418, s19_app/tui/app/loaded_state.py:827, s19_app/tui/app/project_load.py:1653
+update_a2l_view count=1 sites=s19_app/tui/app/a2l_view.py:1233
+_prefill_check_editor count=3 sites=s19_app/tui/app/a2l_view.py:1251, s19_app/tui/app/checks_diff.py:233, s19_app/tui/app/navigation.py:203
+_prefill_patch_editor count=2 sites=s19_app/tui/app/a2l_view.py:1252, s19_app/tui/app/navigation.py:198
+set_a2l_parameters count=2 sites=s19_app/tui/app/checks_diff.py:101, s19_app/tui/app/patch.py:1860
+set_parameters count=2 sites=s19_app/tui/screens_directionb/check_editor.py:223, s19_app/tui/screens_directionb/patch_editor/a2l_picker.py:42
+describe_definitions count=2 sites=s19_app/tui/a2l_definition.py:607, s19_app/tui/a2l_parameter_picker.py:629
+enrich_tags_and_render count=6 sites=s19_app/tui/app/a2l_view.py:809, s19_app/tui/app/file_load.py:1353, s19_app/tui/app/patch.py:2083, s19_app/tui/services/compare_service.py:305, s19_app/tui/services/flow_execution_service.py:399, s19_app/tui/services/variant_execution_service.py:2553
+
+DIRECT_ATTACH_BODY_CALLS
+_start_a2l_load:728-804 calls=A2LAttachRequest, Path, _a2l_attach_worker, _a2l_cache_entry, _busy_begin_action, _busy_fail, _refuse_if_busy, contained_in_workarea, expanduser, info, is_absolute, set_status, stat, step_busy, str, strip, warning
+_a2l_attach_worker:806-841 calls=A2LAttachResult, _progress_forwarder, call_from_thread, copy_into_workarea, exception, info, isinstance, parse_a2l_cached, perf_counter, stat, work
+_on_a2l_attached:843-846 calls=call_after_refresh, step_busy
+_install_attached_a2l:848-916 calls=_busy_fail, _log_a2l_parse_summary, _refresh_a2l_dependent_views, _rehome_focus_after_load, _rehome_placeholder_focus_after_load, _replace_current_a2l, _store_a2l_cache, _sync_loaded_a2l_to_project, call_after_refresh, info, painted_names, perf_counter, record_recent_source, refresh_files, safe_text, str, update_project_labels, warning
+_on_a2l_attach_failed:918-935 calls=end_busy, isinstance, painted_names, refresh_files, warning
+
+ENRICHED_TAG_MUTATION_CENSUS
+count=68
+s19_app/tui/a2l.py:1953
+s19_app/tui/a2l.py:3508
+s19_app/tui/a2l.py:3509
+s19_app/tui/a2l.py:3510
+s19_app/tui/a2l.py:3511
+s19_app/tui/a2l.py:3724
+s19_app/tui/a2l.py:3828
+s19_app/tui/a2l.py:3549
+s19_app/tui/a2l.py:3550
+s19_app/tui/a2l.py:3551
+s19_app/tui/a2l.py:3552
+s19_app/tui/a2l.py:3555
+s19_app/tui/a2l.py:3556
+s19_app/tui/a2l.py:3557
+s19_app/tui/a2l.py:3558
+s19_app/tui/a2l.py:3559
+s19_app/tui/a2l.py:3560
+s19_app/tui/a2l.py:3561
+s19_app/tui/a2l.py:3562
+s19_app/tui/a2l.py:3694
+s19_app/tui/a2l.py:3733
+s19_app/tui/a2l.py:3741
+s19_app/tui/a2l.py:3779
+s19_app/tui/a2l.py:3877
+s19_app/tui/a2l.py:3697
+s19_app/tui/a2l.py:3735
+s19_app/tui/a2l.py:3810
+s19_app/tui/a2l.py:3826
+s19_app/tui/a2l.py:3689
+s19_app/tui/a2l.py:3699
+s19_app/tui/a2l.py:3737
+s19_app/tui/a2l.py:3783
+s19_app/tui/a2l.py:3785
+s19_app/tui/a2l.py:3886
+s19_app/tui/a2l.py:3889
+s19_app/tui/a2l.py:3630
+s19_app/tui/a2l.py:3788
+s19_app/tui/a2l.py:3797
+s19_app/tui/a2l.py:3799
+s19_app/tui/a2l.py:3790
+s19_app/tui/a2l.py:3794
+s19_app/tui/a2l.py:3633
+s19_app/tui/a2l.py:3636
+s19_app/tui/a2l.py:3639
+s19_app/tui/a2l.py:3652
+s19_app/tui/a2l.py:3655
+s19_app/tui/a2l.py:3657
+s19_app/tui/a2l.py:3661
+s19_app/tui/a2l.py:3662
+s19_app/tui/a2l.py:3666
+s19_app/tui/a2l.py:3664
+s19_app/tui/a2l.py:3668
+s19_app/tui/a2l.py:3670
+s19_app/tui/a2l.py:3673
+s19_app/tui/a2l.py:3676
+s19_app/tui/app/a2l_view.py:727 whole-cache-write
+s19_app/tui/app/a2l_view.py:814 whole-cache-write
+s19_app/tui/app/a2l_view.py:816 whole-cache-write
+s19_app/tui/app/a2l_view.py:801 whole-cache-write
+s19_app/tui/app/a2l_view.py:1304 whole-cache-write
+s19_app/tui/app/a2l_view.py:1306 whole-cache-write
+s19_app/tui/app/core.py:331 whole-cache-write
+s19_app/tui/app/core.py:338 whole-cache-write
+s19_app/tui/app/loaded_state.py:751 whole-cache-write
+s19_app/tui/app/loaded_state.py:753 whole-cache-write
+s19_app/tui/app/patch.py:2090 whole-cache-write
+s19_app/tui/app/project_load.py:985 whole-cache-write
+s19_app/tui/app/project_load.py:989 whole-cache-write
+
+CASE06_DISCRIMINATING_FIXTURE
+exists=True size_bytes=37742888
+tests/test_b100_workers.py:963-999 test_tc_b100_53_case06_a2l_attach_keeps_the_loop_free_and_reports_parse_bytes; not executed in E1

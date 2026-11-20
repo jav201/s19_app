@@ -239,7 +239,11 @@ from tools.id_registry import (
 # tests/test_b103_inc10_s0_written_name.py); 329 -> 336 on the Inc 10 branch.
 # batch-103 Inc 10 MU10: +1 (tests/test_b103_inc10_mu_survivors.py); 336 -> 337.
 # Final content merge with Inc 10: measured 366 (358 + 8).
-EXPECTED_SCANNED_TEST_FILES = 366
+# batch-2026-11-18-a2l-load-performance: +6 (test_alp_a2l_occupancy*.py x3,
+# test_alp_inc2_a2l_attach.py, test_alp_inc3_snapshot_parity.py,
+# test_alp_inc3_load_responsiveness.py); 366 -> 372.
+# a2l-load-performance E4R FA-TICK2u: +1 (tests/test_alp_s19_read_once.py); 372 -> 373.
+EXPECTED_SCANNED_TEST_FILES = 373
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

@@ -18,13 +18,14 @@ from __future__ import annotations
 
 import heapq
 import math
+import operator
 import re
 import struct
 from bisect import bisect_left, bisect_right
 from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from types import MappingProxyType
-from typing import Callable, Iterable, Mapping, Optional
+from typing import Callable, Iterable, Iterator, Mapping, NamedTuple, Optional, Sequence
 
 from .a2l import (
     DATATYPE_SIZES,
@@ -41,6 +42,40 @@ from .a2l import (
     encode_physical_to_raw_bytes,
     parse_begin_meta,
 )
+
+
+#: Items freed per step when a large private container is released in slices.
+RELEASE_SLICE = 4096
+
+
+def release_in_slices(*containers) -> None:
+    """Free large private containers in bounded slices just before return.
+
+    One C-level free of a large container holds the GIL and starves the UI
+    thread's 50 ms tick; slicing lets the UI run between steps
+    (R-A2L-REFRESH.050, FA-TICK).  Callers pass only containers they built.
+    """
+    for container in containers:
+        if isinstance(container, list):
+            while container:
+                del container[-RELEASE_SLICE:]
+        elif isinstance(container, dict):
+            while container:
+                for _ in range(RELEASE_SLICE):
+                    if not container:
+                        break
+                    container.popitem()
+        elif isinstance(container, set):
+            while container:
+                for _ in range(RELEASE_SLICE):
+                    if not container:
+                        break
+                    container.pop()
+        else:
+            raise TypeError(
+                "release_in_slices: expected list, dict or set, got "
+                f"{type(container).__name__}"
+            )
 
 
 @dataclass(frozen=True)
@@ -730,6 +765,7 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
             walk(node.get("children") or [], mod_common)
 
     walk(a2l_data.get("sections") or [], None)
+    walk = None  # break the closure self-cycle: no cyclic garbage (R-A2L-REFRESH.053, DX-F3)
 
     reads: dict[object, object] = {}
     maps = {
@@ -862,20 +898,46 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
             return None
         return other.bit_mask
 
-    span_index: dict[int, list[tuple]] = {}
+    definitions_by_position: dict[int, Definition] = {}
+    for entry in span_entries:
+        definition = definitions.get(entry[1])
+        if definition is None:
+            continue
+        if definition.address is None or definition.section != entry[2]:
+            continue
+        definitions_by_position[entry[0]] = definition
+    index = _build_occupancy_index(
+        span_entries, is_array_entry, definitions_by_position, entry_cache
+    )
     result: dict[str, Definition] = {}
     for name in requested:
         definition = definitions[name]
-        address = definition.address
-        if address is None:
+        if definition.address is None:
             result[name] = definition
             continue
-        span_index[None] = span_entries
+        own_position = index.position_by_object.get(
+            (definition.name, definition.section)
+        )
         result[name] = replace(
             definition,
-            shared_with=_shared_with(definition, span_index, mask_of, materialize),
+            shared_with=_shared_with(
+                definition, index, own_position, mask_of, materialize
+            ),
         )
 
+    release_in_slices(
+        definitions,
+        definitions_by_position,
+        span_entries,
+        tags_by_name,
+        object_sections_by_name,
+        entry_cache,
+        requested,
+        requested_set,
+        mod_common_of,
+        tag_consumed,
+        *(f for f in index if isinstance(f, (list, dict))),
+    )  # private containers only; R-A2L-REFRESH.050
     return result
 
 
@@ -3834,58 +3896,427 @@ def _entry_overlaps(definition: Definition, entry: tuple) -> bool:
     return first <= other_last and other_first <= last
 
 
-def _shared_with(
-    definition: Definition,
-    span_index: Mapping[int, tuple],
-    mask_of: Callable[[str], Optional[int]],
-    materialize: Optional[Callable[[tuple], tuple]] = None,
-) -> Optional[str]:
-    """The name of the first other entry, in cross-kind file order, whose span
-    overlaps the definition's span (or whose declared address lies inside it
-    when that entry has no readable length), unless the pair's clean masks
-    select no common bit (R-A2L-DEF.138)."""
+class _OccupancyIndex(NamedTuple):
+    """The one request-local compact occupancy interval index (INC 1).
+
+    ``records`` holds exactly one ``(first, last, entry)`` interval per
+    occupancy entry in section-walk position order, with ``last=None`` the
+    unbounded conservative upper reachability.  The leaves of the implicit
+    complete binary tree rooted at index 1 (leaf base ``leaf_offset``) are
+    laid out in address order: ``leaf_records`` is the stable sort of the
+    record tuples by first address (ties keep walk order), so leaf ``k`` maps
+    directly to ``leaf_records[k]``.  ``min_first`` is the minimum address
+    below a node, ``max_last`` the maximum upper end (``None`` meaning +∞) and
+    ``min_pos`` the minimum walk position below a node; all three are the
+    lists the builder built (no return-time tuple copy).  ``max_last``
+    tightens monotonically toward materialized final spans within the request
+    (R-A2L-DEF.166–.168, E4R).  ``position_by_object`` resolves a unique
+    ``(name, kind)`` to its walk position, with ``None`` for a repeated key.
+    Neither input map is retained.  ``records`` and ``position_by_object`` are
+    the list and dict the builder built, so the request can release them in
+    slices before it returns (R-A2L-REFRESH.050).
+    """
+
+    records: list
+    leaf_offset: int
+    min_first: list
+    max_last: list
+    min_pos: list
+    leaf_records: list
+    position_by_object: Mapping
+
+
+def _build_occupancy_index(
+    span_entries: Sequence[tuple],
+    is_array_entry: Callable[[tuple], bool],
+    definitions_by_position: Mapping[int, Definition],
+    entry_cache: Mapping[int, tuple],
+) -> _OccupancyIndex:
+    """Build the one central occupancy interval index for a describe request.
+
+    One position-order pass emits exactly one interval record per occupancy
+    entry, evaluating the unresolved-route predicate
+    (``entry[2] == "AXIS_PTS" or is_array_entry(entry)``) at most once per
+    entry: the unresolved branch sets ``last = None`` itself.  The upper end
+    is read from ``entry_cache`` first and ``definitions_by_position`` second:
+    a final length of at least 1 gives the exact inclusive end, a known final
+    ``None`` or below-1 length gives the declared-address point, and only an
+    entry absent from both sources whose lazy route can still change its
+    length (an AXIS_PTS or an array-like object) receives an unbounded upper
+    end.  The records keep walk order, but ``leaf_records`` is the stable sort
+    of the record tuples by first address (ties keep walk order) and the
+    complete-tree leaves are summarized bottom-up into ``min_first``,
+    ``max_last`` and ``min_pos`` — the lists that are built, returned without
+    a tuple copy.  The builder never describes or materializes, never expands
+    a span into pages and never rescans per entry.
+
+    Args:
+        span_entries (Sequence[tuple]): The walk entry tuples in increasing
+            unique position order:
+            ``(position, name, kind, address, length, byte_order, ...)``.
+        is_array_entry (Callable[[tuple], bool]): Whether an entry's lazy
+            final length can still change (the request-local predicate).
+        definitions_by_position (Mapping[int, Definition]): Already-final
+            requested definitions keyed by unique entry position.
+        entry_cache (Mapping[int, tuple]): Already-materialized final tuples
+            keyed by entry position.
+
+    Returns:
+        _OccupancyIndex: One interval record per entry, the address-ordered
+        complete-tree navigation summaries and the unique-or-ambiguous object
+        lookup.
+
+    Raises:
+        None.
+
+    Data Flow:
+        - Read each entry's final length from the cache or the definitions
+          map; when neither is final, leave an AXIS_PTS or array-like entry
+          open-ended and read only the provisional length of the rest.
+        - Emit one ``(first, last, entry)`` record per entry in position order.
+        - Stable-sort the record tuples by first address into ``leaf_records``,
+          then summarize the implicit complete tree bottom-up.
+        - Resolve ``(name, kind)`` to its position, marking repeated keys
+          ambiguous with ``None``.
+
+    Dependencies:
+        Uses:
+            - ``_OccupancyIndex``: the result value.
+        Used by:
+            - ``describe_definitions``: the one central index per request.
+    """
+    records = []
+    position_by_object: dict[tuple[str, str], Optional[int]] = {}
+    for entry in span_entries:
+        position = entry[0]
+        first = entry[3]
+        cached = entry_cache.get(position)
+        definition = definitions_by_position.get(position)
+        if cached is not None:
+            byte_length = cached[4]
+            last = (
+                first + byte_length - 1
+                if byte_length is not None and byte_length >= 1
+                else first
+            )
+        elif definition is not None:
+            byte_length = definition.byte_length
+            last = (
+                first + byte_length - 1
+                if byte_length is not None and byte_length >= 1
+                else first
+            )
+        elif entry[2] == "AXIS_PTS" or is_array_entry(entry):
+            last = None  # unresolved lazy route: open-ended below
+        else:
+            last = (
+                first + entry[4] - 1
+                if entry[4] is not None and entry[4] >= 1
+                else first
+            )
+        records.append((first, last, entry))
+        key = (entry[1], entry[2])
+        if key in position_by_object:
+            position_by_object[key] = None
+        else:
+            position_by_object[key] = position
+    count = len(records)
+    leaf_offset = 1
+    while leaf_offset < count:
+        leaf_offset <<= 1
+    size = 2 * leaf_offset
+    first_of = operator.itemgetter(0)
+    leaf_records = sorted(records, key=first_of)
+    min_first = [None] * size
+    max_last = [None] * size  # mutable: tightened toward materialized spans
+    min_pos = [None] * size
+    for leaf, record in enumerate(leaf_records):
+        node = leaf_offset + leaf
+        min_first[node] = record[0]
+        max_last[node] = record[1]
+        min_pos[node] = record[2][0]
+    for node in range(leaf_offset - 1, 0, -1):
+        left, right = 2 * node, 2 * node + 1
+        left_min = min_first[left]
+        right_min = min_first[right]
+        if left_min is None and right_min is None:
+            continue
+        if left_min is None:
+            min_first[node] = right_min
+            max_last[node] = max_last[right]
+            min_pos[node] = min_pos[right]
+        elif right_min is None:
+            min_first[node] = left_min
+            max_last[node] = max_last[left]
+            min_pos[node] = min_pos[left]
+        else:
+            min_first[node] = left_min if left_min <= right_min else right_min
+            left_max = max_last[left]
+            right_max = max_last[right]
+            if left_max is None or right_max is None:
+                max_last[node] = None
+            else:
+                max_last[node] = left_max if left_max >= right_max else right_max
+            left_pos = min_pos[left]
+            right_pos = min_pos[right]
+            min_pos[node] = left_pos if left_pos <= right_pos else right_pos
+    return _OccupancyIndex(
+        records,
+        leaf_offset,
+        min_first,
+        max_last,
+        min_pos,
+        leaf_records,
+        position_by_object,
+    )
+
+
+def _occupancy_candidates(
+    index: _OccupancyIndex, definition: Definition, own_position: Optional[int]
+) -> Iterator[tuple]:
+    """Yield the occupancy entries the index still selects for a definition.
+
+    The requested inclusive final span or point is derived from
+    ``definition``; the address-ordered implicit tree is then explored
+    best-first by walk position: a min-heap keyed on ``(min_pos, node)`` pops
+    the subtree holding the smallest walk position next, so leaves are yielded
+    in exact walk order.  Each popped internal node reads its ``min_first``
+    exactly once (the counted visit) and is pruned when every address below it
+    is above the query end or its tightened upper end is below the query
+    start; otherwise its children are pushed with their own ``min_pos``.  The
+    entry whose position equals ``own_position`` is skipped, and one original
+    entry is yielded at a time — never the complete alias population and never
+    a sorted or page-expanded copy.  A yielded conservative false positive is
+    simply followed by the next position.
+
+    Args:
+        index (_OccupancyIndex): The built occupancy index.
+        definition (Definition): The query definition; its ``address`` and
+            ``byte_length`` give the query span, or a point at its declared
+            address when the length is unreadable.
+        own_position (Optional[int]): The walk position of the definition's
+            own record; ``None`` excludes nothing (fail closed).
+
+    Returns:
+        Iterator[tuple]: Selected original entry tuples in section-walk
+        position order, unmaterialized.
+
+    Raises:
+        None.
+
+    Data Flow:
+        - Reduce the definition to the inclusive query interval.
+        - Explore the address-ordered implicit complete tree best-first with a
+          min-heap over walk positions, visiting only subtrees not proved
+          disjoint.
+        - Skip the own position and yield each remaining selected leaf entry.
+
+    Dependencies:
+        Uses:
+            - The ``_OccupancyIndex`` summaries and records only.
+        Used by:
+            - ``_shared_with``: the only consumer of selected candidates.
+    """
     address = definition.address
     if address is None:
-        return None
-    if definition.byte_length is not None and definition.byte_length >= 1:
-        pages = range(
-            address >> 4, ((address + definition.byte_length - 1) >> 4) + 1
-        )
+        return
+    byte_length = definition.byte_length
+    if byte_length is not None and byte_length >= 1:
+        query_last = address + byte_length - 1
     else:
-        pages = (address >> 4,)
-    if materialize is not None and None in span_index:
-        candidates = span_index[None]
-    else:
-        seen: set[int] = set()
-        multi_page = len(pages) > 1
-        candidates: list[tuple] = []
-        for page in pages:
-            for entry in span_index.get(page, ()):
-                if multi_page:
-                    key = entry[0]
-                    if key in seen:
-                        continue
-                    seen.add(key)
-                candidates.append(entry)
-        if multi_page:
-            candidates.sort(key=lambda entry: entry[0])
-    own_entry = True
-    for entry in candidates:
-        if materialize is not None:
-            entry = materialize(entry)
-        if own_entry and (
-            entry[1] == definition.name
-            and entry[2] == definition.section
-            and entry[3] == definition.address
-            and entry[4] == definition.byte_length
-            and entry[5] == definition.byte_order
-        ):
-            own_entry = False
+        query_last = address
+    records = index.records
+    leaf_offset = index.leaf_offset
+    record_count = len(records)
+    if record_count == 0:
+        return
+    min_first = index.min_first
+    max_last = index.max_last
+    min_pos = index.min_pos
+    leaf_records = index.leaf_records
+    heap = [(min_pos[1], 1)]
+    while heap:
+        _, node = heapq.heappop(heap)
+        if node >= leaf_offset:
+            leaf = node - leaf_offset
+            if leaf >= record_count:
+                continue
+            record = leaf_records[leaf]
+            if record[2][0] == own_position:
+                continue
+            if record[0] > query_last:
+                continue
+            if max_last[node] is not None and max_last[node] < address:
+                continue
+            yield record[2]
             continue
-        if _entry_overlaps(definition, entry) and not _pair_exempt(
-            definition, entry, mask_of
-        ):
-            return entry[1]
+        subtree_min = min_first[node]
+        if subtree_min is None:
+            continue
+        if subtree_min > query_last:
+            continue
+        subtree_max = max_last[node]
+        if subtree_max is not None and subtree_max < address:
+            continue
+        left, right = 2 * node, 2 * node + 1
+        left_pos = min_pos[left]
+        if left_pos is not None:
+            heapq.heappush(heap, (left_pos, left))
+        right_pos = min_pos[right]
+        if right_pos is not None:
+            heapq.heappush(heap, (right_pos, right))
+
+
+def _tighten_occupancy(
+    index: _OccupancyIndex, entry: tuple, final_entry: tuple
+) -> None:
+    """Tighten one leaf's upper end to its materialized final span.
+
+    The leaf is found by two keyed bisects over the address-ordered
+    ``leaf_records``: first the run of leaves whose first address equals the
+    original entry's address, then the one whose walk position equals the
+    original entry's position (positions increase inside a run because the
+    sort is stable over walk order).  The leaf's ``max_last`` is set to the
+    final inclusive end (``address + length - 1``, or the point ``address``
+    when the final length is ``None`` or below 1), then recomputed up to the
+    root in O(log n).  The new value may only be ≤ the old bound given the
+    FA-IDX1 rule; a grown bound raises ``AssertionError``.
+
+    Args:
+        index (_OccupancyIndex): The one request-local occupancy index whose
+            ``max_last`` list is mutated in place.
+        entry (tuple): The original (unmaterialized) entry whose ``[0]`` is
+            the walk position and ``[3]`` the address.
+        final_entry (tuple): The materialized entry whose ``[3]`` is the
+            address and ``[4]`` the final byte length.
+
+    Returns:
+        None: the index's ``max_last`` is tightened in place.
+
+    Raises:
+        AssertionError: the final span grew past the stored upper bound, or
+            the original entry's leaf is not found.
+
+    Data Flow:
+        - Locate the leaf from the original entry's address run and position,
+          then write its final upper end.
+        - Recompute ``max_last`` ancestors bottom-up, stopping at the first
+          unchanged node.
+
+    Dependencies:
+        Uses:
+            - ``bisect_left`` / ``bisect_right``: the address-run and position
+              lookups.
+        Used by:
+            - ``_shared_with``: after each candidate materialization.
+    """
+    leaf_records = index.leaf_records
+    first_of = operator.itemgetter(0)
+    lo = bisect_left(leaf_records, entry[3], key=first_of)
+    hi = bisect_right(leaf_records, entry[3], lo, key=first_of)
+    position_of = lambda record: record[2][0]
+    leaf = bisect_left(leaf_records, entry[0], lo, hi, key=position_of)
+    if leaf == hi or leaf_records[leaf][2][0] != entry[0]:
+        raise AssertionError("occupancy leaf not found")
+    address = final_entry[3]
+    length = final_entry[4]
+    if length is not None and length >= 1:
+        new_last = address + length - 1
+    else:
+        new_last = address
+    max_last = index.max_last
+    node = index.leaf_offset + leaf
+    old = max_last[node]
+    if old is not None and new_last > old:
+        raise AssertionError("occupancy bound grew on materialization (D2 broken)")
+    if max_last[node] == new_last:
+        return
+    max_last[node] = new_last
+    node //= 2
+    min_pos = index.min_pos
+    while node >= 1:
+        left, right = 2 * node, 2 * node + 1
+        left_empty = min_pos[left] is None
+        right_empty = min_pos[right] is None
+        if left_empty and right_empty:
+            new_max = None
+        elif left_empty:
+            new_max = max_last[right]
+        elif right_empty:
+            new_max = max_last[left]
+        else:
+            left_max = max_last[left]
+            right_max = max_last[right]
+            if left_max is None or right_max is None:
+                new_max = None
+            else:
+                new_max = left_max if left_max >= right_max else right_max
+        if max_last[node] == new_max:
+            break
+        max_last[node] = new_max
+        node //= 2
+
+
+def _shared_with(
+    definition: Definition,
+    index: _OccupancyIndex,
+    own_position: Optional[int],
+    mask_of: Callable[[str], Optional[int]],
+    materialize: Callable[[tuple], tuple],
+) -> Optional[str]:
+    """The name of the first index-selected other entry whose final span
+    overlaps the definition's span (or whose declared address lies inside it
+    when that entry has no readable final length), unless the pair's clean
+    masks select no common bit (R-A2L-DEF.138).  Candidates advance in
+    section-walk position order through the central occupancy index; self is
+    excluded only by position before materialization, an exempt or
+    non-overlapping candidate advances to the next position, and no complete
+    alias collection or sort ever occurs.
+
+    Args:
+        definition (Definition): The query definition.
+        index (_OccupancyIndex): The one request-local occupancy index.
+        own_position (Optional[int]): The definition's own walk position
+            (``None`` excludes nothing, fail closed).
+        mask_of (Callable[[str], Optional[int]]): The clean bit mask of a
+            candidate name (the request-local fail-closed lookup).
+        materialize (Callable[[tuple], tuple]): The position-cached lazy
+            final-span conversion of a candidate entry.
+
+    Returns:
+        Optional[str]: The first non-exempt overlapping entry's name, else
+        ``None`` when the candidates are exhausted or the definition has no
+        address.
+
+    Raises:
+        None.
+
+    Data Flow:
+        - Select candidates lazily through ``_occupancy_candidates``.
+        - Materialize each selected candidate through the position cache and
+          tighten its indexed upper end to the final span.
+        - Return the first candidate that overlaps and is not mask-exempt.
+
+    Dependencies:
+        Uses:
+            - ``_occupancy_candidates``: the pruned position-order selector.
+            - ``_tighten_occupancy``: the final-span upper-end tightening.
+            - ``_entry_overlaps``: the inclusive final-span overlap predicate.
+            - ``_pair_exempt``: the clean-mask exemption.
+        Used by:
+            - ``describe_definitions``: every addressed result of a request.
+    """
+    if definition.address is None:
+        return None
+    for entry in _occupancy_candidates(index, definition, own_position):
+        original = entry
+        entry = materialize(entry)
+        _tighten_occupancy(index, original, entry)
+        if not _entry_overlaps(definition, entry):
+            continue
+        if _pair_exempt(definition, entry, mask_of):
+            continue
+        return entry[1]
     return None
 
 

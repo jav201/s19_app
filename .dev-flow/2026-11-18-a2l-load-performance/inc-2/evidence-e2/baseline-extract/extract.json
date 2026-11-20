@@ -1,0 +1,522 @@
+{
+  "marks": [
+    {
+      "name": "A2LParameterPicker.set_parameters",
+      "reqs": [
+        "R-A2L-REFRESH.037"
+      ],
+      "file": "s19_app/tui/a2l_parameter_picker.py",
+      "line": 590,
+      "def": {
+        "qualname": "A2LParameterPicker.set_parameters",
+        "line": 591,
+        "params": [
+          {
+            "name": "rows",
+            "type": "Sequence[dict]",
+            "default": null
+          },
+          {
+            "name": "signature",
+            "type": "object",
+            "default": "None"
+          },
+          {
+            "name": "a2l_data",
+            "type": "Optional[dict]",
+            "default": "None"
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "FileLoadMixin._start_a2l_load",
+      "reqs": [
+        "R-A2L-REFRESH.030",
+        "R-A2L-REFRESH.032",
+        "R-A2L-REFRESH.033",
+        "R-A2L-REFRESH.034"
+      ],
+      "file": "s19_app/tui/app/file_load.py",
+      "line": 728,
+      "def": {
+        "qualname": "FileLoadMixin._start_a2l_load",
+        "line": 729,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "normalized",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "copy",
+            "type": "bool",
+            "default": null
+          },
+          {
+            "name": "sync_project",
+            "type": "bool",
+            "default": "True"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "FileLoadMixin._a2l_attach_worker",
+      "reqs": [
+        "R-A2L-REFRESH.029",
+        "R-A2L-REFRESH.030",
+        "R-A2L-REFRESH.033",
+        "R-A2L-REFRESH.034",
+        "R-A2L-REFRESH.037",
+        "R-A2L-REFRESH.038"
+      ],
+      "file": "s19_app/tui/app/file_load.py",
+      "line": 807,
+      "def": {
+        "qualname": "FileLoadMixin._a2l_attach_worker",
+        "line": 809,
+        "params": [
+          {
+            "name": "request",
+            "type": "A2LAttachRequest",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "FileLoadMixin._install_attached_a2l",
+      "reqs": [
+        "R-A2L-REFRESH.031",
+        "R-A2L-REFRESH.032",
+        "R-A2L-REFRESH.035",
+        "R-A2L-REFRESH.036",
+        "R-A2L-REFRESH.037"
+      ],
+      "file": "s19_app/tui/app/file_load.py",
+      "line": 850,
+      "def": {
+        "qualname": "FileLoadMixin._install_attached_a2l",
+        "line": 851,
+        "params": [
+          {
+            "name": "result",
+            "type": "A2LAttachResult",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "CheckEditorPanel.set_a2l_parameters",
+      "reqs": [
+        "R-A2L-REFRESH.037"
+      ],
+      "file": "s19_app/tui/screens_directionb/check_editor.py",
+      "line": 201,
+      "def": {
+        "qualname": "CheckEditorPanel.set_a2l_parameters",
+        "line": 202,
+        "params": [
+          {
+            "name": "rows",
+            "type": "Sequence[dict]",
+            "default": null
+          },
+          {
+            "name": "signature",
+            "type": "object",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lPickerMixin.set_a2l_parameters",
+      "reqs": [
+        "R-A2L-REFRESH.037"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "line": 25,
+      "def": {
+        "qualname": "A2lPickerMixin.set_a2l_parameters",
+        "line": 26,
+        "params": [
+          {
+            "name": "rows",
+            "type": "Sequence[dict]",
+            "default": null
+          },
+          {
+            "name": "signature",
+            "type": "object",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "FileLoadMixin._start_a2l_load",
+      "reqs": [
+        "R-A2L-REFRESH.030",
+        "R-A2L-REFRESH.032",
+        "R-A2L-REFRESH.033",
+        "R-A2L-REFRESH.034"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "FileLoadMixin",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "normalized",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "copy",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "sync_project",
+          "default": "True"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(E4-030-2) image map with one source byte changed after request capture → request keeps independent read-only original bytes and expected pair",
+        "(E4-033-6) image bytes `1000000`; two keys during request capture → each acknowledgement latency at most `1.0` s",
+        "(E4-034-4) image bytes `1000000` during request capture → visible progress gaps at most `1.0` s"
+      ],
+      "modify": [
+        "[Data: A2L busy run]"
+      ],
+      "assign": [
+        "append"
+      ],
+      "func": "preserves admission and recent decisions, begins the busy run, creates the frozen request without generation/image snapshot fields and starts the attach worker",
+      "volatile": [],
+      "oracle": [],
+      "key": "FileLoadMixin._start_a2l_load"
+    },
+    {
+      "name": "FileLoadMixin._a2l_attach_worker",
+      "reqs": [
+        "R-A2L-REFRESH.029",
+        "R-A2L-REFRESH.030",
+        "R-A2L-REFRESH.033",
+        "R-A2L-REFRESH.034",
+        "R-A2L-REFRESH.037",
+        "R-A2L-REFRESH.038"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "FileLoadMixin",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "A2LAttachRequest",
+          "name": "request",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(E4-029-1) typed NEW attach → worker completes enriched tags, summary and two picker snapshots before install dispatch",
+        "(E4-037-1) OLD measurable names → Check describe count `1` and Patch describe count `1`, both off UI",
+        "(E4-033-3) held enrichment and two keys → each key acknowledged within `1.0` s before install",
+        "(E4-034-1) enrichment held `1.5` s → every visible progress gap at most `1.0` s",
+        "(E4-038-1) enrichment raises ValueError → exact File NOT loaded outcome and no install",
+        "(E4-038-2) real enrichment completes then render_a2l_view raises ValueError → exact File NOT loaded outcome and no describe or install"
+      ],
+      "modify": [
+        "[I/O: workarea A2L copy]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "copies when requested, parses with byte progress, constructs the current parsed result and dispatches install or failure; current code performs no enrichment or definition preparation",
+      "volatile": [],
+      "oracle": [],
+      "key": "FileLoadMixin._a2l_attach_worker"
+    },
+    {
+      "name": "FileLoadMixin._install_attached_a2l",
+      "reqs": [
+        "R-A2L-REFRESH.031",
+        "R-A2L-REFRESH.032",
+        "R-A2L-REFRESH.035",
+        "R-A2L-REFRESH.036",
+        "R-A2L-REFRESH.037"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "FileLoadMixin",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "A2LAttachResult",
+          "name": "result",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(E4-031-1) matching OLD result without an image → enrichment key (new A2L, unchanged image, `-1`) before refresh",
+        "(E4-031-2) matching NEW result over IMG1 → enrichment key (new A2L, unchanged image, independently measured image map size) before refresh",
+        "(E4-032-1) stale A2L generation → Load superseded — current state kept. with zero install or refresh",
+        "(E4-035-2) accepted replacement → install then one UI common refresh then A2L loaded outcome",
+        "(E4-036-2) accepted image-bearing snapshot → worker enrichment count `1` and UI enrichment count `0`"
+      ],
+      "modify": [
+        "[Data: Current A2L]",
+        "[Data: A2L view caches]",
+        "[Data: A2L busy run]"
+      ],
+      "assign": [
+        "replace",
+        "replace",
+        "clear"
+      ],
+      "func": "currently records recents, refreshes files, stores cache and A2L, attaches to the current file, runs common refresh and schedules success without a direct-snapshot generation preflight",
+      "volatile": [],
+      "oracle": [],
+      "key": "FileLoadMixin._install_attached_a2l"
+    },
+    {
+      "name": "A2LParameterPicker.set_parameters",
+      "reqs": [
+        "R-A2L-REFRESH.037"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "A2LParameterPicker",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[dict]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "signature",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "a2l_data",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "repopulated"
+        ],
+        "raw": "bool repopulated"
+      },
+      "module": "s19_app/tui/a2l_parameter_picker.py",
+      "examples": [
+        "(E4-037-2) same-path NEW generation with declared length `8` and format f32 → one supplied worker snapshot paints length `8` and f32 without a UI describe",
+        "(E4-037-3) twenty filter/page rebuilds plus unchanged signature → additional describe count `0` and page rows at most `200`"
+      ],
+      "modify": [
+        "[Data: Picker population]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "currently no-ops on equal non-None signature and otherwise performs one direct bulk describe before normalizing rows and rebuilding one page",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2LParameterPicker.set_parameters"
+    },
+    {
+      "name": "CheckEditorPanel.set_a2l_parameters",
+      "reqs": [
+        "R-A2L-REFRESH.037"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "CheckEditorPanel",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[dict]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "signature",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/check_editor.py",
+      "examples": [
+        "(E4-037-1) accepted OLD direct generation → Check consumes its own matching worker definitions and paints exact declared lengths/formats",
+        "(E4-037-4) wrong A2L source or full signature → accepted mapping invalidated before existing-route describe and no stale definitions painted",
+        "(E4-037-3) unchanged Check signature → repopulated False with preserved filter/page/picks and zero describes"
+      ],
+      "modify": [
+        "[Data: Check picker population]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "currently forwards rows, signature and the app's current A2L payload to the Check picker, then preserves picks and refreshes layout/previews after real population",
+      "volatile": [],
+      "oracle": [],
+      "key": "CheckEditorPanel.set_a2l_parameters"
+    },
+    {
+      "name": "A2lPickerMixin.set_a2l_parameters",
+      "reqs": [
+        "R-A2L-REFRESH.037"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "A2lPickerMixin",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[dict]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "signature",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "examples": [
+        "(E4-037-2) same-path NEW direct generation → Patch consumes a distinct matching worker snapshot and paints f32, never the OLD u16 definition",
+        "(E4-037-4) wrong A2L source or full signature → accepted mapping invalidated before existing-route describe and no stale definitions painted",
+        "(E4-037-3) Patch filter/page rebuilds → additional describe count `0` and current NEW definitions retained"
+      ],
+      "modify": [
+        "[Data: Patch picker population]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "currently forwards rows, signature and the app's current A2L payload to the Patch picker, then invalidates and reapplies layout after real population",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lPickerMixin.set_a2l_parameters"
+    }
+  ],
+  "calls": [
+    {
+      "caller": "A2lPickerMixin.set_a2l_parameters",
+      "callee": "A2LParameterPicker.set_parameters",
+      "sites": [
+        "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py:43"
+      ]
+    },
+    {
+      "caller": "CheckEditorPanel.set_a2l_parameters",
+      "callee": "A2LParameterPicker.set_parameters",
+      "sites": [
+        "s19_app/tui/screens_directionb/check_editor.py:224"
+      ]
+    },
+    {
+      "caller": "FileLoadMixin._start_a2l_load",
+      "callee": "FileLoadMixin._a2l_attach_worker",
+      "sites": [
+        "s19_app/tui/app/file_load.py:802"
+      ]
+    }
+  ],
+  "top_level_sites": {
+    "CheckEditorPanel.set_a2l_parameters": [
+      "s19_app/tui/app/checks_diff.py:101",
+      "s19_app/tui/app/patch.py:1860"
+    ],
+    "A2lPickerMixin.set_a2l_parameters": [
+      "s19_app/tui/app/checks_diff.py:101",
+      "s19_app/tui/app/patch.py:1860"
+    ],
+    "FileLoadMixin._start_a2l_load": [
+      "s19_app/tui/app/file_load.py:625",
+      "s19_app/tui/app/file_load.py:713"
+    ]
+  },
+  "findings": [],
+  "parse_failures": []
+}

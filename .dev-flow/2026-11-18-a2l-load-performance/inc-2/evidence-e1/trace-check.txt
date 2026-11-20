@@ -1,0 +1,12 @@
+TEST   R-A2L-REFRESH.029 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-REFRESH.030 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-REFRESH.031 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-REFRESH.032 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-REFRESH.033 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-REFRESH.034 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-REFRESH.035 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-REFRESH.036 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-REFRESH.037 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-REFRESH.038 is named by no file under tests, and neither is a TC/AT id it lists
+EVID   no 04-validation.md beside .dev-flow/2026-11-18-a2l-load-performance/inc-2/01-requirements.md
+trace_check: 3 US, 10 active requirements (0 withdrawn), checks run: US, CASE, TEST, SLICE, EVID, 11 gap(s)

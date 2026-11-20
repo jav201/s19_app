@@ -1,0 +1,37 @@
+{
+ "placed": [
+  {
+   "name": "FileLoadMixin._start_a2l_load",
+   "file": "s19_app/tui/app/file_load.py",
+   "line": 728
+  },
+  {
+   "name": "FileLoadMixin._a2l_attach_worker",
+   "file": "s19_app/tui/app/file_load.py",
+   "line": 807
+  },
+  {
+   "name": "FileLoadMixin._install_attached_a2l",
+   "file": "s19_app/tui/app/file_load.py",
+   "line": 850
+  },
+  {
+   "name": "A2LParameterPicker.set_parameters",
+   "file": "s19_app/tui/a2l_parameter_picker.py",
+   "line": 590
+  },
+  {
+   "name": "CheckEditorPanel.set_a2l_parameters",
+   "file": "s19_app/tui/screens_directionb/check_editor.py",
+   "line": 201
+  },
+  {
+   "name": "A2lPickerMixin.set_a2l_parameters",
+   "file": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+   "line": 25
+  }
+ ],
+ "missing": [],
+ "conflicts": [],
+ "replaced": []
+}

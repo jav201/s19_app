@@ -1,0 +1,40 @@
+events (rel s, thread):
+  load-call           0.000  30660
+  load-return         0.000  30660
+  parse-entry         0.218  67968
+  keys-ack            1.453  30660
+  parse-exit         24.906  67968
+  enrich-entry       24.906  67968
+  enrich-exit        32.828  67968
+  terminal           86.578  30660
+key latencies: (0.984000000054948, 0.46899999992456287)
+ticker gaps > 0.5s: 14
+  tickgap[1234]  0.625 at t=  25.593
+  tickgap[1250]  1.079 at t=  27.093
+  tickgap[1322]  1.375 at t=  31.484
+  tickgap[1347]  0.907 at t=  34.343
+  tickgap[1410]  1.000 at t=  38.781
+  tickgap[1485]  0.969 at t=  43.828
+  tickgap[1568]  1.079 at t=  48.968
+  tickgap[1645]  1.265 at t=  53.922
+  tickgap[1708]  1.266 at t=  58.218
+  tickgap[1772]  1.234 at t=  62.750
+  tickgap[1861]  1.328 at t=  68.750
+  tickgap[1947]  1.485 at t=  75.343
+  tickgap[2038]  1.593 at t=  81.547
+  tickgap[2067]  1.688 at t=  84.515
+sampler big gaps:
+  gap[179]  1.219  at t=  27.172
+  gap[194]  1.562  at t=  31.547
+  gap[200]  0.953  at t=  34.438
+  gap[218]  1.141  at t=  38.828
+  gap[239]  1.266  at t=  43.875
+  gap[256]  1.312  at t=  48.938
+  gap[272]  1.391  at t=  54.047
+  gap[284]  1.719  at t=  58.078
+  gap[298]  1.359  at t=  62.891
+  gap[318]  1.422  at t=  68.891
+  gap[341]  1.547  at t=  75.422
+  gap[365]  1.687  at t=  81.688
+  gap[372]  2.047  at t=  84.609
+log: ['', '', '', 'A2L loaded: firmware.a2l']

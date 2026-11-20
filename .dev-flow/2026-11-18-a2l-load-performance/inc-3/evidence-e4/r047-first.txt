@@ -1,0 +1,2005 @@
+FFFFFF                                                                   [100%]
+================================== FAILURES ===================================
+__________ test_r047_same_path_changed_content[R-A2L-REFRESH.047/1] ___________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40273/test_r047_same_path_changed_co0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000160C9697910>
+arm = 'loose-image'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["loose-image", "pair-a2l", "pair-image", "only-a2l", "nomac-a2l", "nomac-image"],
+        ids=[f"R-A2L-REFRESH.047/{i}" for i in range(1, 7)],
+    )
+    def test_r047_same_path_changed_content(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.047/1-/6: an equal-size, same-path byte change with no
+        clear publishes the NEW content under a strictly newer generation of
+        the changed artifact; unchanged source bytes stay byte-identical while
+        writer/reset stages move its generation per the stage matrix; no OLD
+        marker survives and the final publication is singular."""
+        _guard_inc3_interface()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old_pair = _pair_a2l(src / "pair_old.a2l", "OLD")
+        new_pair = _pair_a2l(src / "pair_new.a2l", "NEW")
+        assert old_pair.stat().st_size == new_pair.stat().st_size, "fixture: equal-size A2L pair required"
+        assert {t["name"] for t in parse_a2l_file(old_pair)["tags"]} == {"OLD_TAG_A", "OLD_TAG_B"}
+        assert {t["name"] for t in parse_a2l_file(new_pair)["tags"]} == {"NEW_TAG_A", "NEW_TAG_B"}
+        img1 = _write_image(src / "img1.s19", dict(IMG1))
+        img2 = _write_image(src / "img2.s19", dict(IMG2))
+        assert img1.stat().st_size == img2.stat().st_size, "fixture: equal-size image pair required"
+        mac = _write_mac(src / "records.mac")
+    
+        def emit(mem) -> bytes:
+            return emit_s19_from_mem_map(dict(mem), [(min(mem), max(mem) + 1)]).encode("ascii")
+    
+        async def body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            if arm == "loose-image":
+                attach = _old_a2l(src / "att.a2l")
+                same = src / "image.s19"
+                same.write_bytes(emit(IMG1))
+                await _typed_attach(app, pilot, attach)
+                await _load_image(app, pilot, same)
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                size_before = same.stat().st_size
+                same.write_bytes(emit(IMG2))
+                assert same.stat().st_size == size_before, "fixture: equal-size pair required"
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_image(app, pilot, same)
+                await settle_workers(pilot)
+                await wait_until(pilot, lambda: any(e[0] == "OUTCOME" for e in events), "the image outcome", timeout=30.0)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 1, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                outcomes = [e for e in events if e[0] == "OUTCOME"]
+                assert len(outcomes) == 1 and outcomes[0][3].startswith("Loaded "), outcomes
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert app._image_generation == i0 + 1 > i0
+                assert app._a2l_view_generation == a0 + 1
+                assert app.current_a2l_data == parse_a2l_file(attach), "unchanged A2L bytes must stay identical"
+                tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_SCALAR")
+                assert tag.get("raw_value") == 0x8070, tag
+            elif arm == "pair-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                image_digest = _digest_file(folder / img1.name)
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                assert (folder / "pair_old.a2l").stat().st_size == old_pair.stat().st_size
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 3, i0 + 2), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+                assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+                assert app._a2l_view_generation == a0 + 3 > a0
+                assert app._image_generation == i0 + 2
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names and "OLD_TAG_B" not in names
+            elif arm == "pair-image":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / img1.name).write_bytes(emit(IMG2))
+                assert (folder / img1.name).stat().st_size == img1.stat().st_size
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 3, i0 + 2), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert app._image_generation == i0 + 2 > i0
+                assert app._a2l_view_generation == a0 + 3
+                assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+                tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_TAG_A")
+                assert tag.get("in_memory") is False or tag.get("raw_value") is not None
+                assert _a2l_viewer_names(app)
+            elif arm == "only-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0), call.kwargs
+                assert call.kwargs["image_mem_map"] is None, call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is None, "no image/MAC/current_file may be fabricated"
+                assert app._a2l_view_generation == a0 + 2 > a0
+                assert app._image_generation == i0
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names
+            elif arm == "nomac-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                image_digest = _digest_file(folder / img1.name)
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+                assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+                assert not app.current_file.mac_records and app.current_file.mac_path is None
+                assert app._a2l_view_generation == a0 + 2 > a0
+                assert app._image_generation == i0 + 1
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names
+            else:  # nomac-image
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / img1.name).write_bytes(emit(IMG2))
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert not app.current_file.mac_records and app.current_file.mac_path is None
+                assert app._image_generation == i0 + 1 > i0
+                assert app._a2l_view_generation == a0 + 2
+                assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc3_snapshot_parity.py:1203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:301: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:299: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        if arm == "loose-image":
+            attach = _old_a2l(src / "att.a2l")
+            same = src / "image.s19"
+            same.write_bytes(emit(IMG1))
+            await _typed_attach(app, pilot, attach)
+            await _load_image(app, pilot, same)
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            size_before = same.stat().st_size
+            same.write_bytes(emit(IMG2))
+            assert same.stat().st_size == size_before, "fixture: equal-size pair required"
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_image(app, pilot, same)
+            await settle_workers(pilot)
+            await wait_until(pilot, lambda: any(e[0] == "OUTCOME" for e in events), "the image outcome", timeout=30.0)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 1, i0 + 1), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            outcomes = [e for e in events if e[0] == "OUTCOME"]
+            assert len(outcomes) == 1 and outcomes[0][3].startswith("Loaded "), outcomes
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+            assert app._image_generation == i0 + 1 > i0
+            assert app._a2l_view_generation == a0 + 1
+>           assert app.current_a2l_data == parse_a2l_file(attach), "unchanged A2L bytes must stay identical"
+E           AssertionError: unchanged A2L bytes must stay identical
+E           assert {'compu_metho...ors': [], ...} == {'compu_metho...ors': [], ...}
+E             
+E             Omitting 7 identical items, use -vv to show
+E             Differing items:
+E             {'path': 'C:\\Users\\<user>\\AppData\\Local\\Temp\\pytest-of-<user>\\pytest-40273\\test_r047_same_path_changed_co0\\app\\.s19tool\\workarea\\temp\\att.a2l'} != {'path': 'C:\\Users\\<user>\\AppData\\Local\\Temp\\pytest-of-<user>\\pytest-40273\\test_r047_same_path_changed_co0\\src\\att.a2l'}
+E             Use -v to get more diff
+
+tests\test_alp_inc3_snapshot_parity.py:1067: AssertionError
+__________ test_r047_same_path_changed_content[R-A2L-REFRESH.047/2] ___________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40273/test_r047_same_path_changed_co1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000160CB56B510>
+arm = 'pair-a2l'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["loose-image", "pair-a2l", "pair-image", "only-a2l", "nomac-a2l", "nomac-image"],
+        ids=[f"R-A2L-REFRESH.047/{i}" for i in range(1, 7)],
+    )
+    def test_r047_same_path_changed_content(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.047/1-/6: an equal-size, same-path byte change with no
+        clear publishes the NEW content under a strictly newer generation of
+        the changed artifact; unchanged source bytes stay byte-identical while
+        writer/reset stages move its generation per the stage matrix; no OLD
+        marker survives and the final publication is singular."""
+        _guard_inc3_interface()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old_pair = _pair_a2l(src / "pair_old.a2l", "OLD")
+        new_pair = _pair_a2l(src / "pair_new.a2l", "NEW")
+        assert old_pair.stat().st_size == new_pair.stat().st_size, "fixture: equal-size A2L pair required"
+        assert {t["name"] for t in parse_a2l_file(old_pair)["tags"]} == {"OLD_TAG_A", "OLD_TAG_B"}
+        assert {t["name"] for t in parse_a2l_file(new_pair)["tags"]} == {"NEW_TAG_A", "NEW_TAG_B"}
+        img1 = _write_image(src / "img1.s19", dict(IMG1))
+        img2 = _write_image(src / "img2.s19", dict(IMG2))
+        assert img1.stat().st_size == img2.stat().st_size, "fixture: equal-size image pair required"
+        mac = _write_mac(src / "records.mac")
+    
+        def emit(mem) -> bytes:
+            return emit_s19_from_mem_map(dict(mem), [(min(mem), max(mem) + 1)]).encode("ascii")
+    
+        async def body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            if arm == "loose-image":
+                attach = _old_a2l(src / "att.a2l")
+                same = src / "image.s19"
+                same.write_bytes(emit(IMG1))
+                await _typed_attach(app, pilot, attach)
+                await _load_image(app, pilot, same)
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                size_before = same.stat().st_size
+                same.write_bytes(emit(IMG2))
+                assert same.stat().st_size == size_before, "fixture: equal-size pair required"
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_image(app, pilot, same)
+                await settle_workers(pilot)
+                await wait_until(pilot, lambda: any(e[0] == "OUTCOME" for e in events), "the image outcome", timeout=30.0)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 1, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                outcomes = [e for e in events if e[0] == "OUTCOME"]
+                assert len(outcomes) == 1 and outcomes[0][3].startswith("Loaded "), outcomes
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert app._image_generation == i0 + 1 > i0
+                assert app._a2l_view_generation == a0 + 1
+                assert app.current_a2l_data == parse_a2l_file(attach), "unchanged A2L bytes must stay identical"
+                tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_SCALAR")
+                assert tag.get("raw_value") == 0x8070, tag
+            elif arm == "pair-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                image_digest = _digest_file(folder / img1.name)
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                assert (folder / "pair_old.a2l").stat().st_size == old_pair.stat().st_size
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 3, i0 + 2), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+                assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+                assert app._a2l_view_generation == a0 + 3 > a0
+                assert app._image_generation == i0 + 2
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names and "OLD_TAG_B" not in names
+            elif arm == "pair-image":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / img1.name).write_bytes(emit(IMG2))
+                assert (folder / img1.name).stat().st_size == img1.stat().st_size
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 3, i0 + 2), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert app._image_generation == i0 + 2 > i0
+                assert app._a2l_view_generation == a0 + 3
+                assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+                tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_TAG_A")
+                assert tag.get("in_memory") is False or tag.get("raw_value") is not None
+                assert _a2l_viewer_names(app)
+            elif arm == "only-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0), call.kwargs
+                assert call.kwargs["image_mem_map"] is None, call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is None, "no image/MAC/current_file may be fabricated"
+                assert app._a2l_view_generation == a0 + 2 > a0
+                assert app._image_generation == i0
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names
+            elif arm == "nomac-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                image_digest = _digest_file(folder / img1.name)
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+                assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+                assert not app.current_file.mac_records and app.current_file.mac_path is None
+                assert app._a2l_view_generation == a0 + 2 > a0
+                assert app._image_generation == i0 + 1
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names
+            else:  # nomac-image
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / img1.name).write_bytes(emit(IMG2))
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert not app.current_file.mac_records and app.current_file.mac_path is None
+                assert app._image_generation == i0 + 1 > i0
+                assert app._a2l_view_generation == a0 + 2
+                assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc3_snapshot_parity.py:1203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:301: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:299: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        if arm == "loose-image":
+            attach = _old_a2l(src / "att.a2l")
+            same = src / "image.s19"
+            same.write_bytes(emit(IMG1))
+            await _typed_attach(app, pilot, attach)
+            await _load_image(app, pilot, same)
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            size_before = same.stat().st_size
+            same.write_bytes(emit(IMG2))
+            assert same.stat().st_size == size_before, "fixture: equal-size pair required"
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_image(app, pilot, same)
+            await settle_workers(pilot)
+            await wait_until(pilot, lambda: any(e[0] == "OUTCOME" for e in events), "the image outcome", timeout=30.0)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 1, i0 + 1), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            outcomes = [e for e in events if e[0] == "OUTCOME"]
+            assert len(outcomes) == 1 and outcomes[0][3].startswith("Loaded "), outcomes
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+            assert app._image_generation == i0 + 1 > i0
+            assert app._a2l_view_generation == a0 + 1
+            assert app.current_a2l_data == parse_a2l_file(attach), "unchanged A2L bytes must stay identical"
+            tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_SCALAR")
+            assert tag.get("raw_value") == 0x8070, tag
+        elif arm == "pair-a2l":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            image_digest = _digest_file(folder / img1.name)
+            (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+            assert (folder / "pair_old.a2l").stat().st_size == old_pair.stat().st_size
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 3, i0 + 2), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+            assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+            assert app._a2l_view_generation == a0 + 3 > a0
+            assert app._image_generation == i0 + 2
+>           assert app.current_a2l_data == parse_a2l_file(new_pair)
+E           AssertionError: assert {'compu_metho...ors': [], ...} == {'compu_metho...ors': [], ...}
+E             
+E             Omitting 7 identical items, use -vv to show
+E             Differing items:
+E             {'path': 'C:\\Users\\<user>\\AppData\\Local\\Temp\\pytest-of-<user>\\pytest-40273\\test_r047_same_path_changed_co1\\app\\.s19tool\\workarea\\proj_a\\pair_old.a2l'} != {'path': 'C:\\Users\\<user>\\AppData\\Local\\Temp\\pytest-of-<user>\\pytest-40273\\test_r047_same_path_changed_co1\\src\\pair_new.a2l'}
+E             Use -v to get more diff
+
+tests\test_alp_inc3_snapshot_parity.py:1094: AssertionError
+__________ test_r047_same_path_changed_content[R-A2L-REFRESH.047/3] ___________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40273/test_r047_same_path_changed_co2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000160CCD34910>
+arm = 'pair-image'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["loose-image", "pair-a2l", "pair-image", "only-a2l", "nomac-a2l", "nomac-image"],
+        ids=[f"R-A2L-REFRESH.047/{i}" for i in range(1, 7)],
+    )
+    def test_r047_same_path_changed_content(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.047/1-/6: an equal-size, same-path byte change with no
+        clear publishes the NEW content under a strictly newer generation of
+        the changed artifact; unchanged source bytes stay byte-identical while
+        writer/reset stages move its generation per the stage matrix; no OLD
+        marker survives and the final publication is singular."""
+        _guard_inc3_interface()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old_pair = _pair_a2l(src / "pair_old.a2l", "OLD")
+        new_pair = _pair_a2l(src / "pair_new.a2l", "NEW")
+        assert old_pair.stat().st_size == new_pair.stat().st_size, "fixture: equal-size A2L pair required"
+        assert {t["name"] for t in parse_a2l_file(old_pair)["tags"]} == {"OLD_TAG_A", "OLD_TAG_B"}
+        assert {t["name"] for t in parse_a2l_file(new_pair)["tags"]} == {"NEW_TAG_A", "NEW_TAG_B"}
+        img1 = _write_image(src / "img1.s19", dict(IMG1))
+        img2 = _write_image(src / "img2.s19", dict(IMG2))
+        assert img1.stat().st_size == img2.stat().st_size, "fixture: equal-size image pair required"
+        mac = _write_mac(src / "records.mac")
+    
+        def emit(mem) -> bytes:
+            return emit_s19_from_mem_map(dict(mem), [(min(mem), max(mem) + 1)]).encode("ascii")
+    
+        async def body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            if arm == "loose-image":
+                attach = _old_a2l(src / "att.a2l")
+                same = src / "image.s19"
+                same.write_bytes(emit(IMG1))
+                await _typed_attach(app, pilot, attach)
+                await _load_image(app, pilot, same)
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                size_before = same.stat().st_size
+                same.write_bytes(emit(IMG2))
+                assert same.stat().st_size == size_before, "fixture: equal-size pair required"
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_image(app, pilot, same)
+                await settle_workers(pilot)
+                await wait_until(pilot, lambda: any(e[0] == "OUTCOME" for e in events), "the image outcome", timeout=30.0)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 1, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                outcomes = [e for e in events if e[0] == "OUTCOME"]
+                assert len(outcomes) == 1 and outcomes[0][3].startswith("Loaded "), outcomes
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert app._image_generation == i0 + 1 > i0
+                assert app._a2l_view_generation == a0 + 1
+                assert app.current_a2l_data == parse_a2l_file(attach), "unchanged A2L bytes must stay identical"
+                tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_SCALAR")
+                assert tag.get("raw_value") == 0x8070, tag
+            elif arm == "pair-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                image_digest = _digest_file(folder / img1.name)
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                assert (folder / "pair_old.a2l").stat().st_size == old_pair.stat().st_size
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 3, i0 + 2), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+                assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+                assert app._a2l_view_generation == a0 + 3 > a0
+                assert app._image_generation == i0 + 2
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names and "OLD_TAG_B" not in names
+            elif arm == "pair-image":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / img1.name).write_bytes(emit(IMG2))
+                assert (folder / img1.name).stat().st_size == img1.stat().st_size
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 3, i0 + 2), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert app._image_generation == i0 + 2 > i0
+                assert app._a2l_view_generation == a0 + 3
+                assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+                tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_TAG_A")
+                assert tag.get("in_memory") is False or tag.get("raw_value") is not None
+                assert _a2l_viewer_names(app)
+            elif arm == "only-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0), call.kwargs
+                assert call.kwargs["image_mem_map"] is None, call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is None, "no image/MAC/current_file may be fabricated"
+                assert app._a2l_view_generation == a0 + 2 > a0
+                assert app._image_generation == i0
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names
+            elif arm == "nomac-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                image_digest = _digest_file(folder / img1.name)
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+                assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+                assert not app.current_file.mac_records and app.current_file.mac_path is None
+                assert app._a2l_view_generation == a0 + 2 > a0
+                assert app._image_generation == i0 + 1
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names
+            else:  # nomac-image
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / img1.name).write_bytes(emit(IMG2))
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert not app.current_file.mac_records and app.current_file.mac_path is None
+                assert app._image_generation == i0 + 1 > i0
+                assert app._a2l_view_generation == a0 + 2
+                assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc3_snapshot_parity.py:1203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:301: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:299: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        if arm == "loose-image":
+            attach = _old_a2l(src / "att.a2l")
+            same = src / "image.s19"
+            same.write_bytes(emit(IMG1))
+            await _typed_attach(app, pilot, attach)
+            await _load_image(app, pilot, same)
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            size_before = same.stat().st_size
+            same.write_bytes(emit(IMG2))
+            assert same.stat().st_size == size_before, "fixture: equal-size pair required"
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_image(app, pilot, same)
+            await settle_workers(pilot)
+            await wait_until(pilot, lambda: any(e[0] == "OUTCOME" for e in events), "the image outcome", timeout=30.0)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 1, i0 + 1), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            outcomes = [e for e in events if e[0] == "OUTCOME"]
+            assert len(outcomes) == 1 and outcomes[0][3].startswith("Loaded "), outcomes
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+            assert app._image_generation == i0 + 1 > i0
+            assert app._a2l_view_generation == a0 + 1
+            assert app.current_a2l_data == parse_a2l_file(attach), "unchanged A2L bytes must stay identical"
+            tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_SCALAR")
+            assert tag.get("raw_value") == 0x8070, tag
+        elif arm == "pair-a2l":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            image_digest = _digest_file(folder / img1.name)
+            (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+            assert (folder / "pair_old.a2l").stat().st_size == old_pair.stat().st_size
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 3, i0 + 2), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+            assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+            assert app._a2l_view_generation == a0 + 3 > a0
+            assert app._image_generation == i0 + 2
+            assert app.current_a2l_data == parse_a2l_file(new_pair)
+            names = set(_a2l_viewer_names(app))
+            assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+            assert "OLD_TAG_A" not in names and "OLD_TAG_B" not in names
+        elif arm == "pair-image":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            (folder / img1.name).write_bytes(emit(IMG2))
+>           assert (folder / img1.name).stat().st_size == img1.stat().st_size
+E           AssertionError: assert 39 == 42
+E            +  where 39 = os.stat_result(st_mode=33206, st_ino=47287796096197582, st_dev=4269291206, st_nlink=1, st_uid=0, st_gid=0, st_size=39, st_atime=1795062622, st_mtime=1795062622, st_ctime=1795062621).st_size
+E            +    where os.stat_result(st_mode=33206, st_ino=47287796096197582, st_dev=4269291206, st_nlink=1, st_uid=0, st_gid=0, st_size=39, st_atime=1795062622, st_mtime=1795062622, st_ctime=1795062621) = stat()
+E            +      where stat = (WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40273/test_r047_same_path_changed_co2/app/.s19tool/workarea/proj_a') / 'img1.s19').stat
+E            +        where 'img1.s19' = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40273/test_r047_same_path_changed_co2/src/img1.s19').name
+E            +  and   42 = os.stat_result(st_mode=33206, st_ino=12666373960786669, st_dev=4269291206, st_nlink=1, st_uid=0, st_gid=0, st_size=42, st_atime=1795062621, st_mtime=1795062619, st_ctime=1795062619).st_size
+E            +    where os.stat_result(st_mode=33206, st_ino=12666373960786669, st_dev=4269291206, st_nlink=1, st_uid=0, st_gid=0, st_size=42, st_atime=1795062621, st_mtime=1795062619, st_ctime=1795062619) = stat()
+E            +      where stat = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40273/test_r047_same_path_changed_co2/src/img1.s19').stat
+
+tests\test_alp_inc3_snapshot_parity.py:1104: AssertionError
+__________ test_r047_same_path_changed_content[R-A2L-REFRESH.047/4] ___________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40273/test_r047_same_path_changed_co3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000160C9F83090>
+arm = 'only-a2l'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["loose-image", "pair-a2l", "pair-image", "only-a2l", "nomac-a2l", "nomac-image"],
+        ids=[f"R-A2L-REFRESH.047/{i}" for i in range(1, 7)],
+    )
+    def test_r047_same_path_changed_content(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.047/1-/6: an equal-size, same-path byte change with no
+        clear publishes the NEW content under a strictly newer generation of
+        the changed artifact; unchanged source bytes stay byte-identical while
+        writer/reset stages move its generation per the stage matrix; no OLD
+        marker survives and the final publication is singular."""
+        _guard_inc3_interface()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old_pair = _pair_a2l(src / "pair_old.a2l", "OLD")
+        new_pair = _pair_a2l(src / "pair_new.a2l", "NEW")
+        assert old_pair.stat().st_size == new_pair.stat().st_size, "fixture: equal-size A2L pair required"
+        assert {t["name"] for t in parse_a2l_file(old_pair)["tags"]} == {"OLD_TAG_A", "OLD_TAG_B"}
+        assert {t["name"] for t in parse_a2l_file(new_pair)["tags"]} == {"NEW_TAG_A", "NEW_TAG_B"}
+        img1 = _write_image(src / "img1.s19", dict(IMG1))
+        img2 = _write_image(src / "img2.s19", dict(IMG2))
+        assert img1.stat().st_size == img2.stat().st_size, "fixture: equal-size image pair required"
+        mac = _write_mac(src / "records.mac")
+    
+        def emit(mem) -> bytes:
+            return emit_s19_from_mem_map(dict(mem), [(min(mem), max(mem) + 1)]).encode("ascii")
+    
+        async def body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            if arm == "loose-image":
+                attach = _old_a2l(src / "att.a2l")
+                same = src / "image.s19"
+                same.write_bytes(emit(IMG1))
+                await _typed_attach(app, pilot, attach)
+                await _load_image(app, pilot, same)
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                size_before = same.stat().st_size
+                same.write_bytes(emit(IMG2))
+                assert same.stat().st_size == size_before, "fixture: equal-size pair required"
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_image(app, pilot, same)
+                await settle_workers(pilot)
+                await wait_until(pilot, lambda: any(e[0] == "OUTCOME" for e in events), "the image outcome", timeout=30.0)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 1, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                outcomes = [e for e in events if e[0] == "OUTCOME"]
+                assert len(outcomes) == 1 and outcomes[0][3].startswith("Loaded "), outcomes
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert app._image_generation == i0 + 1 > i0
+                assert app._a2l_view_generation == a0 + 1
+                assert app.current_a2l_data == parse_a2l_file(attach), "unchanged A2L bytes must stay identical"
+                tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_SCALAR")
+                assert tag.get("raw_value") == 0x8070, tag
+            elif arm == "pair-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                image_digest = _digest_file(folder / img1.name)
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                assert (folder / "pair_old.a2l").stat().st_size == old_pair.stat().st_size
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 3, i0 + 2), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+                assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+                assert app._a2l_view_generation == a0 + 3 > a0
+                assert app._image_generation == i0 + 2
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names and "OLD_TAG_B" not in names
+            elif arm == "pair-image":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / img1.name).write_bytes(emit(IMG2))
+                assert (folder / img1.name).stat().st_size == img1.stat().st_size
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 3, i0 + 2), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert app._image_generation == i0 + 2 > i0
+                assert app._a2l_view_generation == a0 + 3
+                assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+                tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_TAG_A")
+                assert tag.get("in_memory") is False or tag.get("raw_value") is not None
+                assert _a2l_viewer_names(app)
+            elif arm == "only-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0), call.kwargs
+                assert call.kwargs["image_mem_map"] is None, call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is None, "no image/MAC/current_file may be fabricated"
+                assert app._a2l_view_generation == a0 + 2 > a0
+                assert app._image_generation == i0
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names
+            elif arm == "nomac-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                image_digest = _digest_file(folder / img1.name)
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+                assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+                assert not app.current_file.mac_records and app.current_file.mac_path is None
+                assert app._a2l_view_generation == a0 + 2 > a0
+                assert app._image_generation == i0 + 1
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names
+            else:  # nomac-image
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / img1.name).write_bytes(emit(IMG2))
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert not app.current_file.mac_records and app.current_file.mac_path is None
+                assert app._image_generation == i0 + 1 > i0
+                assert app._a2l_view_generation == a0 + 2
+                assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc3_snapshot_parity.py:1203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:301: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:299: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        if arm == "loose-image":
+            attach = _old_a2l(src / "att.a2l")
+            same = src / "image.s19"
+            same.write_bytes(emit(IMG1))
+            await _typed_attach(app, pilot, attach)
+            await _load_image(app, pilot, same)
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            size_before = same.stat().st_size
+            same.write_bytes(emit(IMG2))
+            assert same.stat().st_size == size_before, "fixture: equal-size pair required"
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_image(app, pilot, same)
+            await settle_workers(pilot)
+            await wait_until(pilot, lambda: any(e[0] == "OUTCOME" for e in events), "the image outcome", timeout=30.0)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 1, i0 + 1), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            outcomes = [e for e in events if e[0] == "OUTCOME"]
+            assert len(outcomes) == 1 and outcomes[0][3].startswith("Loaded "), outcomes
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+            assert app._image_generation == i0 + 1 > i0
+            assert app._a2l_view_generation == a0 + 1
+            assert app.current_a2l_data == parse_a2l_file(attach), "unchanged A2L bytes must stay identical"
+            tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_SCALAR")
+            assert tag.get("raw_value") == 0x8070, tag
+        elif arm == "pair-a2l":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            image_digest = _digest_file(folder / img1.name)
+            (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+            assert (folder / "pair_old.a2l").stat().st_size == old_pair.stat().st_size
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 3, i0 + 2), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+            assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+            assert app._a2l_view_generation == a0 + 3 > a0
+            assert app._image_generation == i0 + 2
+            assert app.current_a2l_data == parse_a2l_file(new_pair)
+            names = set(_a2l_viewer_names(app))
+            assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+            assert "OLD_TAG_A" not in names and "OLD_TAG_B" not in names
+        elif arm == "pair-image":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            (folder / img1.name).write_bytes(emit(IMG2))
+            assert (folder / img1.name).stat().st_size == img1.stat().st_size
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 3, i0 + 2), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+            assert app._image_generation == i0 + 2 > i0
+            assert app._a2l_view_generation == a0 + 3
+            assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+            tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_TAG_A")
+            assert tag.get("in_memory") is False or tag.get("raw_value") is not None
+            assert _a2l_viewer_names(app)
+        elif arm == "only-a2l":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 2, i0), call.kwargs
+            assert call.kwargs["image_mem_map"] is None, call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is None, "no image/MAC/current_file may be fabricated"
+            assert app._a2l_view_generation == a0 + 2 > a0
+            assert app._image_generation == i0
+>           assert app.current_a2l_data == parse_a2l_file(new_pair)
+E           AssertionError: assert {'compu_metho...ors': [], ...} == {'compu_metho...ors': [], ...}
+E             
+E             Omitting 7 identical items, use -vv to show
+E             Differing items:
+E             {'path': 'C:\\Users\\<user>\\AppData\\Local\\Temp\\pytest-of-<user>\\pytest-40273\\test_r047_same_path_changed_co3\\app\\.s19tool\\workarea\\proj_a\\pair_old.a2l'} != {'path': 'C:\\Users\\<user>\\AppData\\Local\\Temp\\pytest-of-<user>\\pytest-40273\\test_r047_same_path_changed_co3\\src\\pair_new.a2l'}
+E             Use -v to get more diff
+
+tests\test_alp_inc3_snapshot_parity.py:1146: AssertionError
+__________ test_r047_same_path_changed_content[R-A2L-REFRESH.047/5] ___________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40273/test_r047_same_path_changed_co4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000160CAAFC0D0>
+arm = 'nomac-a2l'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["loose-image", "pair-a2l", "pair-image", "only-a2l", "nomac-a2l", "nomac-image"],
+        ids=[f"R-A2L-REFRESH.047/{i}" for i in range(1, 7)],
+    )
+    def test_r047_same_path_changed_content(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.047/1-/6: an equal-size, same-path byte change with no
+        clear publishes the NEW content under a strictly newer generation of
+        the changed artifact; unchanged source bytes stay byte-identical while
+        writer/reset stages move its generation per the stage matrix; no OLD
+        marker survives and the final publication is singular."""
+        _guard_inc3_interface()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old_pair = _pair_a2l(src / "pair_old.a2l", "OLD")
+        new_pair = _pair_a2l(src / "pair_new.a2l", "NEW")
+        assert old_pair.stat().st_size == new_pair.stat().st_size, "fixture: equal-size A2L pair required"
+        assert {t["name"] for t in parse_a2l_file(old_pair)["tags"]} == {"OLD_TAG_A", "OLD_TAG_B"}
+        assert {t["name"] for t in parse_a2l_file(new_pair)["tags"]} == {"NEW_TAG_A", "NEW_TAG_B"}
+        img1 = _write_image(src / "img1.s19", dict(IMG1))
+        img2 = _write_image(src / "img2.s19", dict(IMG2))
+        assert img1.stat().st_size == img2.stat().st_size, "fixture: equal-size image pair required"
+        mac = _write_mac(src / "records.mac")
+    
+        def emit(mem) -> bytes:
+            return emit_s19_from_mem_map(dict(mem), [(min(mem), max(mem) + 1)]).encode("ascii")
+    
+        async def body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            if arm == "loose-image":
+                attach = _old_a2l(src / "att.a2l")
+                same = src / "image.s19"
+                same.write_bytes(emit(IMG1))
+                await _typed_attach(app, pilot, attach)
+                await _load_image(app, pilot, same)
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                size_before = same.stat().st_size
+                same.write_bytes(emit(IMG2))
+                assert same.stat().st_size == size_before, "fixture: equal-size pair required"
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_image(app, pilot, same)
+                await settle_workers(pilot)
+                await wait_until(pilot, lambda: any(e[0] == "OUTCOME" for e in events), "the image outcome", timeout=30.0)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 1, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                outcomes = [e for e in events if e[0] == "OUTCOME"]
+                assert len(outcomes) == 1 and outcomes[0][3].startswith("Loaded "), outcomes
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert app._image_generation == i0 + 1 > i0
+                assert app._a2l_view_generation == a0 + 1
+                assert app.current_a2l_data == parse_a2l_file(attach), "unchanged A2L bytes must stay identical"
+                tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_SCALAR")
+                assert tag.get("raw_value") == 0x8070, tag
+            elif arm == "pair-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                image_digest = _digest_file(folder / img1.name)
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                assert (folder / "pair_old.a2l").stat().st_size == old_pair.stat().st_size
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 3, i0 + 2), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+                assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+                assert app._a2l_view_generation == a0 + 3 > a0
+                assert app._image_generation == i0 + 2
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names and "OLD_TAG_B" not in names
+            elif arm == "pair-image":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / img1.name).write_bytes(emit(IMG2))
+                assert (folder / img1.name).stat().st_size == img1.stat().st_size
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 3, i0 + 2), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert app._image_generation == i0 + 2 > i0
+                assert app._a2l_view_generation == a0 + 3
+                assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+                tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_TAG_A")
+                assert tag.get("in_memory") is False or tag.get("raw_value") is not None
+                assert _a2l_viewer_names(app)
+            elif arm == "only-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0), call.kwargs
+                assert call.kwargs["image_mem_map"] is None, call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is None, "no image/MAC/current_file may be fabricated"
+                assert app._a2l_view_generation == a0 + 2 > a0
+                assert app._image_generation == i0
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names
+            elif arm == "nomac-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                image_digest = _digest_file(folder / img1.name)
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+                assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+                assert not app.current_file.mac_records and app.current_file.mac_path is None
+                assert app._a2l_view_generation == a0 + 2 > a0
+                assert app._image_generation == i0 + 1
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names
+            else:  # nomac-image
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / img1.name).write_bytes(emit(IMG2))
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert not app.current_file.mac_records and app.current_file.mac_path is None
+                assert app._image_generation == i0 + 1 > i0
+                assert app._a2l_view_generation == a0 + 2
+                assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc3_snapshot_parity.py:1203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:301: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:299: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        if arm == "loose-image":
+            attach = _old_a2l(src / "att.a2l")
+            same = src / "image.s19"
+            same.write_bytes(emit(IMG1))
+            await _typed_attach(app, pilot, attach)
+            await _load_image(app, pilot, same)
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            size_before = same.stat().st_size
+            same.write_bytes(emit(IMG2))
+            assert same.stat().st_size == size_before, "fixture: equal-size pair required"
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_image(app, pilot, same)
+            await settle_workers(pilot)
+            await wait_until(pilot, lambda: any(e[0] == "OUTCOME" for e in events), "the image outcome", timeout=30.0)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 1, i0 + 1), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            outcomes = [e for e in events if e[0] == "OUTCOME"]
+            assert len(outcomes) == 1 and outcomes[0][3].startswith("Loaded "), outcomes
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+            assert app._image_generation == i0 + 1 > i0
+            assert app._a2l_view_generation == a0 + 1
+            assert app.current_a2l_data == parse_a2l_file(attach), "unchanged A2L bytes must stay identical"
+            tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_SCALAR")
+            assert tag.get("raw_value") == 0x8070, tag
+        elif arm == "pair-a2l":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            image_digest = _digest_file(folder / img1.name)
+            (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+            assert (folder / "pair_old.a2l").stat().st_size == old_pair.stat().st_size
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 3, i0 + 2), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+            assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+            assert app._a2l_view_generation == a0 + 3 > a0
+            assert app._image_generation == i0 + 2
+            assert app.current_a2l_data == parse_a2l_file(new_pair)
+            names = set(_a2l_viewer_names(app))
+            assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+            assert "OLD_TAG_A" not in names and "OLD_TAG_B" not in names
+        elif arm == "pair-image":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            (folder / img1.name).write_bytes(emit(IMG2))
+            assert (folder / img1.name).stat().st_size == img1.stat().st_size
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 3, i0 + 2), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+            assert app._image_generation == i0 + 2 > i0
+            assert app._a2l_view_generation == a0 + 3
+            assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+            tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_TAG_A")
+            assert tag.get("in_memory") is False or tag.get("raw_value") is not None
+            assert _a2l_viewer_names(app)
+        elif arm == "only-a2l":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 2, i0), call.kwargs
+            assert call.kwargs["image_mem_map"] is None, call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is None, "no image/MAC/current_file may be fabricated"
+            assert app._a2l_view_generation == a0 + 2 > a0
+            assert app._image_generation == i0
+            assert app.current_a2l_data == parse_a2l_file(new_pair)
+            names = set(_a2l_viewer_names(app))
+            assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+            assert "OLD_TAG_A" not in names
+        elif arm == "nomac-a2l":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            image_digest = _digest_file(folder / img1.name)
+            (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 2, i0 + 1), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+            assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+            assert not app.current_file.mac_records and app.current_file.mac_path is None
+            assert app._a2l_view_generation == a0 + 2 > a0
+            assert app._image_generation == i0 + 1
+>           assert app.current_a2l_data == parse_a2l_file(new_pair)
+E           AssertionError: assert {'compu_metho...ors': [], ...} == {'compu_metho...ors': [], ...}
+E             
+E             Omitting 7 identical items, use -vv to show
+E             Differing items:
+E             {'path': 'C:\\Users\\<user>\\AppData\\Local\\Temp\\pytest-of-<user>\\pytest-40273\\test_r047_same_path_changed_co4\\app\\.s19tool\\workarea\\proj_a\\pair_old.a2l'} != {'path': 'C:\\Users\\<user>\\AppData\\Local\\Temp\\pytest-of-<user>\\pytest-40273\\test_r047_same_path_changed_co4\\src\\pair_new.a2l'}
+E             Use -v to get more diff
+
+tests\test_alp_inc3_snapshot_parity.py:1174: AssertionError
+__________ test_r047_same_path_changed_content[R-A2L-REFRESH.047/6] ___________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40273/test_r047_same_path_changed_co5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000160CB40E550>
+arm = 'nomac-image'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["loose-image", "pair-a2l", "pair-image", "only-a2l", "nomac-a2l", "nomac-image"],
+        ids=[f"R-A2L-REFRESH.047/{i}" for i in range(1, 7)],
+    )
+    def test_r047_same_path_changed_content(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.047/1-/6: an equal-size, same-path byte change with no
+        clear publishes the NEW content under a strictly newer generation of
+        the changed artifact; unchanged source bytes stay byte-identical while
+        writer/reset stages move its generation per the stage matrix; no OLD
+        marker survives and the final publication is singular."""
+        _guard_inc3_interface()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old_pair = _pair_a2l(src / "pair_old.a2l", "OLD")
+        new_pair = _pair_a2l(src / "pair_new.a2l", "NEW")
+        assert old_pair.stat().st_size == new_pair.stat().st_size, "fixture: equal-size A2L pair required"
+        assert {t["name"] for t in parse_a2l_file(old_pair)["tags"]} == {"OLD_TAG_A", "OLD_TAG_B"}
+        assert {t["name"] for t in parse_a2l_file(new_pair)["tags"]} == {"NEW_TAG_A", "NEW_TAG_B"}
+        img1 = _write_image(src / "img1.s19", dict(IMG1))
+        img2 = _write_image(src / "img2.s19", dict(IMG2))
+        assert img1.stat().st_size == img2.stat().st_size, "fixture: equal-size image pair required"
+        mac = _write_mac(src / "records.mac")
+    
+        def emit(mem) -> bytes:
+            return emit_s19_from_mem_map(dict(mem), [(min(mem), max(mem) + 1)]).encode("ascii")
+    
+        async def body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            if arm == "loose-image":
+                attach = _old_a2l(src / "att.a2l")
+                same = src / "image.s19"
+                same.write_bytes(emit(IMG1))
+                await _typed_attach(app, pilot, attach)
+                await _load_image(app, pilot, same)
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                size_before = same.stat().st_size
+                same.write_bytes(emit(IMG2))
+                assert same.stat().st_size == size_before, "fixture: equal-size pair required"
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_image(app, pilot, same)
+                await settle_workers(pilot)
+                await wait_until(pilot, lambda: any(e[0] == "OUTCOME" for e in events), "the image outcome", timeout=30.0)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 1, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                outcomes = [e for e in events if e[0] == "OUTCOME"]
+                assert len(outcomes) == 1 and outcomes[0][3].startswith("Loaded "), outcomes
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert app._image_generation == i0 + 1 > i0
+                assert app._a2l_view_generation == a0 + 1
+                assert app.current_a2l_data == parse_a2l_file(attach), "unchanged A2L bytes must stay identical"
+                tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_SCALAR")
+                assert tag.get("raw_value") == 0x8070, tag
+            elif arm == "pair-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                image_digest = _digest_file(folder / img1.name)
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                assert (folder / "pair_old.a2l").stat().st_size == old_pair.stat().st_size
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 3, i0 + 2), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+                assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+                assert app._a2l_view_generation == a0 + 3 > a0
+                assert app._image_generation == i0 + 2
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names and "OLD_TAG_B" not in names
+            elif arm == "pair-image":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / img1.name).write_bytes(emit(IMG2))
+                assert (folder / img1.name).stat().st_size == img1.stat().st_size
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 3, i0 + 2), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert app._image_generation == i0 + 2 > i0
+                assert app._a2l_view_generation == a0 + 3
+                assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+                tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_TAG_A")
+                assert tag.get("in_memory") is False or tag.get("raw_value") is not None
+                assert _a2l_viewer_names(app)
+            elif arm == "only-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0), call.kwargs
+                assert call.kwargs["image_mem_map"] is None, call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is None, "no image/MAC/current_file may be fabricated"
+                assert app._a2l_view_generation == a0 + 2 > a0
+                assert app._image_generation == i0
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names
+            elif arm == "nomac-a2l":
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                image_digest = _digest_file(folder / img1.name)
+                (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+                assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+                assert not app.current_file.mac_records and app.current_file.mac_path is None
+                assert app._a2l_view_generation == a0 + 2 > a0
+                assert app._image_generation == i0 + 1
+                assert app.current_a2l_data == parse_a2l_file(new_pair)
+                names = set(_a2l_viewer_names(app))
+                assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+                assert "OLD_TAG_A" not in names
+            else:  # nomac-image
+                folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                a0, i0 = app._a2l_view_generation, app._image_generation
+                (folder / img1.name).write_bytes(emit(IMG2))
+                events: list = []
+                producer = ProducerSpy(monkeypatch)
+                _arm_timeline(app, monkeypatch, events)
+                await _load_project(app, pilot, "proj_a")
+                await settle_workers(pilot)
+                assert len(producer.calls) == 1, producer.calls
+                call = producer.calls[0]
+                assert (
+                    call.kwargs["expected_a2l_generation"],
+                    call.kwargs["expected_image_generation"],
+                ) == (a0 + 2, i0 + 1), call.kwargs
+                assert len([e for e in events if e[0] == "F"]) == 1, events
+                assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+                assert not app.current_file.mac_records and app.current_file.mac_path is None
+                assert app._image_generation == i0 + 1 > i0
+                assert app._a2l_view_generation == a0 + 2
+                assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc3_snapshot_parity.py:1203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:301: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:299: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        if arm == "loose-image":
+            attach = _old_a2l(src / "att.a2l")
+            same = src / "image.s19"
+            same.write_bytes(emit(IMG1))
+            await _typed_attach(app, pilot, attach)
+            await _load_image(app, pilot, same)
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            size_before = same.stat().st_size
+            same.write_bytes(emit(IMG2))
+            assert same.stat().st_size == size_before, "fixture: equal-size pair required"
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_image(app, pilot, same)
+            await settle_workers(pilot)
+            await wait_until(pilot, lambda: any(e[0] == "OUTCOME" for e in events), "the image outcome", timeout=30.0)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 1, i0 + 1), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            outcomes = [e for e in events if e[0] == "OUTCOME"]
+            assert len(outcomes) == 1 and outcomes[0][3].startswith("Loaded "), outcomes
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+            assert app._image_generation == i0 + 1 > i0
+            assert app._a2l_view_generation == a0 + 1
+            assert app.current_a2l_data == parse_a2l_file(attach), "unchanged A2L bytes must stay identical"
+            tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_SCALAR")
+            assert tag.get("raw_value") == 0x8070, tag
+        elif arm == "pair-a2l":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            image_digest = _digest_file(folder / img1.name)
+            (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+            assert (folder / "pair_old.a2l").stat().st_size == old_pair.stat().st_size
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 3, i0 + 2), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+            assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+            assert app._a2l_view_generation == a0 + 3 > a0
+            assert app._image_generation == i0 + 2
+            assert app.current_a2l_data == parse_a2l_file(new_pair)
+            names = set(_a2l_viewer_names(app))
+            assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+            assert "OLD_TAG_A" not in names and "OLD_TAG_B" not in names
+        elif arm == "pair-image":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1, mac=mac)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            (folder / img1.name).write_bytes(emit(IMG2))
+            assert (folder / img1.name).stat().st_size == img1.stat().st_size
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 3, i0 + 2), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+            assert app._image_generation == i0 + 2 > i0
+            assert app._a2l_view_generation == a0 + 3
+            assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+            tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_TAG_A")
+            assert tag.get("in_memory") is False or tag.get("raw_value") is not None
+            assert _a2l_viewer_names(app)
+        elif arm == "only-a2l":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 2, i0), call.kwargs
+            assert call.kwargs["image_mem_map"] is None, call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is None, "no image/MAC/current_file may be fabricated"
+            assert app._a2l_view_generation == a0 + 2 > a0
+            assert app._image_generation == i0
+            assert app.current_a2l_data == parse_a2l_file(new_pair)
+            names = set(_a2l_viewer_names(app))
+            assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+            assert "OLD_TAG_A" not in names
+        elif arm == "nomac-a2l":
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            image_digest = _digest_file(folder / img1.name)
+            (folder / "pair_old.a2l").write_bytes(new_pair.read_bytes())
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 2, i0 + 1), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG1)
+            assert _digest_file(folder / img1.name) == image_digest, "unchanged image bytes must stay identical"
+            assert not app.current_file.mac_records and app.current_file.mac_path is None
+            assert app._a2l_view_generation == a0 + 2 > a0
+            assert app._image_generation == i0 + 1
+            assert app.current_a2l_data == parse_a2l_file(new_pair)
+            names = set(_a2l_viewer_names(app))
+            assert names == {"NEW_TAG_A", "NEW_TAG_B"}, names
+            assert "OLD_TAG_A" not in names
+        else:  # nomac-image
+            folder = _seed_project3(app.workarea, "proj_a", a2l=old_pair, image=img1)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            a0, i0 = app._a2l_view_generation, app._image_generation
+            (folder / img1.name).write_bytes(emit(IMG2))
+            events: list = []
+            producer = ProducerSpy(monkeypatch)
+            _arm_timeline(app, monkeypatch, events)
+            await _load_project(app, pilot, "proj_a")
+            await settle_workers(pilot)
+            assert len(producer.calls) == 1, producer.calls
+            call = producer.calls[0]
+            assert (
+                call.kwargs["expected_a2l_generation"],
+                call.kwargs["expected_image_generation"],
+            ) == (a0 + 2, i0 + 1), call.kwargs
+            assert len([e for e in events if e[0] == "F"]) == 1, events
+            assert app.current_file is not None and app.current_file.mem_map == dict(IMG2)
+            assert not app.current_file.mac_records and app.current_file.mac_path is None
+            assert app._image_generation == i0 + 1 > i0
+            assert app._a2l_view_generation == a0 + 2
+>           assert app.current_a2l_data == parse_a2l_file(old_pair), "unchanged A2L bytes must stay identical"
+E           AssertionError: unchanged A2L bytes must stay identical
+E           assert {'compu_metho...ors': [], ...} == {'compu_metho...ors': [], ...}
+E             
+E             Omitting 7 identical items, use -vv to show
+E             Differing items:
+E             {'path': 'C:\\Users\\<user>\\AppData\\Local\\Temp\\pytest-of-<user>\\pytest-40273\\test_r047_same_path_changed_co5\\app\\.s19tool\\workarea\\proj_a\\pair_old.a2l'} != {'path': 'C:\\Users\\<user>\\AppData\\Local\\Temp\\pytest-of-<user>\\pytest-40273\\test_r047_same_path_changed_co5\\src\\pair_old.a2l'}
+E             Use -v to get more diff
+
+tests\test_alp_inc3_snapshot_parity.py:1200: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_alp_inc3_snapshot_parity.py::test_r047_same_path_changed_content[R-A2L-REFRESH.047/1]
+FAILED tests/test_alp_inc3_snapshot_parity.py::test_r047_same_path_changed_content[R-A2L-REFRESH.047/2]
+FAILED tests/test_alp_inc3_snapshot_parity.py::test_r047_same_path_changed_content[R-A2L-REFRESH.047/3]
+FAILED tests/test_alp_inc3_snapshot_parity.py::test_r047_same_path_changed_content[R-A2L-REFRESH.047/4]
+FAILED tests/test_alp_inc3_snapshot_parity.py::test_r047_same_path_changed_content[R-A2L-REFRESH.047/5]
+FAILED tests/test_alp_inc3_snapshot_parity.py::test_r047_same_path_changed_content[R-A2L-REFRESH.047/6]
+6 failed in 64.36s (0:01:04)

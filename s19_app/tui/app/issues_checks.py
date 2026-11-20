@@ -14,6 +14,7 @@ from ..issues_view import (
 )
 from ..checks_view import CHECK_GROUP_ORDER, GroupedChecksPanel, build_checks_aggregate_strip
 from ...validation import ValidationIssue, ValidationSeverity
+from ..a2l_definition import release_in_slices
 from . import deps
 
 
@@ -129,6 +130,7 @@ class IssuesChecksMixin:
                 continue
             seen.add(key)
             deduped.append(issue)
+        release_in_slices(seen)  # private set only; R-A2L-REFRESH.050
         return deduped
 
     def _filtered_validation_issues(self) -> list[ValidationIssue]:

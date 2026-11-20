@@ -1,0 +1,46 @@
+{
+  "base": "f44e8bc4266b6dead6ff24adef71fdb0b7b0154c",
+  "case": {
+    "addressed_tags": 220040,
+    "bytes": 37742888,
+    "declared_spans": 0,
+    "parse_errors": 0,
+    "path": "examples/case_06_large_nested_a2l/firmware.a2l",
+    "sha256": "45243458427f43da695f4e01e494d69444c1b921588bcd040cfcaf025fed43d9",
+    "tags": 220040,
+    "tags_without_length": 0,
+    "unique_names": 220040
+  },
+  "ci": "",
+  "command": "python case06_baseline.py --limits 1000,4000 --repetitions 1",
+  "head": "d658dfeaa336dea54b99001b52df52fa1fd434d0",
+  "logical_cpus": 16,
+  "machine": "AMD64",
+  "parse_seconds_not_in_describe_measurements": 6.189885100000538,
+  "platform": "Windows-11-10.0.26300-SP0",
+  "processor": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+  "python": "3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:17:27) [MSC v.1929 64 bit (AMD64)]",
+  "root": "<repo>",
+  "runs": [
+    {
+      "available": 220040,
+      "describe_seconds": 1.1604902000399306,
+      "overlap_checks": 500000,
+      "repetition": 1,
+      "requested": 1000,
+      "results": 1000,
+      "shared_with_not_none": 1000
+    },
+    {
+      "available": 220040,
+      "describe_seconds": 3.5570364999584854,
+      "overlap_checks": 7385600,
+      "repetition": 1,
+      "requested": 4000,
+      "results": 4000,
+      "shared_with_not_none": 4000
+    }
+  ],
+  "schema": "a2l-load-performance/inc-1/case06-baseline/v1",
+  "status": "observation-only; no new requirement threshold was evaluated"
+}

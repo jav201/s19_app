@@ -1,0 +1,78 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                    [100%]
+================================== FAILURES ===================================
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:771: AssertionError: A2LAttachRequest(source=WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40195/test_r030_request_.../test_r030_request_isolation_no0/app/.s19tool/workarea'), record_recent=True, a2l_cache=None, gen=1, sync_project=True)
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:771: AssertionError: A2LAttachRequest(source=WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40195/test_r030_request_.../test_r030_request_isolation_wi0/app/.s19tool/workarea'), record_recent=True, a2l_cache=None, gen=2, sync_project=True)
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:847: AssertionError: every worker/helper node must resolve: missing ['_prepare_a2l_attach_snapshot']
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:917: AssertionError: None
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:917: AssertionError: None
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:917: AssertionError: None
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:1480: AssertionError: []
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:1480: AssertionError: []
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+<LOCAL_HOME>\Github\s19_app-a2l-load-performance\tests\test_alp_inc2_a2l_attach.py:133: AssertionError: A2LAttachSnapshot is missing — the Inc 2 attach snapshot is not implemented
+=========================== short test summary info ===========================
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r029_worker_snapshot[typed] - ...
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r029_worker_snapshot[workarea]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r029_worker_snapshot[startup]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r030_request_isolation[no-image]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r030_request_isolation[with-image]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r030_worker_input_census - Ass...
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r031_matching_snapshot_installs[no-image]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r031_matching_snapshot_installs[with-image]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r031_matching_snapshot_installs[same-path]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r032_stale_direct_attach[a2l-generation]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r032_stale_direct_attach[image-generation]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r033_key_latency[copy] - Asser...
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r033_key_latency[parse] - Asse...
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r033_key_latency[enrichment]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r033_key_latency[definitions]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r033_key_latency[case06-full-processing]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r033_key_latency[request-snapshot]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r034_progress_throughout[enrichment]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r034_progress_throughout[definitions]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r034_progress_throughout[case06-full-processing]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r034_progress_throughout[request-snapshot]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r035_refresh_before_success[first]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r035_refresh_before_success[replacement]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r035_refresh_before_success[confirmed-same-path]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r036_refresh_reuses_snapshot[no-image]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r036_refresh_reuses_snapshot[with-image]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r037_picker_snapshot_reuse[initial]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r037_picker_snapshot_reuse[changed-generation]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r037_picker_snapshot_reuse[filter-page-noop]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r037_picker_snapshot_reuse[adapter-mismatch]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r037_picker_snapshot_reuse[headless-unmounted]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r038_preparation_failure[enrichment]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r038_preparation_failure[summary]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r038_preparation_failure[definitions]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_at_alp_i2_1_direct_attach_routes_publish_snapshots
+FAILED tests/test_alp_inc2_a2l_attach.py::test_at_alp_i2_2_case06_keys_and_progress
+FAILED tests/test_alp_inc2_a2l_attach.py::test_at_alp_i2_3_same_path_picker_generations
+37 failed in 100.79s (0:01:40)

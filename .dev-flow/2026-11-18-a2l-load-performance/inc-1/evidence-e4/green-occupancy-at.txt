@@ -1,0 +1,16 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <LOCAL_HOME>\anaconda3\envs\s19env\python.exe
+rootdir: <LOCAL_HOME>\Github\s19_app-a2l-load-performance
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 3 items
+
+tests/test_alp_a2l_occupancy_at.py::test_at_alp_i1_1_full_case06_public_describe PASSED [ 33%]
+tests/test_alp_a2l_occupancy_at.py::test_at_alp_i1_2_narrow_public_describe_stays_lazy PASSED [ 66%]
+tests/test_alp_a2l_occupancy_at.py::test_at_alp_i1_3_describe_to_encode_overlap_safety PASSED [100%]
+============================ QC-TM timing margins =============================
+53.0%  14.111 s / 30.000 s  AT-ALP-I1-1 case_06 public describe  tests/test_alp_a2l_occupancy_at.py::test_at_alp_i1_1_full_case06_public_describe
+QC-TM: 1 bounds, 0 under 20 % margin
+
+======================== 3 passed in 146.28s (0:02:26) ========================
+EXIT:0

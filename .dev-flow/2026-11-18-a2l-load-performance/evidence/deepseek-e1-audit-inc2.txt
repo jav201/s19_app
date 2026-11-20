@@ -1,0 +1,35 @@
+## Findings
+
+**F1 — line-reference drift between requirements and slice (minor)**
+`01-requirements.md:89` cites the worker body as `file_load.py:806-841`; `E1-slice.md:23` (A2) pins the same node as `file_load.py:807-841`. Same symbol, different start line; E4 must treat one of them as wrong.
+
+**F2 — .031 threshold asks for the exact key in 3/3, arms supply it in 1/3 (medium)**
+`01-requirements.md:47` requires each of the three arms to have "the exact enrichment key". `02-test-cases.md:30` asserts a literal key tuple; `02-test-cases.md:29` (.031/1) asserts only generation movement/coherence, and `02-test-cases.md:31` (.031/3) asserts that "key/source/snapshot describe NEW" without a literal key or an unchanged-image-generation assertion. Also, `01-requirements.md:35` defines `mem_size = -1` without an image, but no arm among the 31 asserts a `-1` key (the no-image key appears only inside .031/1 and .036/1, neither literal).
+
+**F3 — .034 held arms cannot exercise the 1.0 s gap bound (medium)**
+`01-requirements.md:50` requires "every interval between visible progress updates is ≤1.0 s". `02-test-cases.md:40` (.034/1) holds enrichment "for at least 3 existing 0.1 s busy ticks" (~0.3 s) and `02-test-cases.md:41` (.034/2) holds "the same interval". A hold shorter than 1.0 s cannot discriminate a 0.4–0.9 s freeze or a partially stopped timer on the ≤1.0 s criterion; only the secondary "at least 2 spinner/elapsed changes" assertion would fire. The ≤1.0 s bound is effectively exercised only by .034/3 and .034/4.
+
+**F4 — .038's third failure operand has no arm (medium)**
+`01-requirements.md:54` conditions on "enrichment, summary construction **or** picker definition preparation" raising. The only arms are enrichment (`02-test-cases.md:52`) and bulk describe (`02-test-cases.md:53`); no summary-construction failure arm exists. The row's own "2/2" threshold reconciles the count, but one operand of the single `shall` is unobserved.
+
+**F5 — .030 numeric threshold mixes full and partial coverage (low/medium)**
+`01-requirements.md:46` states a "3/3" pass threshold, but its third arm is the static census: `02-test-cases.md:28` is the only row marked `partial`, defined at `02-test-cases.md:19` as supplementing rather than replacing product-route arms, and `02-test-cases.md:90` books "30 intended full product-route cases and 1 intended partial static census". A "3/3" numeric oracle is therefore not comparable with the "3/3 product routes" oracle of `.029` (`01-requirements.md:45`).
+
+**F6 — accepted-snapshot attribute is never named (medium)**
+`E1-rulings.md:69` requires exposure "through one private, generation-checked attribute", and `E1-slice.md` §5 (test-ownership row for `tests/test_b100_session_reset.py`) requires declaring "the accepted direct-picker-snapshot app attribute", but no artifact pins that attribute's literal name, type or invalidation field. Every other new name is literal (`A2LAttachRequest`, `A2LAttachResult`, `A2LAttachSnapshot`, `A2LPickerSnapshot`); this one is left to E4.
+
+**F7 — adapter mismatch fallback has no case (medium)**
+`E1-rulings.md:71` pins "No adapter falls back to a mismatched direct-attach snapshot … on other routes, mismatch selects the existing route behavior". No arm among the 31 (`02-test-cases.md:23-53`) nor the 3 ATs (`02-test-cases.md:63-65`) drives a picker request whose source identity/signature does not match an installed snapshot map. `.032` covers install-time rejection, not post-install adapter mismatch.
+
+**F8 — test-gap count vs planned-node count needs a stated granularity (low)**
+`E1-rulings.md:11` records "10 TEST nodes not yet written", while `02-test-cases.md:90` and `E1-slice.md` §5 plan 31 alternatives + 3 ATs = 34 nodes in `tests/test_alp_inc2_a2l_attach.py`. Consistent only if `trace_check.py` counts one TEST per requirement ID; no artifact states that.
+
+## Checked counts (verified, no edits made)
+- Requirement IDs: 10 present, `.029`–`.038` contiguous, no gaps/dupes (`01-requirements.md:45-54`); each row has exactly one `shall` and its declared EARS form (When/While/If) matches the sentence opener: 10/10.
+- Alternatives: 31 rows, matching per-requirement thresholds `.029` 3/3, `.030` 3/3, `.031` 3/3, `.032` 2/2, `.033` 6/6 (12 keys), `.034` 4/4, `.035` 3/3, `.036` 2/2, `.037` 3/3, `.038` 2/2 → 31/31; coverage split 30 `full` + 1 `partial` (`02-test-cases.md:23-53`, `:90`).
+- Slice: exactly 4 SOURCE files, 7 function nodes (6 changed + 1 new: A1–A4, P1, C1, PA1), 4 frozen data contracts (2 changed A5/A6 + 2 new A7/A8) = matches the 11-row table (`E1-slice.md` §1–§2); 0 stylesheets; every §2 node owned by exactly one file; no §2 file appears in the §6 exclusion list, and every §3 read-only dependency does.
+- Slice→requirement coverage: all 10 IDs appear at least once in the §2 Requirements column; `.038` routes through unchanged `_on_a2l_attach_failed` (`E1-slice.md` §3).
+- Preserved canon: 14 rows in `01-requirements.md:62-75`, 14 in `E1-rulings.md:3`, 14 in `02-test-cases.md:71-84` — identical set, all results `not_run`.
+- ATs: 3, each with one distinct on-disk node and non-overlapping US allocation; US set (ALP-01, 103-02, 103-04) matches the requirement rows 10/10.
+- Snapshot/generation consistency: single `A2LAttachSnapshot` + per-picker `A2LPickerSnapshot` in slice/rulings/requirements; one describe per picker per changed generation, `check`/`patch` not shared; expected pair captured before the worker; image generation unchanged on attach (.027 preserved); `Load superseded — current state kept.` and the `.038` failure text are byte-identical in requirements and cases.
+- Negative controls: 10/10 requirement rows name a specific observable corruption, and each maps to a case-level RED assertion (F3 is the only arm whose criterion is too weak to catch its own stated control within the hold).

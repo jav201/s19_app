@@ -1,0 +1,16 @@
+mutant-run: Inc 2 negative controls as source mutants; python 3.11.15
+
+030-forbidden-read: KILLED (exit 1) target -k 030_worker_input_census
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r030_worker_input_census - Ass...
+    1 failed, 36 deselected in 0.41s
+
+031-partial-install: KILLED (exit 1) target -k 031_matching_snapshot_installs
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r031_matching_snapshot_installs[with-image]
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r031_matching_snapshot_installs[same-path]
+    3 failed, 34 deselected in 67.18s (0:01:07)
+
+036-drop-cache: KILLED (exit 1) target -k 036_refresh_reuses_snapshot
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r036_refresh_reuses_snapshot[no-image]
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r036_refresh_reuses_snapshot[with-image]
+    2 failed, 35 deselected in 35.76s

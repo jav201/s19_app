@@ -1,0 +1,7 @@
+........                                                                 [100%]
+============================ QC-TM timing margins =============================
+44.0%  16.799 s / 30.000 s  R-A2L-DEF.165 case_06 integrated describe  tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_165_1_case06_integrated_describe_bound
+93.5%  1.173 s / 18.000 s  R-A2L-DEF.163 case_06 all 220040 resolutions  tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_163_1_case06_all_queries_bound
+93.7%  0.158 s / 2.500 s  R-A2L-DEF.162 case_06 isolated index build  tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_162_1_case06_index_build_bound
+QC-TM: 3 bounds, 0 under 20 % margin
+8 passed in 204.83s (0:03:24)

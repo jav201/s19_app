@@ -1,0 +1,624 @@
+{
+  "base": "f44e8bc4266b6dead6ff24adef71fdb0b7b0154c",
+  "case06_file": {
+    "bytes": 37742888,
+    "path": "examples/case_06_large_nested_a2l/firmware.a2l",
+    "sha256": "45243458427f43da695f4e01e494d69444c1b921588bcd040cfcaf025fed43d9"
+  },
+  "head": "d658dfeaa336dea54b99001b52df52fa1fd434d0",
+  "logical_cpus": 16,
+  "machine": "AMD64",
+  "new_id_canon_counts": {
+    "R-A2L-DEF.156": 0,
+    "R-A2L-DEF.157": 0,
+    "R-A2L-DEF.158": 0,
+    "R-A2L-DEF.159": 0,
+    "R-A2L-DEF.160": 0,
+    "R-A2L-DEF.161": 0,
+    "R-A2L-DEF.162": 0,
+    "R-A2L-DEF.163": 0,
+    "R-A2L-DEF.164": 0,
+    "R-A2L-DEF.165": 0
+  },
+  "picker_id_canon_counts": {
+    "R-PICKER-CORRECT.018": 1,
+    "R-PICKER-CORRECT.019": 1
+  },
+  "picker_test_counts": {
+    "R-PICKER-CORRECT.018": 4,
+    "R-PICKER-CORRECT.019": 2
+  },
+  "picker_test_functions": {
+    "R-PICKER-CORRECT.018": [
+      "tests/test_b103_picker_model.py::test_r018_1_equal_signature_is_a_zero_describe_noop",
+      "tests/test_b103_picker_model.py::test_r018_2_changed_generation_batches_once_per_picker",
+      "tests/test_b103_picker_model.py::test_r018_3_none_always_repopulates_with_real_a2l_data",
+      "tests/test_b103_picker_model.py::test_r018_4_live_reload_refreshes_both_without_reentry"
+    ],
+    "R-PICKER-CORRECT.019": [
+      "tests/test_b103_picker_model.py::test_r019_1_13990_object_population_has_one_timed_batch_per_generation",
+      "tests/test_b103_picker_model.py::test_r019_2_twenty_filter_page_rebuilds_never_describe"
+    ]
+  },
+  "platform": "Windows-11-10.0.26300-SP0",
+  "predecessor_id_canon_count": 1,
+  "preserved_id_canon_counts": {
+    "R-A2L-DEF.136": 1,
+    "R-A2L-DEF.138": 1,
+    "R-A2L-DEF.139": 1,
+    "R-A2L-DEF.140": 1,
+    "R-A2L-DEF.148": 1,
+    "R-A2L-DEF.149": 1,
+    "R-A2L-DEF.58.1": 1,
+    "R-A2L-DEF.58.2": 1
+  },
+  "preserved_test_counts": {
+    "R-A2L-DEF.136": 8,
+    "R-A2L-DEF.138": 23,
+    "R-A2L-DEF.139": 4,
+    "R-A2L-DEF.140": 11,
+    "R-A2L-DEF.148": 38,
+    "R-A2L-DEF.149": 14,
+    "R-A2L-DEF.58.1": 8,
+    "R-A2L-DEF.58.2": 48
+  },
+  "preserved_test_functions": {
+    "R-A2L-DEF.136": [
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_136_1_batch_describe_equals_per_name_describe",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_136_arr_2_shared_layout_and_mod_common_read_once",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_136_arr_3_shared_axis_method_enum_range_read_once",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_136_arr_4_read_forms_immutable_no_list_dict",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_136_arr_4_k1_k3_and_poison_shapes_equal_fresh",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_136_arr_2_shared_layout_and_mod_common",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_136_arr_3_shared_axis_method_enum_range",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_136_1_describing_every_object_is_fast"
+    ],
+    "R-A2L-DEF.138": [
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_1_lost_mask_negative_control",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_2_blob_overlap",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_3_sized_instance_overlap",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_4_unsized_instance_covers_its_declared_address",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_5_v171_ubyte_against_the_single_value_instance",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_6_v171_sbyte_against_the_single_value_instance",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_7_v171_ulong_against_the_array_instance",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_8_v171_ref_1_against_asam_s_example",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_9_hostile_unknown_length_tag_covers_its_declared_address",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_10_clean_length_refused_neighbour",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_11_clean_duplicate_named_neighbour",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_12_byte_order_refused_neighbour",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_13_two_same_valued_bit_mask_lines_on_the_neighbour",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_14_unmasked_objects_whose_spans_overlap",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_15_both_masks_select_a_common_bit",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_17_masks_compared_as_the_bits_they_select",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_18_object_with_no_declared_address_is_not_in_the_index",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_19_0x0_is_a_declared_address",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_20_text_object_runs_the_overlap_step_before_encoded",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_21_hostile_blob_and_instance_headers",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_22_cross_page_file_order",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_138_23_cross_kind_name_collision_has_no_mask_exemption",
+      "tests/test_b103_synth_definitions.py::test_r_a2l_def_138_16_two_disjoint_masks_still_encode"
+    ],
+    "R-A2L-DEF.139": [
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_139_1_name_declared_twice_is_refused",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_139_2_case08_issues_duplicate",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_139_3_commented_out_old_copy_is_not_a_second_declaration",
+      "tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_139_arr_1_name_declared_twice"
+    ],
+    "R-A2L-DEF.140": [
+      "tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_1_encode_overlapping_axis_pts_is_refused",
+      "tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_2_value_just_past_axis_pts_record",
+      "tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_3_axis_pts_without_declared_address_joins_no_span",
+      "tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_4_axis_pts_inherits_no_homonymous_mask",
+      "tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_5_final_curve_span_drives_overlap",
+      "tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_6_final_span_pair_with_masks_cannot_exempt",
+      "tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_7_std_point_inherits_parent_shared_bytes",
+      "tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_8_arrays_receive_no_clean_mask_exemption",
+      "tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_9_cross_page_final_span_and_single_materialization",
+      "tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_10_over_cap_span_before_window_still_blocks",
+      "tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_140_11_refused_matrix_uses_only_its_final_point"
+    ],
+    "R-A2L-DEF.148": [
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_2_shared_layout_first_line_val_blk",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_3_shared_layout_first_line_value",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_4_mod_common_alignment_lines_val_blk",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_5_com_path_under_mod_common",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_7_shared_method_size",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_8_shared_enum_table_same_tuple",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_9_shared_range_table_same_tuple",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_10_long_part_word_of_shared_layout",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_11_long_alignment_word_of_shared_mod_common",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_12_long_format_word_decimals_once",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_13_long_conversion_type_word",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_14_long_tabref_word",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_15_long_part_word_of_axis_layout",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_16_long_layout_name_part_message_count",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_17_long_layout_name_alignment_message_count",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_18_long_tabref_empty_table_count",
+      "tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_19_tab_through_own_method_one_form",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_1_shared_layout_alignment",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_2_shared_layout_first_line_val_blk",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_3_shared_layout_first_line_value",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_4_mod_common_alignment_val_blk",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_5_com_path_under_mod_common",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_6_shared_axis_object",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_7_shared_method",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_8_shared_enum_table",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_9_shared_range_table",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_10_long_part_word_layout",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_11_long_alignment_word_mod_common",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_12_long_format_word",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_13_long_type_word",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_14_long_tabref_word",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_15_long_part_word_axis_layout",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_16_long_layout_name_part",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_17_long_layout_name_alignment",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_curves",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_18_long_tabref_empty_values",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_19_tab_through_own_method_val_blks",
+      "tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_19_tab_through_own_method_values"
+    ],
+    "R-A2L-DEF.149": [
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_149_5_cached_read_form_is_immutable",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_scaling_method",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_scaling_range_table",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid",
+      "tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object"
+    ],
+    "R-A2L-DEF.58.1": [
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_1_1_v171_and_its_image_are_unchanged",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_1_2_case08_is_unchanged",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_1_1_encode_does_not_mutate_v171",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_1_2_encode_does_not_mutate_case08",
+      "tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_1_arr_1_unchanged_inputs_v171",
+      "tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_1_arr_2_unchanged_inputs_case08",
+      "tests/test_b103_synth_definitions.py::test_r_a2l_def_58_1_arr_1_edit_arm_leaves_v171_inputs_unchanged",
+      "tests/test_b103_synth_definitions.py::test_r_a2l_def_58_1_arr_2_edit_arm_leaves_case08_inputs_unchanged"
+    ],
+    "R-A2L-DEF.58.2": [
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_1_count_1e400",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_2_count_nan",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_3_count_minus_3",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_4_count_2_5",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_5_a_5000_digit_decimal_mask_is_refused",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_6_a_5000_digit_decimals_run_is_capped",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_7_bit_mask_0xzz_is_refused",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_8_number_minus_5",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_9_number_above_one_mib",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_10_negative_ecu_address",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_11_non_finite_extended_limits",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_12_non_finite_coefficients_read_as_missing",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_13_all_zero_rat_func",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_14_esc_in_an_entry_text",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_15_v171_unclosed_begin",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_16_float_enum_with_a_non_finite_stored_value",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_17_masked_object_with_no_datatype",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_18_a_table_conversion_that_gives_a_text_is_refused",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_19_a_compu_tab_whose_x_holds_a_nan_is_refused",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_20_a_length_of_5000_hex_digits_is_a_refusal_not_an_exception",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_21_a_data_size_of_5000_hex_digits_is_a_refusal_not_an_exception",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_22_a_number_of_5000_hex_digits_is_a_refusal_not_an_exception",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_24_deep_nesting_is_refused_and_the_walk_keeps_file_order",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_1_count_1e400_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_2_count_nan_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_3_count_minus_3_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_4_count_2_5_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_5_a_5000_digit_decimal_mask_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_7_bit_mask_0xzz_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_8_number_minus_5_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_9_number_above_one_mib_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_10_negative_ecu_address_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_11_non_finite_extended_limits_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_12_non_finite_coefficients_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_13_all_zero_rat_func_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_14_esc_and_unterminated_quote_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_15_v171_unclosed_begin_encode",
+      "tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_17_masked_object_with_no_datatype_encode",
+      "tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_1_5000_digit_matrix_dim",
+      "tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_7_5000_digit_max_axis_points",
+      "tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_2_5000_digit_number",
+      "tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_3_5000_digit_position",
+      "tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_4_5000_digit_fix_no_axis_pts_x",
+      "tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_5_5000_digit_alignment_in_layout",
+      "tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_6_5000_digit_alignment_in_mod_common",
+      "tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_8_5000_digit_axis_object_address",
+      "tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_9_float32_nan_count"
+    ]
+  },
+  "processor": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+  "production_definition_imports": [
+    {
+      "asnames": [
+        null,
+        null
+      ],
+      "line": 48,
+      "names": [
+        "Definition",
+        "describe_definitions"
+      ],
+      "path": "s19_app/tui/a2l_parameter_picker.py"
+    },
+    {
+      "asnames": [
+        null,
+        null
+      ],
+      "line": 9,
+      "names": [
+        "Refusal",
+        "describe_definition"
+      ],
+      "path": "s19_app/tui/app/patch.py"
+    },
+    {
+      "asnames": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "line": 25,
+      "names": [
+        "Decoded",
+        "DecodedAxis",
+        "DecodedValues",
+        "Definition",
+        "Encoded",
+        "Refusal",
+        "display_text",
+        "element_name"
+      ],
+      "path": "s19_app/tui/definition_bench.py"
+    },
+    {
+      "asnames": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "line": 23,
+      "names": [
+        "Decoded",
+        "DecodedAxis",
+        "Definition",
+        "Encoded",
+        "Refusal",
+        "display_text"
+      ],
+      "path": "s19_app/tui/definition_bench_view.py"
+    },
+    {
+      "asnames": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "line": 23,
+      "names": [
+        "Decoded",
+        "Definition",
+        "Encoded",
+        "Refusal",
+        "decode_definition",
+        "encode_definition"
+      ],
+      "path": "s19_app/tui/definition_sheet.py"
+    },
+    {
+      "asnames": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "line": 11,
+      "names": [
+        "Definition",
+        "Refusal",
+        "decode_values",
+        "encode_values"
+      ],
+      "path": "s19_app/tui/screens_directionb/patch_editor/bench_sheet.py"
+    },
+    {
+      "asnames": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "line": 60,
+      "names": [
+        "Definition",
+        "Encoded",
+        "Refusal",
+        "decode_definition",
+        "encode_definition"
+      ],
+      "path": "s19_app/tui/services/change_service.py"
+    }
+  ],
+  "production_public_call_count": 4,
+  "production_public_calls": [
+    {
+      "line": 607,
+      "name": "describe_definitions",
+      "path": "s19_app/tui/a2l_definition.py",
+      "public_name": "describe_definitions"
+    },
+    {
+      "line": 629,
+      "name": "describe_definitions",
+      "path": "s19_app/tui/a2l_parameter_picker.py",
+      "public_name": "describe_definitions"
+    },
+    {
+      "line": 393,
+      "name": "describe_definition",
+      "path": "s19_app/tui/app/patch.py",
+      "public_name": "describe_definition"
+    },
+    {
+      "line": 458,
+      "name": "describe_definition",
+      "path": "s19_app/tui/app/patch.py",
+      "public_name": "describe_definition"
+    }
+  ],
+  "python": "3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:17:27) [MSC v.1929 64 bit (AMD64)]",
+  "root": "<repo>",
+  "schema": "a2l-load-performance/inc-1/e1-census/v1",
+  "source": {
+    "lines": 4400,
+    "path": "s19_app/tui/a2l_definition.py",
+    "sha256": "2dace8562b7e522cfb9938142c656e1c241edf0a2963e5c58280017050a382f1"
+  },
+  "symbol_census": {
+    "_entry_overlaps": {
+      "count": 2,
+      "kinds": {
+        "definition": 1,
+        "load": 1
+      },
+      "occurrences": [
+        {
+          "kind": "definition",
+          "line": 3818
+        },
+        {
+          "kind": "load",
+          "line": 3885
+        }
+      ]
+    },
+    "_pair_exempt": {
+      "count": 2,
+      "kinds": {
+        "definition": 1,
+        "load": 1
+      },
+      "occurrences": [
+        {
+          "kind": "definition",
+          "line": 3786
+        },
+        {
+          "kind": "load",
+          "line": 3885
+        }
+      ]
+    },
+    "_shared_with": {
+      "count": 2,
+      "kinds": {
+        "definition": 1,
+        "load": 1
+      },
+      "occurrences": [
+        {
+          "kind": "load",
+          "line": 876
+        },
+        {
+          "kind": "definition",
+          "line": 3837
+        }
+      ]
+    },
+    "describe_definition": {
+      "count": 1,
+      "kinds": {
+        "definition": 1
+      },
+      "occurrences": [
+        {
+          "kind": "definition",
+          "line": 588
+        }
+      ]
+    },
+    "describe_definitions": {
+      "count": 2,
+      "kinds": {
+        "definition": 1,
+        "load": 1
+      },
+      "occurrences": [
+        {
+          "kind": "load",
+          "line": 607
+        },
+        {
+          "kind": "definition",
+          "line": 610
+        }
+      ]
+    },
+    "describe_name": {
+      "count": 4,
+      "kinds": {
+        "definition": 1,
+        "load": 3
+      },
+      "occurrences": [
+        {
+          "kind": "definition",
+          "line": 745
+        },
+        {
+          "kind": "load",
+          "line": 773
+        },
+        {
+          "kind": "load",
+          "line": 838
+        },
+        {
+          "kind": "load",
+          "line": 853
+        }
+      ]
+    },
+    "entry_cache": {
+      "count": 5,
+      "kinds": {
+        "load": 4,
+        "store": 1
+      },
+      "occurrences": [
+        {
+          "kind": "store",
+          "line": 830
+        },
+        {
+          "kind": "load",
+          "line": 834
+        },
+        {
+          "kind": "load",
+          "line": 835
+        },
+        {
+          "kind": "load",
+          "line": 849
+        },
+        {
+          "kind": "load",
+          "line": 850
+        }
+      ]
+    },
+    "materialize": {
+      "count": 5,
+      "kinds": {
+        "definition": 1,
+        "load": 4
+      },
+      "occurrences": [
+        {
+          "kind": "definition",
+          "line": 832
+        },
+        {
+          "kind": "load",
+          "line": 876
+        },
+        {
+          "kind": "load",
+          "line": 3856
+        },
+        {
+          "kind": "load",
+          "line": 3874
+        },
+        {
+          "kind": "load",
+          "line": 3875
+        }
+      ]
+    },
+    "span_entries": {
+      "count": 5,
+      "kinds": {
+        "load": 4,
+        "store": 1
+      },
+      "occurrences": [
+        {
+          "kind": "store",
+          "line": 642
+        },
+        {
+          "kind": "load",
+          "line": 672
+        },
+        {
+          "kind": "load",
+          "line": 692
+        },
+        {
+          "kind": "load",
+          "line": 716
+        },
+        {
+          "kind": "load",
+          "line": 873
+        }
+      ]
+    },
+    "span_index": {
+      "count": 6,
+      "kinds": {
+        "load": 5,
+        "store": 1
+      },
+      "occurrences": [
+        {
+          "kind": "store",
+          "line": 865
+        },
+        {
+          "kind": "load",
+          "line": 873
+        },
+        {
+          "kind": "load",
+          "line": 876
+        },
+        {
+          "kind": "load",
+          "line": 3856
+        },
+        {
+          "kind": "load",
+          "line": 3857
+        },
+        {
+          "kind": "load",
+          "line": 3863
+        }
+      ]
+    }
+  }
+}

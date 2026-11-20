@@ -1,0 +1,81 @@
+mutant-run: Inc 2 negative controls as source mutants; python 3.11.15
+
+029-prep-on-ui: KILLED (exit 1) target -k 029 and typed
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r029_worker_snapshot[typed] - ...
+    1 failed, 36 deselected in 9.34s
+
+033-prep-on-ui: KILLED (exit 1) target -k 033_key_latency and enrichment
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r033_key_latency[enrichment]
+    1 failed, 36 deselected in 8.72s
+
+030-forbidden-read: SURVIVED (exit 0) target -k 030_worker_input_census
+    .                                                                        [100%]
+    1 passed, 36 deselected in 0.13s
+
+030-writable-mapping: KILLED (exit 1) target -k 030_request_isolation
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r030_request_isolation[with-image]
+    1 failed, 1 passed, 35 deselected in 34.26s
+
+031-partial-install: SURVIVED (exit 0) target -k 031_matching_snapshot_installs
+    ...                                                                      [100%]
+    3 passed, 34 deselected in 66.07s (0:01:06)
+
+032-accept-stale: KILLED (exit 1) target -k 032_stale_direct_attach
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r032_stale_direct_attach[a2l-generation]
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r032_stale_direct_attach[image-generation]
+    2 failed, 35 deselected in 101.98s (0:01:41)
+
+034-clear-progress: KILLED (exit 1) target -k 034_progress_throughout and enrichment
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r034_progress_throughout[enrichment]
+    1 failed, 36 deselected in 188.19s (0:03:08)
+
+035-omit-refresh: KILLED (exit 1) target -k 035_refresh_before_success
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r035_refresh_before_success[replacement]
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r035_refresh_before_success[confirmed-same-path]
+    3 failed, 34 deselected in 36.87s
+
+036-drop-cache: SURVIVED (exit 0) target -k 036_refresh_reuses_snapshot
+    ..                                                                       [100%]
+    2 passed, 35 deselected in 33.70s
+
+037-always-describe: KILLED (exit 1) target -k 037_picker_snapshot_reuse and initial
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r037_picker_snapshot_reuse[initial]
+    1 failed, 36 deselected in 9.05s
+
+037-shared-describe: KILLED (exit 1) target -k 037_picker_snapshot_reuse and initial
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r037_picker_snapshot_reuse[initial]
+    1 failed, 36 deselected in 9.99s
+
+038-swallow-enrich-failure: KILLED (exit 1) target -k 038_preparation_failure and enrichment
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r038_preparation_failure[enrichment]
+    1 failed, 36 deselected in 50.11s
+
+038-suppress-workarea-refresh: KILLED (exit 1) target -k 038_preparation_failure
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r038_preparation_failure[summary]
+    FAILED tests/test_alp_inc2_a2l_attach.py::test_r038_preparation_failure[definitions]
+    3 failed, 34 deselected in 202.90s (0:03:22)
+
+--- conductor rulings: three survivors re-run (mutant-run-ruled.txt) ---
+030-forbidden-read SURVIVED in the first pass because the census arm listed
+only _a2l_attach_worker and _prepare_a2l_attach_snapshot, while the D-13
+split moved the producer body into _prepare_a2l_attach_snapshot_inner.
+Ruling: test fix — the census now covers all three nodes.
+031-partial-install SURVIVED because the arm asserted the enrichment key
+AFTER the outcome, where the recompute-on-mismatch path had repaired it;
+the contract (I-ALP-2.4) installs the key BEFORE the common refresh.
+Ruling: test fix — .031 records the key at every refresh entry and requires
+the final entry to already be the expected key.
+036-drop-cache SURVIVED because the mutant dropped the key AFTER the refresh
+(mutant placement defect, not a test gap).
+Ruling: mutant repositioned before the refresh.
+Re-run of the three corrected mutants: all KILLED (exit 1).
+The unmutated tree stays 6/6 green on the affected nodes.
+
+FINAL: 13/13 mutants KILLED, 0 unruled survivors.

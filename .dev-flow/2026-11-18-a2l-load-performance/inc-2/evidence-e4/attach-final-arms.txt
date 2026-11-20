@@ -1,0 +1,707 @@
+FFFF.FF                                                                  [100%]
+================================== FAILURES ===================================
+_____________________ test_r029_worker_snapshot[workarea] _____________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40213/test_r029_worker_snapshot_work0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A1BD1B09D0>
+route = 'workarea'
+
+    @pytest.mark.parametrize("route", ["typed", "workarea", "startup"], ids=lambda x: x)
+    def test_r029_worker_snapshot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, route: str) -> None:
+        """R-A2L-REFRESH.029/1-/3: enrichment, summary and both picker describes
+        complete off the UI thread before the install; visible NEW cells exact."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        new = _new_a2l(src / "new.a2l")
+    
+        if route == "workarea":
+            workarea_temp = base / WORKAREA_DIRNAME / WORKAREA_SUBDIR / WORKAREA_TEMP
+            workarea_temp.mkdir(parents=True, exist_ok=True)
+            (workarea_temp / "new.a2l").write_bytes(new.read_bytes())
+    
+        events: list = []
+        copies = Spy(monkeypatch, app_module.deps, "copy_into_workarea")
+    
+        async def typed_body(app, pilot):
+            main = threading.get_ident()
+            _mount_views(app)
+            await pilot.pause()
+            _arm_pipeline_spies(app, monkeypatch, events, main)
+            await _typed_attach(app, pilot, new)
+            await settle_workers(pilot)
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_panel_state(_check_panel(app), NEW_ROWS)
+            _assert_panel_state(_patch_panel(app), NEW_ROWS)
+            assert _a2l_viewer_names(app) == [name for name, *_ in NEW_ROWS]
+            return None
+    
+        async def workarea_body(app, pilot):
+            main = threading.get_ident()
+            _mount_views(app)
+            await pilot.pause()
+            _arm_pipeline_spies(app, monkeypatch, events, main)
+            await _workarea_attach(app, pilot, "new.a2l")
+            await settle_workers(pilot)
+            assert len(copies.calls) == 0, copies.calls
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_panel_state(_check_panel(app), NEW_ROWS)
+            _assert_panel_state(_patch_panel(app), NEW_ROWS)
+            assert _a2l_viewer_names(app) == [name for name, *_ in NEW_ROWS]
+            return None
+    
+        async def startup_body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            await wait_until(
+                pilot,
+                lambda: app.current_a2l_path is not None
+                and Path(app.current_a2l_path).name == "new.a2l",
+                "the start-up attach of new.a2l",
+            )
+            await settle_workers(pilot)
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_panel_state(_check_panel(app), NEW_ROWS)
+            _assert_panel_state(_patch_panel(app), NEW_ROWS)
+            assert _a2l_viewer_names(app) == [name for name, *_ in NEW_ROWS]
+            return None
+    
+        if route == "typed":
+            main = _run(base, typed_body)
+        elif route == "workarea":
+            main = _run(base, workarea_body)
+        else:
+            main = threading.get_ident()
+            # Class-level spies: the start-up attach begins during app start.
+            _arm_pipeline_spies(S19TuiApp, monkeypatch, events, main)
+            _run(base, startup_body, load_path=src / "new.a2l", base_dir=base)
+    
+        names = [e[0] for e in events]
+        assert names.count("enrichment") == 1, events
+        assert names.count("summary") == 1, events
+        assert names.count("describe") == 2, events
+        assert names.count("install") == 1, events
+        prep = [e for e in events if e[0] in {"enrichment", "summary", "describe"}]
+        installs = [e for e in events if e[0] == "install"]
+        assert all(thread != main for _, thread in prep), events
+        assert max(i for i, e in enumerate(events) if e[0] in {"enrichment", "summary", "describe"}) < min(
+            i for i, e in enumerate(events) if e[0] == "install"
+        ), events
+>       assert installs[0][1] == main, events
+E       AssertionError: [('UI', 29372), ('enrichment', 21664), ('summary', 21664), ('describe', 21664), ('describe', 21664), ('install', 29372)]
+E       assert 29372 == None
+
+tests\test_alp_inc2_a2l_attach.py:728: AssertionError
+________________________ test_r033_key_latency[parse] _________________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40213/test_r033_key_latency_parse_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A1BD322DD0>
+arm = 'parse'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["copy", "parse", "enrichment", "definitions", "case06-full-processing", "request-snapshot"],
+        ids=lambda x: x,
+    )
+    def test_r033_key_latency(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.033/1-/6: two existing navigation keys are acknowledged
+        within 1.0 s during the named phase, each latency recorded; no median
+        substitution."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        bound = timing_bound(1.0)
+        latencies: list = []
+    
+        if arm == "case06-full-processing":
+            async def body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                deadline = time.monotonic() + 240
+                app.load_a2l_from_path(CASE06)
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                while not (
+                    app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "firmware.a2l"
+                ):
+                    if time.monotonic() > deadline:
+                        raise AssertionError("the case_06 attach never installed")
+                    await pilot.pause(0.05)
+                await settle_workers(pilot)
+                assert any("A2L loaded" in line for line in _log_lines(app))
+                snapshot_map = _accepted_snapshots(app)
+                assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+                return None
+    
+            _run(base, body)
+            assert len(latencies) == 2, latencies
+            assert all(lat <= bound for lat in latencies), latencies
+            return
+    
+        if arm == "request-snapshot":
+            big = _write_big_image(src / "big1m.s19")
+    
+            async def body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                await _load_image(app, pilot, big)
+                requests: list = []
+    
+                real_worker = app._a2l_attach_worker
+    
+                def worker_spy(request):
+                    requests.append(request)
+                    return real_worker(request)
+    
+                monkeypatch.setattr(app, "_a2l_attach_worker", worker_spy)
+                # The keys are scheduled immediately before the synchronous
+                # request-snapshot capture: their measured latency covers it.
+                app.load_a2l_from_path(old)
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                await settle_workers(pilot)
+                assert len(requests) == 1, requests
+                mapping = getattr(requests[0], "image_mem_map", None)
+                assert mapping is not None and len(mapping) == len(app.current_file.mem_map), (
+                    "the worker did not receive an independent read-only image copy"
+                )
+                with pytest.raises(Exception):
+                    mapping[next(iter(mapping))] = 0xFF
+                assert app.current_a2l_path is not None
+                return None
+    
+            _run(base, body)
+            assert len(latencies) == 2, latencies
+            assert all(lat <= bound for lat in latencies), latencies
+            return
+    
+        # The four held-phase arms.
+        async def typed_submit(app, pilot):
+            await _submit_typed(app, pilot, str(old))
+    
+        if arm == "copy":
+            hold = Hold(monkeypatch, [(app_module.deps, "copy_into_workarea")])
+    
+            async def copy_body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                await typed_submit(app, pilot)
+                await reached(pilot, hold, "the held copy phase")
+                assert app.current_a2l_path is None, "an install/outcome happened during the hold"
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                assert "busy:" in _status_text(app), _status_text(app)
+                await release(pilot, hold)
+                await wait_until(
+                    pilot,
+                    lambda: app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "old.a2l",
+                    "the held copy outcome",
+                )
+                return None
+    
+            _run(base, copy_body)
+        elif arm == "parse":
+            entered = threading.Event()
+            release_parse = threading.Event()
+            progress_reports: list = []
+            real_parse = app_module.deps.parse_a2l_cached
+    
+            def gated(path, *args, **kwargs):
+                progress = kwargs.get("progress")
+    
+                def wrapped(done, total):
+                    progress_reports.append((done, total))
+                    if not entered.is_set():
+                        entered.set()
+                        assert release_parse.wait(180), "the held parse was never released"
+                    if progress is not None:
+                        return progress(done, total)
+                    return None
+    
+                kwargs["progress"] = wrapped
+                return real_parse(path, *args, **kwargs)
+    
+            monkeypatch.setattr(app_module.deps, "parse_a2l_cached", gated)
+    
+            async def parse_body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                await typed_submit(app, pilot)
+                await reached(pilot, _ParsedHold(entered), "the held parse phase")
+                assert progress_reports, "the parse made no byte-progress report"
+                assert app.current_a2l_path is None, "an install/outcome happened during the hold"
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                assert 33 <= _bar(app) <= 66, _bar(app)
+                assert "busy:" in _status_text(app), _status_text(app)
+                release_parse.set()
+                await settle_workers(pilot)
+                await wait_until(
+                    pilot,
+                    lambda: app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "old.a2l",
+                    "the held parse outcome",
+                )
+                return None
+    
+>           _run(base, parse_body)
+
+tests\test_alp_inc2_a2l_attach.py:1178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def parse_body(app, pilot):
+        app.set_focus(app.query_one("#files_list"))
+        await pilot.pause()
+        await typed_submit(app, pilot)
+        await reached(pilot, _ParsedHold(entered), "the held parse phase")
+        assert progress_reports, "the parse made no byte-progress report"
+        assert app.current_a2l_path is None, "an install/outcome happened during the hold"
+        phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+        latencies.extend(phase_keys)
+        assert 33 <= _bar(app) <= 66, _bar(app)
+>       assert "busy:" in _status_text(app), _status_text(app)
+E       AssertionError: ⠙ Loading old.a2l  ·  step 2/3 Parse  ·  00:00
+E       assert 'busy:' in '⠙ Loading old.a2l  ·  step 2/3 Parse  ·  00:00'
+E        +  where '⠙ Loading old.a2l  ·  step 2/3 Parse  ·  00:00' = _status_text(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}))
+
+tests\test_alp_inc2_a2l_attach.py:1167: AssertionError
+___________________ test_r033_key_latency[request-snapshot] ___________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40213/test_r033_key_latency_request_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A1BE841010>
+arm = 'request-snapshot'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["copy", "parse", "enrichment", "definitions", "case06-full-processing", "request-snapshot"],
+        ids=lambda x: x,
+    )
+    def test_r033_key_latency(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.033/1-/6: two existing navigation keys are acknowledged
+        within 1.0 s during the named phase, each latency recorded; no median
+        substitution."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        bound = timing_bound(1.0)
+        latencies: list = []
+    
+        if arm == "case06-full-processing":
+            async def body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                deadline = time.monotonic() + 240
+                app.load_a2l_from_path(CASE06)
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                while not (
+                    app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "firmware.a2l"
+                ):
+                    if time.monotonic() > deadline:
+                        raise AssertionError("the case_06 attach never installed")
+                    await pilot.pause(0.05)
+                await settle_workers(pilot)
+                assert any("A2L loaded" in line for line in _log_lines(app))
+                snapshot_map = _accepted_snapshots(app)
+                assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+                return None
+    
+            _run(base, body)
+            assert len(latencies) == 2, latencies
+            assert all(lat <= bound for lat in latencies), latencies
+            return
+    
+        if arm == "request-snapshot":
+            big = _write_big_image(src / "big1m.s19")
+    
+            async def body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                await _load_image(app, pilot, big)
+                requests: list = []
+    
+                real_worker = app._a2l_attach_worker
+    
+                def worker_spy(request):
+                    requests.append(request)
+                    return real_worker(request)
+    
+                monkeypatch.setattr(app, "_a2l_attach_worker", worker_spy)
+                # The keys are scheduled immediately before the synchronous
+                # request-snapshot capture: their measured latency covers it.
+                app.load_a2l_from_path(old)
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                await settle_workers(pilot)
+                assert len(requests) == 1, requests
+                mapping = getattr(requests[0], "image_mem_map", None)
+                assert mapping is not None and len(mapping) == len(app.current_file.mem_map), (
+                    "the worker did not receive an independent read-only image copy"
+                )
+                with pytest.raises(Exception):
+                    mapping[next(iter(mapping))] = 0xFF
+                assert app.current_a2l_path is not None
+                return None
+    
+            _run(base, body)
+            assert len(latencies) == 2, latencies
+>           assert all(lat <= bound for lat in latencies), latencies
+E           AssertionError: [1.8429999999934807, 0.1720000000204891]
+E           assert False
+E            +  where False = all(<generator object test_r033_key_latency.<locals>.<genexpr> at 0x000001A1BE362DC0>)
+
+tests\test_alp_inc2_a2l_attach.py:1105: AssertionError
+_______________ test_r034_progress_throughout[request-snapshot] _______________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40213/test_r034_progress_throughout_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A1C3A4EED0>
+arm = 'request-snapshot'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["enrichment", "definitions", "case06-full-processing", "request-snapshot"],
+        ids=lambda x: x,
+    )
+    def test_r034_progress_throughout(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.034/1-/4: the existing busy line stays visible and every
+        inter-update gap is <= 1.0 s through the named phase until the outcome."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+    
+        if arm == "case06-full-processing":
+            async def body(app, pilot):
+                sampler = Sampler()
+                task = sampler.start(pilot, app, bar=True)
+                await pilot.pause(0.1)
+                deadline = time.monotonic() + 300
+                app.load_a2l_from_path(CASE06)
+                while True:
+                    if (
+                        app.current_a2l_path is not None
+                        and Path(app.current_a2l_path).name == "firmware.a2l"
+                        and "a2l_load" not in app._busy.runs
+                    ):
+                        break
+                    if time.monotonic() > deadline:
+                        raise AssertionError("the case_06 attach never reached its terminal outcome")
+                    await pilot.pause(0.05)
+                sampler.stop.set()
+                await task
+                _assert_progress_continuous(sampler, arm)
+                changes = sampler.text_changes()
+                texts = [text for _, text in changes]
+                assert any("busy:" in text and "firmware.a2l" in text for text in texts), texts
+                assert any("Build the tag table" in text for text in texts), texts
+                bars = [bar for _t, _x, bar in sampler.frames if bar is not None]
+                assert all(0 <= value <= 100 for value in bars), "out-of-range bar value"
+                assert any("A2L loaded" in line for line in _log_lines(app))
+                assert "busy:" in changes[-1][1], changes[-1]
+                return None
+    
+            _run(base, body)
+            return
+    
+        if arm == "request-snapshot":
+            big = _write_big_image(src / "big1m.s19")
+    
+            async def body(app, pilot):
+                await _load_image(app, pilot, big)
+                sampler = Sampler()
+                task = sampler.start(pilot, app, bar=True)
+                await pilot.pause(0.1)
+                started = threading.Event()
+    
+                real_worker = app._a2l_attach_worker
+    
+                def worker_spy(request):
+                    started.set()
+                    return real_worker(request)
+    
+                monkeypatch.setattr(app, "_a2l_attach_worker", worker_spy)
+                app.load_a2l_from_path(old)
+                deadline = time.monotonic() + 120
+                while not started.is_set():
+                    if time.monotonic() > deadline:
+                        raise AssertionError("the attach worker never started")
+                    await pilot.pause(0.01)
+                await pilot.pause(0.5)
+                sampler.stop.set()
+                await task
+                changes = sampler.text_changes()
+                assert any("busy:" in text and "old.a2l" in text for text, _ in changes), changes
+                times = [t for t, _ in changes]
+                gaps = [b - a for a, b in zip(times, times[1:])]
+                assert all(gap <= 1.0 for gap in gaps), gaps
+                await settle_workers(pilot)
+                assert app.current_a2l_path is not None
+                return None
+    
+>           _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1324: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:1316: in body
+    assert any("busy:" in text and "old.a2l" in text for text, _ in changes), changes
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+.0 = <list_iterator object at 0x000001A1C76FA8C0>
+
+>   assert any("busy:" in text and "old.a2l" in text for text, _ in changes), changes
+               ^^^^^^^^^^^^^^^
+E   TypeError: argument of type 'float' is not iterable
+
+tests\test_alp_inc2_a2l_attach.py:1316: TypeError
+____________ test_r034_progress_throughout[case06-full-processing] ____________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40213/test_r034_progress_throughout_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A1C3A4DFD0>
+arm = 'case06-full-processing'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["enrichment", "definitions", "case06-full-processing", "request-snapshot"],
+        ids=lambda x: x,
+    )
+    def test_r034_progress_throughout(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.034/1-/4: the existing busy line stays visible and every
+        inter-update gap is <= 1.0 s through the named phase until the outcome."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+    
+        if arm == "case06-full-processing":
+            async def body(app, pilot):
+                sampler = Sampler()
+                task = sampler.start(pilot, app, bar=True)
+                await pilot.pause(0.1)
+                deadline = time.monotonic() + 300
+                app.load_a2l_from_path(CASE06)
+                while True:
+                    if (
+                        app.current_a2l_path is not None
+                        and Path(app.current_a2l_path).name == "firmware.a2l"
+                        and "a2l_load" not in app._busy.runs
+                    ):
+                        break
+                    if time.monotonic() > deadline:
+                        raise AssertionError("the case_06 attach never reached its terminal outcome")
+                    await pilot.pause(0.05)
+                sampler.stop.set()
+                await task
+                _assert_progress_continuous(sampler, arm)
+                changes = sampler.text_changes()
+                texts = [text for _, text in changes]
+                assert any("busy:" in text and "firmware.a2l" in text for text in texts), texts
+                assert any("Build the tag table" in text for text in texts), texts
+                bars = [bar for _t, _x, bar in sampler.frames if bar is not None]
+                assert all(0 <= value <= 100 for value in bars), "out-of-range bar value"
+                assert any("A2L loaded" in line for line in _log_lines(app))
+                assert "busy:" in changes[-1][1], changes[-1]
+                return None
+    
+>           _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:1275: in body
+    _assert_progress_continuous(sampler, arm)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+sampler = <tests.test_alp_inc2_a2l_attach.Sampler object at 0x000001A1C41B39D0>
+what = 'case06-full-processing'
+
+    def _assert_progress_continuous(sampler: Sampler, what: str) -> None:
+        changes = sampler.text_changes()
+        assert len(changes) >= 2, f"{what}: fewer than 2 spinner/elapsed changes ({len(changes)})"
+        times = [t for t, _ in changes]
+        gaps = [b - a for a, b in zip(times, times[1:])]
+>       assert all(gap <= 1.0 for gap in gaps), f"{what}: progress gaps {gaps}"
+E       AssertionError: case06-full-processing: progress gaps [0.1720000000204891, 0.14000000001396984, 0.0779999999795109, 0.125, 0.2660000000614673, 0.17199999990407377, 0.062000000034458935, 0.10999999998603016, 0.09299999999348074, 0.0940000000409782, 0.0940000000409782, 0.26599999994505197, 0.14000000001396984, 0.1559999999590218, 0.0940000000409782, 0.0940000000409782, 0.09399999992456287, 0.062000000034458935, 0.0940000000409782, 0.3279999999795109, 0.2029999999795109, 0.06299999996554106, 0.062000000034458935, 0.14099999994505197, 0.07800000009592623, 0.1559999999590218, 0.26599999994505197, 0.28100000007543713, 0.06299999996554106, 0.09299999999348074, 0.0779999999795109, 0.07900000002700835, 0.125, 0.29599999997299165, 0.1720000000204891, 0.1720000000204891, 0.06299999996554106, 0.0779999999795109, 0.15600000007543713, 0.0779999999795109, 0.2970000000204891, 0.2339999999385327, 0.0470000000204891, 0.0779999999795109, 0.1410000000614673, 0.09399999992456287, 0.07800000009592623, 0.10899999993853271, 0.0470000000204891, 0.31299999996554106, 0.25, 0.0779999999795109, 0.14000000001396984, 0.06300000008195639, 0.3279999999795109, 0.18799999996554106, 0.0779999999795109, 0.125, 0.0779999999795109, 0.4220000000204891, 0.26500000001396984, 0.06299999996554106, 0.0940000000409782, 0.09299999999348074, 0.0470000000204891, 0.0940000000409782, 0.125, 0.3589999999385327, 0.0940000000409782, 0.1559999999590218, 0.06299999996554106, 0.14000000001396984, 0.10999999998603016, 0.15600000007543713, 0.06299999996554106, 0.10900000005494803, 0.3279999999795109, 0.1559999999590218, 0.0940000000409782, 0.10899999993853271, 0.0470000000204891, 0.0940000000409782, 0.1559999999590218, 0.10999999998603016, 0.0470000000204891, 0.10900000005494803, 0.39099999994505197, 0.1559999999590218, 0.0940000000409782, 0.045999999972991645, 0.0940000000409782, 0.125, 0.06299999996554106, 0.10900000005494803, 0.125, 0.2970000000204891, 0.1559999999590218, 0.125, 0.0940000000409782, 0.125, 0.1559999999590218, 0.06299999996554106, 0.3279999999795109, 0.25, 0.0940000000409782, 0.10900000005494803, 0.125, 0.06199999991804361, 0.125, 0.10999999998603016, 0.0940000000409782, 0.062000000034458935, 0.0779999999795109, 0.375, 0.1559999999590218, 0.15700000000651926, 0.062000000034458935, 0.0940000000409782, 0.09399999992456287, 0.15600000007543713, 0.09399999992456287, 0.09299999999348074, 0.0940000000409782, 0.0470000000204891, 0.0779999999795109, 0.43799999996554106, 0.21799999999348074, 0.10999999998603016, 0.062000000034458935, 0.1410000000614673, 0.0779999999795109, 0.1559999999590218, 0.0779999999795109, 0.06300000008195639, 0.39099999994505197, 0.18700000003445894, 0.10899999993853271, 0.06300000008195639, 0.046999999904073775, 0.125, 0.07800000009592623, 0.10899999993853271, 0.0470000000204891, 0.4690000000409782, 0.09399999992456287, 0.10900000005494803, 0.06299999996554106, 0.125, 0.10900000005494803, 0.0779999999795109, 0.125, 0.06299999996554106, 0.125, 0.062000000034458935, 0.515999999945052, 0.10900000005494803, 0.14099999994505197, 0.062000000034458935, 0.10999999998603016, 0.0779999999795109, 0.10900000005494803, 0.14099999994505197, 0.0779999999795109, 0.10900000005494803, 0.0940000000409782, 0.10899999993853271, 0.10999999998603016, 0.09299999999348074, 0.06300000008195639, 0.4529999999795109, 0.125, 0.0779999999795109, 0.18799999996554106, 0.062000000034458935, 0.125, 0.0940000000409782, 0.10899999993853271, 0.0940000000409782, 0.10899999993853271, 0.10999999998603016, 0.07800000009592623, 0.06199999991804361, 0.1410000000614673, 0.06299999996554106, 0.5, 0.0779999999795109, 0.10900000005494803, 0.2029999999795109, 0.06299999996554106, 0.062000000034458935, 0.14099999994505197, 0.07800000009592623, 0.0779999999795109, 0.0470000000204891, 0.09399999992456287, 0.10900000005494803, 0.09399999992456287, 0.10900000005494803, 0.0940000000409782, 0.0779999999795109, 0.09399999992456287, 0.10900000005494803, 0.4529999999795109, 0.2660000000614673, 0.09399999992456287, 0.0779999999795109, 0.0940000000409782, 0.0779999999795109, 0.10900000005494803, 0.09399999992456287, 0.062000000034458935, 0.0940000000409782, 0.0779999999795109, 0.10999999998603016, 0.045999999972991645, 0.10999999998603016, 0.2970000000204891, 0.31200000003445894, 0.375, 0.6559999999590218, 0.1880000000819564, 0.26599999994505197, 0.25, 0.18700000003445894, 0.2809999999590218, 0.375, 0.7660000000614673, 0.3279999999795109, 0.18799999996554106, 0.3279999999795109, 0.23400000005494803, 0.25, 0.2339999999385327, 0.23499999998603016, 1.0, 0.2190000000409782, 0.29599999997299165, 0.15700000000651926, 0.23400000005494803, 0.4059999999590218, 0.15700000000651926, 0.1559999999590218, 0.2190000000409782, 0.17099999997299165, 1.2040000000270084, 0.2809999999590218, 0.1720000000204891, 0.2029999999795109, 0.125, 0.1720000000204891, 1.2179999999934807, 0.10999999998603016, 0.20300000009592623, 0.3279999999795109, 0.3589999999385327, 0.20400000002700835, 0.17099999997299165, 0.20400000002700835, 1.6709999999729916, 0.3130000000819564, 0.39099999994505197, 0.17099999997299165, 0.20400000002700835, 0.35900000005494803, 0.25, 0.2029999999795109, 0.2029999999795109, 0.2029999999795109, 0.15700000000651926, 0.21799999999348074, 0.2190000000409782, 0.5939999999245629, 0.2190000000409782, 0.43700000003445894, 0.1720000000204891, 0.21899999992456287, 1.4679999999934807, 0.2190000000409782, 0.1720000000204891, 0.25, 0.2809999999590218, 0.4529999999795109, 0.28200000000651926, 0.25, 0.18700000003445894, 0.25, 0.2029999999795109, 0.375, 0.2029999999795109, 0.23499999998603016, 0.26500000001396984, 0.23499999998603016, 1.609000000054948, 0.25, 0.1720000000204891, 0.2029999999795109, 0.43799999996554106, 0.2029999999795109, 0.2970000000204891, 0.31200000003445894, 0.4529999999795109, 0.1720000000204891, 0.18799999996554106, 0.35900000005494803, 0.18799999996554106, 0.31200000003445894, 0.2029999999795109, 0.0940000000409782, 0.3119999999180436, 0.23499999998603016, 0.375, 0.15600000007543713, 0.2339999999385327, 1.5630000000819564, 0.34399999992456287, 0.2029999999795109, 0.31200000003445894, 0.25, 0.2029999999795109, 0.2190000000409782, 0.35999999998603016, 0.39000000001396984, 0.4059999999590218, 0.3130000000819564, 0.26599999994505197, 0.2029999999795109, 0.2970000000204891, 0.34299999999348074, 0.35999999998603016, 0.2029999999795109, 0.31200000003445894, 1.8599999999860302, 0.23400000005494803, 0.2029999999795109, 0.2029999999795109, 0.18799999996554106, 0.40600000007543713, 0.25, 0.31299999996554106, 0.25, 0.25, 0.2029999999795109, 0.26500000001396984, 0.40700000000651926, 0.23400000005494803, 0.375, 0.39099999994505197, 0.375, 0.25, 0.43700000003445894, 0.21899999992456287, 0.2190000000409782, 0.2029999999795109, 1.875, 0.26500000001396984, 0.1720000000204891, 0.2190000000409782, 0.1559999999590218, 0.26599999994505197, 0.3280000000959262, 0.14099999994505197, 0.17099999997299165, 0.1880000000819564, 0.2029999999795109, 0.2339999999385327, 0.20400000002700835, 0.21799999999348074, 0.23499999998603016, 0.3279999999795109, 0.48400000005494803, 0.26599999994505197, 0.1720000000204891, 0.34299999999348074, 0.2190000000409782, 1.875, 0.4529999999795109, 0.18799999996554106, 0.18700000003445894, 0.35999999998603016, 0.2029999999795109, 0.31200000003445894, 0.4220000000204891, 0.2970000000204891, 0.18799999996554106, 0.3279999999795109, 0.21799999999348074, 0.45400000002700835, 0.2029999999795109, 2.0929999999934807, 0.25, 0.35999999998603016, 0.4530000000959262, 0.4059999999590218, 0.4059999999590218, 0.1410000000614673, 0.21899999992456287, 0.18700000003445894, 0.3440000000409782, 0.14099999994505197, 0.2029999999795109, 0.3440000000409782, 0.14000000001396984, 0.125, 0.23499999998603016, 0.4059999999590218, 0.1720000000204891, 0.21799999999348074, 0.3910000000614673, 0.2029999999795109, 0.31299999996554106, 0.14000000001396984, 0.2660000000614673, 0.1869999999180436, 1.8910000000614673, 0.2339999999385327, 0.375, 0.32900000002700835, 0.21799999999348074, 0.2970000000204891, 0.39099999994505197, 0.43700000003445894, 0.31299999996554106, 0.18700000003445894, 0.4220000000204891, 0.18799999996554106, 0.21799999999348074, 0.1880000000819564, 0.4059999999590218, 0.2029999999795109, 0.1410000000614673, 0.2809999999590218, 0.25, 0.2970000000204891, 0.43799999996554106, 0.2029999999795109, 0.46799999999348074, 2.219000000040978, 0.2190000000409782, 0.1869999999180436, 0.1880000000819564, 0.17199999990407377, 0.28100000007543713, 0.21899999992456287, 0.43700000003445894, 0.2970000000204891, 0.18799999996554106, 0.28100000007543713, 0.2969999999040738, 0.28100000007543713, 0.2339999999385327, 0.28200000000651926, 0.2029999999795109, 0.4690000000409782, 0.29599999997299165, 0.23499999998603016, 0.26500000001396984, 0.5, 0.1720000000204891, 0.2660000000614673, 0.17199999990407377, 0.2190000000409782, 0.29599999997299165, 0.1410000000614673, 2.422000000020489, 0.26599999994505197, 0.18700000003445894, 0.21899999992456287, 0.23400000005494803, 0.4220000000204891, 0.21899999992456287, 0.28100000007543713, 0.5629999999655411, 0.125, 0.26500000001396984, 0.18799999996554106, 0.18700000003445894, 0.2809999999590218, 0.35999999998603016, 2.547000000020489, 0.25]
+E       assert False
+E        +  where False = all(<generator object _assert_progress_continuous.<locals>.<genexpr> at 0x000001A1C6FD97D0>)
+
+tests\test_alp_inc2_a2l_attach.py:1238: AssertionError
+__________________ test_at_alp_i2_2_case06_keys_and_progress __________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40213/test_at_alp_i2_2_case06_keys_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A1E1591650>
+
+    def test_at_alp_i2_2_case06_keys_and_progress(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """AT-ALP-I2-2: the real case_06 direct attach keeps every key and every
+        visible progress gap within 1.0 s from request through preparation and
+        common refresh to the terminal outcome."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        bound = timing_bound(1.0)
+        latencies: list = []
+    
+        async def body(app, pilot):
+            app.set_focus(app.query_one("#files_list"))
+            await pilot.pause()
+            sampler = Sampler()
+            task = sampler.start(pilot, app, bar=True)
+            await pilot.pause(0.1)
+            deadline = time.monotonic() + 300
+            app.load_a2l_from_path(CASE06)
+            phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+            latencies.extend(phase_keys)
+            while True:
+                if (
+                    app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "firmware.a2l"
+                    and "a2l_load" not in app._busy.runs
+                ):
+                    break
+                if time.monotonic() > deadline:
+                    raise AssertionError("the case_06 attach never reached its terminal outcome")
+                await pilot.pause(0.05)
+            sampler.stop.set()
+            await task
+            changes = sampler.text_changes()
+            times = [t for t, _ in changes]
+            gaps = [b - a for a, b in zip(times, times[1:])]
+            assert all(gap <= 1.0 for gap in gaps), gaps
+            assert any("busy:" in text and "firmware.a2l" in text for text, _ in changes), changes
+            assert any("A2L loaded" in line for line in _log_lines(app)), _log_lines(app)
+            assert Path(app.current_a2l_path).name == "firmware.a2l"
+            assert app._a2l_enriched_tags, "no enriched tags at the outcome"
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:2002: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def body(app, pilot):
+        app.set_focus(app.query_one("#files_list"))
+        await pilot.pause()
+        sampler = Sampler()
+        task = sampler.start(pilot, app, bar=True)
+        await pilot.pause(0.1)
+        deadline = time.monotonic() + 300
+        app.load_a2l_from_path(CASE06)
+        phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+        latencies.extend(phase_keys)
+        while True:
+            if (
+                app.current_a2l_path is not None
+                and Path(app.current_a2l_path).name == "firmware.a2l"
+                and "a2l_load" not in app._busy.runs
+            ):
+                break
+            if time.monotonic() > deadline:
+                raise AssertionError("the case_06 attach never reached its terminal outcome")
+            await pilot.pause(0.05)
+        sampler.stop.set()
+        await task
+        changes = sampler.text_changes()
+        times = [t for t, _ in changes]
+        gaps = [b - a for a, b in zip(times, times[1:])]
+>       assert all(gap <= 1.0 for gap in gaps), gaps
+E       AssertionError: [0.2029999999795109, 0.10999999998603016, 0.10900000005494803, 3.6089999999385327, 0.10999999998603016, 0.0470000000204891, ...]
+E       assert False
+E        +  where False = all(<generator object test_at_alp_i2_2_case06_keys_and_progress.<locals>.body.<locals>.<genexpr> at 0x000001A1AED7D2F0>)
+
+tests\test_alp_inc2_a2l_attach.py:1993: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r029_worker_snapshot[workarea]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r033_key_latency[parse] - Asse...
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r033_key_latency[request-snapshot]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r034_progress_throughout[request-snapshot]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r034_progress_throughout[case06-full-processing]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_at_alp_i2_2_case06_keys_and_progress
+6 failed, 1 passed in 551.83s (0:09:11)
+EXIT=1

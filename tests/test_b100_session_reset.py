@@ -124,6 +124,13 @@ SNAPSHOT_EXCLUSIONS: dict[str, str] = {
     # Inc 1b (E2 N3): one transient right-click candidate, consumed or cleared
     # by the gesture; it carries no project-session state across a load.
     "_right_gesture": "transient mouse-gesture candidate; UI input state, not session state (Inc 1b N3)",
+    # Inc 2 (batch 2026-11-18-a2l-load-performance, E4 tester re-pin): the
+    # accepted direct-attach picker hand-off, always a read-only mapping.
+    # A4 replaces it on every accepted direct attach; mounted adapters
+    # replace it with the empty read-only mapping on a generation,
+    # full-signature or A2L-source mismatch; unmounted adapters leave it
+    # untouched so a later matching mount still consumes it.
+    "_accepted_a2l_picker_snapshots": "accepted direct-attach picker hand-off; replaced on accepted attach, emptied on mounted mismatch, untouched by unmounted calls (Inc 2)",
 }
 
 # The K1/K2 allow-list (ARQ §2.2): names a load-over may differ in BY
@@ -1059,6 +1066,10 @@ def test_tc_b100_10_reset_leaves_the_patch_editor_clean_for_the_next_load(
 #: Batch-103 G3 re-pin: the approved Inc 7 ranker/resolution and Inc 1b
 #: right-gesture candidate join the historical base; Inc 12b's delta remains
 #: exactly ``_quit_pending``. All four current additions are classified.
+#: Re-frozen at batch 2026-11-18-a2l-load-performance Inc 2 E4 (tester):
+#: ``_accepted_a2l_picker_snapshots`` (the accepted direct-attach picker
+#: hand-off) joins the census; it is classified in ``SNAPSHOT_EXCLUSIONS``
+#: with its reason, so the one-name delta rule is unchanged.
 _CENSUS_AT_12B_BASE = frozenset({
     '_a2l_cache_data',
     '_a2l_cache_key',
@@ -1075,6 +1086,7 @@ _CENSUS_AT_12B_BASE = frozenset({
     '_a2l_tag_find_query',
     '_a2l_tag_hex_highlight',
     '_a2l_window_start',
+    '_accepted_a2l_picker_snapshots',
     '_active_screen_key',
     '_alt_first_visible_address',
     '_alt_goto_focus_address',

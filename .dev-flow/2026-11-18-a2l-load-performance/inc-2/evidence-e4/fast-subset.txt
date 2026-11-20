@@ -1,0 +1,251 @@
+...................F..........F.                                         [100%]
+================================== FAILURES ===================================
+____________ test_r035_refresh_before_success[confirmed-same-path] ____________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40220/test_r035_refresh_before_succe2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BB61518D90>
+arm = 'confirmed-same-path'
+
+    @pytest.mark.parametrize("arm", ["first", "replacement", "confirmed-same-path"], ids=lambda x: x)
+    def test_r035_refresh_before_success(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.035/1-/3: install -> one common refresh(UI) -> outcome;
+        no OLD value or intermediate empty state at the outcome."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        new = _new_a2l(src / "new.a2l")
+        same = src / "same.a2l"
+        same.write_bytes(old.read_bytes())
+    
+        async def body(app, pilot):
+            main = threading.get_ident()
+            _mount_views(app)
+            await pilot.pause()
+            hashes = None
+            listed = None
+            if arm == "replacement":
+                await _typed_attach(app, pilot, old)
+            elif arm == "confirmed-same-path":
+                project = _seed_project(app.workarea, "P_OLD", a2l=same)
+                await _load_project(app, pilot, "P_OLD")
+                app.current_project = "Proj One"
+                app.current_project_dir = project
+                hashes = _project_digests(app.current_project_dir)
+                listed = app.current_a2l_path
+            events: list = []
+            _arm_install_fanout_outcome(app, monkeypatch, events)
+            workers = Spy(monkeypatch, app, "_a2l_attach_worker")
+            if arm == "confirmed-same-path":
+                listed.write_bytes(new.read_bytes())
+                await _submit_typed(app, pilot, str(listed))
+                assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+                await pilot.press("y")
+            else:
+                await _typed_attach(app, pilot, old if arm == "first" else new)
+            await settle_workers(pilot)
+            kind = [e[0] for e in events]
+            assert kind.count("install") == 1 and kind.count("refresh") == 1, events
+            order = [e[0] for e in events if e[0] in {"install", "refresh", "outcome"}]
+            assert order == ["install", "refresh", "outcome"], events
+            refresh_thread = [e[1] for e in events if e[0] == "refresh"]
+            assert refresh_thread == [main], events
+            outcome = [e[2] for e in events if e[0] == "outcome"]
+            assert len(outcome) == 1 and outcome[0].startswith("A2L loaded"), outcome
+            assert len(workers.calls) == 1, workers.calls
+            rows = OLD_ROWS if arm == "first" else NEW_ROWS
+            _assert_panel_state(_check_panel(app), rows)
+            _assert_panel_state(_patch_panel(app), rows)
+            assert _a2l_viewer_names(app) == [name for name, *_ in rows]
+            if arm == "confirmed-same-path":
+                assert workers.calls[0].args[0].sync_project is False, workers.calls[0]
+                assert _project_digests(app.current_project_dir) == hashes
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1567: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:288: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:286: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def body(app, pilot):
+        main = threading.get_ident()
+        _mount_views(app)
+        await pilot.pause()
+        hashes = None
+        listed = None
+        if arm == "replacement":
+            await _typed_attach(app, pilot, old)
+        elif arm == "confirmed-same-path":
+            project = _seed_project(app.workarea, "P_OLD", a2l=same)
+            await _load_project(app, pilot, "P_OLD")
+            app.current_project = "Proj One"
+            app.current_project_dir = project
+            hashes = _project_digests(app.current_project_dir)
+            listed = app.current_a2l_path
+        events: list = []
+        _arm_install_fanout_outcome(app, monkeypatch, events)
+        workers = Spy(monkeypatch, app, "_a2l_attach_worker")
+        if arm == "confirmed-same-path":
+            listed.write_bytes(new.read_bytes())
+            await _submit_typed(app, pilot, str(listed))
+            assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+            await pilot.press("y")
+        else:
+            await _typed_attach(app, pilot, old if arm == "first" else new)
+        await settle_workers(pilot)
+        kind = [e[0] for e in events]
+        assert kind.count("install") == 1 and kind.count("refresh") == 1, events
+        order = [e[0] for e in events if e[0] in {"install", "refresh", "outcome"}]
+        assert order == ["install", "refresh", "outcome"], events
+        refresh_thread = [e[1] for e in events if e[0] == "refresh"]
+        assert refresh_thread == [main], events
+        outcome = [e[2] for e in events if e[0] == "outcome"]
+        assert len(outcome) == 1 and outcome[0].startswith("A2L loaded"), outcome
+        assert len(workers.calls) == 1, workers.calls
+        rows = OLD_ROWS if arm == "first" else NEW_ROWS
+        _assert_panel_state(_check_panel(app), rows)
+        _assert_panel_state(_patch_panel(app), rows)
+        assert _a2l_viewer_names(app) == [name for name, *_ in rows]
+        if arm == "confirmed-same-path":
+            assert workers.calls[0].args[0].sync_project is False, workers.calls[0]
+>           assert _project_digests(app.current_project_dir) == hashes
+E           AssertionError: assert {'project.jso...16e82eb50629'} == {'project.jso...5b534a6ec43d'}
+E             
+E             Omitting 1 identical items, use -vv to show
+E             Differing items:
+E             {'same.a2l': 'a77222733bd12f8bb5f009f097fc0ff36f20909dc9ad09bed5df16e82eb50629'} != {'same.a2l': '41890ae87107bdb7d0c0b3ae225f612584178b12c6660d4bca775b534a6ec43d'}
+E             Use -v to get more diff
+
+tests\test_alp_inc2_a2l_attach.py:1562: AssertionError
+___________ test_at_alp_i2_1_direct_attach_routes_publish_snapshots ___________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40220/test_at_alp_i2_1_direct_attach0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BB61D6AE90>
+
+    def test_at_alp_i2_1_direct_attach_routes_publish_snapshots(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """AT-ALP-I2-1: typed, Workarea Files and start-up attaches each finish
+        with current viewer, Check, Patch, Memory Map, Split/Join, Loaded, MAC
+        and Issues state, with the common refresh before each outcome."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        new = _new_a2l(src / "new.a2l")
+        img = _write_image(src / "img1.s19", dict(IMG1))
+        mac = _write_mac(src / "records.mac")
+        workarea_temp = base / WORKAREA_DIRNAME / WORKAREA_SUBDIR / WORKAREA_TEMP
+        workarea_temp.mkdir(parents=True, exist_ok=True)
+        (workarea_temp / "new.a2l").write_bytes(new.read_bytes())
+    
+        async def body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            await _load_image(app, pilot, img)
+            await _load_image(app, pilot, mac)
+            events: list = []
+            _arm_install_fanout_outcome(app, monkeypatch, events)
+            await _typed_attach(app, pilot, old)
+            await settle_workers(pilot)
+            kind = [e[0] for e in events if e[0] in {"install", "refresh", "outcome"}]
+            assert kind == ["install", "refresh", "outcome"], events
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_full_views(app, OLD_ROWS, "old.a2l", image=True)
+            events.clear()
+            _arm_install_fanout_outcome(app, monkeypatch, events)
+            await _workarea_attach(app, pilot, "new.a2l")
+            await settle_workers(pilot)
+            kind = [e[0] for e in events if e[0] in {"install", "refresh", "outcome"}]
+            assert kind == ["install", "refresh", "outcome"], events
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_full_views(app, NEW_ROWS, "new.a2l", image=True)
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:2077: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:288: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:286: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:2065: in body
+    _assert_full_views(app, OLD_ROWS, "old.a2l", image=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+rows = (('OLD_SCALAR', 4096, 2, 'u16'), ('ARR12', 8192, 12, 'u16'), ('AUX2', 16384, 2, 'u16'))
+a2l_name = 'old.a2l', image = True
+
+    def _assert_full_views(app: S19TuiApp, rows, a2l_name: str, image: bool) -> None:
+        _assert_panel_state(_check_panel(app), rows)
+        _assert_panel_state(_patch_panel(app), rows)
+        assert _a2l_viewer_names(app) == [name for name, *_ in rows]
+        memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+        if image:
+            assert memory.rendered_text != memory._EMPTY_TEXT
+            # House pattern (tests/test_b103_a2l_refresh.py): the visible memory
+            # surface is rendered_text + the region rows + the detail body. The
+            # band-summary header never carries A2L names (security B3); the
+            # A2L tags reach the panel through the tag receipt instead.
+            parts = [memory.rendered_text]
+            parts.extend(_plain(row.render()) for row in memory.query(".map-region-row"))
+            if len(memory.query("#map_detail_body")) > 0:
+                parts.append(_plain(memory.query_one("#map_detail_body", Static).render()))
+            visible_text = "\n".join(parts)
+            assert visible_text.strip(), "the visible memory surface is empty"
+            assert [t["name"] for t in memory._a2l_tags] == [name for name, *_ in rows], (
+                [t["name"] for t in memory._a2l_tags],
+            )
+        split = app.query_one("#screen_split_join", SplitJoinWindow)
+>       assert [(r.name, r.base, r.size) for r in split._a2l_rows_cache] == [
+            (name, address, size) for name, address, size, _fmt in rows
+        ]
+E       AssertionError: assert [] == [('OLD_SCALAR...2', 16384, 2)]
+E         
+E         Right contains 3 more items, first extra item: ('OLD_SCALAR', 4096, 2)
+E         Use -v to get more diff
+
+tests\test_alp_inc2_a2l_attach.py:2026: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r035_refresh_before_success[confirmed-same-path]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_at_alp_i2_1_direct_attach_routes_publish_snapshots
+2 failed, 30 passed, 5 deselected in 485.10s (0:08:05)
+EXIT=1

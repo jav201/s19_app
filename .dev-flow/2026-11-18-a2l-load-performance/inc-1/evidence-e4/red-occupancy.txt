@@ -1,0 +1,494 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <LOCAL_HOME>\anaconda3\envs\s19env\python.exe
+rootdir: <LOCAL_HOME>\Github\s19_app-a2l-load-performance
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 15 items
+
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_156_1_single_name_uses_one_index FAILED [  6%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_156_2_batch_uses_one_index FAILED [ 13%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_156_3_repeated_name_does_not_rebuild FAILED [ 20%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_157_1_point_like_span_is_compact FAILED [ 26%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_157_2_cross_page_span_is_one_interval FAILED [ 33%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_157_3_over_cap_span_is_not_expanded FAILED [ 40%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_159_1_position_not_address_selects_next FAILED [ 46%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_159_2_aliases_are_not_gathered_or_sorted FAILED [ 53%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_159_3_exempt_alias_does_not_hide_next FAILED [ 60%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_160_1_homonym_identity_is_position FAILED [ 66%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_160_2_same_span_is_not_self FAILED [ 73%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_160_3_same_name_elsewhere_is_not_self FAILED [ 80%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_161_1_narrow_query_is_not_eager FAILED [ 86%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_161_2_only_selected_unresolved_candidate_materializes FAILED [ 93%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_161_3_repeated_query_reuses_final_span FAILED [100%]
+
+================================== FAILURES ===================================
+_______________ test_r_a2l_def_156_1_single_name_uses_one_index _______________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40146/test_r_a2l_def_156_1_single_na0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000298CEA07190>
+
+    def test_r_a2l_def_156_1_single_name_uses_one_index(tmp_path, monkeypatch):
+        """R-A2L-DEF.156/1 - one requested name in a three-object inline A2L:
+        one result and exactly 1 central-index construction."""
+        mod = _mod()
+        a2l = inline(
+            tmp_path,
+            characteristic("A", "VALUE", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            characteristic("B", "VALUE", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            characteristic("C", "VALUE", "0x80", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        state = _install_counters(monkeypatch, mod)
+        result = mod.describe_definitions(["A"], a2l)
+        assert list(result) == ["A"]
+        assert result["A"].shared_with == "B"
+>       assert state["constructions"] == 1, (
+            f"expected exactly 1 central-index construction, observed "
+            f"{state['constructions']} (the base assigns the same global list "
+            "under span_index[None] once per addressed result)"
+        )
+E       AssertionError: expected exactly 1 central-index construction, observed 0 (the base assigns the same global list under span_index[None] once per addressed result)
+E       assert 0 == 1
+
+tests\test_alp_a2l_occupancy.py:212: AssertionError
+__________________ test_r_a2l_def_156_2_batch_uses_one_index __________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40146/test_r_a2l_def_156_2_batch_use0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000298CE9CA010>
+
+    def test_r_a2l_def_156_2_batch_uses_one_index(tmp_path, monkeypatch):
+        """R-A2L-DEF.156/2 - A and B at 0x10, disjoint C at 0x80, requested as
+        A, B, C: keys A, B, C; A.shared_with B; B.shared_with A; C.shared_with
+        None; exactly 1 construction."""
+        mod = _mod()
+        a2l = inline(
+            tmp_path,
+            characteristic("A", "VALUE", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            characteristic("B", "VALUE", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            characteristic("C", "VALUE", "0x80", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        state = _install_counters(monkeypatch, mod)
+        result = mod.describe_definitions(["A", "B", "C"], a2l)
+        assert list(result) == ["A", "B", "C"]
+        assert result["A"].shared_with == "B"
+        assert result["B"].shared_with == "A"
+        assert result["C"].shared_with is None
+>       assert state["constructions"] == 1, (
+            f"expected exactly 1 central-index construction, observed "
+            f"{state['constructions']}"
+        )
+E       AssertionError: expected exactly 1 central-index construction, observed 0
+E       assert 0 == 1
+
+tests\test_alp_a2l_occupancy.py:236: AssertionError
+_____________ test_r_a2l_def_156_3_repeated_name_does_not_rebuild _____________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40146/test_r_a2l_def_156_3_repeated_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000298CE9CB950>
+
+    def test_r_a2l_def_156_3_repeated_name_does_not_rebuild(tmp_path, monkeypatch):
+        """R-A2L-DEF.156/3 - names A, A, B at disjoint 0x10 and 0x20: keys A, B
+        in request order, both shared_with None, exactly 1 construction and no
+        additional construction for the repeated name."""
+        mod = _mod()
+        a2l = inline(
+            tmp_path,
+            characteristic("A", "VALUE", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            characteristic("B", "VALUE", "0x20", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        state = _install_counters(monkeypatch, mod)
+        result = mod.describe_definitions(["A", "A", "B"], a2l)
+        assert list(result) == ["A", "B"]
+        assert result["A"].shared_with is None
+        assert result["B"].shared_with is None
+>       assert state["constructions"] == 1, (
+            f"expected exactly 1 central-index construction, observed "
+            f"{state['constructions']}"
+        )
+E       AssertionError: expected exactly 1 central-index construction, observed 0
+E       assert 0 == 1
+
+tests\test_alp_a2l_occupancy.py:257: AssertionError
+_______________ test_r_a2l_def_157_1_point_like_span_is_compact _______________
+
+    def test_r_a2l_def_157_1_point_like_span_is_compact():
+        """R-A2L-DEF.157/1 - one byte at 0x10: exactly 1 interval record
+        (first 0x10, last 0x10) and 0 page-expansion records."""
+        mod = _mod()
+>       _require_seam(mod, "_build_occupancy_index")
+
+tests\test_alp_a2l_occupancy.py:290: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+mod = <module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>
+name = '_build_occupancy_index'
+
+    def _require_seam(mod, name: str) -> None:
+        """Fail RED with AttributeError while the E3 private seam ``name`` does not
+        exist on the base — without running the seam-dependent body."""
+>       assert hasattr(mod, name), (
+            f"{name} is not implemented on the base: this white-box case is RED "
+            "until the E3 private seam exists"
+        )
+E       AssertionError: _build_occupancy_index is not implemented on the base: this white-box case is RED until the E3 private seam exists
+E       assert False
+E        +  where False = hasattr(<module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>, '_build_occupancy_index')
+
+tests\test_alp_a2l_occupancy.py:46: AssertionError
+____________ test_r_a2l_def_157_2_cross_page_span_is_one_interval _____________
+
+    def test_r_a2l_def_157_2_cross_page_span_is_one_interval():
+        """R-A2L-DEF.157/2 - sixty-four bytes at 0x10 crossing four 16-byte pages:
+        exactly 1 interval record (first 0x10, last 0x4F) and 0 page records."""
+        mod = _mod()
+>       _require_seam(mod, "_build_occupancy_index")
+
+tests\test_alp_a2l_occupancy.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+mod = <module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>
+name = '_build_occupancy_index'
+
+    def _require_seam(mod, name: str) -> None:
+        """Fail RED with AttributeError while the E3 private seam ``name`` does not
+        exist on the base — without running the seam-dependent body."""
+>       assert hasattr(mod, name), (
+            f"{name} is not implemented on the base: this white-box case is RED "
+            "until the E3 private seam exists"
+        )
+E       AssertionError: _build_occupancy_index is not implemented on the base: this white-box case is RED until the E3 private seam exists
+E       assert False
+E        +  where False = hasattr(<module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>, '_build_occupancy_index')
+
+tests\test_alp_a2l_occupancy.py:46: AssertionError
+_____________ test_r_a2l_def_157_3_over_cap_span_is_not_expanded ______________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40146/test_r_a2l_def_157_3_over_cap_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000298CE5F1910>
+
+    def test_r_a2l_def_157_3_over_cap_span_is_not_expanded(tmp_path, monkeypatch):
+        """R-A2L-DEF.157/3 - over-cap span at 0x0 with length 1,048,577 covering a
+        query at 0x100000: exactly 1 interval for BIG with last 0x100000, 0 page
+        records, and the overlap stays visible through the public route."""
+        mod = _mod()
+>       _require_seam(mod, "_build_occupancy_index")
+
+tests\test_alp_a2l_occupancy.py:311: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+mod = <module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>
+name = '_build_occupancy_index'
+
+    def _require_seam(mod, name: str) -> None:
+        """Fail RED with AttributeError while the E3 private seam ``name`` does not
+        exist on the base — without running the seam-dependent body."""
+>       assert hasattr(mod, name), (
+            f"{name} is not implemented on the base: this white-box case is RED "
+            "until the E3 private seam exists"
+        )
+E       AssertionError: _build_occupancy_index is not implemented on the base: this white-box case is RED until the E3 private seam exists
+E       assert False
+E        +  where False = hasattr(<module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>, '_build_occupancy_index')
+
+tests\test_alp_a2l_occupancy.py:46: AssertionError
+___________ test_r_a2l_def_159_1_position_not_address_selects_next ____________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40146/test_r_a2l_def_159_1_position_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000298CE68C190>
+
+    def test_r_a2l_def_159_1_position_not_address_selects_next(tmp_path, monkeypatch):
+        """R-A2L-DEF.159/1 - BIG 0x10..0x4F; LATE at 0x40 has the smaller position
+        than EARLY at 0x20: shared_with is exactly LATE, at most 1 consumed
+        candidate yield and 2 final materializations, 0 gathers and sorts."""
+        mod = _mod()
+        a2l = inline(
+            tmp_path,
+            characteristic("BIG", "ASCII", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255", "NUMBER 64"),
+            characteristic("LATE", "VALUE", "0x40", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            characteristic("EARLY", "VALUE", "0x20", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        entries = [
+            (1, "BIG", "CHARACTERISTIC", 0x10, 64, "big", None),
+            (2, "LATE", "CHARACTERISTIC", 0x40, 1, "big", None),
+            (3, "EARLY", "CHARACTERISTIC", 0x20, 1, "big", None),
+        ]
+        state = _install_counters(monkeypatch, mod)
+        definition = mod.describe_definition("BIG", a2l)
+        assert definition.shared_with == "LATE"
+        assert _reference_next_overlap(entries, 1) == "LATE" == definition.shared_with
+        consumed = state["consumed_positions"]
+>       assert consumed, (
+            "the consumed-yield instrument resolved 0 targets on a known-present "
+            "case: hard failure (the base has no _occupancy_candidates seam)"
+        )
+E       AssertionError: the consumed-yield instrument resolved 0 targets on a known-present case: hard failure (the base has no _occupancy_candidates seam)
+E       assert []
+
+tests\test_alp_a2l_occupancy.py:355: AssertionError
+___________ test_r_a2l_def_159_2_aliases_are_not_gathered_or_sorted ___________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40146/test_r_a2l_def_159_2_aliases_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000298CE9C7BD0>
+
+    def test_r_a2l_def_159_2_aliases_are_not_gathered_or_sorted(tmp_path, monkeypatch):
+        """R-A2L-DEF.159/2 - 4,000 records share one span with reverse-position
+        names; the queried position is smallest and followed by NEXT: shared_with
+        is exactly NEXT, at most 1 consumed candidate yield and 2 materializations,
+        0 gathers and sorts."""
+        mod = _mod()
+        count = 4000
+        names = ["A3999", "NEXT"] + [f"A{3999 - i:04d}" for i in range(2, count)]
+        assert len(names) == count and len(set(names)) == count
+        blocks = [
+            characteristic(name, "VALUE", "0x1000", "RL_U8", "NO_COMPU_METHOD", "0", "255")
+            for name in names
+        ]
+        a2l = inline(tmp_path, *blocks)
+        assert len(a2l["tags"]) == count and len(a2l.get("errors") or []) == 0
+        entries = [(i, name, "CHARACTERISTIC", 0x1000, 1, "big", None) for i, name in enumerate(names)]
+        state = _install_counters(monkeypatch, mod)
+        definition = mod.describe_definition("A3999", a2l)
+        assert definition.shared_with == "NEXT"
+        assert _reference_next_overlap(entries, 0) == "NEXT" == definition.shared_with
+        consumed = state["consumed_positions"]
+>       assert consumed, (
+            "the consumed-yield instrument resolved 0 targets on a known-present "
+            "case: hard failure (the base has no _occupancy_candidates seam)"
+        )
+E       AssertionError: the consumed-yield instrument resolved 0 targets on a known-present case: hard failure (the base has no _occupancy_candidates seam)
+E       assert []
+
+tests\test_alp_a2l_occupancy.py:386: AssertionError
+____________ test_r_a2l_def_159_3_exempt_alias_does_not_hide_next _____________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40146/test_r_a2l_def_159_3_exempt_al0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000298CEF24410>
+
+    def test_r_a2l_def_159_3_exempt_alias_does_not_hide_next(tmp_path, monkeypatch):
+        """R-A2L-DEF.159/3 - the first overlapping scalar pair FREE has clean
+        disjoint masks and the following BLOCK is unmasked: shared_with is exactly
+        BLOCK, at most 2 consumed candidate yields (FREE, BLOCK) and 3
+        materializations, 0 gathers and sorts."""
+        mod = _mod()
+        a2l = inline(
+            tmp_path,
+            characteristic("Q", "VALUE", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x000F"),
+            characteristic("FREE", "VALUE", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "BIT_MASK 0x00F0"),
+            characteristic("BLOCK", "VALUE", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535"),
+        )
+        assert len(a2l.get("errors") or []) == 0
+        # the independent oracle's mask rule is exact here: same address, same
+        # 2-byte span, masks 0x000F and 0x00F0 select no common bit.
+        entries = [
+            (3, "Q", "CHARACTERISTIC", 0x10, 2, "big", 0x000F),
+            (4, "FREE", "CHARACTERISTIC", 0x10, 2, "big", 0x00F0),
+            (5, "BLOCK", "CHARACTERISTIC", 0x10, 2, "big", None),
+        ]
+        state = _install_counters(monkeypatch, mod)
+        definition = mod.describe_definition("Q", a2l)
+        assert definition.shared_with == "BLOCK"
+        assert _reference_next_overlap(entries, 3) == "BLOCK" == definition.shared_with
+        consumed = state["consumed_positions"]
+>       assert consumed, (
+            "the consumed-yield instrument resolved 0 targets on a known-present "
+            "case: hard failure (the base has no _occupancy_candidates seam)"
+        )
+E       AssertionError: the consumed-yield instrument resolved 0 targets on a known-present case: hard failure (the base has no _occupancy_candidates seam)
+E       assert []
+
+tests\test_alp_a2l_occupancy.py:421: AssertionError
+______________ test_r_a2l_def_160_1_homonym_identity_is_position ______________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40146/test_r_a2l_def_160_1_homonym_i0')
+
+    def test_r_a2l_def_160_1_homonym_identity_is_position(tmp_path):
+        """R-A2L-DEF.160/1 - two same-name, same-span records at positions 10 and
+        11, own position 10: only position 10 is excluded; position 11 is the
+        evaluated other record (private position witness)."""
+        mod = _mod()
+>       _require_seam(mod, "_build_occupancy_index")
+
+tests\test_alp_a2l_occupancy.py:443: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+mod = <module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>
+name = '_build_occupancy_index'
+
+    def _require_seam(mod, name: str) -> None:
+        """Fail RED with AttributeError while the E3 private seam ``name`` does not
+        exist on the base — without running the seam-dependent body."""
+>       assert hasattr(mod, name), (
+            f"{name} is not implemented on the base: this white-box case is RED "
+            "until the E3 private seam exists"
+        )
+E       AssertionError: _build_occupancy_index is not implemented on the base: this white-box case is RED until the E3 private seam exists
+E       assert False
+E        +  where False = hasattr(<module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>, '_build_occupancy_index')
+
+tests\test_alp_a2l_occupancy.py:46: AssertionError
+_________________ test_r_a2l_def_160_2_same_span_is_not_self __________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40146/test_r_a2l_def_160_2_same_span0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000298CEF4EAD0>
+
+    def test_r_a2l_def_160_2_same_span_is_not_self(tmp_path, monkeypatch):
+        """R-A2L-DEF.160/2 - different names, identical address, length and byte
+        order: the other position is not mistaken for self.  Exactly one candidate
+        is consumed per query, so neither name nor address/span equality excludes
+        the other position."""
+        mod = _mod()
+        a2l = inline(
+            tmp_path,
+            characteristic("A", "VALUE", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            characteristic("B", "VALUE", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        assert len(a2l.get("errors") or []) == 0
+        entries = [
+            (0, "A", "CHARACTERISTIC", 0x10, 1, "big", None),
+            (1, "B", "CHARACTERISTIC", 0x10, 1, "big", None),
+        ]
+        state = _install_counters(monkeypatch, mod)
+        a_def = mod.describe_definition("A", a2l)
+        assert a_def.shared_with == "B"
+        consumed_a = list(state["consumed_positions"])
+        state["consumed_positions"].clear()
+>       assert consumed_a, (
+            "the consumed-yield instrument resolved 0 targets on a known-present "
+            "case: hard failure (the base has no _occupancy_candidates seam)"
+        )
+E       AssertionError: the consumed-yield instrument resolved 0 targets on a known-present case: hard failure (the base has no _occupancy_candidates seam)
+E       assert []
+
+tests\test_alp_a2l_occupancy.py:484: AssertionError
+____________ test_r_a2l_def_160_3_same_name_elsewhere_is_not_self _____________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40146/test_r_a2l_def_160_3_same_name0')
+
+    def test_r_a2l_def_160_3_same_name_elsewhere_is_not_self(tmp_path):
+        """R-A2L-DEF.160/3 - same-name records at disjoint 0x10 and 0x80, own
+        position 10: no candidate is yielded and the private selector answers
+        exactly None — no false overlap and no name-based grouping."""
+        mod = _mod()
+>       _require_seam(mod, "_build_occupancy_index")
+
+tests\test_alp_a2l_occupancy.py:504: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+mod = <module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>
+name = '_build_occupancy_index'
+
+    def _require_seam(mod, name: str) -> None:
+        """Fail RED with AttributeError while the E3 private seam ``name`` does not
+        exist on the base — without running the seam-dependent body."""
+>       assert hasattr(mod, name), (
+            f"{name} is not implemented on the base: this white-box case is RED "
+            "until the E3 private seam exists"
+        )
+E       AssertionError: _build_occupancy_index is not implemented on the base: this white-box case is RED until the E3 private seam exists
+E       assert False
+E        +  where False = hasattr(<module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>, '_build_occupancy_index')
+
+tests\test_alp_a2l_occupancy.py:46: AssertionError
+_______________ test_r_a2l_def_161_1_narrow_query_is_not_eager ________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40146/test_r_a2l_def_161_1_narrow_qu0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000298CE5C6B50>
+
+    def test_r_a2l_def_161_1_narrow_query_is_not_eager(tmp_path, monkeypatch):
+        """R-A2L-DEF.161/1 - one name requested from 4,000 pairwise-disjoint scalar
+        objects: one result, 0 additional final-span materializations and exactly
+        1 per-name definition build."""
+        mod = _mod()
+        count = 4000
+        blocks = []
+        names = []
+        for i in range(count):
+            addr = 0x1000 + i * 0x40 + (i % 7) * 4
+            name = "V" if i == 1999 else f"D{(i * 7919) % 10007}_{i}"
+            blocks.append(characteristic(name, "VALUE", f"0x{addr:X}", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+            names.append(name)
+        assert len(names) == count and len(set(names)) == count
+        a2l = inline(tmp_path, *blocks)
+        assert len(a2l["tags"]) == count and len(a2l.get("errors") or []) == 0
+        state = _install_counters(monkeypatch, mod)
+        result = mod.describe_definitions(["V"], a2l)
+        assert list(result) == ["V"]
+        assert result["V"].shared_with is None
+        assert state["builds"]["V"] == 1 and len(state["builds"]) == 1, state["builds"]
+>       assert state["materializations"] == 0, (
+            f"expected 0 additional final-span materializations, observed "
+            f"{state['materializations']} (the base materializes every global "
+            "candidate)"
+        )
+E       AssertionError: expected 0 additional final-span materializations, observed 4000 (the base materializes every global candidate)
+E       assert 4000 == 0
+
+tests\test_alp_a2l_occupancy.py:557: AssertionError
+____ test_r_a2l_def_161_2_only_selected_unresolved_candidate_materializes _____
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40146/test_r_a2l_def_161_2_only_sele0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000298CEDA8690>
+
+    def test_r_a2l_def_161_2_only_selected_unresolved_candidate_materializes(tmp_path, monkeypatch):
+        """R-A2L-DEF.161/2 - VALUE V at 0x40 inside the earlier-starting CURVE CX
+        at 0x20 (final length 64, unresolved among 4,000 objects): shared_with is
+        exactly CX, exactly 1 additional final-span materialization and exactly 2
+        definition builds (V and CX)."""
+        mod = _mod()
+        a2l = _cx_v_fixture(tmp_path)
+        assert mod.describe_definition("CX", a2l).byte_length == 64
+        state = _install_counters(monkeypatch, mod)
+        result = mod.describe_definitions(["V"], a2l)
+        assert result["V"].shared_with == "CX"
+        assert state["materializations"] == 1, (
+            f"expected exactly 1 additional final-span materialization, observed "
+            f"{state['materializations']}"
+        )
+        assert state["builds"] == {"V": 1, "CX": 1}, state["builds"]
+>       assert state["constructions"] == 1, state["constructions"]
+E       AssertionError: 0
+E       assert 0 == 1
+
+tests\test_alp_a2l_occupancy.py:599: AssertionError
+____________ test_r_a2l_def_161_3_repeated_query_reuses_final_span ____________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40146/test_r_a2l_def_161_3_repeated_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000298CEBAAD50>
+
+    def test_r_a2l_def_161_3_repeated_query_reuses_final_span(tmp_path, monkeypatch):
+        """R-A2L-DEF.161/3 - request V, V with CX declared first: one result key V,
+        V.shared_with exactly CX, exactly 1 additional final-span materialization
+        of CX and exactly one build each of V and CX."""
+        mod = _mod()
+        a2l = _cx_v_fixture(tmp_path)
+        assert mod.describe_definition("CX", a2l).byte_length == 64
+        state = _install_counters(monkeypatch, mod)
+        result = mod.describe_definitions(["V", "V"], a2l)
+        assert list(result) == ["V"]
+        assert result["V"].shared_with == "CX"
+        assert state["materializations"] == 1, (
+            f"expected exactly 1 additional final-span materialization of CX, "
+            f"observed {state['materializations']}"
+        )
+        assert state["builds"] == {"V": 1, "CX": 1}, state["builds"]
+>       assert state["constructions"] == 1, state["constructions"]
+E       AssertionError: 0
+E       assert 0 == 1
+
+tests\test_alp_a2l_occupancy.py:618: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_156_1_single_name_uses_one_index
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_156_2_batch_uses_one_index
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_156_3_repeated_name_does_not_rebuild
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_157_1_point_like_span_is_compact
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_157_2_cross_page_span_is_one_interval
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_157_3_over_cap_span_is_not_expanded
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_159_1_position_not_address_selects_next
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_159_2_aliases_are_not_gathered_or_sorted
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_159_3_exempt_alias_does_not_hide_next
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_160_1_homonym_identity_is_position
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_160_2_same_span_is_not_self
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_160_3_same_name_elsewhere_is_not_self
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_161_1_narrow_query_is_not_eager
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_161_2_only_selected_unresolved_candidate_materializes
+FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_161_3_repeated_query_reuses_final_span
+============================= 15 failed in 0.94s ==============================

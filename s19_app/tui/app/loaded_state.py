@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import gc
 from pathlib import Path
 import time
 from typing import Any, List, Optional, Sequence
@@ -568,15 +569,22 @@ class LoadedStateMixin:
 
         Returns:
             bool: ``True`` when the complete bundle was accepted; ``False`` when
-            a keyed enrichment snapshot was superseded before installation.
+            a keyed enrichment snapshot or a supplied generation pair was
+            superseded (or incomplete/inconsistent) before installation.
 
         Data Flow:
-            - Compare every keyed snapshot with the expected post-install A2L
-              and image generations before cache, session, widget or log work.
+            - Compare every complete legacy or S1 snapshot generation pair
+              — keyed, keyless generation-only and snapshot bundles alike —
+              with the expected post-install A2L and image generations
+              before cache, session, widget or log work; an incomplete or
+              mutually inconsistent pair rejects the same way.
             - Preserve the existing state/cache installation and deferred
               sections/hex/focus chain for an accepted bundle.
-            - Install accepted precomputed A2L values directly and optionally
-              publish the common fan-out before returning.
+            - Install accepted precomputed A2L values directly; when the
+              S1 snapshot is present its key/tags/summary are authoritative
+              and its read-only picker mapping replaces the accepted
+              mapping before any common refresh.
+            - Optionally publish the common fan-out before returning.
 
         Dependencies:
             Uses:
@@ -586,16 +594,52 @@ class LoadedStateMixin:
                 - ``_complete_prepared_load`` / ``_install_prepared_project``
                 - ``_apply_loaded_file`` (synchronous fallback)
         """
-        if prepared.a2l_enriched_key is not None:
+        if prepared.a2l_enriched_key is not None or (
+            prepared.a2l_preparation is not None
+            or prepared.a2l_view_generation is not None
+            or prepared.a2l_image_generation is not None
+        ):
+            # Inc 3 (I-ALP-3 / R-A2L-REFRESH.048): preflight EVERY complete
+            # legacy or S1 snapshot generation pair — including a keyless
+            # generation-only bundle — before any candidate mutation. An
+            # incomplete, mutually inconsistent or stale pair rejects the
+            # whole bundle; the two-None legacy constructor arm below keeps
+            # the existing no-preflight acceptance.
+            preparation = prepared.a2l_preparation
+            legacy_a2l = prepared.a2l_view_generation
+            legacy_image = prepared.a2l_image_generation
+            # An either-field guard: a partial legacy pair may not be
+            # compared or installed.
+            if (legacy_a2l is None) != (legacy_image is None):
+                if not gc.isenabled():
+                    gc.enable()
+                return False
+            if preparation is not None and legacy_a2l is not None and (
+                legacy_a2l,
+                legacy_image,
+            ) != (
+                preparation.expected_a2l_generation,
+                preparation.expected_image_generation,
+            ):
+                # No representation may select a different generation truth.
+                if not gc.isenabled():
+                    gc.enable()
+                return False
             actual = (
-                prepared.a2l_view_generation,
-                prepared.a2l_image_generation,
+                (
+                    preparation.expected_a2l_generation,
+                    preparation.expected_image_generation,
+                )
+                if preparation is not None
+                else (legacy_a2l, legacy_image)
             )
             expected = (
                 self._a2l_view_generation + int(bool(prepared.loaded.a2l_data)),
                 self._image_generation + 1,
             )
             if actual != expected:
+                if not gc.isenabled():
+                    gc.enable()
                 return False
         loaded = prepared.loaded
         # Q-h1: the file-load worker's cache entry is stored on the main
@@ -752,6 +796,20 @@ class LoadedStateMixin:
                 self._a2l_enriched_key = prepared.a2l_enriched_key
                 self._a2l_summary_lines = prepared.a2l_summary_lines
                 self._a2l_summary_start = 0
+            preparation = prepared.a2l_preparation
+            if preparation is not None:
+                # Inc 3 (I-ALP-2.3 / I-ALP-3): the S1 snapshot is
+                # authoritative — one shallow list conversion per tuple
+                # preserves the existing app-cache attribute types, summary
+                # restarts at 0, and its already read-only independent
+                # Check/Patch mapping replaces the accepted picker mapping
+                # without another copy, before any common refresh consumes
+                # it.
+                self._a2l_enriched_key = preparation.enrichment_key
+                self._a2l_enriched_tags = list(preparation.enriched_tags)
+                self._a2l_summary_lines = list(preparation.summary_lines)
+                self._a2l_summary_start = 0
+                self._accepted_a2l_picker_snapshots = preparation.picker_snapshots
         # Surface the new file name right away so the user sees immediate feedback
         # even before the deferred sections/hex refreshes complete.
         status_message = self._format_coexistence_status(loaded, path)
@@ -825,6 +883,22 @@ class LoadedStateMixin:
 
         if publish_a2l:
             self._refresh_a2l_dependent_views()
+            # D-13: the one deliberate full collection of the load's
+            # garbage, after the preserved refresh, timed and logged
+            # (R-A2L-REFRESH.052/.054). gc.freeze() was rejected: it keeps
+            # Textual UI cycles alive (GC-REDESIGN, R-A2L-REFRESH.053).
+            # Project bundle stages pass ``publish_a2l=False`` — P5
+            # re-enables after its own final refresh.
+            if not gc.isenabled():
+                gc_started = time.perf_counter()
+                unreachable = gc.collect()
+                gc.enable()
+                self.logger.info(
+                    "A2L load GC: route=%s unreachable=%d seconds=%.3f",
+                    "image",
+                    unreachable,
+                    time.perf_counter() - gc_started,
+                )
         self.call_later(_step_sections)
         return True
 

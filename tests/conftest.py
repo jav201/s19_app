@@ -262,6 +262,18 @@ def _recent_store_isolated(tmp_path_factory: pytest.TempPathFactory, monkeypatch
     return lad
 
 
+@pytest.fixture(autouse=True)
+def _gc_hygiene():
+    """Hygiene only (R-A2L-REFRESH.053, DX-F3): after every test, re-enable
+    and unfreeze the cycle collector so a test that disabled/froze it never
+    leaks that state into the next one. Asserts nothing."""
+    import gc
+
+    yield
+    gc.enable()
+    gc.unfreeze()
+
+
 # ---------------------------------------------------------------------------
 # S19 generator
 # ---------------------------------------------------------------------------

@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 import logging
 import re
 from pathlib import Path
-from typing import Literal, Mapping, Optional, Tuple
+from typing import TYPE_CHECKING, Literal, Mapping, Optional, Tuple
 from textual import events
 from textual.message import Message
 from textual.widgets import DataTable, RichLog
@@ -28,6 +28,14 @@ from ..insight_style import CYAN, DGRAY, GREEN, LABEL, VALUE
 from ...validation import ValidationReport, ValidationSeverity
 from ..services.project_gather_service import ProjectInventory, SavePlan
 from ..services.variant_execution_service import DerivedFrom, ProjectManifest
+
+if TYPE_CHECKING:
+    # Inc 3 (I-ALP-3 / E2-LS-2): ``A2LAttachSnapshot`` is imported only for
+    # type checking — a runtime import would close the ``shared.py`` →
+    # ``file_load.py`` → ``shared.py`` cycle (``file_load`` imports
+    # ``PreparedLoad`` from this module). ``from __future__ import
+    # annotations`` already defers every annotation string.
+    from .file_load import A2LAttachSnapshot
 
 
 #: Inc 9b (G2): the refusal reason word ``_typed_load_route`` returns mapped
@@ -140,6 +148,10 @@ class PreparedLoad:
             when both match the expected post-install generations; a mismatch
             rejects it before any state write. ``None`` on the non-precomputed
             fallback bundle.
+        a2l_preparation (Optional[A2LAttachSnapshot]): The Inc 2 generation-bound
+            prepared attach snapshot (I-ALP-3), the authoritative enrichment
+            key/tags/summary and Check/Patch picker payload for a prepared
+            load; ``None`` preserves legacy non-prepared construction.
 
     Data Flow:
         - Built inside ``S19TuiApp._prepare_load_payload`` on the worker thread.
@@ -182,6 +194,14 @@ class PreparedLoad:
     # back to the main thread for ``_store_a2l_cache`` (never stored off
     # main). ``PreparedLoad(loaded=…)`` leaves it ``None``.
     a2l_cache: Optional[A2LCacheEntry] = None
+    # Inc 3 (I-ALP-3 / S1): the Inc 2 prepared attach snapshot the worker
+    # packed into this bundle — its expected pair is the preflight
+    # authority, its enrichment key/tags/summary are the authoritative
+    # install payload and its read-only Check/Patch picker mapping is the
+    # accepted mapping installed before the common refresh. ``None``
+    # preserves the legacy non-prepared construction arm and is never
+    # product-worker evidence.
+    a2l_preparation: Optional[A2LAttachSnapshot] = None
 
 
 _MAC_COLUMN_HEADERS: tuple[str, ...] = (

@@ -1,0 +1,9 @@
+repo_head=d5cb80cee8ba22d6c5c046ef528a48375c368ed2
+e1_commit=85e689572f7ae97a467354a960750436a7ba3877
+codewire_commit=b6cd30d62bf46abbe2f9375e8c04b296f1eeaf05
+platform=Windows-11-10.0.26300-SP0
+machine=AMD64
+python=3.12.7
+command=PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 python "$CODE_WIRE/tools/codewire_lint.py" .dev-flow/2026-11-18-a2l-load-performance/inc-1/codewire/graph-inc1.md --json .dev-flow/2026-11-18-a2l-load-performance/inc-1/evidence-e2/graph-inc1-parse.json
+not read=0 nodes=4 entities=1 edges=8
+exit=0

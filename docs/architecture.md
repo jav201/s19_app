@@ -159,7 +159,7 @@ Markers (registered in `pyproject.toml`):
 
 - **`slow`** — stress / perf smoke tests. `pytest -q -m "not slow"` skips them. No example smoke case is currently pinned `@pytest.mark.slow`: the former ~490s `pv__case_06_large_nested_a2l` duplicate was pruned in batch-36 (US-060), and the large-A2L pipeline is now covered by the retained 36 MB top-level `case_06_large_nested_a2l` in the normal suite.
 - **`snapshot`** — `pytest-textual-snapshot` baselines.
-- **`serial_timing`** — a wall-clock timing arm, run apart and serially: CI lane 2 runs `-m serial_timing`, lane 1 leaves these out (`-m "not serial_timing"`).
+- **`serial_timing`** — a wall-clock timing arm, run apart and serially: CI lane 1 leaves these out (`-m "not serial_timing"`), lane 2 runs those that are not `slow` (`-m "serial_timing and not slow"`), and on a push the separate `tui-ci-heavy` job runs the `slow` ones (`-m "slow and serial_timing"`, the heavy case_06 arms).
 
 Visual regression: 29 SVG baselines under `tests/__snapshots__/`, generated only against the public synthetic fixtures (`examples/case_00_public/` and the `tests/conftest.py` generators) — **never against client firmware, A2L or MAC artefacts** (`R-TUI-034`, the TC-031 no-leak inspection).
 

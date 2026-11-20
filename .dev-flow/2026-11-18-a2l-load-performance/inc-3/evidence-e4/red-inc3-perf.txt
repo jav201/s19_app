@@ -1,0 +1,144 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <LOCAL_HOME>\anaconda3\envs\s19env\python.exe
+rootdir: <LOCAL_HOME>\Github\s19_app-a2l-load-performance
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 4 items
+
+tests/test_alp_inc3_load_responsiveness.py::test_r040_image_post_parse_responsive FAILED [ 25%]
+tests/test_alp_inc3_load_responsiveness.py::test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/1] FAILED [ 50%]
+tests/test_alp_inc3_load_responsiveness.py::test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/2] FAILED [ 75%]
+tests/test_alp_inc3_load_responsiveness.py::test_r042_a2l_only_post_parse_responsive FAILED [100%]
+
+================================== FAILURES ===================================
+____________________ test_r040_image_post_parse_responsive ____________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40268/test_r040_image_post_parse_res0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002905E0C24D0>
+
+    @pytest.mark.serial_timing
+    def test_r040_image_post_parse_responsive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """R-A2L-REFRESH.040/1: 3 serial case_06 image+A2L runs; request-to-
+        outcome total includes admission/copy and parse; 4 named phases;
+        median <= 45 s, every run < 60 s; 50 ms timer with every tick <= 100 ms
+        late, >= 3 ticks during the 0.20 s producer gate, zero failing."""
+>       _guard_perf_seams()
+
+tests\test_alp_inc3_load_responsiveness.py:443: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _guard_perf_seams() -> None:
+        """The fast RED guard: the Inc 3 prepared-snapshot contracts must exist
+        before any timing arm runs its real case_06 route."""
+        fl = _fl_module()
+>       assert getattr(fl, "FileLoadRequest", None) is not None, (
+            "FileLoadRequest (F1) missing — the Inc 3 prepared-load context is not implemented"
+        )
+E       AssertionError: FileLoadRequest (F1) missing — the Inc 3 prepared-load context is not implemented
+E       assert None is not None
+E        +  where None = getattr(<module 's19_app.tui.app.file_load' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\app\\file_load.py'>, 'FileLoadRequest', None)
+
+tests\test_alp_inc3_load_responsiveness.py:97: AssertionError
+______ test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/1] ______
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40268/test_r041_project_pair_post_pa0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002905E091C90>
+shape = 'pair'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize(
+        "shape",
+        ["pair", "nomac"],
+        ids=[f"R-A2L-REFRESH.041/{i}" for i in range(1, 3)],
+    )
+    def test_r041_project_pair_post_parse_responsive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, shape: str) -> None:
+        """R-A2L-REFRESH.041/1-/2: 3 serial case_06 project-pair runs per shape
+        (with and without MAC); total includes parse; 4 named phases; median
+        <= 45 s, every run < 60 s; the unchanged 50 ms/100 ms timer, >= 3 gate
+        ticks; each final pair current."""
+>       _guard_perf_seams()
+
+tests\test_alp_inc3_load_responsiveness.py:462: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _guard_perf_seams() -> None:
+        """The fast RED guard: the Inc 3 prepared-snapshot contracts must exist
+        before any timing arm runs its real case_06 route."""
+        fl = _fl_module()
+>       assert getattr(fl, "FileLoadRequest", None) is not None, (
+            "FileLoadRequest (F1) missing — the Inc 3 prepared-load context is not implemented"
+        )
+E       AssertionError: FileLoadRequest (F1) missing — the Inc 3 prepared-load context is not implemented
+E       assert None is not None
+E        +  where None = getattr(<module 's19_app.tui.app.file_load' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\app\\file_load.py'>, 'FileLoadRequest', None)
+
+tests\test_alp_inc3_load_responsiveness.py:97: AssertionError
+______ test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/2] ______
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40268/test_r041_project_pair_post_pa1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002905E014050>
+shape = 'nomac'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize(
+        "shape",
+        ["pair", "nomac"],
+        ids=[f"R-A2L-REFRESH.041/{i}" for i in range(1, 3)],
+    )
+    def test_r041_project_pair_post_parse_responsive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, shape: str) -> None:
+        """R-A2L-REFRESH.041/1-/2: 3 serial case_06 project-pair runs per shape
+        (with and without MAC); total includes parse; 4 named phases; median
+        <= 45 s, every run < 60 s; the unchanged 50 ms/100 ms timer, >= 3 gate
+        ticks; each final pair current."""
+>       _guard_perf_seams()
+
+tests\test_alp_inc3_load_responsiveness.py:462: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _guard_perf_seams() -> None:
+        """The fast RED guard: the Inc 3 prepared-snapshot contracts must exist
+        before any timing arm runs its real case_06 route."""
+        fl = _fl_module()
+>       assert getattr(fl, "FileLoadRequest", None) is not None, (
+            "FileLoadRequest (F1) missing — the Inc 3 prepared-load context is not implemented"
+        )
+E       AssertionError: FileLoadRequest (F1) missing — the Inc 3 prepared-load context is not implemented
+E       assert None is not None
+E        +  where None = getattr(<module 's19_app.tui.app.file_load' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\app\\file_load.py'>, 'FileLoadRequest', None)
+
+tests\test_alp_inc3_load_responsiveness.py:97: AssertionError
+__________________ test_r042_a2l_only_post_parse_responsive ___________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40268/test_r042_a2l_only_post_parse_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002905E021410>
+
+    @pytest.mark.serial_timing
+    def test_r042_a2l_only_post_parse_responsive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """R-A2L-REFRESH.042/1: 3 serial case_06 P-ONLY runs; total includes
+        parse; admission/parse/preparation/install-publication reported with no
+        copy phase fabricated; median <= 45 s, every run < 60 s; the unchanged
+        timer bounds hold; final A2L-only state is current, no image/MAC."""
+>       _guard_perf_seams()
+
+tests\test_alp_inc3_load_responsiveness.py:476: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _guard_perf_seams() -> None:
+        """The fast RED guard: the Inc 3 prepared-snapshot contracts must exist
+        before any timing arm runs its real case_06 route."""
+        fl = _fl_module()
+>       assert getattr(fl, "FileLoadRequest", None) is not None, (
+            "FileLoadRequest (F1) missing — the Inc 3 prepared-load context is not implemented"
+        )
+E       AssertionError: FileLoadRequest (F1) missing — the Inc 3 prepared-load context is not implemented
+E       assert None is not None
+E        +  where None = getattr(<module 's19_app.tui.app.file_load' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\app\\file_load.py'>, 'FileLoadRequest', None)
+
+tests\test_alp_inc3_load_responsiveness.py:97: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_alp_inc3_load_responsiveness.py::test_r040_image_post_parse_responsive
+FAILED tests/test_alp_inc3_load_responsiveness.py::test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/1]
+FAILED tests/test_alp_inc3_load_responsiveness.py::test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/2]
+FAILED tests/test_alp_inc3_load_responsiveness.py::test_r042_a2l_only_post_parse_responsive
+============================== 4 failed in 0.31s ==============================
+pytest_exit_code=1

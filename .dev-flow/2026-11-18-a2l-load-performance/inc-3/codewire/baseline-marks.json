@@ -1,0 +1,67 @@
+{
+ "placed": [
+  {
+   "name": "FileLoadMixin.load_from_path",
+   "file": "s19_app/tui/app/file_load.py",
+   "line": 438
+  },
+  {
+   "name": "FileLoadMixin._load_workarea_file",
+   "file": "s19_app/tui/app/file_load.py",
+   "line": 946
+  },
+  {
+   "name": "FileLoadMixin._parse_loaded_file",
+   "file": "s19_app/tui/app/file_load.py",
+   "line": 1205
+  },
+  {
+   "name": "FileLoadMixin._prepare_load_payload",
+   "file": "s19_app/tui/app/file_load.py",
+   "line": 1280
+  },
+  {
+   "name": "FileLoadMixin._start_load_worker",
+   "file": "s19_app/tui/app/file_load.py",
+   "line": 1444
+  },
+  {
+   "name": "ProjectLoadMixin._handle_load_project",
+   "file": "s19_app/tui/app/project_load.py",
+   "line": 1198
+  },
+  {
+   "name": "ProjectLoadMixin._prepare_project_load",
+   "file": "s19_app/tui/app/project_load.py",
+   "line": 1410
+  },
+  {
+   "name": "ProjectLoadMixin._install_prepared_project",
+   "file": "s19_app/tui/app/project_load.py",
+   "line": 1563
+  },
+  {
+   "name": "ProjectLoadMixin._reset_project_session",
+   "file": "s19_app/tui/app/project_load.py",
+   "line": 887
+  },
+  {
+   "name": "LoadedStateMixin._apply_prepared_load",
+   "file": "s19_app/tui/app/loaded_state.py",
+   "line": 548
+  },
+  {
+   "name": "A2lViewMixin._replace_current_a2l",
+   "file": "s19_app/tui/app/a2l_view.py",
+   "line": 732
+  },
+  {
+   "name": "enrich_tags_and_render",
+   "file": "s19_app/tui/services/a2l_service.py",
+   "line": 10
+  }
+ ],
+ "missing": [],
+ "conflicts": [],
+ "replaced": []
+}

@@ -1,0 +1,34 @@
+# Unit FA-TICK4u — describe releases its occupancy index in slices; the gate-hold tick loop stops flooding the UI [deepseek-v4-pro · medium]
+
+Tree: `alp-e4r` at **`788ecbd1`** (HEAD check mandatory). Rules: `FB-common.md` + `FA-common-rtx.md` (this unit runs on rtx). No agent edits `~/.claude/skills`. **Append to `../REPORT.md` after EACH row** (a row not in REPORT.md does not exist).
+
+## Fixed diagnosis (FA-TICK4 report, measured; facts re-grepped at 788ecbd1, HT-13)
+- On the case_06 project rows two mechanisms still make in-window UI ticks late (R-A2L-REFRESH.050, 0.10 s):
+  1. **Product.** `describe_definitions` (`s19_app/tui/a2l_definition.py`) releases its private containers before it returns (`release_in_slices(...)` at :928, whose last argument is `*(f for f in index if isinstance(f, (list, dict)))`, :939). The request-local `index` is an `_OccupancyIndex` (NamedTuple, :3899) built by `_build_occupancy_index` (:3927). Its `records` field is a `tuple` (:3918, built as `tuple(records)`) and its `position_by_object` field is a `MappingProxyType(position_by_object)` (:4068). `release_in_slices` (:51) cannot empty either, so describe's return frees ~220 k records and a 220 k-key dict in one C-level dealloc (0.046–0.068 s with the GIL held).
+  2. **Test harness.** `tests/test_alp_inc3_load_responsiveness.py::_tick_loop` (:276) waits for the gate-hold ticks with `await pilot.pause(0.02)` (:283). In Textual 8.2.8 every `pilot.pause` posts one callback to the app and to every widget and waits for all of them (643–858 UI callbacks per late tick). That test-made UI load makes gate-hold ticks 0.05–0.07 s late (one measured outlier 0.251 s). The ticks are measured by `TickTimer` (:144), an app `set_timer` chain, so the loop only has to yield.
+- **The product and harness change is fixed**: it is the FA-TICK4 scratch diff, copied to `../FA-TICK4-scratch.diff`. Apply it as is (`git apply ../FA-TICK4-scratch.diff`); do not change product code beyond it. It (i) returns the built `records` list and `position_by_object` dict (field annotation `records: list`, docstring cites R-A2L-REFRESH.050), and (ii) replaces `await pilot.pause(0.02)` with `await asyncio.sleep(0.02)` in `_tick_loop` (+ `import asyncio`). `MappingProxyType` stays imported (other uses at :142, :1480, …).
+- Measured on the laptop with (i)+(ii): `.041/1` and `.041/2` worst 0.049 s (N = 9 each), describe return gap 0.000 s, case_06 output digest identical.
+- **Known test consequence (must be fixed by row 3):** the test helper `_install_counters` (`tests/test_alp_a2l_occupancy.py:80`; `counting_build` :110–124) captures `(index, definitions_by_position, entry_cache)` in `state["index_captures"]` and readers use them **after** describe returned: `tests/test_alp_a2l_occupancy_at.py:121–122, :141–142` (`len(index.records) == 5 / 6`) and `tests/test_alp_a2l_occupancy_perf.py:399` and `:443–456` (the VAL_BLK `open_known_final` check of `test_r_a2l_def_158_1/158_2`). With (i) those records are emptied, so `test_at_alp_i1_3_describe_to_encode_overlap_safety` goes RED; and since FA-TICKb the VAL_BLK check already reads released `definitions_by_position` / `entry_cache`, so it is vacuous today.
+
+## Requirement row
+R-A2L-REFRESH.050: "While the system performs post-parse preparation for an image+A2L or project load, the system shall fire each due 50 ms UI timer tick no more than 100 ms late."
+
+## Files you may edit
+`s19_app/tui/a2l_definition.py` and `tests/test_alp_inc3_load_responsiveness.py` (by applying the diff, plus row 2's new test function in the latter), `tests/test_alp_a2l_occupancy.py` (rows 3–4). No new test module (TC-607's `EXPECTED_SCANNED_TEST_FILES` stays as is). Do not edit `tests/test_alp_a2l_occupancy_at.py` or `tests/test_alp_a2l_occupancy_perf.py`.
+
+## Rows
+| row | change | negative control (scratch copy of the tree) → RED |
+|---|---|---|
+| 1 | Apply the diff. Record `git diff --stat` and that the product hunks equal the diff. | — (row 4's test is the oracle) |
+| 2 | In `tests/test_alp_inc3_load_responsiveness.py`, new non-slow, non-`serial_timing` test `test_r_a2l_refresh_050_gate_hold_loop_does_not_drive_the_pilot`: run `_tick_loop` with `asyncio.run` and fakes: a pilot whose `pause` counts its calls; a timer whose `gate_ticks` returns 0 on the first call and `MIN_GATE_TICKS` afterwards; a gate object with `gate_started = time.perf_counter() - 1.0`. Assert the pilot's `pause` was called 0 times and the loop returned. Docstring: why (each `pilot.pause` floods the UI with one callback per widget during the measured gate hold, a test-made load; FA-TICK4). | put `await pilot.pause(0.02)` back → RED (1 call) |
+| 3 | In `tests/test_alp_a2l_occupancy.py::_install_counters.counting_build`, capture **build-time snapshots** instead of the live objects: `state["index_captures"].append((index._replace(records=list(index.records), position_by_object=dict(index.position_by_object)), dict(definitions_by_position), dict(entry_cache)))`, while still **returning the live** `index` (the one with `_CountingSeq`). Add a comment: why (describe releases these containers before it returns, R-A2L-REFRESH.050; readers check what the builder saw). | capture the live objects again → `test_at_alp_i1_3_describe_to_encode_overlap_safety` RED |
+| 4 | Same file, next to FA-TICKb's `test_r_a2l_refresh_050_producer_frees_private_containers_before_return` (:639), new test `test_r_a2l_refresh_050_describe_frees_its_occupancy_index_before_return`: reuse that test's 8,000-object input; with `sys.setprofile`, at the `return` event of the `describe_definitions` frame read `frame.f_locals["index"]` and assert `len(index.records) == 0` and `len(index.position_by_object) == 0`; restore the profiler in `finally`. Also assert the result equals (same keys, same order, equal values) a run with `release_in_slices` monkeypatched to a no-op in the module. Docstring cites R-A2L-REFRESH.050 and FA-TICK4. | change the builder back to `tuple(records)` → RED (8,000) |
+| 5 | No code. Run the regression below and record it. | — |
+
+## Nodes you may run (`timeout 300`)
+- `-n 0`: the two new tests; `tests/test_alp_a2l_occupancy.py tests/test_alp_a2l_occupancy_at.py tests/test_alp_a2l_occupancy_perf.py -m "not slow and not serial_timing"`.
+- `-n 0`: `tests/test_alp_inc3_load_responsiveness.py -m "not slow and not serial_timing"`.
+- `-n 4`: `tests/test_b103_a2l_definition*.py -m "not slow and not serial_timing"` (8 files; list them in REPORT.md).
+- `-n 0`: `tests/test_suite_hygiene.py -k "040 or 041 or 002"`; `tests/test_id_registry.py`.
+- A failure you did not expect: re-run that node on a base clone (`git clone -q -b alp-e4r ~/work/zq-fa/fa.bundle ../scratch/base`) and record base vs yours.
+- Never run a `slow` node; never run the full suite; the timing rows are measured by the orchestrator on the quiet laptop.

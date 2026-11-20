@@ -66,3 +66,8 @@ docs/requirements/history/** -text
 
 # Inc 10 x64u data (E3-2): expected Intel HEX lines are compared byte for byte, LF-only on every checkout.
 tests/fixtures/b103_inc10/** text eol=lf
+
+# a2l-load-performance (R6-F1): the case_06 A2L is a performance fixture whose size and
+# SHA-256 are pinned by the timing tests. LF on every checkout keeps those pins and the
+# measured bytes identical on Windows and Linux (the blob is already LF).
+examples/case_06_large_nested_a2l/firmware.a2l text eol=lf

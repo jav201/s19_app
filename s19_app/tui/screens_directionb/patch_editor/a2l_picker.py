@@ -22,22 +22,46 @@ class A2lPickerMixin:
     # ------------------------------------------------------------------
 
     def set_a2l_parameters(
-        self, rows: Sequence[dict], signature: object = None, *, a2l_data=None
+        self,
+        rows: Sequence[dict],
+        signature: object = None,
+        *,
+        a2l_data=None,
+        prepared_definitions=None,
     ) -> None:
-        """Populate the A2L picker (R-B102-PE-001, R-B102-PE-005).
+        """Populate the A2L picker (R-B102-PE-001, R-B102-PE-005; C-7, I-ALP-2.3).
 
-        Delegates rows, the app's safe ``_a2l_enriched_key`` signature and the
-        caller-supplied parsed A2L data to the embedded picker: it mounts at
-        most one 200-row page and preserves the filter, page, highlight and
-        picks while the signature is unchanged, in which case this shim
-        returns without touching the layout. On a real (re)population the
-        cached ``Fmt · Unit`` width may change, so the derived widths are
-        invalidated and re-derived on the next layout pass. The app passes its
-        parsed A2L data through ``a2l_data``; a headless panel or an app
-        without parsed A2L data supplies ``None`` — the panel never reaches
-        for the app itself (C-7).
+        Delegates rows, the caller-supplied signature and parsed A2L data to
+        the embedded picker: it mounts at most one 200-row page and preserves
+        the filter, page, highlight and picks while the signature is
+        unchanged, in which case this shim returns without touching the
+        layout. On a real (re)population the cached ``Fmt · Unit`` width may
+        change, so the derived widths are invalidated and re-derived on the
+        next layout pass.
+
+        C-7: this panel is presentational — it never reaches for the app.
+        The app caller threads ``a2l_data`` (its ``current_a2l_data``) and,
+        on an I-ALP-2.3 snapshot hit, the prepared definitions. A headless
+        panel forwards ``a2l_data=None`` (legacy: no data, and the snapshot
+        survives for a later mount) and ignores a passed
+        ``prepared_definitions``.
         """
-        if not self._a2l_picker.set_parameters(rows, signature, a2l_data=a2l_data):
+        if not self.is_mounted:
+            repopulated = self._a2l_picker.set_parameters(
+                rows, signature, a2l_data=None
+            )
+        elif prepared_definitions is not None:
+            repopulated = self._a2l_picker.set_parameters(
+                rows,
+                signature,
+                a2l_data=a2l_data,
+                prepared_definitions=prepared_definitions,
+            )
+        else:
+            repopulated = self._a2l_picker.set_parameters(
+                rows, signature, a2l_data=a2l_data
+            )
+        if not repopulated:
             return
         self._a2l_layout = None
         self.call_after_refresh(self._apply_a2l_layout)

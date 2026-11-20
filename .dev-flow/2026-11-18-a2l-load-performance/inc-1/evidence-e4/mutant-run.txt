@@ -1,0 +1,85 @@
+mutant-run: repo base 905e9b99; 14 mutants from the planned E1 negative controls; python {sys.version.split()[0]}
+
+156-rebuild-per-name: KILLED (exit 1) target -k 156_2 in tests/test_alp_a2l_occupancy.py
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_156_2_batch_uses_one_index
+    1 failed, 14 deselected in 0.30s
+
+157-page-expansion: KILLED (exit 1) target -k 157_2 or 157_3 in tests/test_alp_a2l_occupancy.py
+    FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_157_2_cross_page_span_is_one_interval
+    FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_157_3_over_cap_span_is_not_expanded
+    2 failed, 13 deselected in 0.28s
+
+158-force-open-valblk: KILLED (exit 1) target -k 158 in tests/test_alp_a2l_occupancy_perf.py
+    FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_1_disjoint_1000_checks_bounded[val_blk]
+    FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_2_disjoint_4000_checks_bounded[val_blk]
+    2 failed, 2 passed, 4 deselected in 9.32s
+
+158-restore-global-scan: KILLED (exit 1) target -k 158 in tests/test_alp_a2l_occupancy_perf.py
+    FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_2_disjoint_4000_checks_bounded[scalar]
+    FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_2_disjoint_4000_checks_bounded[val_blk]
+    4 failed, 4 deselected in 22.10s
+
+159-select-by-address: KILLED (exit 1) target -k 159_1 in tests/test_alp_a2l_occupancy.py
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_159_1_position_not_address_selects_next
+    1 failed, 14 deselected in 0.23s
+
+159-gather-without-sort: SURVIVED (exit 0) target -k 159_1 in tests/test_alp_a2l_occupancy.py
+    .                                                                        [100%]
+    1 passed, 14 deselected in 0.12s
+
+159-consume-after-answer: KILLED (exit 1) target -k 159_1 in tests/test_alp_a2l_occupancy.py
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_159_1_position_not_address_selects_next
+    1 failed, 14 deselected in 0.21s
+
+160-exclude-by-name-or-address: KILLED (exit 1) target -k 160_1 or 160_2 in tests/test_alp_a2l_occupancy.py
+    FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_160_1_homonym_identity_is_position
+    FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_160_2_same_span_is_not_self
+    2 failed, 13 deselected in 0.25s
+
+161-eager-describe-all: KILLED (exit 1) target -k 161_1 in tests/test_alp_a2l_occupancy.py
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_161_1_narrow_query_is_not_eager
+    1 failed, 14 deselected in 0.47s
+
+162-rescan-per-record: KILLED (exit 1) target -k 162_1 in tests/test_alp_a2l_occupancy_perf.py
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_162_1_case06_index_build_bound
+    1 failed, 7 deselected in 242.54s (0:04:02)
+
+163-restore-global-route: KILLED (exit 1) target -k 163_1 in tests/test_alp_a2l_occupancy_perf.py
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_163_1_case06_all_queries_bound
+    1 failed, 7 deselected in 399.77s (0:06:39)
+
+164-retained-512b-per-entry: KILLED (exit 1) target -k 164_1 in tests/test_alp_a2l_occupancy_perf.py
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_164_1_case06_index_memory_bound
+    1 failed, 7 deselected in 10.51s
+
+165-restore-global-route: KILLED (exit 1) target -k 165_1 in tests/test_alp_a2l_occupancy_perf.py
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_165_1_case06_integrated_describe_bound
+    1 failed, 7 deselected in 143.95s (0:02:23)
+
+165-partial-mapping: KILLED (exit 1) target -k 165_1 in tests/test_alp_a2l_occupancy_perf.py
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_165_1_case06_integrated_describe_bound
+    1 failed, 7 deselected in 37.26s
+
+--- conductor ruling: 159-gather-without-sort re-run ---
+First pass SURVIVED because the no-gather/no-sort source arm inspected the
+monkeypatched test wrapper instead of the product function (test defect: the
+arm was vacuous). Ruling: fix the arm to receive the unpatched function
+captured before instrumentation (_assert_no_gather_sort(state["real_candidates"]));
+re-run the same mutant. Result: KILLED (exit 1; AssertionError at the token
+check in tests/test_alp_a2l_occupancy.py:190). The unmutated tree stays
+15/15 green with the fixed arm (green-occupancy.txt regenerated).
+
+159-gather-without-sort: KILLED (exit 1) target -k 159_1 in tests/test_alp_a2l_occupancy.py
+    FAILED tests/test_alp_a2l_occupancy.py::test_r_a2l_def_159_1_position_not_address_selects_next
+    1 failed, 14 deselected in 0.27s
+
+FINAL: 14/14 mutants KILLED, 0 unruled survivors.

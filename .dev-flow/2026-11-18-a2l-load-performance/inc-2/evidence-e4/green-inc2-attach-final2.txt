@@ -1,0 +1,175 @@
+................F....................                                    [100%]
+================================== FAILURES ===================================
+___________________ test_r033_key_latency[request-snapshot] ___________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40235/test_r033_key_latency_request_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021892FEB4D0>
+arm = 'request-snapshot'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["copy", "parse", "enrichment", "definitions", "case06-full-processing", "request-snapshot"],
+        ids=lambda x: x,
+    )
+    def test_r033_key_latency(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.033/1-/6: two existing navigation keys are acknowledged
+        within 1.0 s during the named phase, each latency recorded; no median
+        substitution."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        bound = timing_bound(1.0)
+        latencies: list = []
+    
+        if arm == "case06-full-processing":
+            async def body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                deadline = time.monotonic() + 240
+                app.load_a2l_from_path(CASE06)
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                while not (
+                    app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "firmware.a2l"
+                ):
+                    if time.monotonic() > deadline:
+                        raise AssertionError("the case_06 attach never installed")
+                    await pilot.pause(0.05)
+                await settle_workers(pilot)
+                assert any("A2L loaded" in line for line in _log_lines(app))
+                snapshot_map = _accepted_snapshots(app)
+                assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+                return None
+    
+            _run(base, body)
+            assert len(latencies) == 2, latencies
+            assert all(lat <= bound for lat in latencies), latencies
+            return
+    
+        if arm == "request-snapshot":
+            big = _write_big_image(src / "big1m.s19")
+            fl = _fl_module()
+            service = _service_module()
+            enrich_calls: list = []
+            real_enrich = getattr(fl, "enrich_tags_and_render", None)
+    
+            def enrich_spy(*args, **kwargs):
+                enrich_calls.append(threading.get_ident())
+                return real_enrich(*args, **kwargs) if real_enrich is not None else None
+    
+            monkeypatch.setattr(fl, "enrich_tags_and_render", enrich_spy, raising=False)
+            monkeypatch.setattr(service, "enrich_tags_and_render", enrich_spy, raising=False)
+            # The worker blocks at parse until released, so preparation cannot
+            # start while the keys acknowledge (D-11 phase assertion).
+            hold = Hold(monkeypatch, [(app_module.deps, "parse_a2l_cached")])
+    
+            async def press_key_from(pilot, app, key: str, t0: float) -> float:
+                before = app.focused
+                await pilot.press(key)
+                deadline = time.monotonic() + 30.0
+                while not (app.focused is not None and app.focused != before):
+                    if time.monotonic() > deadline:
+                        raise AssertionError(f"key {key!r} never acknowledged")
+                    await pilot.pause(0.005)
+                return time.monotonic() - t0
+    
+            async def body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                await _load_image(app, pilot, big)
+                live_map = app.current_file.mem_map
+                live_len = len(live_map)
+                first_byte = next(iter(live_map))
+                original_value = live_map[first_byte]
+                requests: list = []
+    
+                real_worker = app._a2l_attach_worker
+    
+                def worker_spy(request):
+                    requests.append(request)
+                    return real_worker(request)
+    
+                monkeypatch.setattr(app, "_a2l_attach_worker", worker_spy)
+                # The keys are scheduled immediately before the synchronous
+                # request-snapshot capture: their pending window covers the
+                # capture (D-11 — each capture latency is recorded individually,
+                # with no 1.0 s bound on the capture window).
+                t0 = time.monotonic()
+                press_task = asyncio.create_task(press_key_from(pilot, app, "tab", t0))
+                app.load_a2l_from_path(old)
+                # The existing busy progress line was painted before the capture
+                # and stays visible through it.
+                _assert_busy_progress(
+                    _status_text(app), name="old.a2l", step="step 1/3", step_label="Copy into the work area"
+                )
+                capture_latencies = [await press_task]
+                capture_latencies.append(
+                    await press_key_from(pilot, app, "shift+tab", time.monotonic())
+                )
+                latencies.extend(capture_latencies)
+                # Phase assertions: both keys acknowledged while the parse was
+                # still held and preparation had not started — the
+                # acknowledgements did not wait for parse or preparation (D-11).
+                assert len(requests) == 1, requests
+                assert enrich_calls == [], enrich_calls
+                hold.release.set()
+                await settle_workers(pilot)
+                mapping = getattr(requests[0], "image_mem_map", None)
+                assert mapping is not None and len(mapping) == live_len, (
+                    "the worker did not receive an independent read-only image copy"
+                )
+                with pytest.raises(Exception):
+                    mapping[first_byte] = 0xFF
+                # Source-mutation control: the captured copy is independent of
+                # the live map — a later live-byte change cannot alter it.
+                live_map[first_byte] = 0xFF
+                assert mapping[first_byte] == original_value, (mapping[first_byte], original_value)
+                assert live_map[first_byte] == 0xFF, "the test-controlled source change did not land"
+                assert app.current_a2l_path is not None
+                return None
+    
+>           _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1218: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:301: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:299: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:1166: in body
+    await _load_image(app, pilot, big)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40235/test_r033_key_latency_request_0/src/big1m.s19')
+
+    async def _load_image(app: S19TuiApp, pilot, path: Path) -> None:
+        await _submit_typed(app, pilot, str(path))
+        if isinstance(app.screen, ConfirmQuestionScreen):
+            await pilot.press("y")
+        await settle_workers(pilot)
+>       assert app.current_file is not None and app.current_file.mem_map, list(app.log_lines)
+E       AssertionError: []
+E       assert (None is not None)
+E        +  where None = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}).current_file
+
+tests\test_alp_inc2_a2l_attach.py:319: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r033_key_latency[request-snapshot]
+1 failed, 36 passed in 753.94s (0:12:33)

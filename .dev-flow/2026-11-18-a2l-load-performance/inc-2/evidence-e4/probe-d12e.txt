@@ -1,0 +1,13 @@
+phases (rel s):
+  start             0.000
+  summary-entry     2.812
+  summary-exit      4.453
+  end              34.734
+ticker gaps > 0.4s:
+  gap[383]  0.468 at t=   0.219
+  gap[416]  0.734 at t=   1.344
+  gap[553]  0.750 at t=   4.906
+  gap[784]  0.860 at t=   9.937
+  gap[1125]  1.157 at t=  17.437
+  gap[1388]  1.266 at t=  23.687
+  gap[1806]  1.562 at t=  32.922

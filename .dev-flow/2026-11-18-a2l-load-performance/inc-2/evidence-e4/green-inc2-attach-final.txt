@@ -1,0 +1,82 @@
+...................................F.                                    [100%]
+================================== FAILURES ===================================
+__________________ test_at_alp_i2_2_case06_keys_and_progress __________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40234/test_at_alp_i2_2_case06_keys_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021BA25DB110>
+
+    def test_at_alp_i2_2_case06_keys_and_progress(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """AT-ALP-I2-2: the real case_06 direct attach keeps every key and every
+        visible progress gap within 1.0 s from request through post-parse
+        preparation and installation; the preserved-refresh gap is recorded
+        unasserted (D-12); the terminal outcome follows."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        bound = timing_bound(1.0)
+        latencies: list = []
+    
+        async def body(app, pilot):
+            app.set_focus(app.query_one("#files_list"))
+            await pilot.pause()
+            sampler = Sampler()
+            task = sampler.start(pilot, app, bar=True)
+            await pilot.pause(0.1)
+            # D-12: the sampling window ends when post-parse preparation and
+            # installation complete, i.e. when the preserved common refresh
+            # begins; the preserved-refresh gap is recorded unasserted.
+            refresh_entry: list = []
+            real_refresh = app._refresh_a2l_dependent_views
+    
+            def refresh_spy():
+                refresh_entry.append(time.monotonic())
+                return real_refresh()
+    
+            monkeypatch.setattr(app, "_refresh_a2l_dependent_views", refresh_spy)
+            deadline = time.monotonic() + 300
+            app.load_a2l_from_path(CASE06)
+            phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+            latencies.extend(phase_keys)
+            while True:
+                if (
+                    app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "firmware.a2l"
+                    and "a2l_load" not in app._busy.runs
+                ):
+                    break
+                if time.monotonic() > deadline:
+                    raise AssertionError("the case_06 attach never reached its terminal outcome")
+                await pilot.pause(0.05)
+            sampler.stop.set()
+            await task
+            changes = sampler.text_changes()
+            times = [t for t, _ in changes]
+            gaps = [b - a for a, b in zip(times, times[1:])]
+            # D-12: every gap inside the commissioned window (before the
+            # preserved common refresh starts) is <= 1.0 s; the preserved-refresh
+            # gap is recorded unasserted (HLR-176).
+            assert refresh_entry, "the preserved common refresh never started"
+            t0_abs = sampler.frames[0][0]
+            refresh_rel = refresh_entry[0] - t0_abs
+            window_gaps = [gap for (a, b), gap in zip(zip(times, times[1:]), gaps) if b <= refresh_rel]
+            assert window_gaps, (times, refresh_rel)
+            assert all(gap <= 1.0 for gap in window_gaps), window_gaps
+            assert any(_is_busy_progress(text, name="firmware.a2l") for _, text in changes), changes
+            assert any("A2L loaded" in line for line in _log_lines(app)), _log_lines(app)
+            assert Path(app.current_a2l_path).name == "firmware.a2l"
+            assert app._a2l_enriched_tags, "no enriched tags at the outcome"
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            return None
+    
+        _run(base, body)
+        assert len(latencies) == 2, latencies
+>       assert all(lat <= bound for lat in latencies), latencies
+E       AssertionError: [0.5, 1.0310000000754371]
+E       assert False
+E        +  where False = all(<generator object test_at_alp_i2_2_case06_keys_and_progress.<locals>.<genexpr> at 0x0000021BA26AECE0>)
+
+tests\test_alp_inc2_a2l_attach.py:2218: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_alp_inc2_a2l_attach.py::test_at_alp_i2_2_case06_keys_and_progress
+1 failed, 36 passed in 811.91s (0:13:31)

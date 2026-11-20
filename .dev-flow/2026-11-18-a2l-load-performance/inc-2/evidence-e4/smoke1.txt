@@ -1,0 +1,103 @@
+.F
+================================== FAILURES ===================================
+______________________ test_r029_worker_snapshot[typed] _______________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40197/test_r029_worker_snapshot_type0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002CE16D27150>
+route = 'typed'
+
+    @pytest.mark.parametrize("route", ["typed", "workarea", "startup"], ids=lambda x: x)
+    def test_r029_worker_snapshot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, route: str) -> None:
+        """R-A2L-REFRESH.029/1-/3: enrichment, summary and both picker describes
+        complete off the UI thread before the install; visible NEW cells exact."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        new = _new_a2l(src / "new.a2l")
+    
+        if route == "workarea":
+            workarea_temp = base / WORKAREA_DIRNAME / WORKAREA_SUBDIR / WORKAREA_TEMP
+            workarea_temp.mkdir(parents=True, exist_ok=True)
+            (workarea_temp / "new.a2l").write_bytes(new.read_bytes())
+    
+        events: list = []
+        copies = Spy(monkeypatch, app_module.deps, "copy_into_workarea")
+    
+        async def typed_body(app, pilot):
+            main = threading.get_ident()
+            _mount_views(app)
+            await pilot.pause()
+            _arm_pipeline_spies(app, monkeypatch, events, main)
+            await _typed_attach(app, pilot, new)
+            await settle_workers(pilot)
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_panel_state(_check_panel(app), NEW_ROWS)
+            _assert_panel_state(_patch_panel(app), NEW_ROWS)
+            assert _a2l_viewer_names(app) == [name for name, *_ in NEW_ROWS]
+            return None
+    
+        async def workarea_body(app, pilot):
+            main = threading.get_ident()
+            _mount_views(app)
+            await pilot.pause()
+            _arm_pipeline_spies(app, monkeypatch, events, main)
+            await _workarea_attach(app, pilot, "new.a2l")
+            await settle_workers(pilot)
+            assert len(copies.calls) == 0, copies.calls
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_panel_state(_check_panel(app), NEW_ROWS)
+            _assert_panel_state(_patch_panel(app), NEW_ROWS)
+            assert _a2l_viewer_names(app) == [name for name, *_ in NEW_ROWS]
+            return None
+    
+        async def startup_body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            await wait_until(
+                pilot,
+                lambda: app.current_a2l_path is not None
+                and Path(app.current_a2l_path).name == "new.a2l",
+                "the start-up attach of new.a2l",
+            )
+            await settle_workers(pilot)
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_panel_state(_check_panel(app), NEW_ROWS)
+            _assert_panel_state(_patch_panel(app), NEW_ROWS)
+            assert _a2l_viewer_names(app) == [name for name, *_ in NEW_ROWS]
+            return None
+    
+        if route == "typed":
+            main = _run(base, typed_body)
+        elif route == "workarea":
+            main = _run(base, workarea_body)
+        else:
+            main = threading.get_ident()
+            # Class-level spies: the start-up attach begins during app start.
+            _arm_pipeline_spies(S19TuiApp, monkeypatch, events, main)
+            _run(base, startup_body, load_path=src / "new.a2l", base_dir=base)
+    
+        names = [e[0] for e in events]
+        assert names.count("enrichment") == 1, events
+        assert names.count("summary") == 1, events
+        assert names.count("describe") == 2, events
+        assert names.count("install") == 1, events
+        prep = [e for e in events if e[0] in {"enrichment", "summary", "describe"}]
+        installs = [e for e in events if e[0] == "install"]
+        assert all(thread != main for _, thread in prep), events
+        assert max(i for i, e in enumerate(events) if e[0] in {"enrichment", "summary", "describe"}) < min(
+            i for i, e in enumerate(events) if e[0] == "install"
+        ), events
+>       assert installs[0][1] == main, events
+E       AssertionError: [('UI', 27172), ('enrichment', 41372), ('summary', 41372), ('describe', 41372), ('describe', 41372), ('install', 27172)]
+E       assert 27172 == None
+
+tests\test_alp_inc2_a2l_attach.py:728: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r029_worker_snapshot[typed] - ...
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 1 passed in 8.47s

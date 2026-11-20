@@ -1,4 +1,5 @@
 from typing import Dict, List, Optional
+import io
 import logging
 import re
 
@@ -310,7 +311,9 @@ class S19File:
         s6_count: Optional[int] = None
         try:
             with open(self.path, 'r') as f:
-                for line_number, line in enumerate(f, 1):
+                # Read the text once, then split in memory, so the worker does not hand the GIL
+                # back and forth per read while the UI waits (R-A2L-REFRESH.050, FA-TICK2).
+                for line_number, line in enumerate(io.StringIO(f.read()), 1):
                     line = line.strip()
                     if not line:
                         continue

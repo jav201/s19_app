@@ -1,0 +1,23 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <LOCAL_HOME>\anaconda3\envs\s19env\python.exe
+rootdir: <LOCAL_HOME>\Github\s19_app-a2l-load-performance
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 8 items
+
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_1_disjoint_1000_checks_bounded[scalar] PASSED [ 12%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_1_disjoint_1000_checks_bounded[val_blk] PASSED [ 25%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_2_disjoint_4000_checks_bounded[scalar] PASSED [ 37%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_2_disjoint_4000_checks_bounded[val_blk] PASSED [ 50%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_162_1_case06_index_build_bound PASSED [ 62%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_163_1_case06_all_queries_bound PASSED [ 75%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_164_1_case06_index_memory_bound PASSED [ 87%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_165_1_case06_integrated_describe_bound PASSED [100%]
+============================ QC-TM timing margins =============================
+57.2%  12.848 s / 30.000 s  R-A2L-DEF.165 case_06 integrated describe  tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_165_1_case06_integrated_describe_bound
+93.7%  0.158 s / 2.500 s  R-A2L-DEF.162 case_06 isolated index build  tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_162_1_case06_index_build_bound
+93.9%  1.103 s / 18.000 s  R-A2L-DEF.163 case_06 all 220040 resolutions  tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_163_1_case06_all_queries_bound
+QC-TM: 3 bounds, 0 under 20 % margin
+
+======================== 8 passed in 190.57s (0:03:10) ========================
+EXIT:0

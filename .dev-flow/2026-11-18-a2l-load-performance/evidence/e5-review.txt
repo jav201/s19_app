@@ -1,0 +1,45 @@
+# E5 code/security review — record and rulings
+
+Reviewer: independent Hermes subagent (DeepSeek v4 Pro), one pass on the
+whole batch diff (product + tests) against the frozen contracts, code and
+security lenses. Verdict: SIN BLOCKERS; 2 MAJOR; 4 MINOR.
+
+## MAJOR rulings (executed evidence, conductor)
+
+- **E5-INC2-F3** — "_install_attached_a2l's except BaseException does not
+  re-enable the cycle collector". RULED COVERED: `call_from_thread`
+  re-raises UI-thread exceptions in the calling worker thread, and the
+  attach worker's `except BaseException` (file_load.py:971-972) re-enables
+  the collector before ending the busy, on every install-exception path.
+- **E5-INC3-F4** — "_apply_prepared_load has no try/finally: an install
+  exception leaves GC disabled and the busy hung (loose route)". RULED
+  COVERED: same mechanism — the loose-route worker's `except BaseException`
+  (file_load.py:1994-1995) re-enables the collector and posts `_busy_fail`.
+  Executed evidence: a gc.enable/disable call-stack trace in the new E5 arm
+  shows the re-enable landing in `_start_load_worker:1995` after the
+  injected install exception (worker thread, `run_callable`).
+
+Both invariants are now locked by two new permanent arms that assert
+`gc.isenabled()` and the busy end after an injected install exception on
+each route (test_r038_install_exception_reenables_gc in the Inc 2 suite,
+test_r043_install_exception_reenables_gc in the Inc 3 parity suite). They
+would go RED if a refactor broke the call_from_thread propagation or
+removed the worker-side handlers. The reviewer's suggested local re-enables
+are declined as a second guard layer for the same invariant (per
+"prefer removing a feature over guarding it"); the arms are the durable
+check.
+
+## MINOR (backlog, not fixed in this batch)
+
+1. The attach worker's gc.disable() covers copy+parse beyond the D-13
+   dictated window; no peak-memory measurement exists for that window.
+2. No test asserts the gc lifecycle on the superseded/failure arms beyond
+   the two new arms above (covered by them for the exception paths).
+3. A duplicate (name, kind) key in span_entries would null the index's
+   self-exclusion; today unreachable because _find_tag refuses the
+   duplicate before _shared_with. Precondition to document/enforce locally.
+4. Snapshot payloads (a2l_source/Definition objects) are shared, not
+   protected; consumption is by identity, so no exploitable divergence
+   today. A census check could convert the convention into an assertion.
+
+All four are recorded for the operator's review page; none blocks.

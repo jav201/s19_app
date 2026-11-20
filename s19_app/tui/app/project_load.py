@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from collections import deque
 from dataclasses import dataclass
+import gc
 import hashlib
 from pathlib import Path, PureWindowsPath
 import stat
@@ -50,6 +51,7 @@ from ..workspace import (
     recent_kind,
 )
 from . import deps
+from .file_load import A2LAttachSnapshot
 from .shared import (
     _TYPED_REFUSAL_TOKENS,
     A2LCacheEntry,
@@ -82,7 +84,14 @@ UnsavedItem = tuple[Literal["image", "document", "flow"], str]
 @dataclass(frozen=True)
 class ProjectLoadRequest:
     """Inc 12b (S-b): the project-load worker's immutable request, built on
-    the main thread after the cheap refusals (LLR-177.1e / .1h)."""
+    the main thread after the cheap refusals (LLR-177.1e / .1h).
+
+    Inc 3 (I-ALP-3 / P1) appends the UI-captured generation counters after
+    ``routed``: every product request populates both (the worker prepares
+    its stage expectations from them and reads no live counter), while
+    legacy direct constructions keep their old ``None`` defaults and are
+    not worker-proof.
+    """
 
     name: str
     project_dir: Path
@@ -92,12 +101,22 @@ class ProjectLoadRequest:
     a2l_cache: Optional[A2LCacheEntry]
     gen: int
     routed: bool
+    captured_a2l_generation: Optional[int] = None
+    captured_image_generation: Optional[int] = None
 
 
 @dataclass(frozen=True)
 class PreparedProjectLoad:
     """Inc 12b (S-b): the project worker's result; nothing in it is session
-    until ``_install_prepared_project`` installs it (LLR-177.1f)."""
+    until ``_install_prepared_project`` installs it (LLR-177.1f).
+
+    Inc 3 (I-ALP-3 / P2): the image/MAC members carry prepared
+    ``PreparedLoad`` bundles on product routes (``LoadedFile`` remains
+    accepted solely for legacy direct construction), and the defaulted
+    ``a2l_only`` member carries the A2L-only project's single Inc 2
+    snapshot — no synthetic ``LoadedFile`` or ``PreparedLoad`` is ever
+    fabricated for that route (R-A2L-REFRESH.042/.046).
+    """
 
     request: ProjectLoadRequest
     refusal: Optional[str]
@@ -106,10 +125,11 @@ class PreparedProjectLoad:
     problems: tuple[ProjectFileProblem, ...]
     a2l_cache: Optional[A2LCacheEntry]
     install: InstallSet
-    image: Optional[LoadedFile]
+    image: Optional[PreparedLoad | LoadedFile]
     unreadable: tuple[VariantDescriptor, ...]
-    mac: Optional[LoadedFile]
+    mac: Optional[PreparedLoad | LoadedFile]
     document: Optional[RecordedDocumentState]
+    a2l_only: Optional[A2LAttachSnapshot] = None
 
 
 @dataclass(frozen=True)
@@ -1384,24 +1404,45 @@ class ProjectLoadMixin:
                 self._a2l_cache_entry(),
                 gen,
                 routed,
+                # Inc 3 (I-ALP-3 / P1): capture both generation counters
+                # on the UI thread before the worker launches; P4 derives
+                # every stage-specific expected pair from these captured
+                # values and never reads a live counter.
+                captured_a2l_generation=self._a2l_view_generation,
+                captured_image_generation=self._image_generation,
             )
             self._project_load_worker(request)
         except BaseException:
             self._busy_fail("project_load", gen)
             raise
 
-    @work(thread=True, group="project_load")
+    # The fixed description keeps Textual from calling ``repr()`` on the
+    # request (which carries the parsed A2L) on the UI thread.
+    @work(thread=True, group="project_load", description="project load worker")
     def _project_load_worker(self, request: ProjectLoadRequest) -> None:
         """The project-load worker (S-b / S-d): prepare, then hand the result."""
+        # D-13: the whole project worker (parse, payload, preparation) runs
+        # with the cycle collector disabled — parse and describe churn
+        # enough objects that mid-run generational collections hold the GIL
+        # and starve the UI busy tick. Every outcome re-enables it
+        # (R-A2L-REFRESH.050/.051).
+        gc.disable()
         try:
             try:
                 prepared = self._prepare_project_load(request)
             except Exception as exc:  # noqa: BLE001 - worker-step failures
+                # D-13: a preparation failure re-enables the cycle
+                # collector immediately (the producer re-enables on its
+                # own failure; this covers a failure after it succeeded).
+                if not gc.isenabled():
+                    gc.enable()
                 self.logger.exception("Project load failed on the worker: %r", request.name)
                 self.call_from_thread(self._on_project_load_failed, request, exc)
                 return
             self.call_from_thread(self._on_project_loaded, prepared)
         except BaseException:
+            if not gc.isenabled():
+                gc.enable()
             self.call_from_thread(self._busy_fail, "project_load", request.gen)
             raise
 
@@ -1533,6 +1574,58 @@ class ProjectLoadMixin:
         mac: Optional[LoadedFile] = None
         if install.mac is not None:
             mac = self._parse_data_file(install.mac, a2l_path, a2l_data, image)
+        # Inc 3 (I-ALP-3 / P4 / D-1 / D-3): prepare the product image/MAC
+        # bundles and the A2L-only snapshot off the UI thread through F5
+        # and the single Inc 2 producer, using the stage-specific expected
+        # pairs derived from the request-captured counters. Only a request
+        # with legacy ``None`` captured generations retains the previous
+        # non-prepared LoadedFile handoff. A preparation exception
+        # propagates to the existing project failure route — never a
+        # candidate fallback (D-5).
+        captured_a = request.captured_a2l_generation
+        captured_i = request.captured_image_generation
+        image_bundle: Optional[PreparedLoad] = None
+        mac_bundle: Optional[PreparedLoad] = None
+        a2l_only: Optional[A2LAttachSnapshot] = None
+        if captured_a is not None and captured_i is not None:
+            has_a2l = a2l_data is not None
+            image_stage = image is not None
+            if image is not None:
+                # Reset bumps A2L generation once; the image stage bumps it
+                # again only when it attaches A2L (D-3 stage matrix).
+                image_bundle = self._prepare_load_payload(
+                    image,
+                    a2l_view_generation=captured_a + 1 + (1 if has_a2l else 0),
+                    image_generation=captured_i + 1,
+                    prepare_a2l=has_a2l and mac is None,
+                )
+            if mac is not None:
+                mac_bundle = self._prepare_load_payload(
+                    mac,
+                    a2l_view_generation=(
+                        captured_a
+                        + 1
+                        + (1 if has_a2l else 0)
+                        + (1 if (image_stage and has_a2l) else 0)
+                    ),
+                    image_generation=captured_i + 1 + (1 if image_stage else 0),
+                    prepare_a2l=has_a2l,
+                )
+            elif image is None and has_a2l and a2l_path is not None:
+                # A2L-only project (P-ONLY): the same Inc 2 producer with
+                # no image mapping, expected pair (A+2, I), and no
+                # synthetic PreparedLoad or LoadedFile (D-3, REFRESH.042).
+                a2l_only = self._prepare_a2l_attach_snapshot(
+                    a2l_path=a2l_path,
+                    a2l_data=a2l_data,
+                    image_mem_map=None,
+                    expected_a2l_generation=captured_a + 2,
+                    expected_image_generation=captured_i,
+                )
+        if image_bundle is not None:
+            image = image_bundle
+        if mac_bundle is not None:
+            mac = mac_bundle
         return PreparedProjectLoad(
             request,
             None,
@@ -1541,16 +1634,21 @@ class ProjectLoadMixin:
             tuple(problems),
             a2l_cache,
             install,
-            image,
+            image_bundle if image_bundle is not None else image,
             tuple(unreadable),
-            mac,
+            mac_bundle if mac_bundle is not None else mac,
             document,
+            a2l_only=a2l_only,
         )
 
     def _on_project_loaded(self, prepared: PreparedProjectLoad) -> None:
         """Main thread: paint step 4 then defer the install (LLR-176.3)."""
         gen = prepared.request.gen
         if prepared.refusal is not None:
+            # D-13: a refusal outcome re-enables the cycle collector
+            # immediately (the worker disabled it at entry).
+            if not gc.isenabled():
+                gc.enable()
             self._quit_pending = False
             self.end_busy("project_load", gen, prepared.refusal)
             return
@@ -1571,11 +1669,20 @@ class ProjectLoadMixin:
             None
 
         Data Flow:
-            - Build image/MAC bundles and reject keyed stale bundles before reset.
-            - Install each bundle without intermediate A2L publication; close
-              every superseded exit with kept-state text and no success outcome.
-            - Publish the common fan-out once, then retain announcement/result
-              behavior and defer the successful busy outcome.
+            - Preflight every supplied generation representation (S1
+              snapshot and/or legacy pair, including a keyless
+              generation-only bundle and the A2L-only snapshot) against the
+              stage pairs derived from the CURRENT UI counters BEFORE reset;
+              any mismatch discards the whole candidate with the exact
+              superseded outcome (I-ALP-3 / R-A2L-REFRESH.048 / D-3).
+            - Install each bundle without intermediate A2L publication;
+              close every superseded exit with kept-state text and no
+              success outcome.
+            - Install the A2L-only snapshot through the A2L writer with its
+              prepared cache/mapping, never a synthesized LoadedFile.
+            - Publish the common fan-out once, then retain
+              announcement/result behavior and defer the successful busy
+              outcome.
 
         Dependencies:
             Uses:
@@ -1587,24 +1694,87 @@ class ProjectLoadMixin:
         request = prepared.request
         gen = request.gen
         image_bundle = (
-            PreparedLoad(loaded=prepared.image) if prepared.image is not None else None
+            prepared.image
+            if isinstance(prepared.image, PreparedLoad)
+            else (PreparedLoad(loaded=prepared.image) if prepared.image is not None else None)
         )
         mac_bundle = (
-            PreparedLoad(loaded=prepared.mac) if prepared.mac is not None else None
+            prepared.mac
+            if isinstance(prepared.mac, PreparedLoad)
+            else (PreparedLoad(loaded=prepared.mac) if prepared.mac is not None else None)
         )
-        for bundle in (image_bundle, mac_bundle):
-            if bundle is None or bundle.a2l_enriched_key is None:
+        a2l_only = prepared.a2l_only
+
+        def _reject_superseded() -> None:
+            # D-13: a rejection path re-enables the cycle collector
+            # immediately (the producer left it disabled on success).
+            if not gc.isenabled():
+                gc.enable()
+            self.end_busy("project_load", gen, "Load superseded — current state kept.")
+
+        # Inc 3 (I-ALP-3 / R-A2L-REFRESH.048 / D-3 / E2-P-02): derive every
+        # required stage pair from the CURRENT UI counters at installation
+        # entry and check every supplied generation representation BEFORE
+        # reset — no candidate/cache/session/widget/project/publication
+        # mutation on any mismatch.
+        current_a = self._a2l_view_generation
+        current_i = self._image_generation
+        image_stage = image_bundle is not None
+        for bundle, is_image in ((image_bundle, True), (mac_bundle, False)):
+            if bundle is None:
                 continue
-            actual = (bundle.a2l_view_generation, bundle.a2l_image_generation)
-            expected = (
-                self._a2l_view_generation + int(bool(bundle.loaded.a2l_data)),
-                self._image_generation + 1,
-            )
-            if actual != expected:
-                self.end_busy(
-                    "project_load", gen, "Load superseded — current state kept."
+            attach = bool(bundle.loaded.a2l_data)
+            if is_image:
+                required = (current_a + 1 + int(attach), current_i + 1)
+            else:
+                prior_attach = image_stage and bool(
+                    image_bundle.loaded.a2l_data
                 )
+                required = (
+                    current_a + 1 + int(attach) + int(prior_attach),
+                    current_i + 1 + int(image_stage),
+                )
+            preparation = bundle.a2l_preparation
+            legacy_a2l = bundle.a2l_view_generation
+            legacy_image = bundle.a2l_image_generation
+            if preparation is None and legacy_a2l is None and legacy_image is None:
+                if bundle.a2l_enriched_key is None:
+                    continue  # legacy direct-construction arm
+                # A keyed bundle with no generation pair can never match —
+                # the same rejection the baseline preflight performed.
+                _reject_superseded()
                 return
+            # An either-field guard: a partial legacy pair is incomplete
+            # and may not be compared or installed.
+            if (legacy_a2l is None) != (legacy_image is None):
+                _reject_superseded()
+                return
+            if preparation is not None and legacy_a2l is not None and (
+                legacy_a2l,
+                legacy_image,
+            ) != (
+                preparation.expected_a2l_generation,
+                preparation.expected_image_generation,
+            ):
+                _reject_superseded()
+                return
+            actual = (
+                (
+                    preparation.expected_a2l_generation,
+                    preparation.expected_image_generation,
+                )
+                if preparation is not None
+                else (legacy_a2l, legacy_image)
+            )
+            if actual != required:
+                _reject_superseded()
+                return
+        if a2l_only is not None and (
+            a2l_only.expected_a2l_generation,
+            a2l_only.expected_image_generation,
+        ) != (current_a + 2, current_i):
+            _reject_superseded()
+            return
         try:
             self._reset_project_session()
             self._declared_regions = (
@@ -1620,6 +1790,16 @@ class ProjectLoadMixin:
                     install.a2l,
                     prepared.a2l_cache[1] if prepared.a2l_cache is not None else None,
                 )
+                if a2l_only is not None:
+                    # Inc 3 (I-ALP-2.3 / R-A2L-REFRESH.046): install the
+                    # prepared A2L-only enrichment caches and the accepted
+                    # picker mapping before the final common refresh —
+                    # never a synthesized LoadedFile or L1 call.
+                    self._a2l_enriched_key = a2l_only.enrichment_key
+                    self._a2l_enriched_tags = list(a2l_only.enriched_tags)
+                    self._a2l_summary_lines = list(a2l_only.summary_lines)
+                    self._a2l_summary_start = 0
+                    self._accepted_a2l_picker_snapshots = a2l_only.picker_snapshots
                 self._apply_empty_state()
             self._reopen_active_document(prepared.document)
             self.current_project = request.name
@@ -1636,9 +1816,7 @@ class ProjectLoadMixin:
                     time.perf_counter(),
                     publish_a2l=False,
                 ):
-                    self.end_busy(
-                        "project_load", gen, "Load superseded — current state kept."
-                    )
+                    _reject_superseded()
                     return
             if mac_bundle is not None and not self._apply_prepared_load(
                 mac_bundle,
@@ -1646,11 +1824,23 @@ class ProjectLoadMixin:
                 time.perf_counter(),
                 publish_a2l=False,
             ):
-                self.end_busy(
-                    "project_load", gen, "Load superseded — current state kept."
-                )
+                _reject_superseded()
                 return
             self._refresh_a2l_dependent_views()
+            # D-13: the one deliberate full collection of the load's
+            # garbage, after the preserved final refresh, timed and logged
+            # (R-A2L-REFRESH.052/.054). gc.freeze() was rejected: it keeps
+            # Textual UI cycles alive (GC-REDESIGN, R-A2L-REFRESH.053).
+            if not gc.isenabled():
+                gc_started = time.perf_counter()
+                unreachable = gc.collect()
+                gc.enable()
+                self.logger.info(
+                    "A2L load GC: route=%s unreachable=%d seconds=%.3f",
+                    "project",
+                    unreachable,
+                    time.perf_counter() - gc_started,
+                )
             loaded = self.current_file
             announcement = deps.compose_load_announcement(
                 request.name,
@@ -1688,6 +1878,10 @@ class ProjectLoadMixin:
                 safe_text(announcement.summary_line()).plain,
             )
         except BaseException:
+            # D-13: never leave the cycle collector disabled on a failure
+            # path.
+            if not gc.isenabled():
+                gc.enable()
             self._busy_fail("project_load", gen)
             raise
 

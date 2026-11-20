@@ -1,0 +1,286 @@
+...F......F.F                                                            [100%]
+================================== FAILURES ===================================
+______________ test_r005_unload_publication[R-A2L-REFRESH.005/4] ______________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40208/test_r005_unload_publication_R3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002E346CC09D0>
+case = 'R-A2L-REFRESH.005/4'
+
+    @pytest.mark.parametrize("case", [f"R-A2L-REFRESH.005/{i}" for i in range(1, 6)], ids=lambda x: x)
+    def test_r005_unload_publication(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+        async def scenario(app, pilot, f):
+            kind = ("primary", "mac", "a2l", "all", "a2l")[int(case.rsplit("/", 1)[1]) - 1]
+            if case.endswith("/5"):
+                _project(f, "P_ONLY", image=None, a2l=f.new)
+                await _load_project(app, pilot, "P_ONLY")
+            else:
+                await _load_image(app, pilot, f.img1)
+                await _load_image(app, pilot, f.mac)
+                await _load_a2l(app, pilot, f.old)
+            events = []
+            _arm_fanout(app, monkeypatch, events)
+            timeline = []
+    
+            def artifacts():
+                current = app.current_file
+                return (
+                    None if current is None else dict(current.mem_map),
+                    None if current is None or current.mac_path is None else current.mac_path.name,
+                    None if app.current_a2l_path is None else app.current_a2l_path.name,
+                )
+    
+            real_empty = app._apply_empty_state
+    
+            def clear_event() -> None:
+                timeline.append(("CLEAR", artifacts()))
+                real_empty()
+    
+            monkeypatch.setattr(app, "_apply_empty_state", clear_event)
+            real_fanout = app._refresh_a2l_dependent_views
+    
+            def fanout_event() -> None:
+                timeline.append(("F", artifacts()))
+                real_fanout()
+    
+            monkeypatch.setattr(app, "_refresh_a2l_dependent_views", fanout_event)
+            real_status = app.set_status
+    
+            def status_event(message: str) -> None:
+                timeline.append(("UNLOADED", message))
+                real_status(message)
+    
+            monkeypatch.setattr(app, "set_status", status_event)
+            _unload(app, kind)
+            await pilot.pause()
+            await pilot.pause()
+            assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+            unload_label = {"primary": "primary image", "mac": "MAC", "a2l": "A2L", "all": "all artifacts"}[kind]
+            assert [event[0] for event in timeline] == ["CLEAR", "F", "UNLOADED"]
+            assert timeline[0][1] == timeline[1][1] == artifacts()
+            assert timeline[-1][1] == f"Unloaded {unload_label}."
+            if kind == "primary":
+                await _assert_snap(app, pilot, rows=OLD, image=None, a2l_name="old.a2l", loaded_mac=True, memory_names=[row[0] for row in OLD])
+            elif kind == "mac":
+                await _assert_snap(app, pilot, rows=OLD, image=IMG1, a2l_name="old.a2l")
+            elif kind == "a2l" and not case.endswith("/5"):
+                await _assert_snap(app, pilot, rows=None, image=IMG1, a2l_name=None, loaded_mac=True)
+            else:
+                await _assert_snap(app, pilot, rows=None, image=None, a2l_name=None)
+    
+>       _run(tmp_path, scenario)
+
+tests\test_b103_a2l_refresh.py:598: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b103_a2l_refresh.py:454: in _run
+    asyncio.run(drive())
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b103_a2l_refresh.py:452: in drive
+    await scenario(app, pilot, fixture)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+f = Fixture(base=WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40208/test_r005_unload_publication_...Path('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40208/test_r005_unload_publication_R3/src/records.mac'))
+
+    async def scenario(app, pilot, f):
+        kind = ("primary", "mac", "a2l", "all", "a2l")[int(case.rsplit("/", 1)[1]) - 1]
+        if case.endswith("/5"):
+            _project(f, "P_ONLY", image=None, a2l=f.new)
+            await _load_project(app, pilot, "P_ONLY")
+        else:
+            await _load_image(app, pilot, f.img1)
+            await _load_image(app, pilot, f.mac)
+            await _load_a2l(app, pilot, f.old)
+        events = []
+        _arm_fanout(app, monkeypatch, events)
+        timeline = []
+    
+        def artifacts():
+            current = app.current_file
+            return (
+                None if current is None else dict(current.mem_map),
+                None if current is None or current.mac_path is None else current.mac_path.name,
+                None if app.current_a2l_path is None else app.current_a2l_path.name,
+            )
+    
+        real_empty = app._apply_empty_state
+    
+        def clear_event() -> None:
+            timeline.append(("CLEAR", artifacts()))
+            real_empty()
+    
+        monkeypatch.setattr(app, "_apply_empty_state", clear_event)
+        real_fanout = app._refresh_a2l_dependent_views
+    
+        def fanout_event() -> None:
+            timeline.append(("F", artifacts()))
+            real_fanout()
+    
+        monkeypatch.setattr(app, "_refresh_a2l_dependent_views", fanout_event)
+        real_status = app.set_status
+    
+        def status_event(message: str) -> None:
+            timeline.append(("UNLOADED", message))
+            real_status(message)
+    
+        monkeypatch.setattr(app, "set_status", status_event)
+        _unload(app, kind)
+        await pilot.pause()
+        await pilot.pause()
+        assert [e[0] for e in events if e[0] != "UI"] == ["F"]
+        unload_label = {"primary": "primary image", "mac": "MAC", "a2l": "A2L", "all": "all artifacts"}[kind]
+>       assert [event[0] for event in timeline] == ["CLEAR", "F", "UNLOADED"]
+E       AssertionError: assert ['UNLOADED', ...', 'UNLOADED'] == ['CLEAR', 'F', 'UNLOADED']
+E         
+E         At index 0 diff: 'UNLOADED' != 'CLEAR'
+E         Left contains one more item: 'UNLOADED'
+E         Use -v to get more diff
+
+tests\test_b103_a2l_refresh.py:586: AssertionError
+__ test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install ___
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40208/test_tc_b100_53_reset_runs_aft0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002E34A77A790>
+
+    def test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """LLR-177.1g, LLR-165.1 (P1-29): a call-order spy over the end of the
+        worker step (``_prepare_project_load``), ``_reset_project_session`` and
+        ``_apply_loaded_file`` → ``["worker_end", "reset@main", "install",
+        "install"]`` for ``P2``; a ``PermissionError`` forced into
+        ``read_project_manifest`` → 0 resets and the session kept.
+    
+        Why: a reset before the worker leaves an empty session when the worker
+        fails (LLR-177.2); a reset after the first install wipes it.
+        Negative control: a reset in ``_handle_load_project`` before the
+        worker → the failure arm leaves ``current_file is None`` → RED; the
+        base (no worker step) → no ``worker_end`` → RED."""
+        base = tmp_path / "app"
+        trio(W(base) / "P2")
+        trio(W(base) / "PF")
+        events: list = []
+        main_box = [threading.get_ident()]
+    
+        def _end(*_a, **_k):
+            events.append("worker_end" if threading.get_ident() != main_box[0] else "worker_end@main")
+    
+        def _reset(*_a, **_k):
+            events.append("reset@main" if threading.get_ident() == main_box[0] else "reset@worker")
+    
+        Spy(monkeypatch, S19TuiApp, "_prepare_project_load", after=_end)
+        Spy(monkeypatch, S19TuiApp, "_reset_project_session", before=_reset)
+        Spy(monkeypatch, S19TuiApp, "_apply_loaded_file", before=lambda *_a, **_k: events.append("install"))
+        real_manifest = app_module.deps.read_project_manifest
+    
+        def _manifest(project_dir, *a, **k):
+            if Path(project_dir).name == "PF":
+                raise PermissionError("synthetic")
+            return real_manifest(project_dir, *a, **k)
+    
+        monkeypatch.setattr(app_module.deps, "read_project_manifest", _manifest)
+    
+        async def scenario(app, pilot, log):
+            await open_trio_project(app, pilot, "P2")
+            ok = list(events)
+            events.clear()
+            try:
+                app._handle_load_project("PF")
+            except Exception:  # noqa: BLE001 — the base raises in the request frame
+                pass
+            await settle_workers(pilot)
+            return ok, list(events), app.current_project, app.current_file is not None
+    
+        ok, failed, project, has_image = run(base, scenario)
+>       assert ok == ["worker_end", "reset@main", "install", "install"], ok
+E       AssertionError: ['worker_end', 'reset@main']
+E       assert ['worker_end', 'reset@main'] == ['worker_end'...l', 'install']
+E         
+E         Right contains 2 more items, first extra item: 'install'
+E         Use -v to get more diff
+
+tests\test_b100_workers.py:1416: AssertionError
+_ test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size] _
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40208/test_tc_b100_54_a2l_attach_ref1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002E34A91DBD0>
+gone = 'a2l_size'
+
+    @pytest.mark.parametrize("gone", ["project_folder", "a2l_size"])
+    def test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, gone: str
+    ) -> None:
+        """CR12b-2 / SE5-12b-2 (ruling E5, split by subject): before any busy
+        run begins, ``load_a2l_from_path`` reads the open project's folder
+        (``validate_project_files``) and the A2L's size (``stat``).
+        - ``project_folder``: the open project ``gone`` was removed outside the
+          app -> 1 line ``A2L NOT loaded: project 'gone' could not be read —
+          check that the folder can be opened, then load again.``;
+        - ``a2l_size``: the size ``stat`` raises ``OSError`` -> 1 line ``A2L
+          file not found: <typed>``.
+        Both: nothing raised out of the request, 0 begins, no run left, the app
+        running.
+    
+        Why: from the Load dialog or a deferred callback the raise ends the app
+        and the unsaved session is lost; a size read as 0 would skip the
+        over-cap rule. Negative control (81ac4c0): both calls are unguarded ->
+        ``FileNotFoundError`` / ``OSError`` leaves the request -> RED."""
+        base = tmp_path / "app"
+        a2l = tmp_path / "src" / "firmware.a2l"
+        a2l.parent.mkdir(parents=True)
+        shutil.copyfile(CASE01 / "firmware.a2l", a2l)
+        begins = Spy(monkeypatch, S19TuiApp, "_busy_begin_action")
+        if gone == "a2l_size":
+            real_stat = pathlib.Path.stat
+    
+            def _stat(self, *args, **kwargs):
+                if sys._getframe(1).f_code.co_name == "load_a2l_from_path":
+                    raise OSError(5, "synthetic size read failure")
+                return real_stat(self, *args, **kwargs)
+    
+            monkeypatch.setattr(pathlib.Path, "stat", _stat)
+    
+        async def scenario(app, pilot, log):
+            if gone == "project_folder":
+                app.current_project = "gone"
+                app.current_project_dir = app.workarea / "gone"
+            mark = len(log.messages)
+            try:
+                app.load_a2l_from_path(a2l)
+                raised = None
+            except BaseException as exc:  # noqa: BLE001 — the RED shape
+                raised = type(exc).__name__
+            for _ in range(3):
+                await pilot.pause()
+            return raised, log.since(mark), list(app._busy.runs), running(app)
+    
+        raised, lines, runs, alive = run(base, scenario)
+        expected = (
+            "A2L NOT loaded: project 'gone' could not be read — check that the folder "
+            "can be opened, then load again."
+            if gone == "project_folder"
+            else f"A2L file not found: {a2l}"
+        )
+        assert raised is None, f"{raised} left load_a2l_from_path"
+>       assert lines == [expected], lines
+E       AssertionError: ['A2L loaded: firmware.a2l']
+E       assert ['A2L loaded: firmware.a2l'] == ['A2L file no...firmware.a2l']
+E         
+E         At index 0 diff: 'A2L loaded: firmware.a2l' != 'A2L file not found: C:\\Users\\<user>\\AppData\\Local\\Temp\\pytest-of-<user>\\pytest-40208\\test_tc_b100_54_a2l_attach_ref1\\src\\firmware.a2l'
+E         Use -v to get more diff
+
+tests\test_b100_workers.py:3277: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/4]
+FAILED tests/test_b100_workers.py::test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install
+FAILED tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size]
+3 failed, 10 passed in 190.36s (0:03:10)
+EXIT=1

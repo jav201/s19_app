@@ -254,6 +254,14 @@ class _ReadSpy:
 
 
 def _describe_spy(monkeypatch):
+    """One describe record shared by the picker/definition bindings and —
+    Inc 2 (batch 2026-11-18-a2l-load-performance) retarget — the
+    direct-attach worker's own binding in ``s19_app.tui.app.file_load``, so
+    a describe call moved onto the attach worker stays visible to every
+    existing .018/.019 oracle instead of looking absent."""
+    import importlib
+    import threading
+
     calls = []
     real = definition_module.describe_definitions
 
@@ -261,11 +269,19 @@ def _describe_spy(monkeypatch):
         materialized = list(names)
         started = time.perf_counter()
         result = real(materialized, a2l_data)
-        calls.append({"names": materialized, "data": a2l_data, "seconds": time.perf_counter() - started, "count": len(result)})
+        calls.append({
+            "names": materialized,
+            "data": a2l_data,
+            "seconds": time.perf_counter() - started,
+            "count": len(result),
+            "thread": threading.get_ident(),
+        })
         return result
 
     monkeypatch.setattr(definition_module, "describe_definitions", spy)
     monkeypatch.setattr(picker_module, "describe_definitions", spy, raising=False)
+    attach_module = importlib.import_module("s19_app.tui.app.file_load")
+    monkeypatch.setattr(attach_module, "describe_definitions", spy, raising=False)
     return calls
 
 
@@ -514,7 +530,7 @@ def test_r017_2_hostile_unit_is_replaced_literally(tmp_path):
                 "compu_method_unit": unit,
             }]
             if editor == "patch":
-                # C-7 (batch G2): the Patch panel no longer reaches self.app —
+                # C-7: the Patch panel no longer reaches self.app —
                 # set_a2l_parameters takes the parsed A2L data from the caller,
                 # the way app/patch.py threads it. The Check panel still reads
                 # self.app, so its arm stays on the no-a2l_data seam.
@@ -662,7 +678,12 @@ def test_r018_1_equal_signature_is_a_zero_describe_noop(tmp_path, monkeypatch):
 
 # R-PICKER-CORRECT.018/2: changed real generation describes once per visible picker.
 def test_r018_2_changed_generation_batches_once_per_picker(tmp_path, monkeypatch):
-    """R-PICKER-CORRECT.018/2: ARR12 12/u16 -> 8/f32, one all-names call each."""
+    """R-PICKER-CORRECT.018/2: ARR12 12/u16 -> 8/f32, one shared all-names call.
+
+    Operator D10 (R-A2L-REFRESH.037 as amended in E4R): the attach producer
+    runs one shared bulk describe per generation for BOTH pickers, so the
+    changed generation is described once in total, not once per picker.
+    """
     describes = _describe_spy(monkeypatch)
     first = _generation_a2l(tmp_path / "generation1.a2l")
     second = _generation_a2l(tmp_path / "generation2.a2l", datatype="FLOAT32_IEEE", matrix="2")
@@ -677,7 +698,7 @@ def test_r018_2_changed_generation_batches_once_per_picker(tmp_path, monkeypatch
         return {editor: _row_result(app.query_one(f"#{editor}_editor_panel"), "ARR12") for editor in ("check", "patch")}
 
     results = _run(tmp_path, body)
-    assert len(describes) == 2
+    assert len(describes) == 1
     assert all(call["names"] == ["ARR12"] and call["data"] is not None for call in describes)
     for result in results.values():
         assert result["size"] == 8
@@ -727,7 +748,7 @@ def test_r018_3_none_always_repopulates_with_real_a2l_data(tmp_path, monkeypatch
 
 # R-PICKER-CORRECT.018/4: Inc 5 live reload refreshes both before the outcome.
 def test_r018_4_live_reload_refreshes_both_without_reentry(tmp_path, monkeypatch):
-    """R-PICKER-CORRECT.018/4: visible ARR12 12 -> 8 on reload, one describe each."""
+    """R-PICKER-CORRECT.018/4: visible ARR12 12 -> 8 on reload, one shared describe (D10)."""
     describes = _describe_spy(monkeypatch)
     first = _generation_a2l(tmp_path / "live1.a2l")
     second = _generation_a2l(tmp_path / "live2.a2l", matrix="2 2")
@@ -753,7 +774,7 @@ def test_r018_4_live_reload_refreshes_both_without_reentry(tmp_path, monkeypatch
 
     active = _run(tmp_path, body)
     assert active == "patch"
-    assert len(describes) == 2
+    assert len(describes) == 1
     assert outcomes and outcomes[-1][1] == {"check": 8, "patch": 8}
 
 

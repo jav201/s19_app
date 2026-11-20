@@ -1,0 +1,136 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <LOCAL_HOME>\anaconda3\envs\s19env\python.exe
+rootdir: <LOCAL_HOME>\Github\s19_app-a2l-load-performance
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 3 items
+
+tests/test_alp_a2l_occupancy_at.py::test_at_alp_i1_1_full_case06_public_describe FAILED [ 33%]
+tests/test_alp_a2l_occupancy_at.py::test_at_alp_i1_2_narrow_public_describe_stays_lazy FAILED [ 66%]
+tests/test_alp_a2l_occupancy_at.py::test_at_alp_i1_3_describe_to_encode_overlap_safety FAILED [100%]
+
+================================== FAILURES ===================================
+________________ test_at_alp_i1_1_full_case06_public_describe _________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40150/test_at_alp_i1_1_full_case06_p0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002993FC0E450>
+
+    @pytest.mark.serial_timing
+    def test_at_alp_i1_1_full_case06_public_describe(tmp_path, monkeypatch):
+        """AT-ALP-I1-1 - real file bytes → independent source-text order oracle
+        computed once → parser → public batch describe of all 220,040 unique
+        names: exact ordered key set, 0 full-case oracle differences per run, the
+        timing protocol (median of 3 at most 30.0 s), per-run construction and
+        population counts, and the R-A2L-DEF.159 / .160 semantic known-answer
+        pins in the same node."""
+        mod = a2ldef
+>       median, runs, oracle_seconds, comparison_seconds = _run_integrated_case06(
+            tmp_path, monkeypatch, mod
+        )
+
+tests\test_alp_a2l_occupancy_at.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_a2l_occupancy_perf.py:365: in _run_integrated_case06
+    _require_seam(mod, "_build_occupancy_index")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+mod = <module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>
+name = '_build_occupancy_index'
+
+    def _require_seam(mod, name: str) -> None:
+        """Fail RED with AttributeError while the E3 private seam ``name`` does not
+        exist on the base — without running the seam-dependent body."""
+>       assert hasattr(mod, name), (
+            f"{name} is not implemented on the base: this white-box case is RED "
+            "until the E3 private seam exists"
+        )
+E       AssertionError: _build_occupancy_index is not implemented on the base: this white-box case is RED until the E3 private seam exists
+E       assert False
+E        +  where False = hasattr(<module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>, '_build_occupancy_index')
+
+tests\test_alp_a2l_occupancy.py:46: AssertionError
+_____________ test_at_alp_i1_2_narrow_public_describe_stays_lazy ______________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40150/test_at_alp_i1_2_narrow_public0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002993FB03610>
+
+    def test_at_alp_i1_2_narrow_public_describe_stays_lazy(tmp_path, monkeypatch):
+        """AT-ALP-I1-2 - real file bytes → parser → public single-name describe of
+        a narrow case_06 query: one correct definition for the exact requested
+        name, its shared_with matching the independent oracle, and no eager
+        all-file final-span materialization or definition build."""
+        mod = a2ldef
+        a2l = parse_a2l_file(_CASE06)
+        names = [tag["name"] for tag in a2l["tags"]]
+        assert len(names) == _CASE06_POPULATION
+        name = names[0]
+        _oracle_seconds, oracle_by_name, _expected_names = _case06_oracle(a2l)
+        state = _install_counters(monkeypatch, mod)
+        result = mod.describe_definitions([name], a2l)
+        assert list(result) == [name] and len(result) == 1
+        assert result[name].shared_with == oracle_by_name[name], (
+            result[name].shared_with, oracle_by_name[name]
+        )
+        assert state["builds"][name] == 1 and len(state["builds"]) == 1, state["builds"]
+        assert state["materializations"] <= 64, (
+            f"the narrow query materialized {state['materializations']} final spans: "
+            "an eager all-file route would materialize every occupancy record"
+        )
+>       assert state["constructions"] == 1, state["constructions"]
+E       AssertionError: 0
+E       assert 0 == 1
+
+tests\test_alp_a2l_occupancy_at.py:76: AssertionError
+_____________ test_at_alp_i1_3_describe_to_encode_overlap_safety ______________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40150/test_at_alp_i1_3_describe_to_e0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002996A35BFD0>
+
+    def test_at_alp_i1_3_describe_to_encode_overlap_safety(tmp_path, monkeypatch):
+        """AT-ALP-I1-3 - inline A2L with one-byte, 64-byte and over-cap spans,
+        interleaved kinds, same-name/same-span and same-name/disjoint records →
+        parser → public describe → the real encode route: cross-page LATE, both
+        homonym shapes and over-cap BIG produce the exact existing outcomes and
+        refusals with no image mutation; one central index per describe holds one
+        interval record per occupancy entry and 0 page-expansion records."""
+        mod = a2ldef
+        state = _install_counters(monkeypatch, mod)
+        clean = inline(
+            tmp_path,
+            characteristic("BIG", "ASCII", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255", "NUMBER 64"),
+            characteristic("LATE", "VALUE", "0x40", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            characteristic("EARLY", "VALUE", "0x20", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            characteristic("BIGC", "VALUE", "0x0", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+            characteristic("V", "VALUE", "0x100000", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+        )
+        next(tag for tag in clean["tags"] if tag.get("name") == "BIGC")["length"] = 1_048_577
+    
+        big = mod.describe_definition("BIG", clean)
+        assert big.shared_with == "LATE"
+        image = img(0x10, bytes(64))
+        before = dict(image)
+        refusal = mod.encode_definition(big, clean, "AB", image)
+        assert isinstance(refusal, mod.Refusal), refusal
+        assert refusal.code == "A2L-DEF-OVERLAP" and "LATE" in refusal.message, refusal
+        assert image == before, "a refused encode must not mutate the image"
+    
+        point = mod.describe_definition("V", clean)
+        assert point.shared_with == "BIGC"
+        point_image = {0x100000: 0}
+        point_before = dict(point_image)
+        refusal = mod.encode_definition(point, clean, "7", point_image)
+        assert isinstance(refusal, mod.Refusal), refusal
+        assert refusal.code == "A2L-DEF-OVERLAP" and "BIGC" in refusal.message, refusal
+        assert point_image == point_before
+    
+        # structural witness: one construction per describe, 5 entries → 5 records
+>       assert state["constructions"] == 2, state["constructions"]
+E       AssertionError: 0
+E       assert 0 == 2
+
+tests\test_alp_a2l_occupancy_at.py:118: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_alp_a2l_occupancy_at.py::test_at_alp_i1_1_full_case06_public_describe
+FAILED tests/test_alp_a2l_occupancy_at.py::test_at_alp_i1_2_narrow_public_describe_stays_lazy
+FAILED tests/test_alp_a2l_occupancy_at.py::test_at_alp_i1_3_describe_to_encode_overlap_safety
+============================= 3 failed in 18.34s ==============================

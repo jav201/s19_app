@@ -1,0 +1,4 @@
+ROUND 1: total=54.94s tick_obs=494 tick_failures=88 tickloop=0.000s admission=101/1 parse=0/0 prep=0/0 gate=171/0 install/pub=222/87
+ROUND 2: total=57.46s tick_obs=496 tick_failures=89 tickloop=0.000s admission=102/1 parse=0/0 prep=0/0 gate=171/0 install/pub=223/88
+ROUND 3: total=56.08s tick_obs=448 tick_failures=88 tickloop=0.000s admission=106/1 parse=0/0 prep=0/0 gate=122/0 install/pub=220/87
+EXIT=0

@@ -1,0 +1,66 @@
+D-12 deviation note — G-T-I2-repair (green-inc2-attach-fixed run)
+
+Full suite: 35 passed, 2 failed (EXIT=1), 769.39 s. Transcript:
+green-inc2-attach-fixed.txt.
+
+The only two failures are the D-12 case_06 arms:
+  test_r034_progress_throughout[case06-full-processing]
+  test_at_alp_i2_2_case06_keys_and_progress
+
+Both fail ONLY on the re-scoped window assertion ("cada gap de la ventana
+[request -> preparación post-parse + instalación completa, antes del common
+refresh preservado] <= 1.0 s"). Every other assertion of those arms passes:
+keys <= 1.0 s, busy-line tokens (glyph/Loading/step), "Build the tag table"
+step label, bar range 0-100, terminal outcome "A2L loaded", snapshot map,
+refresh-gap recording (unasserted).
+
+Root cause (product-side, test-side unfixable): the worker's post-parse
+preparation for case_06 (220,040 tags; enrichment + two bulk
+describe_definitions) holds the GIL in growing 1.2-2.2 s stretches, starving
+the UI loop so the busy tick cannot repaint. Measured in the full run the
+asserted window contains gaps of 1.19, 1.44, 1.72, 1.28, 1.39, 1.67, 1.69,
+1.75, 1.94, 1.97, 2.17, 2.20 s (all BEFORE the preserved common refresh
+entry). The preserved-refresh gap itself is correctly excluded and recorded
+unasserted.
+
+Independent evidence that the stalls are the product's preparation, not the
+test instrumentation:
+  probe-d12d.txt  pure product (no app, no sampler): _prepare_a2l_attach_snapshot
+                  alone (34.5 s wall) starves a plain ticker thread in gaps up
+                  to 1.52 s.
+  probe-d12e.txt  pure product per-phase: enrich 4.5 s + describe1 14.5 s +
+                  describe2 14.8 s; ticker gaps 0.59-1.39 s.
+  probe-d12c.txt  real app: loop-thread ticker gaps 0.9-1.7 s during
+                  enrichment/describes; sampler text-change gaps 0.95-2.19 s.
+  probe-d12f.txt  the new .034[case06] logic replicated: window gaps max
+                  1.92 s; preserved-refresh gap 1.98 s (recorded, unasserted).
+  probe-d12b.txt  phase markers: all big gaps fall between prepare-entry and
+                  prepare-exit (before refresh-entry).
+
+The E4 design premise behind D-12 ("case_06 common-refresh/tag-table gaps of
+2.5-3.6 s" as the sole blocker) does not hold on this host: the >1.0 s gaps
+also occur DURING post-parse preparation, which the amended requirement
+R-A2L-REFRESH.034 still binds to the 1.0 s cadence. Per the task rules the
+product is frozen, so the test asserts the ruling literally and stays RED on
+these two arms. A green suite requires either a product fix (release the GIL
+in enrichment/describe_definitions) or a further design return (D-13) that
+carves preparation out of the 1.0 s cadence.
+
+Extra repairs beyond the 8 listed defects (revealed once the listed defects
+were fixed; same impossibility class, no assertion weakened):
+  r035[confirmed-same-path]: the project digests were captured BEFORE the
+  test's own replacement write, so "project bytes unchanged" was
+  unsatisfiable; the capture moved to after the write (the attach itself is
+  what must not change the project, sync_project=False).
+  AT-I2-1: (a) the Split/Join assertion compared _a2l_rows_cache (MEMORY_SEGMENT
+  rows) against A2L tag rows with fixtures that declare no segments; the
+  OLD/NEW fixtures now declare one MEMORY_SEGMENT per tag (the house pattern
+  from tests/test_b103_a2l_refresh.py). (b) The start-up arm asserted MAC
+  state that the A2L-only start-up route cannot have; _assert_full_views now
+  takes mac=True/False per route. (c) The start-up timeline spies were armed
+  after the start-up attach had already completed; they are now armed at
+  class level before app start (the .029 start-up pattern). (d)
+  _arm_install_fanout_outcome wrapped its own previous wrapper when re-armed
+  for AT-I2-1's second route; it now captures the real methods from the class.
+Note: .037[adapter-mismatch] failed once in a fast subset under machine load
+(60 s house wait timeout) and passes standalone (23.6 s) and in the full run.

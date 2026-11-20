@@ -1,0 +1,32 @@
+## Findings
+
+**ID / case / slice counts — consistent**
+- 10 IDs present once each: `01-requirements.md:46-55`; listed at `E1-rulings.md:7`; all 10 mapped in `E1-slice.md:13-16` (.156,157,158,159,160,161,162,163,164,165), no orphan requirement and no duplicate row.
+- 21 planned cases confirmed by enumeration (`02-test-cases.md:20-40`): 156×3, 157×3, 158×2, 159×3, 160×3, 161×3, 162×1, 163×1, 164×1, 165×1; 21 distinct node IDs; +3 AT nodes (`02:48-50`).
+- Slice: one source file (`E1-slice.md:7`), 4 nodes = 2 changed + 2 new (`E1-slice.md:9,13-16`), 5 baseline Code-Wire nodes — matches `01-requirements.md` counts section and `E1-rulings.md` D-10.
+
+**Threshold-element gaps (requirement threshold has no planned assertion)**
+1. `01-requirements.md:48` (.158 threshold: "0 index-construction calls per definition beyond the one permitted by .156") — `02-test-cases.md:26` and `02:27` assert only check totals and `shared_with=None`; no index-construction-per-definition counter appears in any case.
+2. `01-requirements.md:54` (.164 threshold: "exactly 220,040 indexed positions retained") — `02-test-cases.md:39` asserts only the 3 peaks and 0 page-expansion records.
+3. `01-requirements.md:49` (.159 threshold: "0 whole-alias sorts" applies to all three arms) — `02-test-cases.md:30` (159/3) drops the sort-count assertion that 159/1 and 159/2 carry (`02:28-29`).
+4. `01-requirements.md:52` (.162: "every run indexes exactly 220,040 unique positions") — `02-test-cases.md:37` states the count once, not per measured run.
+
+**Watchdog inconsistency**
+5. `01-requirements.md:38` states the external watchdog is "twice the bound"; `01-requirements.md:54` and `02-test-cases.md:13` use 96 MiB for .164 (twice-the-bound would be 128 MiB). Control remains RED either way (512 × 220,040 = 112,660,480 B > 96 MiB > 64 MiB), so impact is documentation only. Other arms are consistent 2×: .162 5.0/2.5 (`01:52`), .163 36/18 (`01:53`), .165 60/30 (`01:55`).
+
+**"partial" coverage definition violated**
+6. `02-test-cases.md:5` defines `partial` as supplementing a public-route acceptance case, but AT rows (`02:48-50`) link only .165/.156, .161, and .159/.160/.138/.140. Marked partial with no linked public-route acceptance case: `02:23` (157/1), `02:24` (157/2), `02:37` (162/1), `02:38` (163/1), `02:39` (164/1).
+7. `01-requirements.md:50` claims .160 is green on "3/3 arms", but only one node is public: `02:32` is "full public describe", while `02:31` and `02:33` are "partial private-helper arm". AT-ALP-I1-3 (`02:50`) covers homonym safety but not the same-name-disjoint arm (160/3).
+
+**Full-case oracle feasibility**
+8. `02-test-cases.md:9` has the full-case reference "derive positions from the parse walk," but the walk is unchanged product code (`E1-slice.md:24`) and position is the identity/order rule being certified by .160 (`01:50`) and compared for 0 differences at `02:38` and `02:40`. A walk position-assignment defect is undetectable by that oracle; positions are not derived independently.
+9. `02-test-cases.md:9` requires comparing all 220,040 outcomes inside tests whose own bounds are 18.0 s (`02:38`) and 30.0 s (`02:40`); no oracle runtime bound exists, and `01-requirements.md:38` excludes only parsing and fixture generation from timed regions while the watchdog covers only the timed region. Exact next-non-exempt-overlap resolution over nested 220,040-record data (large alias populations plus mask exemptions) is stated but nowhere cost-bounded, so feasibility is unquantified.
+10. `02-test-cases.md:38,40` run 3 measured repetitions with the full 220,040-outcome comparison but do not state whether the oracle is computed once or per run; the comparison cost therefore lands inside or beside the timed protocol unstated.
+
+**Ownership mapping gap**
+11. `E1-slice.md:14,16` assign .158 only to `_shared_with` and `_occupancy_candidates`, yet .158's "0 index-construction calls per definition" element belongs to `describe_definitions`/`_build_occupancy_index` (`E1-slice.md:13,15`). No slice node owns that counter, matching gap 1.
+
+**Not verifiable from these four files**
+12. `E1-rulings.md:11` places the ten rows after R-A2L-DEF.155; nothing in the audited set establishes .155 exists or that 10 IDs remain unused (depends on `census.json`/canon). The 160-function and 38-executed counts (`01-requirements.md` preserved table) are internally consistent by arithmetic (8+48+8+23+4+11+38+14+4+2 = 160; 23+4+11 = 38) but rest on unread evidence files.
+
+**Mechanical counts checked:** 10 requirement IDs; 21 requirement cases; 3 acceptance cases; 1 source file; 4 slice nodes; 5 baseline Code-Wire nodes; 10/10 rows with one `When`+one `shall`; 10/10 numeric thresholds; 10/10 named negative controls; 4 watchdog ratios (3 at 2×, 1 at 1.5×); 160 preserved functions; 38 executed.

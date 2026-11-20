@@ -1,0 +1,11 @@
+parsing examples\case_06_large_nested_a2l\firmware.a2l ...
+  parse 6.0s tags=220040
+  names=220040
+  A-plain: describe1 14.8s describe2 14.3s
+  A-plain: ticker gaps n=1306 peak=1.125s >0.5s: [1.125, 1.047, 0.969, 0.813, 0.703]
+parsing examples\case_06_large_nested_a2l\firmware.a2l ...
+  parse 7.5s tags=220040
+  names=220040
+  B-gc-off: describe1 11.7s describe2 11.8s
+  B-gc-off: ticker gaps n=1240 peak=0.406s >0.5s: []
+RESULT A=1.125s B=0.406s

@@ -1,0 +1,11 @@
+mutant-run: Inc 3 negative controls as source mutants; python 3.11.15
+
+039-bypass-producer: KILLED (exit 1) target -k 039
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r039_shared_snapshot_interface[R-A2L-REFRESH.039/3]
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r039_shared_snapshot_interface[R-A2L-REFRESH.039/5]
+    3 failed, 2 passed, 30 deselected in 79.34s (0:01:19)
+
+048-l1-accept-stale: KILLED (exit 1) target -k 048_stale_snapshot_discard
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r048_stale_snapshot_discard[R-A2L-REFRESH.048/1]
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r048_stale_snapshot_discard[R-A2L-REFRESH.048/2]
+    2 failed, 10 passed, 23 deselected in 159.20s (0:02:39)

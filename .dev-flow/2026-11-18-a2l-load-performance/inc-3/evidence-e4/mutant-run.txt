@@ -1,0 +1,71 @@
+mutant-run: Inc 3 negative controls as source mutants; python 3.11.15
+
+039-bypass-producer: SURVIVED (exit 0) target -k 039 and 1
+    .                                                                        [100%]
+    1 passed, 34 deselected in 26.07s
+
+040-prep-on-ui: KILLED (exit 1) target -k 040_image_post_parse_responsive
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_inc3_load_responsiveness.py::test_r040_image_post_parse_responsive
+    1 failed, 3 deselected in 314.36s (0:05:14)
+
+040-hold-105s: KILLED (exit 1) target -k 040_image_post_parse_responsive
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_inc3_load_responsiveness.py::test_r040_image_post_parse_responsive
+    1 failed, 3 deselected in 690.84s (0:11:30)
+
+041-non-precomputed: KILLED (exit 1) target -k 041_project_pair_post_parse_responsive
+    FAILED tests/test_alp_inc3_load_responsiveness.py::test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/1]
+    FAILED tests/test_alp_inc3_load_responsiveness.py::test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/2]
+    2 failed, 2 deselected in 365.49s (0:06:05)
+
+043-minimal-fallback: KILLED (exit 1) target -k 043_preparation_failure
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r043_preparation_failure_has_no_ui_fallback[R-A2L-REFRESH.043/1]
+    1 failed, 3 passed, 31 deselected in 50.07s
+
+044-publish-twice: KILLED (exit 1) target -k 044_image_final_publication
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r044_image_final_publication[R-A2L-REFRESH.044/2]
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r044_image_final_publication[R-A2L-REFRESH.044/3]
+    3 failed, 32 deselected in 108.90s (0:01:48)
+
+045-publish-on-reset: KILLED (exit 1) target -k 045_project_final_publication
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r045_project_final_publication[R-A2L-REFRESH.045/2]
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r045_project_final_publication[R-A2L-REFRESH.045/3]
+    3 failed, 32 deselected in 12.17s
+
+046-skip-a2l-only-install: KILLED (exit 1) target -k 046_a2l_only_final_publication
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r046_a2l_only_final_publication[R-A2L-REFRESH.046/1]
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r046_a2l_only_final_publication[R-A2L-REFRESH.046/2]
+    2 failed, 33 deselected in 29.49s
+
+047-path-keyed-reuse: KILLED (exit 1) target -k 047_same_path_changed_content and 047/1
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r047_same_path_changed_content[R-A2L-REFRESH.047/1]
+    1 failed, 34 deselected in 42.25s
+
+048-accept-stale: KILLED (exit 1) target -k 048_stale_snapshot_discard
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r048_stale_snapshot_discard[R-A2L-REFRESH.048/9]
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r048_stale_snapshot_discard[R-A2L-REFRESH.048/10]
+    6 failed, 6 passed, 23 deselected in 114.77s (0:01:54)
+
+048-captured-not-live: KILLED (exit 1) target -k 048_stale_snapshot_discard and 048/9
+    =========================== short test summary info ===========================
+    FAILED tests/test_alp_inc3_snapshot_parity.py::test_r048_stale_snapshot_discard[R-A2L-REFRESH.048/9]
+    1 failed, 34 deselected in 2.79s
+
+--- conductor rulings: two mutants re-run (mutant-run-ruled.txt) ---
+039-bypass-producer SURVIVED in the first pass because it targeted only
+arm /1 (the direct-attach route, which does not traverse
+_prepare_load_payload) and the first mutant shape raised NameError. Ruling:
+mutant reshaped (no crash; a2l_preparation=None with direct enrichment) and
+re-run against all five .039 arms: KILLED (arms /3 and /5 fail on the
+producer-bypass assertions; /1 is the Inc 2 interface pin and stays green).
+048-l1-accept-stale SURVIVED because the image-route arms reject through
+TWO L1 guards — the legacy/snapshot agreement guard and the live
+comparison — and the first mutant disabled only the comparison. Ruling:
+mutant now disables both: KILLED (arms /1 and /2 fail on kept-state
+assertions).
+The unmutated tree stays 35/35 green on the parity suite (verify-parity.txt).
+
+FINAL: 13/13 mutants KILLED, 0 unruled survivors.

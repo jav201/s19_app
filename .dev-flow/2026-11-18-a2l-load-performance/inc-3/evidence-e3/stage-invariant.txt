@@ -1,0 +1,14 @@
+SYNC P5=true await=0 yield=0
+SYNC reset=true await=0 yield=0
+SYNC L1=true await=0 yield=0
+P5_SEQUENCE preflight=1595-1607 reset=1609 L1=1633,1643 final_publication=1653 outcome_callback=1684
+L1_SCHEDULING call_later=785,799,828 after_apply_preflight_and_install; no stage yield before them
+GENERATION_WRITE s19_app/tui/app/a2l_view.py:768 _replace_current_a2l _a2l_view_generation
+GENERATION_WRITE s19_app/tui/app/core.py:251 S19TuiApp _a2l_view_generation
+GENERATION_WRITE s19_app/tui/app/core.py:398 __init__ _image_generation
+GENERATION_WRITE s19_app/tui/app/loaded_state.py:642 _apply_prepared_load _image_generation
+GENERATION_WRITERS class_default=core.py:251 image_init=core.py:398 runtime_a2l=a2l_view.py:768 runtime_image=loaded_state.py:642
+A2L_WRITER_CALLS file_load.py:881 loaded_state.py:394,726 project_load.py:963,1619 all_UI_install_or_unload_routes=true
+INVARIANT TRUE P5_L1=synchronous_UI_without_await_or_yield runtime_generation_writers=UI_only STAGE_RACE=unreachable rollback=none
+BLOCKER none
+INSTRUMENT_CONTROLS known_await=detected known_yield=detected

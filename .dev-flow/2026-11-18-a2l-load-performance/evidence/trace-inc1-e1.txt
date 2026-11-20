@@ -1,0 +1,14 @@
+TEST   R-A2L-DEF.156 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.157 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.158 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.159 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.160 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.161 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.162 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.163 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.164 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.165 is named by no file under tests, and neither is a TC/AT id it lists
+EVID   no 04-validation.md beside .dev-flow/2026-11-18-a2l-load-performance/inc-1/01-requirements.md
+trace_check: 2 US, 20 active requirements (0 withdrawn), checks run: US, CASE, TEST, SLICE, EVID, 11 gap(s)
+
+exit=1

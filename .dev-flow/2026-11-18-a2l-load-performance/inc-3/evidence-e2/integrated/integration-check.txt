@@ -1,0 +1,6 @@
+INTEGRATION_PARSED_COUNTS source={'Nodes': 12, 'Entities': 14, 'Edges': 23, 'Findings': 13, 'examples': 97} output={'Nodes': 12, 'Entities': 12, 'Edges': 23, 'Findings': 13, 'examples': 97}
+INTEGRATION_LINT unread=0 all_parts_and_integrated=true reports_closed=true
+INTEGRATION nodes=12 entities=12 edges=23 findings=13 examples=97 requirements=10 implementation_nodes=13 SOURCE=4 duplicate_entities_subsumed=2
+INTEGRATION_COVERAGE F1_F6=6 P1_P5=5 L1=1 S1_entity=1 all_examples_preserved=true
+INTEGRATION_DISPOSITIONS targeted_findings_closed=5 open_design_findings=0 functional_tests=none
+STAGE_INVARIANT synchronous_UI=true STAGE_RACE=removed rollback=none adverse_cases_added=10

@@ -1,0 +1,449 @@
+{
+  "nodes": [
+    {
+      "name": "FileLoadMixin.load_from_path",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.043"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "func": "baseline admits/copies a loose file and starts the load worker without an explicit captured A2L/generation request",
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(E1-baseline-F1) image path with attached A2L → worker starts with path and busy generation"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "FileLoadMixin._load_workarea_file",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.047"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "func": "baseline admits a workarea file and starts the same load worker without explicit captured A2L/generation context",
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(E1-baseline-F2) workarea image name with attached A2L → worker starts in place"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "FileLoadMixin._parse_loaded_file",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[Path]]",
+          "name": "a2l_files",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[A2LCacheEntry]]",
+          "name": "a2l_cache_out",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "Optional[LoadedFile]",
+        "names": [
+          "result"
+        ],
+        "raw": "Optional[LoadedFile] result"
+      },
+      "func": "baseline resolves A2L/current-file inputs by reading live app state and parses the data file",
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(E1-baseline-F3) image path and no explicit A2L list → current A2L path/data/current file are read"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "FileLoadMixin._prepare_load_payload",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.043"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "LoadedFile",
+          "name": "loaded",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "a2l_view_generation",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "image_generation",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "PreparedLoad",
+        "names": [
+          "result"
+        ],
+        "raw": "PreparedLoad result"
+      },
+      "func": "baseline directly enriches A2L and builds MAC/validation/render caches with predicted generation fields",
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(E1-baseline-F4) loaded image+A2L and explicit expected generations → precomputed PreparedLoad"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "FileLoadMixin._start_load_worker",
+      "reqs": [
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.044",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[Path]]",
+          "name": "a2l_files",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "gen",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "sync_project",
+          "default": "True"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "func": "baseline parses and prepares off thread, reads live generations, falls back to a minimal bundle on preparation failure, then dispatches completion",
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(E1-baseline-F5) worker preparation raises → non-precomputed PreparedLoad falls back"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "ProjectLoadMixin._handle_load_project",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.042",
+        "R-A2L-REFRESH.043"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "name",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "routed",
+          "default": "False"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "func": "baseline admits a project and creates a frozen request without captured post-install generation expectations",
+      "module": "s19_app/tui/app/project_load.py",
+      "examples": [
+        "(E1-baseline-P1) admitted project pair → ProjectLoadRequest starts one worker"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "ProjectLoadMixin._prepare_project_load",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.042",
+        "R-A2L-REFRESH.043"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ProjectLoadRequest",
+          "name": "request",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "PreparedProjectLoad",
+        "names": [
+          "result"
+        ],
+        "raw": "PreparedProjectLoad result"
+      },
+      "func": "baseline parses project A2L/image/MAC off thread but never prepares a load payload or A2L enrichment snapshot",
+      "module": "s19_app/tui/app/project_load.py",
+      "examples": [
+        "(E1-baseline-P2) project pair request → parsed image/MAC and no prepared payload"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "ProjectLoadMixin._install_prepared_project",
+      "reqs": [
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.042",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.045",
+        "R-A2L-REFRESH.046",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PreparedProjectLoad",
+          "name": "prepared",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "func": "baseline wraps parsed image/MAC in non-precomputed bundles, resets, installs without intermediate common publication, then publishes once",
+      "module": "s19_app/tui/app/project_load.py",
+      "examples": [
+        "(E1-baseline-P3) parsed project image+MAC+A2L → two minimal PreparedLoad bundles and one final publication"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "ProjectLoadMixin._reset_project_session",
+      "reqs": [
+        "R-A2L-REFRESH.045",
+        "R-A2L-REFRESH.046",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "func": "baseline clears outgoing project state through the single A2L writer, incrementing A2L generation without common publication",
+      "module": "s19_app/tui/app/project_load.py",
+      "examples": [
+        "(E1-baseline-P4) outgoing A2L generation A → reset clears path/data and reaches A+1"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "LoadedStateMixin._apply_prepared_load",
+      "reqs": [
+        "R-A2L-REFRESH.044",
+        "R-A2L-REFRESH.045",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PreparedLoad",
+          "name": "prepared",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "float",
+          "name": "load_started",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "publish_a2l",
+          "default": "True"
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "accepted"
+        ],
+        "raw": "bool accepted"
+      },
+      "func": "baseline preflights only a non-None A2L enrichment key before installation and optionally publishes once",
+      "module": "s19_app/tui/app/loaded_state.py",
+      "examples": [
+        "(E1-baseline-L1) stale keyed snapshot → False before current-file mutation; keyless generation-only bundle → no preflight"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "A2lViewMixin._replace_current_a2l",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.046",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "a2l_path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "a2l_data",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "func": "baseline sole writer replaces current A2L path/data, increments A2L generation and invalidates derived caches without publishing",
+      "module": "s19_app/tui/app/a2l_view.py",
+      "examples": [
+        "(E1-baseline-C1) changed content at the same path → path/data replaced and generation strictly increases"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "enrich_tags_and_render",
+      "reqs": [
+        "R-A2L-REFRESH.039"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "a2l_data",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict[int, int]]",
+          "name": "mem_map",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "max_tag_lines",
+          "default": "500"
+        }
+      ],
+      "out": {
+        "type": "tuple[list[dict[str, Any]], list[str]]",
+        "names": [
+          "result"
+        ],
+        "raw": "tuple[list[dict[str, Any]], list[str]] result"
+      },
+      "func": "baseline canonical service builds enriched tags and summary lines; Inc 3 must reach it only through Inc 2's producer",
+      "module": "s19_app/tui/services/a2l_service.py",
+      "examples": [
+        "(E1-baseline-C2) parsed OLD A2L and image map → OLD enriched rows and summary"
+      ],
+      "modify": [],
+      "volatile": [],
+      "oracle": []
+    }
+  ],
+  "entities": [],
+  "edges": [],
+  "findings": [],
+  "unread": []
+}

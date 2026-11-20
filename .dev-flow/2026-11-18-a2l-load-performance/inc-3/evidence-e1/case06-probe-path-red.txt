@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "<repo>\.dev-flow\2026-11-18-a2l-load-performance\inc-3\evidence-e1\case06_probe.py", line 35, in <module>
+    main()
+  File "<repo>\.dev-flow\2026-11-18-a2l-load-performance\inc-3\evidence-e1\case06_probe.py", line 16, in main
+    import s19_app
+ModuleNotFoundError: No module named 's19_app'

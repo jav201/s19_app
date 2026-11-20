@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Callable, List, Mapping, Optional
 from textual import work
 from textual.widgets import DataTable, Select, Static, TextArea
@@ -1819,7 +1820,7 @@ class PatchMixin:
 
     def _prefill_patch_editor(self) -> None:
         """Populate the Patch Editor's A2L picker on screen entry
-        (batch-102 Inc 5, R-B102-PE-001, R-B102-PE-005).
+        (batch-102 Inc 5, R-B102-PE-001, R-B102-PE-005; C-7, I-ALP-2.3).
 
         Hands the loaded A2L's measurable parameters to the picker's
         highlight-mode ledger with the safe Inc-2 ``_a2l_enriched_key``
@@ -1827,6 +1828,14 @@ class PatchMixin:
         no-op that preserves the filter, the page and the highlight
         (R-B102-PE-005). A not-yet-mounted panel (headless unit path) is
         tolerated as a no-op, matching ``_prefill_check_editor``.
+
+        C-7: the panel is presentational, so the I-ALP-2.3 snapshot adapter
+        lives here in the caller. The caller reads the accepted picker
+        snapshot's ``patch`` entry and forwards ``a2l_data`` plus, on a
+        signature/A2L-source match, the prepared definitions; a present-but-
+        mismatched entry empties the whole mapping before the fallback
+        populate runs. A not-yet-mounted panel keeps the legacy no-data call,
+        so the snapshot survives for a later mount.
         """
         try:
             panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
@@ -1836,9 +1845,32 @@ class PatchMixin:
         measurable = [
             tag for tag in tags if isinstance(tag.get("address"), int)
         ]
-        panel.set_a2l_parameters(
-            measurable, self._a2l_enriched_key, a2l_data=self.current_a2l_data
-        )
+        key = self._a2l_enriched_key
+        entry = getattr(
+            self, "_accepted_a2l_picker_snapshots", MappingProxyType({})
+        ).get("patch")
+        if not panel.is_mounted:
+            panel.set_a2l_parameters(measurable, key)
+        elif (
+            entry is not None
+            and entry.signature == key
+            and entry.a2l_source is self.current_a2l_data
+        ):
+            panel.set_a2l_parameters(
+                measurable,
+                key,
+                a2l_data=self.current_a2l_data,
+                prepared_definitions=entry.definitions,
+            )
+        elif entry is not None:
+            self._accepted_a2l_picker_snapshots = MappingProxyType({})
+            panel.set_a2l_parameters(
+                measurable, key, a2l_data=self.current_a2l_data
+            )
+        else:
+            panel.set_a2l_parameters(
+                measurable, key, a2l_data=self.current_a2l_data
+            )
 
     def on_a2l_parameter_picker_bulk_add_requested(
         self, event: A2LParameterPicker.BulkAddRequested

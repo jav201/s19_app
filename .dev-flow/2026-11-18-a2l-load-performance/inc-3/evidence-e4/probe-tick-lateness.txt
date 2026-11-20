@@ -1,0 +1,6 @@
+observations=492 total=54.869s phases={'admission/copy': 7.579597400035709, 'parse': 0.002865399932488799, 'post-parse preparation': 40.94029940001201, 'install/publication': 6.341760599985719}
+failures=99 gate_ticks=179 gate_elapsed=10.142
+lateness: min=-0.0007 p50=0.0168 p90=0.1359 max=5.3194
+late(>0.100s)=99; of those >0.2s: 9; >1s: 3
+late lateness: min=0.1002 p50=0.1359 max=5.3194
+EXIT=0

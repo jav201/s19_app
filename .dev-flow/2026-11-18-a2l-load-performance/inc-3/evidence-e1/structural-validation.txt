@@ -1,0 +1,10 @@
+REQUIREMENTS count=10 EARS=10 thresholds=10 negative_controls=10 total_budgets=3 same_path_content_generation=resolved adverse_thresholds=4/4,3/3,6/6,12/12
+CASES count=39 classes=19_normal,4_performance,16_robustness per_requirement={'R-A2L-REFRESH.039': 5, 'R-A2L-REFRESH.040': 1, 'R-A2L-REFRESH.041': 2, 'R-A2L-REFRESH.042': 1, 'R-A2L-REFRESH.043': 4, 'R-A2L-REFRESH.044': 3, 'R-A2L-REFRESH.045': 3, 'R-A2L-REFRESH.046': 2, 'R-A2L-REFRESH.047': 6, 'R-A2L-REFRESH.048': 12} results=absent
+SLICE source_files=4 implementation_nodes=13 L1_mapping=041_only_for_image_project
+CODEWIRE baseline=9_changed_functions+3_context=12 marks=12 unread=0 findings=0 parse_failures=0
+PREMISES P01_P06=TRUE census_source=132 census_source_and_tests=498 red_controls=3
+FIXTURE case06=220040_tags paths=redacted QWEN=initial_and_retries_failed DEEPSEEK=pi_audit
+TRACE US_CASE_SLICE=gaps_0 TEST=gaps_10_planned EVID=gaps_1_future_E5
+STAGE_INVARIANT synchronous_UI=true runtime_writers=UI_only stage_race=removed rollback=none
+REDACTION known_root_and_home_controls=true personal_paths=0
+E1_STRUCTURE PASS; no product behavior, test result or performance claim validated

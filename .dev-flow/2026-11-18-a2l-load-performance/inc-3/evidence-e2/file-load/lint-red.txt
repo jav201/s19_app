@@ -1,0 +1,2 @@
+.dev-flow\2026-11-18-a2l-load-performance\inc-3\evidence-e2\file-load\lint-red-input.md:6: not read: `this line is deliberately unread` in node `broken`: not a field
+not read=1 nodes=1 entities=0 edges=0

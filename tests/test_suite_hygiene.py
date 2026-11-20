@@ -66,7 +66,8 @@ MARKER_LINE = (
 PR_LANE_1 = 'pytest -v -rs -n auto -m "not slow and not serial_timing"'
 PR_LANE_2 = 'pytest -q -rs -m "serial_timing and not slow"'
 PUSH_LANE_1 = 'pytest -v -rs -n auto -m "not serial_timing"'
-PUSH_LANE_2 = "pytest -q -rs -m serial_timing"
+PUSH_LANE_2 = 'pytest -q -rs -m "serial_timing and not slow"'
+HEAVY_LANE = 'pytest -q -rs -m "slow and serial_timing"'
 
 LANE_2_IF_PR = (
     "github.event_name == 'pull_request' && !cancelled() "
@@ -657,7 +658,7 @@ def test_r_tst_007_conventions_hold_each_test_rule(rule_id) -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-010 .. 018 — the CI workflow, read as text (E3S-6 ratchet included)
+# R-TST-010 .. 019, 026 — the CI workflow, read as text (E3S-6 ratchet included)
 # ---------------------------------------------------------------------------
 
 
@@ -742,6 +743,26 @@ def _lane_steps(steps, marker: str) -> list:
     return [step for step in picked if _step_run(step)]
 
 
+def _lane_step(steps, marker: str, command: str):
+    """The one ``marker`` lane step that runs ``command``: the PR and push lane 2
+    share one command, so a step is found by its event and its command."""
+    found = [step for step in _lane_steps(steps, marker) if _step_run(step) == command]
+    assert len(found) == 1, f"{len(found)} {marker} lane steps run {command}"
+    return found[0]
+
+
+_PYTEST_RUN = re.compile(r"(?m)^(?:python -m )?pytest\b")
+
+
+def _setup_steps(steps) -> list:
+    """Every step that runs no pytest, as its non-blank lines."""
+    return [
+        [line.rstrip() for line in step if line.strip()]
+        for step in steps
+        if not _PYTEST_RUN.search(_step_run(step) or "")
+    ]
+
+
 _SCRIPT_INJECTION = re.compile(r"\$\{\{\s*github\.(event\.|head_ref)")
 
 
@@ -797,27 +818,40 @@ def test_r_tst_010_2_injection_ratchet_reads_every_run_line_of_every_job() -> No
 
 
 def test_r_tst_011_push_runs_two_lanes() -> None:
+    """Traces: R-TST-011, R-TST-019."""
     text = WORKFLOW_PATH.read_text(encoding="utf-8")
     jobs = _workflow_jobs(text)
     steps = _job_steps(jobs["tui-ci"])
     runs = [_step_run(step) for step in _lane_steps(steps, "push")]
     assert runs == [PUSH_LANE_1, PUSH_LANE_2]
     assert _script_injections(text) == []
+    # R-TST-019: a push also runs the slow timing arms, in a push-only job that
+    # waits on no other job (a red tui-ci would skip it) and sets up as tui-ci.
+    assert "tui-ci-heavy" in jobs, "the push-only tui-ci-heavy job must stay present"
+    heavy = jobs["tui-ci-heavy"]
+    job_keys = [line.strip() for line in heavy if re.match(r"    [a-z]", line)]
+    gates = [key for key in job_keys if key.startswith(("if:", "needs:"))]
+    assert gates == ["if: github.event_name == 'push'"], job_keys
+    heavy_steps = _job_steps(heavy)
+    heavy_runs = [
+        run for run in (_step_run(step) for step in heavy_steps)
+        if run and _PYTEST_RUN.search(run)
+    ]
+    assert heavy_runs == [HEAVY_LANE], heavy_runs
+    assert _setup_steps(heavy_steps) == _setup_steps(steps), (
+        "tui-ci-heavy must check out, install and set up as tui-ci does"
+    )
 
 
 def test_r_tst_012_serial_lane_runs_after_a_red_lane() -> None:
     text = WORKFLOW_PATH.read_text(encoding="utf-8")
     jobs = _workflow_jobs(text)
     steps = _job_steps(jobs["tui-ci"])
-    by_run = {}
-    for step in steps:
-        run = _step_run(step)
-        if run:
-            by_run[run] = step
     lane2_ifs = [
-        _step_value(by_run[command], "if") for command in (PR_LANE_2, PUSH_LANE_2)
+        _step_value(_lane_step(steps, "pull_request", PR_LANE_2), "if"),
+        _step_value(_lane_step(steps, "push", PUSH_LANE_2), "if"),
     ]
-    assert set(lane2_ifs) == {LANE_2_IF_PR, LANE_2_IF_PUSH}, lane2_ifs
+    assert lane2_ifs == [LANE_2_IF_PR, LANE_2_IF_PUSH], lane2_ifs
 
 
 def test_r_tst_013_014_ci_checks_out_full_history() -> None:
@@ -876,24 +910,22 @@ def test_r_tst_013_snapshot_job_changes_only_persist_credentials() -> None:
 
 
 def test_r_tst_015_016_017_ci_time_limits() -> None:
+    """Traces: R-TST-015, R-TST-016, R-TST-017, R-TST-026."""
     text = WORKFLOW_PATH.read_text(encoding="utf-8")
     jobs = _workflow_jobs(text)
     tui_lines = jobs["tui-ci"]
     steps = _job_steps(tui_lines)
-    by_run = {}
-    for step in steps:
-        run = _step_run(step)
-        if run:
-            by_run[run] = step
-    for command in (PR_LANE_1, PR_LANE_2, PUSH_LANE_1, PUSH_LANE_2):
-        assert command in by_run, f"missing lane step: {command}"
-    assert _step_value(by_run[PUSH_LANE_1], "timeout-minutes") == "220"
-    assert _step_value(by_run[PR_LANE_1], "timeout-minutes") == "120"
-    assert _step_value(by_run[PUSH_LANE_2], "timeout-minutes") == "75"
-    assert _step_value(by_run[PR_LANE_2], "timeout-minutes") == "30"
+    pr_1 = _lane_step(steps, "pull_request", PR_LANE_1)
+    pr_2 = _lane_step(steps, "pull_request", PR_LANE_2)
+    push_1 = _lane_step(steps, "push", PUSH_LANE_1)
+    push_2 = _lane_step(steps, "push", PUSH_LANE_2)
+    assert _step_value(push_1, "timeout-minutes") == "220"
+    assert _step_value(pr_1, "timeout-minutes") == "120"
+    assert _step_value(push_2, "timeout-minutes") == "75"
+    assert _step_value(pr_2, "timeout-minutes") == "30"
     # R-TST-017: lane 2 still runs after a red or timed-out lane 1.
-    assert _step_value(by_run[PR_LANE_2], "if") == LANE_2_IF_PR
-    assert _step_value(by_run[PUSH_LANE_2], "if") == LANE_2_IF_PUSH
+    assert _step_value(pr_2, "if") == LANE_2_IF_PR
+    assert _step_value(push_2, "if") == LANE_2_IF_PUSH
     job_level = [
         line.strip() for line in tui_lines if line.startswith("    timeout-minutes:")
     ]
@@ -902,13 +934,22 @@ def test_r_tst_015_016_017_ci_time_limits() -> None:
     assert len(install_steps) == 1, "install step must carry id: install (E3A-13)"
     # Lane 2 fits after a lane-1 stop: install + lane 1 + lane 2 <= job limit.
     job_limit = int(job_level[0].split(":", 1)[1])
-    for lane_1, lane_2 in ((PUSH_LANE_1, PUSH_LANE_2), (PR_LANE_1, PR_LANE_2)):
+    for lane_1, lane_2 in ((push_1, push_2), (pr_1, pr_2)):
         total = (
             _SETUP_MINUTES
-            + int(_step_value(by_run[lane_1], "timeout-minutes"))
-            + int(_step_value(by_run[lane_2], "timeout-minutes"))
+            + int(_step_value(lane_1, "timeout-minutes"))
+            + int(_step_value(lane_2, "timeout-minutes"))
         )
-        assert total <= job_limit, (lane_1, total, job_limit)
+        assert total <= job_limit, (_step_run(lane_1), total, job_limit)
+    # R-TST-026: the push-only heavy job has its own limit,
+    # ceil(1.5 x 41 min laptop wall x CI factor 2) = 123.
+    assert "tui-ci-heavy" in jobs, "the push-only tui-ci-heavy job must stay present"
+    heavy_level = [
+        line.strip()
+        for line in jobs["tui-ci-heavy"]
+        if line.startswith("    timeout-minutes:")
+    ]
+    assert heavy_level == ["timeout-minutes: 123"], heavy_level
 
 
 def test_r_tst_018_ci_installs_pinned_xdist() -> None:

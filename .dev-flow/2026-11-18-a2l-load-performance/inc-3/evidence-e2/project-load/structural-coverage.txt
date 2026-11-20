@@ -1,0 +1,10 @@
+structural coverage: PASS (graph parse only; no functional execution)
+nodes=5 unread=0 requirements_with_examples=8
+R-A2L-REFRESH.039 examples=present
+R-A2L-REFRESH.041 examples=present
+R-A2L-REFRESH.042 examples=present
+R-A2L-REFRESH.043 examples=present
+R-A2L-REFRESH.045 examples=present
+R-A2L-REFRESH.046 examples=present
+R-A2L-REFRESH.047 examples=present
+R-A2L-REFRESH.048 examples=present

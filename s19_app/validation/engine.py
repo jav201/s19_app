@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import heapq
 from dataclasses import dataclass
-from typing import Optional
+from typing import Iterator, Optional
 
 from ..range_index import (
     address_in_sorted_ranges,
@@ -10,6 +11,23 @@ from ..range_index import (
 )
 from .model import CoverageMetrics, ValidationIssue, ValidationSeverity
 from .rules import validate_a2l_structure, validate_mac_records
+
+
+#: Names per C-level ``sorted`` call in ``_sorted_in_slices``.
+SORT_SLICE = 4096
+
+
+def _sorted_in_slices(names: set[str]) -> Iterator[str]:
+    """Yield ``names`` in ``sorted()`` order without one long C-level sort.
+
+    One ``sorted()`` over ~220 k names holds the GIL for ~0.15 s and starves
+    the UI tick (R-A2L-REFRESH.050). Each slice of at most ``SORT_SLICE``
+    names is sorted alone and the runs are merged; the names are distinct,
+    so the merged order equals ``sorted(names)``.
+    """
+    items = list(names)
+    runs = [sorted(items[i:i + SORT_SLICE]) for i in range(0, len(items), SORT_SLICE)]
+    return heapq.merge(*runs)
 
 
 @dataclass(slots=True)
@@ -148,7 +166,7 @@ def validate_artifact_consistency(
             )
 
     all_names = set(a2l_by_name).union(set(mac_by_name))
-    for lowered_name in sorted(all_names):
+    for lowered_name in _sorted_in_slices(all_names):
         in_a2l = lowered_name in a2l_by_name
         in_mac = lowered_name in mac_by_name
         if in_a2l and in_mac:

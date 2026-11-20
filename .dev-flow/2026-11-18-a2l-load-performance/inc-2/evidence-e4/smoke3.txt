@@ -1,0 +1,931 @@
+FFFFF.E                                                                  [100%]
+=================================== ERRORS ====================================
+_____ ERROR at teardown of test_at_alp_i2_3_same_path_picker_generations ______
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000001C96A37E9D0>, _basetemp=WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40206'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="session", autouse=True)
+    def _recent_store_session_guard(tmp_path_factory: pytest.TempPathFactory):
+        """Record the real store's SHA-256 (or its absence) before any test runs,
+        point ``LOCALAPPDATA`` at a session temporary folder for every
+        session/module/class-scoped fixture, and fail the session if the real
+        store changed (LLR-172.1's one guard, LED .41). ``recent_store_path``
+        reads the variable at call time (seam S9), so this takes effect."""
+        real = os.environ.get("LOCALAPPDATA")
+        before = _real_store_digest(real)
+        names_before = _real_store_folder_names(real)
+        patch = pytest.MonkeyPatch()
+        patch.setenv("LOCALAPPDATA", str(tmp_path_factory.mktemp("lad-session")))
+        yield
+        patch.undo()
+        after = _real_store_digest(real)
+>       assert after == before, (
+            "the real per-user recent-sources store under LOCALAPPDATA changed during "
+            "the test run (C8 / LLR-172.1): a test or fixture wrote it"
+        )
+E       AssertionError: the real per-user recent-sources store under LOCALAPPDATA changed during the test run (C8 / LLR-172.1): a test or fixture wrote it
+E       assert '7eaaa9df387e...7179bb73d2678' == '4d822c86411e...50443cf5cdbad'
+E         
+E         - 4d822c86411ee89e2bec93d2e7711f8611b7c1d75f15223f67850443cf5cdbad
+E         + 7eaaa9df387e44e80062a9cd961d0597f60f825b96509f536397179bb73d2678
+
+tests\conftest.py:244: AssertionError
+================================== FAILURES ===================================
+______________________ test_r033_key_latency[enrichment] ______________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40206/test_r033_key_latency_enrichme0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C96A3CAD10>
+arm = 'enrichment'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["copy", "parse", "enrichment", "definitions", "case06-full-processing", "request-snapshot"],
+        ids=lambda x: x,
+    )
+    def test_r033_key_latency(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.033/1-/6: two existing navigation keys are acknowledged
+        within 1.0 s during the named phase, each latency recorded; no median
+        substitution."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        bound = timing_bound(1.0)
+        latencies: list = []
+    
+        if arm == "case06-full-processing":
+            async def body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                deadline = time.monotonic() + 240
+                app.load_a2l_from_path(CASE06)
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                while not (
+                    app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "firmware.a2l"
+                ):
+                    if time.monotonic() > deadline:
+                        raise AssertionError("the case_06 attach never installed")
+                    await pilot.pause(0.05)
+                await settle_workers(pilot)
+                assert any("A2L loaded" in line for line in _log_lines(app))
+                snapshot_map = _accepted_snapshots(app)
+                assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+                return None
+    
+            _run(base, body)
+            assert len(latencies) == 2, latencies
+            assert all(lat <= bound for lat in latencies), latencies
+            return
+    
+        if arm == "request-snapshot":
+            big = _write_big_image(src / "big1m.s19")
+    
+            async def body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                await _load_image(app, pilot, big)
+                requests: list = []
+    
+                real_worker = app._a2l_attach_worker
+    
+                def worker_spy(request):
+                    requests.append(request)
+                    return real_worker(request)
+    
+                monkeypatch.setattr(app, "_a2l_attach_worker", worker_spy)
+                # The keys are scheduled immediately before the synchronous
+                # request-snapshot capture: their measured latency covers it.
+                app.load_a2l_from_path(old)
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                await settle_workers(pilot)
+                assert len(requests) == 1, requests
+                mapping = getattr(requests[0], "image_mem_map", None)
+                assert mapping is not None and len(mapping) == len(app.current_file.mem_map), (
+                    "the worker did not receive an independent read-only image copy"
+                )
+                with pytest.raises(Exception):
+                    mapping[next(iter(mapping))] = 0xFF
+                assert app.current_a2l_path is not None
+                return None
+    
+            _run(base, body)
+            assert len(latencies) == 2, latencies
+            assert all(lat <= bound for lat in latencies), latencies
+            return
+    
+        # The four held-phase arms.
+        async def typed_submit(app, pilot):
+            await _submit_typed(app, pilot, str(old))
+    
+        if arm == "copy":
+            hold = Hold(monkeypatch, [(app_module.deps, "copy_into_workarea")])
+    
+            async def copy_body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                await typed_submit(app, pilot)
+                await reached(pilot, hold, "the held copy phase")
+                assert app.current_a2l_path is None, "an install/outcome happened during the hold"
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                assert "busy:" in _status_text(app), _status_text(app)
+                await release(pilot, hold)
+                await wait_until(
+                    pilot,
+                    lambda: app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "old.a2l",
+                    "the held copy outcome",
+                )
+                return None
+    
+            _run(base, copy_body)
+        elif arm == "parse":
+            entered = threading.Event()
+            release_parse = threading.Event()
+            progress_reports: list = []
+            real_parse = app_module.deps.parse_a2l_cached
+    
+            def gated(path, *args, **kwargs):
+                progress = kwargs.get("progress")
+    
+                def wrapped(done, total):
+                    progress_reports.append((done, total))
+                    if not entered.is_set():
+                        entered.set()
+                        assert release_parse.wait(180), "the held parse was never released"
+                    if progress is not None:
+                        return progress(done, total)
+                    return None
+    
+                kwargs["progress"] = wrapped
+                return real_parse(path, *args, **kwargs)
+    
+            monkeypatch.setattr(app_module.deps, "parse_a2l_cached", gated)
+    
+            async def parse_body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                await typed_submit(app, pilot)
+                await reached(pilot, _ParsedHold(entered), "the held parse phase")
+                assert progress_reports, "the parse made no byte-progress report"
+                assert app.current_a2l_path is None, "an install/outcome happened during the hold"
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                assert 33 <= _bar(app) <= 66, _bar(app)
+                assert "busy:" in _status_text(app), _status_text(app)
+                release_parse.set()
+                await settle_workers(pilot)
+                await wait_until(
+                    pilot,
+                    lambda: app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "old.a2l",
+                    "the held parse outcome",
+                )
+                return None
+    
+            _run(base, parse_body)
+        else:
+            fl = _fl_module()
+            if arm == "enrichment":
+                service = _service_module()
+                hold = Hold(monkeypatch, [(fl, "enrich_tags_and_render"), (service, "enrich_tags_and_render")])
+            else:
+                definition = _definition_module()
+                picker = _picker_module()
+                hold = Hold(
+                    monkeypatch,
+                    [
+                        (definition, "describe_definitions"),
+                        (picker, "describe_definitions"),
+                        (fl, "describe_definitions"),
+                    ],
+                )
+    
+            async def held_body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                await typed_submit(app, pilot)
+                await reached(pilot, hold, f"the held {arm} phase")
+                assert app.current_a2l_path is None, "an install/outcome happened during the hold"
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                assert "busy:" in _status_text(app), _status_text(app)
+                await release(pilot, hold)
+                await wait_until(
+                    pilot,
+                    lambda: app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "old.a2l",
+                    f"the held {arm} outcome",
+                )
+                return None
+    
+>           _run(base, held_body)
+
+tests\test_alp_inc2_a2l_attach.py:1214: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def held_body(app, pilot):
+        app.set_focus(app.query_one("#files_list"))
+        await pilot.pause()
+        await typed_submit(app, pilot)
+        await reached(pilot, hold, f"the held {arm} phase")
+        assert app.current_a2l_path is None, "an install/outcome happened during the hold"
+        phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+        latencies.extend(phase_keys)
+>       assert "busy:" in _status_text(app), _status_text(app)
+E       AssertionError: ⠦ Loading old.a2l  ·  step 2/3 Parse  ·  00:00
+E       assert 'busy:' in '⠦ Loading old.a2l  ·  step 2/3 Parse  ·  00:00'
+E        +  where '⠦ Loading old.a2l  ·  step 2/3 Parse  ·  00:00' = _status_text(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}))
+
+tests\test_alp_inc2_a2l_attach.py:1204: AssertionError
+_____________________ test_r033_key_latency[definitions] ______________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40206/test_r033_key_latency_definiti0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C96BFA0350>
+arm = 'definitions'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["copy", "parse", "enrichment", "definitions", "case06-full-processing", "request-snapshot"],
+        ids=lambda x: x,
+    )
+    def test_r033_key_latency(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.033/1-/6: two existing navigation keys are acknowledged
+        within 1.0 s during the named phase, each latency recorded; no median
+        substitution."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        bound = timing_bound(1.0)
+        latencies: list = []
+    
+        if arm == "case06-full-processing":
+            async def body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                deadline = time.monotonic() + 240
+                app.load_a2l_from_path(CASE06)
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                while not (
+                    app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "firmware.a2l"
+                ):
+                    if time.monotonic() > deadline:
+                        raise AssertionError("the case_06 attach never installed")
+                    await pilot.pause(0.05)
+                await settle_workers(pilot)
+                assert any("A2L loaded" in line for line in _log_lines(app))
+                snapshot_map = _accepted_snapshots(app)
+                assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+                return None
+    
+            _run(base, body)
+            assert len(latencies) == 2, latencies
+            assert all(lat <= bound for lat in latencies), latencies
+            return
+    
+        if arm == "request-snapshot":
+            big = _write_big_image(src / "big1m.s19")
+    
+            async def body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                await _load_image(app, pilot, big)
+                requests: list = []
+    
+                real_worker = app._a2l_attach_worker
+    
+                def worker_spy(request):
+                    requests.append(request)
+                    return real_worker(request)
+    
+                monkeypatch.setattr(app, "_a2l_attach_worker", worker_spy)
+                # The keys are scheduled immediately before the synchronous
+                # request-snapshot capture: their measured latency covers it.
+                app.load_a2l_from_path(old)
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                await settle_workers(pilot)
+                assert len(requests) == 1, requests
+                mapping = getattr(requests[0], "image_mem_map", None)
+                assert mapping is not None and len(mapping) == len(app.current_file.mem_map), (
+                    "the worker did not receive an independent read-only image copy"
+                )
+                with pytest.raises(Exception):
+                    mapping[next(iter(mapping))] = 0xFF
+                assert app.current_a2l_path is not None
+                return None
+    
+            _run(base, body)
+            assert len(latencies) == 2, latencies
+            assert all(lat <= bound for lat in latencies), latencies
+            return
+    
+        # The four held-phase arms.
+        async def typed_submit(app, pilot):
+            await _submit_typed(app, pilot, str(old))
+    
+        if arm == "copy":
+            hold = Hold(monkeypatch, [(app_module.deps, "copy_into_workarea")])
+    
+            async def copy_body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                await typed_submit(app, pilot)
+                await reached(pilot, hold, "the held copy phase")
+                assert app.current_a2l_path is None, "an install/outcome happened during the hold"
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                assert "busy:" in _status_text(app), _status_text(app)
+                await release(pilot, hold)
+                await wait_until(
+                    pilot,
+                    lambda: app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "old.a2l",
+                    "the held copy outcome",
+                )
+                return None
+    
+            _run(base, copy_body)
+        elif arm == "parse":
+            entered = threading.Event()
+            release_parse = threading.Event()
+            progress_reports: list = []
+            real_parse = app_module.deps.parse_a2l_cached
+    
+            def gated(path, *args, **kwargs):
+                progress = kwargs.get("progress")
+    
+                def wrapped(done, total):
+                    progress_reports.append((done, total))
+                    if not entered.is_set():
+                        entered.set()
+                        assert release_parse.wait(180), "the held parse was never released"
+                    if progress is not None:
+                        return progress(done, total)
+                    return None
+    
+                kwargs["progress"] = wrapped
+                return real_parse(path, *args, **kwargs)
+    
+            monkeypatch.setattr(app_module.deps, "parse_a2l_cached", gated)
+    
+            async def parse_body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                await typed_submit(app, pilot)
+                await reached(pilot, _ParsedHold(entered), "the held parse phase")
+                assert progress_reports, "the parse made no byte-progress report"
+                assert app.current_a2l_path is None, "an install/outcome happened during the hold"
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                assert 33 <= _bar(app) <= 66, _bar(app)
+                assert "busy:" in _status_text(app), _status_text(app)
+                release_parse.set()
+                await settle_workers(pilot)
+                await wait_until(
+                    pilot,
+                    lambda: app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "old.a2l",
+                    "the held parse outcome",
+                )
+                return None
+    
+            _run(base, parse_body)
+        else:
+            fl = _fl_module()
+            if arm == "enrichment":
+                service = _service_module()
+                hold = Hold(monkeypatch, [(fl, "enrich_tags_and_render"), (service, "enrich_tags_and_render")])
+            else:
+                definition = _definition_module()
+                picker = _picker_module()
+                hold = Hold(
+                    monkeypatch,
+                    [
+                        (definition, "describe_definitions"),
+                        (picker, "describe_definitions"),
+                        (fl, "describe_definitions"),
+                    ],
+                )
+    
+            async def held_body(app, pilot):
+                app.set_focus(app.query_one("#files_list"))
+                await pilot.pause()
+                await typed_submit(app, pilot)
+                await reached(pilot, hold, f"the held {arm} phase")
+                assert app.current_a2l_path is None, "an install/outcome happened during the hold"
+                phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+                latencies.extend(phase_keys)
+                assert "busy:" in _status_text(app), _status_text(app)
+                await release(pilot, hold)
+                await wait_until(
+                    pilot,
+                    lambda: app.current_a2l_path is not None
+                    and Path(app.current_a2l_path).name == "old.a2l",
+                    f"the held {arm} outcome",
+                )
+                return None
+    
+>           _run(base, held_body)
+
+tests\test_alp_inc2_a2l_attach.py:1214: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def held_body(app, pilot):
+        app.set_focus(app.query_one("#files_list"))
+        await pilot.pause()
+        await typed_submit(app, pilot)
+        await reached(pilot, hold, f"the held {arm} phase")
+        assert app.current_a2l_path is None, "an install/outcome happened during the hold"
+        phase_keys = await _focus_key_pair(pilot, app, bound=bound)
+        latencies.extend(phase_keys)
+>       assert "busy:" in _status_text(app), _status_text(app)
+E       AssertionError: ⠙ Loading old.a2l  ·  step 2/3 Parse  ·  00:00
+E       assert 'busy:' in '⠙ Loading old.a2l  ·  step 2/3 Parse  ·  00:00'
+E        +  where '⠙ Loading old.a2l  ·  step 2/3 Parse  ·  00:00' = _status_text(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}))
+
+tests\test_alp_inc2_a2l_attach.py:1204: AssertionError
+__________________ test_r034_progress_throughout[enrichment] __________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40206/test_r034_progress_throughout_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C96C0BDA50>
+arm = 'enrichment'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["enrichment", "definitions", "case06-full-processing", "request-snapshot"],
+        ids=lambda x: x,
+    )
+    def test_r034_progress_throughout(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.034/1-/4: the existing busy line stays visible and every
+        inter-update gap is <= 1.0 s through the named phase until the outcome."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+    
+        if arm == "case06-full-processing":
+            async def body(app, pilot):
+                sampler = Sampler()
+                task = sampler.start(pilot, app, bar=True)
+                await pilot.pause(0.1)
+                deadline = time.monotonic() + 300
+                app.load_a2l_from_path(CASE06)
+                while True:
+                    if (
+                        app.current_a2l_path is not None
+                        and Path(app.current_a2l_path).name == "firmware.a2l"
+                        and "a2l_load" not in app._busy.runs
+                    ):
+                        break
+                    if time.monotonic() > deadline:
+                        raise AssertionError("the case_06 attach never reached its terminal outcome")
+                    await pilot.pause(0.05)
+                sampler.stop.set()
+                await task
+                _assert_progress_continuous(sampler, arm)
+                changes = sampler.text_changes()
+                texts = [text for _, text in changes]
+                assert any("busy:" in text and "firmware.a2l" in text for text in texts), texts
+                assert any("Build the tag table" in text for text in texts), texts
+                bars = [bar for _t, _x, bar in sampler.frames if bar is not None]
+                assert all(0 <= value <= 100 for value in bars), "out-of-range bar value"
+                assert any("A2L loaded" in line for line in _log_lines(app))
+                assert "busy:" in changes[-1][1], changes[-1]
+                return None
+    
+            _run(base, body)
+            return
+    
+        if arm == "request-snapshot":
+            big = _write_big_image(src / "big1m.s19")
+    
+            async def body(app, pilot):
+                await _load_image(app, pilot, big)
+                sampler = Sampler()
+                task = sampler.start(pilot, app, bar=True)
+                await pilot.pause(0.1)
+                started = threading.Event()
+    
+                real_worker = app._a2l_attach_worker
+    
+                def worker_spy(request):
+                    started.set()
+                    return real_worker(request)
+    
+                monkeypatch.setattr(app, "_a2l_attach_worker", worker_spy)
+                app.load_a2l_from_path(old)
+                deadline = time.monotonic() + 120
+                while not started.is_set():
+                    if time.monotonic() > deadline:
+                        raise AssertionError("the attach worker never started")
+                    await pilot.pause(0.01)
+                await pilot.pause(0.5)
+                sampler.stop.set()
+                await task
+                changes = sampler.text_changes()
+                assert any("busy:" in text and "old.a2l" in text for text, _ in changes), changes
+                times = [t for t, _ in changes]
+                gaps = [b - a for a, b in zip(times, times[1:])]
+                assert all(gap <= 1.0 for gap in gaps), gaps
+                await settle_workers(pilot)
+                assert app.current_a2l_path is not None
+                return None
+    
+            _run(base, body)
+            return
+    
+        # The two 1.5 s held arms.
+        fl = _fl_module()
+        if arm == "enrichment":
+            service = _service_module()
+            hold = Hold(monkeypatch, [(fl, "enrich_tags_and_render"), (service, "enrich_tags_and_render")])
+        else:
+            definition = _definition_module()
+            picker = _picker_module()
+            hold = Hold(
+                monkeypatch,
+                [
+                    (definition, "describe_definitions"),
+                    (picker, "describe_definitions"),
+                    (fl, "describe_definitions"),
+                ],
+            )
+    
+        async def held_progress_body(app, pilot):
+            sampler = Sampler()
+            await _submit_typed(app, pilot, str(old))
+            await reached(pilot, hold, f"the held {arm} phase")
+            task = sampler.start(pilot, app)
+            await asyncio.sleep(1.5)
+            sampler.stop.set()
+            await task
+            _assert_progress_continuous(sampler, arm)
+            texts = [text for _, text in sampler.text_changes()]
+            assert any("busy:" in text for text in texts), texts
+            assert not any("A2L loaded" in text or "NOT loaded" in text for text in texts), texts
+            await release(pilot, hold)
+            await wait_until(
+                pilot,
+                lambda: app.current_a2l_path is not None
+                and Path(app.current_a2l_path).name == "old.a2l",
+                f"the held {arm} attach outcome",
+            )
+            return None
+    
+>       _run(base, held_progress_body)
+
+tests\test_alp_inc2_a2l_attach.py:1365: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def held_progress_body(app, pilot):
+        sampler = Sampler()
+        await _submit_typed(app, pilot, str(old))
+        await reached(pilot, hold, f"the held {arm} phase")
+        task = sampler.start(pilot, app)
+        await asyncio.sleep(1.5)
+        sampler.stop.set()
+        await task
+        _assert_progress_continuous(sampler, arm)
+        texts = [text for _, text in sampler.text_changes()]
+>       assert any("busy:" in text for text in texts), texts
+E       AssertionError: ['⠙ Loading old.a2l  ·  step 2/3 Parse  ·  00:00', '⠹ Loading old.a2l  ·  step 2/3 Parse  ·  00:00', '⠸ Loading old.a2...se  ·  00:00', '⠦ Loading old.a2l  ·  step 2/3 Parse  ·  00:00', '⠧ Loading old.a2l  ·  step 2/3 Parse  ·  00:00', ...]
+E       assert False
+E        +  where False = any(<generator object test_r034_progress_throughout.<locals>.held_progress_body.<locals>.<genexpr> at 0x000001C96B09CE10>)
+
+tests\test_alp_inc2_a2l_attach.py:1354: AssertionError
+_________________ test_r034_progress_throughout[definitions] __________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40206/test_r034_progress_throughout_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C96AC30BD0>
+arm = 'definitions'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["enrichment", "definitions", "case06-full-processing", "request-snapshot"],
+        ids=lambda x: x,
+    )
+    def test_r034_progress_throughout(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.034/1-/4: the existing busy line stays visible and every
+        inter-update gap is <= 1.0 s through the named phase until the outcome."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+    
+        if arm == "case06-full-processing":
+            async def body(app, pilot):
+                sampler = Sampler()
+                task = sampler.start(pilot, app, bar=True)
+                await pilot.pause(0.1)
+                deadline = time.monotonic() + 300
+                app.load_a2l_from_path(CASE06)
+                while True:
+                    if (
+                        app.current_a2l_path is not None
+                        and Path(app.current_a2l_path).name == "firmware.a2l"
+                        and "a2l_load" not in app._busy.runs
+                    ):
+                        break
+                    if time.monotonic() > deadline:
+                        raise AssertionError("the case_06 attach never reached its terminal outcome")
+                    await pilot.pause(0.05)
+                sampler.stop.set()
+                await task
+                _assert_progress_continuous(sampler, arm)
+                changes = sampler.text_changes()
+                texts = [text for _, text in changes]
+                assert any("busy:" in text and "firmware.a2l" in text for text in texts), texts
+                assert any("Build the tag table" in text for text in texts), texts
+                bars = [bar for _t, _x, bar in sampler.frames if bar is not None]
+                assert all(0 <= value <= 100 for value in bars), "out-of-range bar value"
+                assert any("A2L loaded" in line for line in _log_lines(app))
+                assert "busy:" in changes[-1][1], changes[-1]
+                return None
+    
+            _run(base, body)
+            return
+    
+        if arm == "request-snapshot":
+            big = _write_big_image(src / "big1m.s19")
+    
+            async def body(app, pilot):
+                await _load_image(app, pilot, big)
+                sampler = Sampler()
+                task = sampler.start(pilot, app, bar=True)
+                await pilot.pause(0.1)
+                started = threading.Event()
+    
+                real_worker = app._a2l_attach_worker
+    
+                def worker_spy(request):
+                    started.set()
+                    return real_worker(request)
+    
+                monkeypatch.setattr(app, "_a2l_attach_worker", worker_spy)
+                app.load_a2l_from_path(old)
+                deadline = time.monotonic() + 120
+                while not started.is_set():
+                    if time.monotonic() > deadline:
+                        raise AssertionError("the attach worker never started")
+                    await pilot.pause(0.01)
+                await pilot.pause(0.5)
+                sampler.stop.set()
+                await task
+                changes = sampler.text_changes()
+                assert any("busy:" in text and "old.a2l" in text for text, _ in changes), changes
+                times = [t for t, _ in changes]
+                gaps = [b - a for a, b in zip(times, times[1:])]
+                assert all(gap <= 1.0 for gap in gaps), gaps
+                await settle_workers(pilot)
+                assert app.current_a2l_path is not None
+                return None
+    
+            _run(base, body)
+            return
+    
+        # The two 1.5 s held arms.
+        fl = _fl_module()
+        if arm == "enrichment":
+            service = _service_module()
+            hold = Hold(monkeypatch, [(fl, "enrich_tags_and_render"), (service, "enrich_tags_and_render")])
+        else:
+            definition = _definition_module()
+            picker = _picker_module()
+            hold = Hold(
+                monkeypatch,
+                [
+                    (definition, "describe_definitions"),
+                    (picker, "describe_definitions"),
+                    (fl, "describe_definitions"),
+                ],
+            )
+    
+        async def held_progress_body(app, pilot):
+            sampler = Sampler()
+            await _submit_typed(app, pilot, str(old))
+            await reached(pilot, hold, f"the held {arm} phase")
+            task = sampler.start(pilot, app)
+            await asyncio.sleep(1.5)
+            sampler.stop.set()
+            await task
+            _assert_progress_continuous(sampler, arm)
+            texts = [text for _, text in sampler.text_changes()]
+            assert any("busy:" in text for text in texts), texts
+            assert not any("A2L loaded" in text or "NOT loaded" in text for text in texts), texts
+            await release(pilot, hold)
+            await wait_until(
+                pilot,
+                lambda: app.current_a2l_path is not None
+                and Path(app.current_a2l_path).name == "old.a2l",
+                f"the held {arm} attach outcome",
+            )
+            return None
+    
+>       _run(base, held_progress_body)
+
+tests\test_alp_inc2_a2l_attach.py:1365: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def held_progress_body(app, pilot):
+        sampler = Sampler()
+        await _submit_typed(app, pilot, str(old))
+        await reached(pilot, hold, f"the held {arm} phase")
+        task = sampler.start(pilot, app)
+        await asyncio.sleep(1.5)
+        sampler.stop.set()
+        await task
+        _assert_progress_continuous(sampler, arm)
+        texts = [text for _, text in sampler.text_changes()]
+>       assert any("busy:" in text for text in texts), texts
+E       AssertionError: ['⠙ Loading old.a2l  ·  step 2/3 Parse  ·  00:00', '⠹ Loading old.a2l  ·  step 2/3 Parse  ·  00:00', '⠸ Loading old.a2...se  ·  00:00', '⠴ Loading old.a2l  ·  step 2/3 Parse  ·  00:00', '⠦ Loading old.a2l  ·  step 2/3 Parse  ·  00:00', ...]
+E       assert False
+E        +  where False = any(<generator object test_r034_progress_throughout.<locals>.held_progress_body.<locals>.<genexpr> at 0x000001C96A650D40>)
+
+tests\test_alp_inc2_a2l_attach.py:1354: AssertionError
+___________ test_at_alp_i2_1_direct_attach_routes_publish_snapshots ___________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40206/test_at_alp_i2_1_direct_attach0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C96BF20BD0>
+
+    def test_at_alp_i2_1_direct_attach_routes_publish_snapshots(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """AT-ALP-I2-1: typed, Workarea Files and start-up attaches each finish
+        with current viewer, Check, Patch, Memory Map, Split/Join, Loaded, MAC
+        and Issues state, with the common refresh before each outcome."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        new = _new_a2l(src / "new.a2l")
+        img = _write_image(src / "img1.s19", dict(IMG1))
+        mac = _write_mac(src / "records.mac")
+        workarea_temp = base / WORKAREA_DIRNAME / WORKAREA_SUBDIR / WORKAREA_TEMP
+        workarea_temp.mkdir(parents=True, exist_ok=True)
+        (workarea_temp / "new.a2l").write_bytes(new.read_bytes())
+    
+        async def body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            await _load_image(app, pilot, img)
+            await _load_image(app, pilot, mac)
+            events: list = []
+            _arm_install_fanout_outcome(app, monkeypatch, events)
+            await _typed_attach(app, pilot, old)
+            await settle_workers(pilot)
+            kind = [e[0] for e in events if e[0] in {"install", "refresh", "outcome"}]
+            assert kind == ["install", "refresh", "outcome"], events
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_full_views(app, OLD_ROWS, "old.a2l", image=True)
+            events.clear()
+            _arm_install_fanout_outcome(app, monkeypatch, events)
+            await _workarea_attach(app, pilot, "new.a2l")
+            await settle_workers(pilot)
+            kind = [e[0] for e in events if e[0] in {"install", "refresh", "outcome"}]
+            assert kind == ["install", "refresh", "outcome"], events
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_full_views(app, NEW_ROWS, "new.a2l", image=True)
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1927: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:1915: in body
+    _assert_full_views(app, OLD_ROWS, "old.a2l", image=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+rows = (('OLD_SCALAR', 4096, 2, 'u16'), ('ARR12', 8192, 12, 'u16'), ('AUX2', 16384, 2, 'u16'))
+a2l_name = 'old.a2l', image = True
+
+    def _assert_full_views(app: S19TuiApp, rows, a2l_name: str, image: bool) -> None:
+        _assert_panel_state(_check_panel(app), rows)
+        _assert_panel_state(_patch_panel(app), rows)
+        assert _a2l_viewer_names(app) == [name for name, *_ in rows]
+        memory = app.query_one("#memory_map_panel", MemoryMapPanel)
+        if image:
+            assert memory.rendered_text != memory._EMPTY_TEXT
+            for name, *_ in rows:
+>               assert name in memory.rendered_text
+E               AssertionError: assert 'OLD_SCALAR' in 'Entropy bands - 1 region(s), 3 B mapped'
+E                +  where 'Entropy bands - 1 region(s), 3 B mapped' = MemoryMapPanel(id='memory_map_panel').rendered_text
+
+tests\test_alp_inc2_a2l_attach.py:1874: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r033_key_latency[enrichment]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r033_key_latency[definitions]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r034_progress_throughout[enrichment]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r034_progress_throughout[definitions]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_at_alp_i2_1_direct_attach_routes_publish_snapshots
+ERROR tests/test_alp_inc2_a2l_attach.py::test_at_alp_i2_3_same_path_picker_generations
+5 failed, 1 passed, 6 deselected, 1 error in 798.99s (0:13:18)
+EXIT=1

@@ -2,16 +2,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import gc
 import os
 from pathlib import Path, PurePath
 import stat
 import time
-from typing import Any, List, Optional, Tuple
+from types import MappingProxyType
+from typing import Any, List, Mapping, Optional, Tuple
 from textual import work
 from textual.widgets import ListItem, ListView
 from ...range_index import address_in_sorted_ranges
 from ...render.hexview import build_row_bases
 from ...utils import safe_text
+from ..a2l_definition import Definition, describe_definitions
 from ..mac import parse_mac_file
 from ..models import LoadedFile
 from ..screens import ConfirmQuestionScreen, LoadChoice, LoadDialog
@@ -41,7 +44,13 @@ from .shared import (
 
 @dataclass(frozen=True)
 class A2LAttachRequest:
-    """Inc 12b (S-b): the A2L attach worker's immutable request."""
+    """Inc 12b (S-b): the A2L attach worker's immutable request.
+
+    Inc 2 (batch 2026-11-18-a2l-load-performance, I-ALP-2.1) appends the
+    expected post-install pair and the request-owned read-only image
+    mapping: product requests always carry the pair, and an image-bearing
+    request carries an independent copy captured before worker launch.
+    """
 
     source: Path
     copy: bool
@@ -51,17 +60,87 @@ class A2LAttachRequest:
     a2l_cache: Optional[A2LCacheEntry]
     gen: int
     sync_project: bool = True
+    expected_a2l_generation: Optional[int] = None
+    expected_image_generation: Optional[int] = None
+    image_mem_map: Optional[Mapping[int, int]] = None
 
 
 @dataclass(frozen=True)
 class A2LAttachResult:
     """Inc 12b (S-b): the A2L attach worker's result (copy_seconds dropped,
-    E3 A12b-04)."""
+    E3 A12b-04).
+
+    Inc 2 (batch 2026-11-18-a2l-load-performance, I-ALP-2.1) appends the
+    prepared attach snapshot: every successful product worker result
+    carries one; ``preparation=None`` is only the legacy
+    direct-construction compatibility arm.
+    """
 
     request: A2LAttachRequest
     path: Path
     entry: A2LCacheEntry
     parse_seconds: float
+    preparation: Optional["A2LAttachSnapshot"] = None
+
+
+@dataclass(frozen=True)
+class A2LAttachSnapshot:
+    """Inc 2 (I-ALP-2.2): the generation-bound, read-only hand-off of one
+    direct attach's post-parse work — enriched tags, summary lines and the
+    two independent picker bulk descriptions — built on the attach worker
+    before the install callback is dispatched.
+
+    The recorded expected pair is the install preflight authority; the
+    enrichment key is ``(expected_a2l_generation, expected_image_generation,
+    mem_size)`` with ``mem_size=-1`` without an image. Parsed payloads and
+    :class:`Definition` objects are shared read-only after hand-off, never
+    recursively frozen.
+    """
+
+    expected_a2l_generation: int
+    expected_image_generation: int
+    enrichment_key: Tuple[int, int, int]
+    enriched_tags: Tuple[dict, ...]
+    summary_lines: Tuple[str, ...]
+    picker_snapshots: Mapping[str, "A2LPickerSnapshot"]
+
+
+@dataclass(frozen=True)
+class A2LPickerSnapshot:
+    """Inc 2 (I-ALP-2.2): one picker's read-only bulk-describe hand-off for
+    an accepted direct attach — its literal picker key, the full enrichment
+    signature, the exact A2L source object for identity comparison and that
+    picker's own read-only definitions mapping.
+    """
+
+    picker: str
+    signature: Tuple[int, int, int]
+    a2l_source: dict
+    definitions: Mapping[str, Definition]
+
+
+@dataclass(frozen=True)
+class FileLoadRequest:
+    """Inc 3 (I-ALP-3 / F1): the file-load worker's immutable UI-captured
+    route context, built on the main thread after the existing
+    admission/copy steps (R-A2L-REFRESH.039/.043/.047/.048).
+
+    Every field is fixed at capture; the product worker treats all captured
+    payloads as read-only and resolves no live session member, artifact or
+    generation counter itself. ``sync_project`` keeps the legacy in-place
+    workarea arm (``False``) apart from the copying typed route (``True``).
+    """
+
+    path: Path
+    a2l_path: Optional[Path]
+    a2l_data: Optional[dict]
+    a2l_cache: Optional[A2LCacheEntry]
+    current_file: Optional[LoadedFile]
+    expected_a2l_generation: int
+    expected_image_generation: int
+    gen: int
+    a2l_files: Optional[Tuple[Path, ...]] = None
+    sync_project: bool = True
 
 
 class FileLoadMixin:
@@ -530,7 +609,27 @@ class FileLoadMixin:
             # Workarea refresh + diagnostic log are dispatched via
             # ``call_later`` so they run on the next idle frame.
             copied_size = copied.stat().st_size
-            self._start_load_worker(copied, gen=gen)
+            # Inc 3 (I-ALP-3 / F2): capture the immutable route context on
+            # the UI thread before the worker launches — the copied path,
+            # the explicit attached-A2L path/data/cache, the existing-file
+            # snapshot, the expected post-install generation pair and the
+            # busy generation — so the product worker reads no live session
+            # member or counter (R-A2L-REFRESH.039/.048).
+            context = FileLoadRequest(
+                path=copied,
+                a2l_path=self.current_a2l_path,
+                a2l_data=self.current_a2l_data,
+                a2l_cache=self._a2l_cache_entry(),
+                current_file=self.current_file,
+                expected_a2l_generation=(
+                    self._a2l_view_generation + (1 if self.current_a2l_data else 0)
+                ),
+                expected_image_generation=self._image_generation + 1,
+                gen=gen,
+                a2l_files=None,
+                sync_project=True,
+            )
+            self._start_load_worker(copied, gen=gen, context=context)
 
             def _post_worker_launch() -> None:
                 self.refresh_files()
@@ -786,6 +885,17 @@ class FileLoadMixin:
             return
         gen = self._busy_begin_action("a2l_load", normalized.name)
         try:
+            # Inc 2 (I-ALP-2.1 / R-A2L-REFRESH.030): capture the expected
+            # post-install pair and an independent read-only copy of the
+            # current image map before the worker launches, so the worker's
+            # only application inputs are this immutable request and the
+            # parsed payload.
+            expected_a2l_generation = self._a2l_view_generation + 1
+            expected_image_generation = self._image_generation
+            image_mem_map: Optional[Mapping[int, int]] = None
+            current_file = self.current_file
+            if current_file is not None and current_file.mem_map is not None:
+                image_mem_map = MappingProxyType(dict(current_file.mem_map))
             request = A2LAttachRequest(
                 source=normalized,
                 copy=copy,
@@ -795,6 +905,9 @@ class FileLoadMixin:
                 a2l_cache=self._a2l_cache_entry(),
                 gen=gen,
                 sync_project=sync_project,
+                expected_a2l_generation=expected_a2l_generation,
+                expected_image_generation=expected_image_generation,
+                image_mem_map=image_mem_map,
             )
             if not copy:
                 self.step_busy("a2l_load", gen, 2)
@@ -803,9 +916,19 @@ class FileLoadMixin:
             self._busy_fail("a2l_load", gen)
             raise
 
-    @work(thread=True, group="a2l_load")
+    # The fixed description keeps Textual from calling ``repr()`` on the
+    # request (which carries the parsed A2L) on the UI thread.
+    @work(thread=True, group="a2l_load", description="A2L attach worker")
     def _a2l_attach_worker(self, request: A2LAttachRequest) -> None:
         """The A2L attach worker (S-b / S-d): copy (unless in place) + parse."""
+        # D-13: the whole worker (copy, parse, preparation) runs with the
+        # cycle collector disabled — parse and describe churn enough objects
+        # that mid-run generational collections hold the GIL for >1.0 s and
+        # starve the UI busy tick. The install path re-enables the collector
+        # and runs the one big collection after the preserved common refresh
+        # (D-12 territory); the failure and superseded-reject paths
+        # re-enable it immediately.
+        gc.disable()
         try:
             try:
                 started = time.perf_counter()
@@ -827,18 +950,191 @@ class FileLoadMixin:
                     request.a2l_cache,
                     progress=self._progress_forwarder("a2l_load", request.gen, 2),
                 )
+                # Inc 2 (I-ALP-2.2): complete enrichment, summary and both
+                # picker bulk describes off the UI thread before dispatching
+                # installation; the request-owned image mapping and expected
+                # pair are the only application inputs besides the parsed
+                # payload.
+                preparation = self._prepare_a2l_attach_snapshot(
+                    a2l_path=path,
+                    a2l_data=entry[1],
+                    image_mem_map=request.image_mem_map,
+                    expected_a2l_generation=request.expected_a2l_generation,
+                    expected_image_generation=request.expected_image_generation,
+                )
                 result = A2LAttachResult(
-                    request, path, entry, time.perf_counter() - parse_started
+                    request,
+                    path,
+                    entry,
+                    time.perf_counter() - parse_started,
+                    preparation=preparation,
                 )
             except Exception as exc:  # noqa: BLE001 - worker-step failures
+                if not gc.isenabled():
+                    gc.enable()
                 if not isinstance(exc, WorkareaContainmentError):
                     self.logger.exception("A2L attach failed: %s", request.source)
                 self.call_from_thread(self._on_a2l_attach_failed, request, exc)
                 return
             self.call_from_thread(self._on_a2l_attached, result)
         except BaseException:
+            if not gc.isenabled():
+                gc.enable()
             self.call_from_thread(self._busy_fail, "a2l_load", request.gen)
             raise
+
+    def _prepare_a2l_attach_snapshot(
+        self,
+        *,
+        a2l_path: Path,
+        a2l_data: dict,
+        image_mem_map: Mapping[int, int] | None,
+        expected_a2l_generation: int,
+        expected_image_generation: int,
+    ) -> A2LAttachSnapshot:
+        """Build one generation-bound attach snapshot off the UI thread.
+
+        Summary:
+            The Inc 2 (I-ALP-2.2) route-neutral producer: run the existing
+            enrichment/summary service once over the parsed payload and the
+            request-owned image mapping, derive the existing three-part
+            enrichment key and measurable-name sequence, describe every
+            measurable name once in one bulk describe shared read-only by
+            both the Check and Patch pickers (R-A2L-REFRESH.037 E4R /
+            operator D10), and pack the whole hand-off into one frozen,
+            read-only snapshot before the install callback is dispatched.
+
+        Args:
+            a2l_path (Path): The parsed source path, used only as explicit
+                parsed-source context.
+            a2l_data (dict): The parsed A2L payload the worker selected.
+            image_mem_map (Mapping[int, int] | None): The request-owned
+                read-only image mapping, or ``None`` without an image.
+            expected_a2l_generation (int): The predicted post-install A2L
+                generation.
+            expected_image_generation (int): The unchanged image generation
+                captured before worker launch.
+
+        Returns:
+            A2LAttachSnapshot: One frozen snapshot carrying the expected
+                pair, the enrichment key, enriched-tag and summary tuples
+                and the independent read-only Check/Patch picker entries.
+
+        Raises:
+            Exception: Any enrichment, summary or definition-describe
+                failure propagates to the worker's existing attach-failure
+                route; no partial snapshot is returned or dispatched.
+
+        Data Flow:
+            - ``enrich_tags_and_render`` computes merged tags and summary
+              lines exactly once (``max_tag_lines=500``, the UI seam's
+              value).
+            - ``mem_size`` is ``-1`` without an image and
+              ``len(image_mem_map)`` otherwise, so the key equals the UI
+              cache key ``(A2L generation, image generation, mem_size)``.
+            - Measurable names are the enriched tags with an integer
+              address, in enrichment order — the same sequence the prefill
+              seams hand to the pickers.
+            - ``describe_definitions`` runs once over that same full name
+              sequence and its result is wrapped in one
+              :class:`MappingProxyType` shared read-only by both the
+              ``check`` and ``patch`` :class:`A2LPickerSnapshot` entries
+              (R-A2L-REFRESH.037 E4R / operator D10); both entries also
+              share the exact ``a2l_data`` object as their source for
+              identity comparison.
+            - No request, admission state, widget, mounted state, session
+              member or live generation is read here.
+
+        Dependencies:
+            Uses:
+                - ``enrich_tags_and_render`` / ``describe_definitions``
+                - ``A2LAttachSnapshot`` / ``A2LPickerSnapshot``
+            Used by:
+                - ``_a2l_attach_worker`` on the attach worker thread
+        """
+        # D-13 (executed probe-d13-mechanism.txt): the preparation churns
+        # enough objects that mid-run generational collections hold the GIL
+        # for over 1.0 s and starve the UI busy tick (plain peak 1.125 s).
+        # Disabling the cycle collector for the duration drops the peak gap
+        # to 0.406 s and speeds the describes ~20%. On success the collector
+        # stays disabled: the install path re-enables it and collects once
+        # AFTER the preserved common refresh (HLR-176 territory, D-12), so
+        # no big collection pause can land inside the commissioned window.
+        # On failure the collector is re-enabled here. Consumers of the
+        # snapshot must re-enable after their preserved refresh.
+        gc.disable()
+        try:
+            return self._prepare_a2l_attach_snapshot_inner(
+                a2l_path=a2l_path,
+                a2l_data=a2l_data,
+                image_mem_map=image_mem_map,
+                expected_a2l_generation=expected_a2l_generation,
+                expected_image_generation=expected_image_generation,
+            )
+        except BaseException:
+            gc.enable()
+            raise
+
+    def _prepare_a2l_attach_snapshot_inner(
+        self,
+        *,
+        a2l_path: Path,
+        a2l_data: dict,
+        image_mem_map: Mapping[int, int] | None,
+        expected_a2l_generation: int,
+        expected_image_generation: int,
+    ) -> A2LAttachSnapshot:
+        """The D-13 gc-managed body of :meth:`_prepare_a2l_attach_snapshot`."""
+        enriched, summary_lines = enrich_tags_and_render(
+            a2l_data,
+            image_mem_map,
+            max_tag_lines=500,
+        )
+        mem_size = len(image_mem_map) if image_mem_map is not None else -1
+        enrichment_key = (
+            expected_a2l_generation,
+            expected_image_generation,
+            mem_size,
+        )
+        names = [
+            tag["name"]
+            for tag in enriched
+            if isinstance(tag.get("address"), int)
+        ]
+        definitions = describe_definitions(names, a2l_data)
+        picker_definitions = MappingProxyType(definitions)
+        self.logger.info(
+            "A2L attach snapshot prepared: path=%s a2l_generation=%d "
+            "image_generation=%d mem_size=%d names=%d",
+            a2l_path,
+            expected_a2l_generation,
+            expected_image_generation,
+            mem_size,
+            len(names),
+        )
+        return A2LAttachSnapshot(
+            expected_a2l_generation=expected_a2l_generation,
+            expected_image_generation=expected_image_generation,
+            enrichment_key=enrichment_key,
+            enriched_tags=tuple(enriched),
+            summary_lines=tuple(summary_lines),
+            picker_snapshots=MappingProxyType(
+                {
+                    "check": A2LPickerSnapshot(
+                        picker="check",
+                        signature=enrichment_key,
+                        a2l_source=a2l_data,
+                        definitions=picker_definitions,
+                    ),
+                    "patch": A2LPickerSnapshot(
+                        picker="patch",
+                        signature=enrichment_key,
+                        a2l_source=a2l_data,
+                        definitions=picker_definitions,
+                    ),
+                }
+            ),
+        )
 
     def _on_a2l_attached(self, result: A2LAttachResult) -> None:
         """Main thread: paint step 3, defer the tag-table build (LLR-176.3)."""
@@ -859,7 +1155,13 @@ class FileLoadMixin:
             None
 
         Data Flow:
+            - Preflight the snapshot's recorded expected pair against the
+              live post-install pair before any recents, files, cache,
+              session, view or project-sync mutation; a mismatch ends busy
+              with ``Load superseded — current state kept.`` and returns.
             - Preserve recents, cache, current-A2L and current-file attach order.
+            - Install the snapshot's enrichment key/tags/summary caches and
+              the accepted picker mapping before the common fan-out.
             - Run the common fan-out once, then retain labels/focus/logging.
             - Sync to a project only for requests that explicitly allow it.
 
@@ -873,7 +1175,23 @@ class FileLoadMixin:
         req = result.request
         copied = result.path
         gen = req.gen
+        preparation = result.preparation
         try:
+            # Inc 2 (I-ALP-2.4 / R-A2L-REFRESH.032): the snapshot's recorded
+            # expected pair is the preflight authority. Any mismatch against
+            # the live post-install pair discards the whole result before
+            # recents, files, cache, session, dependent-view or project-sync
+            # mutation and ends the run with the exact superseded outcome.
+            if preparation is not None and (
+                preparation.expected_a2l_generation,
+                preparation.expected_image_generation,
+            ) != (self._a2l_view_generation + 1, self._image_generation):
+                if not gc.isenabled():
+                    gc.enable()
+                self.end_busy(
+                    "a2l_load", gen, "Load superseded — current state kept."
+                )
+                return
             if req.record_recent and not record_recent_source(req.source):
                 self.logger.warning("Recent sources not updated: %r", str(req.source))
             self.refresh_files()
@@ -883,9 +1201,35 @@ class FileLoadMixin:
             if self.current_file:
                 self.current_file.a2l_path = copied
                 self.current_file.a2l_data = self.current_a2l_data
+            # Inc 2 (I-ALP-2.3 / R-A2L-REFRESH.036): install the worker-built
+            # caches verbatim — one shallow list conversion per tuple
+            # preserves the existing app-cache attribute types, summary
+            # restarts at 0, and the already read-only picker mapping is
+            # installed without another copy — before the common refresh
+            # consumes them.
+            if preparation is not None:
+                self._a2l_enriched_key = preparation.enrichment_key
+                self._a2l_enriched_tags = list(preparation.enriched_tags)
+                self._a2l_summary_lines = list(preparation.summary_lines)
+                self._a2l_summary_start = 0
+                self._accepted_a2l_picker_snapshots = preparation.picker_snapshots
             view_started = time.perf_counter()
             self._refresh_a2l_dependent_views()
             view_elapsed = time.perf_counter() - view_started
+            # D-13: the one deliberate full collection of the load's
+            # garbage, after the preserved refresh, timed and logged
+            # (R-A2L-REFRESH.052/.054). gc.freeze() was rejected: it keeps
+            # Textual UI cycles alive (GC-REDESIGN, R-A2L-REFRESH.053).
+            if not gc.isenabled():
+                gc_started = time.perf_counter()
+                unreachable = gc.collect()
+                gc.enable()
+                self.logger.info(
+                    "A2L load GC: route=%s unreachable=%d seconds=%.3f",
+                    "attach",
+                    unreachable,
+                    time.perf_counter() - gc_started,
+                )
             if view_elapsed > self.slow_parse_warn_seconds:
                 self.logger.warning(
                     "A2L view refresh was slow: path=%s elapsed_seconds=%.3f threshold_seconds=%.3f",
@@ -912,6 +1256,10 @@ class FileLoadMixin:
                 safe_text(f"A2L loaded: {painted_names([copied.name])}").plain,
             )
         except BaseException:
+            # D-13: never leave the cycle collector disabled on a failure
+            # path.
+            if not gc.isenabled():
+                gc.enable()
             self._busy_fail("a2l_load", gen)
             raise
 
@@ -1028,8 +1376,27 @@ class FileLoadMixin:
                 gen = self._busy_begin_action("file_load", candidate.name)
                 try:
                     self.step_busy("file_load", gen, 2)
+                    # Inc 3 (I-ALP-3 / F3): the admitted in-place non-A2L
+                    # arm captures the same immutable route context on the
+                    # UI thread (0 copies, project sync disabled) before
+                    # starting the shared worker contract.
+                    context = FileLoadRequest(
+                        path=candidate,
+                        a2l_path=self.current_a2l_path,
+                        a2l_data=self.current_a2l_data,
+                        a2l_cache=self._a2l_cache_entry(),
+                        current_file=self.current_file,
+                        expected_a2l_generation=(
+                            self._a2l_view_generation
+                            + (1 if self.current_a2l_data else 0)
+                        ),
+                        expected_image_generation=self._image_generation + 1,
+                        gen=gen,
+                        a2l_files=None,
+                        sync_project=False,
+                    )
                     self._start_load_worker(
-                        candidate, gen=gen, sync_project=False
+                        candidate, gen=gen, sync_project=False, context=context
                     )
                 except BaseException:
                     self._busy_fail("file_load", gen)
@@ -1206,6 +1573,7 @@ class FileLoadMixin:
         a2l_files: Optional[list[Path]] = None,
         *,
         a2l_cache_out: Optional[list[A2LCacheEntry]] = None,
+        context: Optional[FileLoadRequest] = None,
     ) -> Optional[LoadedFile]:
         """The session-reading wrapper of ``_parse_data_file`` (Q-h1).
 
@@ -1213,24 +1581,51 @@ class FileLoadMixin:
             Resolve the A2L path/data from the file-load arguments or the
             session, parse through the explicit-input ``_parse_data_file``,
             and append the cache entry it used or made to ``a2l_cache_out``
-            (never storing: Q-h1 — the caller stores on main). It keeps
-            reading the session on the file-load worker (outside
-            LLR-177.1e's three workers; finding F-6).
+            (never storing: Q-h1 — the caller stores on main). The Inc 3
+            product arm (``context``) consumes only the immutable
+            UI-captured ``FileLoadRequest`` and reads no live session
+            member; the legacy ``None`` arm keeps the existing
+            synchronous/legacy-test reads and is never worker-isolation
+            evidence.
 
         Args:
             path (Path): File to parse.
             a2l_files (Optional[list[Path]]): A2L paths from project load.
             a2l_cache_out (Optional[list[A2LCacheEntry]]): The out-channel
                 the entry is appended to.
+            context (Optional[FileLoadRequest]): The UI-captured immutable
+                route context (F1); the product worker always supplies it.
 
         Returns:
             Optional[LoadedFile]: Parsed and merged payload.
+
+        Data Flow:
+            - ``context.a2l_files`` wins when present, otherwise the
+              captured ``context.a2l_path`` / ``a2l_data`` / ``a2l_cache``
+              / ``current_file`` inputs drive the parse; the legacy
+              standalone ``a2l_files`` argument is ignored on that arm.
+            - The legacy arm reads the live session exactly as before.
 
         Dependencies:
             Uses: parse_a2l_cached / _a2l_cache_entry / _parse_data_file
             Used by: _start_load_worker / load_selected_file
         """
         suffix = path.suffix.lower()
+        if context is not None:
+            self.logger.info(
+                "Loading file (captured context): path=%s suffix=%s",
+                path,
+                suffix,
+            )
+            a2l_path = context.a2l_files[0] if context.a2l_files else context.a2l_path
+            if a2l_path is not None:
+                entry = deps.parse_a2l_cached(a2l_path, context.a2l_cache)
+                a2l_data = entry[1]
+                if a2l_cache_out is not None:
+                    a2l_cache_out.append(entry)
+            else:
+                a2l_data = context.a2l_data
+            return self._parse_data_file(path, a2l_path, a2l_data, context.current_file)
         self.logger.info(
             "Loading file: path=%s suffix=%s project=%s",
             path,
@@ -1279,6 +1674,8 @@ class FileLoadMixin:
         loaded: LoadedFile,
         a2l_view_generation: Optional[int] = None,
         image_generation: Optional[int] = None,
+        *,
+        prepare_a2l: bool = True,
     ) -> PreparedLoad:
         """
         Summary:
@@ -1298,6 +1695,12 @@ class FileLoadMixin:
             image_generation (Optional[int]): Predicted image generation —
                 the live counter + 1, ``_apply_prepared_load`` always bumps.
                 Same threading contract as ``a2l_view_generation``.
+            prepare_a2l (bool): Whether to produce the A2L payload. With A2L
+                data and ``True`` the single Inc 2 producer runs once and
+                its returned I-ALP-2 snapshot is packed into
+                ``PreparedLoad.a2l_preparation``; ``False`` skips A2L
+                production and leaves a generation-only (keyless) bundle —
+                the project image-after-reset stage (D-1/D-3).
 
         Returns:
             PreparedLoad: Bundle with MAC cache, validation report, highlights,
@@ -1305,9 +1708,14 @@ class FileLoadMixin:
             generation snapshot the A2L precompute was built against.
 
         Data Flow:
-            - Pre-compute enriched A2L tags (or skip when no A2L present),
-              keyed ``(a2l_view_generation, image_generation, mem_size)``
-              — never ``id()``-based (F-B102-A2L-1).
+            - With A2L data and ``prepare_a2l``, call the route-neutral Inc 2
+              producer ``_prepare_a2l_attach_snapshot`` exactly once with the
+              explicit parsed source/data, the worker-owned image mapping and
+              the stage generations — never direct enrichment
+              (R-A2L-REFRESH.039, D-1).
+            - Pack the returned snapshot's key/tags/summary lists and the
+              frozen snapshot itself into the bundle; a producer exception
+              propagates with no minimal fallback here.
             - Run ``_compute_mac_view_payload`` to produce the MAC table + validation output.
             - Derive MAC highlights and sorted out-of-range lists using the cached
               ``range_index``.
@@ -1319,11 +1727,12 @@ class FileLoadMixin:
 
         Dependencies:
             Uses:
-                - ``enrich_tags_and_render``
+                - ``_prepare_a2l_attach_snapshot`` (the Inc 2 producer)
                 - ``_compute_mac_view_payload``
                 - ``_get_range_index`` / ``address_in_sorted_ranges``
             Used by:
                 - ``_start_load_worker``
+                - ``_prepare_project_load`` (project image/MAC stages)
         """
         self.logger.info(
             "Load phase boundary: prepare_entry path=%s file_type=%s",
@@ -1345,21 +1754,34 @@ class FileLoadMixin:
                 1 if loaded.a2l_data else 0
             )
         a2l_data = loaded.a2l_data
+        a2l_preparation: Optional[A2LAttachSnapshot] = None
         a2l_enriched_tags: list[dict[str, Any]] = []
         a2l_enriched_key: Optional[tuple] = None
         a2l_summary_lines: list[str] = []
-        if a2l_data:
-            mem_map = loaded.mem_map
-            a2l_enriched_tags, a2l_summary_lines = enrich_tags_and_render(
-                a2l_data,
-                mem_map,
-                max_tag_lines=500,
+        if a2l_data and prepare_a2l:
+            # Inc 3 (I-ALP-2.2 / I-ALP-3 / D-1): the single Inc 2 producer
+            # replaces direct enrichment on every prepared route. Its
+            # frozen snapshot is the authoritative payload; the legacy
+            # cache fields mirror it so the install path keeps the
+            # existing attribute types (one shallow list conversion).
+            if a2l_view_generation is None or image_generation is None:
+                # Unreachable: the defaults above always resolve both
+                # stage predictions; the guard keeps the producer's int
+                # inputs honest without touching its signature.
+                raise RuntimeError(
+                    "A2L preparation requires resolved stage generations"
+                )
+            preparation = self._prepare_a2l_attach_snapshot(
+                a2l_path=loaded.a2l_path or loaded.path,
+                a2l_data=a2l_data,
+                image_mem_map=loaded.mem_map,
+                expected_a2l_generation=a2l_view_generation,
+                expected_image_generation=image_generation,
             )
-            a2l_enriched_key = (
-                a2l_view_generation,
-                image_generation,
-                len(mem_map) if mem_map is not None else -1,
-            )
+            a2l_preparation = preparation
+            a2l_enriched_tags = list(preparation.enriched_tags)
+            a2l_enriched_key = preparation.enrichment_key
+            a2l_summary_lines = list(preparation.summary_lines)
         self.logger.info(
             "Load phase boundary: prepare_a2l_done has_a2l=%s enriched_tags=%d",
             bool(a2l_data),
@@ -1435,9 +1857,12 @@ class FileLoadMixin:
             mac_widths=mac_widths,
             mac_cell_rows=mac_cell_rows,
             mac_cell_styles=mac_cell_styles,
+            a2l_preparation=a2l_preparation,
         )
 
-    @work(thread=True, exclusive=True, group="load")
+    # The fixed description keeps Textual from calling ``repr()`` on the
+    # request (which carries the parsed A2L) on the UI thread.
+    @work(thread=True, exclusive=True, group="load", description="file load worker")
     def _start_load_worker(
         self,
         path: Path,
@@ -1445,6 +1870,7 @@ class FileLoadMixin:
         *,
         gen: int,
         sync_project: bool = True,
+        context: Optional[FileLoadRequest] = None,
     ) -> None:
         """
         Summary:
@@ -1456,6 +1882,11 @@ class FileLoadMixin:
             a2l_files (Optional[list[Path]]): Optional A2L paths from project load.
             gen (int): The busy run's generation from ``_busy_begin_action``
                 (keyword-only; Inc 12a S-m), passed to ``step_busy`` and the end.
+            sync_project (bool): Whether an accepted load may sync its project.
+            context (Optional[FileLoadRequest]): The immutable UI-captured
+                route context (F1); the product routes (F2/F3) always
+                supply one, ``None`` retains the legacy direct-call
+                behavior only.
 
         Returns:
             None
@@ -1463,14 +1894,13 @@ class FileLoadMixin:
         Data Flow:
             - Log a ``worker_parse_start`` phase marker and run ``_parse_loaded_file``.
             - Log ``worker_parse_done`` then call ``_prepare_load_payload`` to build the
-              MAC cache, validation report, highlights, out-of-range list, and bases set,
-              passing the predicted post-apply generation snapshots (image +1; A2L +1
-              only when the parse carried a payload) so the apply preflight can reject
-              the whole bundle if either generation was superseded.
+              MAC cache, validation report, highlights, out-of-range list, and bases set.
+              The product arm passes the context's captured stage generations and reads
+              no live counter or current artifact; a preparation failure there dispatches
+              the existing failure route with no minimal-bundle fallback (D-5).
+              The legacy arm keeps the previous live prediction and fallback.
             - Dispatch ``_complete_prepared_load`` via ``call_from_thread`` so the UI
               wrapper owns installation, publication, optional sync and outcome.
-            - On parse or prepare exceptions, fall back to installing the minimal
-              non-precomputed payload (or surface the error when the parse itself failed).
 
         Dependencies:
             Uses:
@@ -1479,6 +1909,7 @@ class FileLoadMixin:
                 - ``_complete_prepared_load`` / ``_handle_load_error``
             Used by:
                 - ``load_from_path`` (load dialog and startup path)
+                - ``_load_workarea_file`` (in-place workarea arm)
         """
         try:
             load_started = time.perf_counter()
@@ -1488,8 +1919,12 @@ class FileLoadMixin:
             self._flush_logger()
             out: list[A2LCacheEntry] = []
             try:
-                loaded = self._parse_loaded_file(path, a2l_files, a2l_cache_out=out)
+                loaded = self._parse_loaded_file(
+                    path, a2l_files, a2l_cache_out=out, context=context
+                )
             except Exception as exc:
+                if not gc.isenabled():
+                    gc.enable()
                 self.call_from_thread(self._handle_load_error, path, exc, gen)
                 return
             if loaded is None:
@@ -1508,25 +1943,47 @@ class FileLoadMixin:
             )
             self._flush_logger()
             prepare_started = time.perf_counter()
-            try:
-                # Predict the generations the apply step will have bumped by
-                # installation: image +1 always, A2L +1 only with a payload.
-                # A stale snapshot rejects the whole prepared load preflight.
-                prepared = self._prepare_load_payload(
-                    loaded,
-                    a2l_view_generation=(
-                        self._a2l_view_generation + 1
-                        if loaded.a2l_data
-                        else self._a2l_view_generation
-                    ),
-                    image_generation=self._image_generation + 1,
-                )
-            except Exception as exc:
-                # Fall back to the slow-path install so users still see the file.
-                self.logger.exception(
-                    "Prepare load payload failed; falling back: %s", exc
-                )
-                prepared = PreparedLoad(loaded=loaded)
+            if context is not None:
+                # Inc 3 product arm (I-ALP-3 / D-5): consume only the
+                # captured stage generations; a preparation failure uses
+                # the existing failure route — never a minimal-bundle
+                # fallback and never synchronous UI preparation.
+                try:
+                    prepared = self._prepare_load_payload(
+                        loaded,
+                        a2l_view_generation=context.expected_a2l_generation,
+                        image_generation=context.expected_image_generation,
+                    )
+                except Exception as exc:
+                    if not gc.isenabled():
+                        gc.enable()
+                    self.logger.exception(
+                        "Prepare load payload failed: %s", exc
+                    )
+                    self.call_from_thread(
+                        self._handle_load_error, path, exc, gen
+                    )
+                    return
+            else:
+                try:
+                    # Predict the generations the apply step will have bumped by
+                    # installation: image +1 always, A2L +1 only with a payload.
+                    # A stale snapshot rejects the whole prepared load preflight.
+                    prepared = self._prepare_load_payload(
+                        loaded,
+                        a2l_view_generation=(
+                            self._a2l_view_generation + 1
+                            if loaded.a2l_data
+                            else self._a2l_view_generation
+                        ),
+                        image_generation=self._image_generation + 1,
+                    )
+                except Exception as exc:
+                    # Fall back to the slow-path install so users still see the file.
+                    self.logger.exception(
+                        "Prepare load payload failed; falling back: %s", exc
+                    )
+                    prepared = PreparedLoad(loaded=loaded)
             if out:
                 prepared.a2l_cache = out[0]
             self.logger.info(
@@ -1551,6 +2008,10 @@ class FileLoadMixin:
                 sync_project=sync_project,
             )
         except BaseException:
+            # D-13: never leave the cycle collector disabled on a worker
+            # failure path.
+            if not gc.isenabled():
+                gc.enable()
             self.call_from_thread(self._busy_fail, "file_load", gen)
             raise
 

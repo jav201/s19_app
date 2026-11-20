@@ -1,0 +1,2 @@
+PASS nodes=7 entities=12 source_files=4 requirements=10 alternatives=34 example_links=45 route_neutral_a3=1 unread=0
+alternative_counts 029=3 030=3 031=3 032=2 033=6 034=4 035=3 036=2 037=5 038=3

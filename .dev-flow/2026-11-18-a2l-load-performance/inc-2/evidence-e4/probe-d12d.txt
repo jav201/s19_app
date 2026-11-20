@@ -1,0 +1,8 @@
+preparation wall time: 34.500s
+ticker gaps > 0.5s: 6
+  gap  0.750
+  gap  0.704
+  gap  0.859
+  gap  1.219
+  gap  1.234
+  gap  1.515

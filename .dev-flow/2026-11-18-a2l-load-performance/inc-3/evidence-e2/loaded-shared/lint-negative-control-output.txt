@@ -1,0 +1,2 @@
+.dev-flow\2026-11-18-a2l-load-performance\inc-3\evidence-e2\loaded-shared\lint-negative-control.txt:6: not read: `unsupported_field: this line must be rep` in node `known_bad`: not a field
+not read=1 nodes=1 entities=0 edges=0

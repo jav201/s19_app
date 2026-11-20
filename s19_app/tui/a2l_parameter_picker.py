@@ -593,6 +593,7 @@ class A2LParameterPicker(Vertical):
         signature: object = None,
         *,
         a2l_data: Optional[dict] = None,
+        prepared_definitions: Optional[Mapping[str, Definition]] = None,
     ) -> bool:
         """Populate the ledger (R-B102-SEL-001, R-B102-SEL-004, R-B102-SEL-006).
 
@@ -602,9 +603,16 @@ class A2LParameterPicker(Vertical):
         description supplies every row's element datatype/kind and unit. Direct
         rows without A2L data use their tag datatype/characteristic kind instead.
 
+        Inc 2 (batch 2026-11-18-a2l-load-performance, I-ALP-2.3): a supplied
+        ``prepared_definitions`` mapping — including an empty mapping — is
+        installed as the read-only definitions without a describe. An omitted
+        input retains the existing single direct describe. ``definitions``
+        and ``definitions_source`` still describe the last real population.
+
         When ``signature`` is non-``None`` and equals the stored signature,
         returns ``False`` before describing definitions or touching filter,
-        page, picks or table. Otherwise replaces the source rows, clears the
+        page, picks or table — and before consuming either definition input.
+        Otherwise replaces the source rows, clears the
         picks, resets the filter/page state, caches ``fmt_longest`` and rebuilds
         one page.
 
@@ -614,6 +622,9 @@ class A2LParameterPicker(Vertical):
                 repopulates.
             a2l_data (Optional[dict]): The loaded parse payload used for one
                 batched definition description per real population.
+            prepared_definitions (Optional[Mapping[str, Definition]]): An
+                already-built read-only definition mapping to consume
+                verbatim instead of describing.
 
         Returns:
             bool: ``True`` when the ledger was repopulated, ``False`` on the
@@ -625,9 +636,12 @@ class A2LParameterPicker(Vertical):
         self._param_rows = {}
         self._picked_params = []
         names = [str(row.get("name") or "?") for row in rows]
-        definitions = (
-            describe_definitions(names, a2l_data) if a2l_data is not None else {}
-        )
+        if prepared_definitions is not None:
+            definitions: Mapping[str, Definition] = prepared_definitions
+        else:
+            definitions = (
+                describe_definitions(names, a2l_data) if a2l_data is not None else {}
+            )
         self._definitions = MappingProxyType(definitions)
         self._definitions_source = a2l_data
         for row, name in zip(rows, names):

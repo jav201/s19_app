@@ -1,0 +1,1511 @@
+FF......FFFFF....F..FFF                                                  [100%]
+================================== FAILURES ===================================
+______________________ test_r029_worker_snapshot[typed] _______________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40215/test_r029_worker_snapshot_type0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F1CDFA6090>
+route = 'typed'
+
+    @pytest.mark.parametrize("route", ["typed", "workarea", "startup"], ids=lambda x: x)
+    def test_r029_worker_snapshot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, route: str) -> None:
+        """R-A2L-REFRESH.029/1-/3: enrichment, summary and both picker describes
+        complete off the UI thread before the install; visible NEW cells exact."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        new = _new_a2l(src / "new.a2l")
+    
+        if route == "workarea":
+            workarea_temp = base / WORKAREA_DIRNAME / WORKAREA_SUBDIR / WORKAREA_TEMP
+            workarea_temp.mkdir(parents=True, exist_ok=True)
+            (workarea_temp / "new.a2l").write_bytes(new.read_bytes())
+    
+        events: list = []
+        copies = Spy(monkeypatch, app_module.deps, "copy_into_workarea")
+    
+        async def typed_body(app, pilot):
+            main = threading.get_ident()
+            _mount_views(app)
+            await pilot.pause()
+            _arm_pipeline_spies(app, monkeypatch, events, main)
+            await _typed_attach(app, pilot, new)
+            await settle_workers(pilot)
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_panel_state(_check_panel(app), NEW_ROWS)
+            _assert_panel_state(_patch_panel(app), NEW_ROWS)
+            assert _a2l_viewer_names(app) == [name for name, *_ in NEW_ROWS]
+            return None
+    
+        async def workarea_body(app, pilot):
+            main = threading.get_ident()
+            _mount_views(app)
+            await pilot.pause()
+            _arm_pipeline_spies(app, monkeypatch, events, main)
+            await _workarea_attach(app, pilot, "new.a2l")
+            await settle_workers(pilot)
+            assert len(copies.calls) == 0, copies.calls
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_panel_state(_check_panel(app), NEW_ROWS)
+            _assert_panel_state(_patch_panel(app), NEW_ROWS)
+            assert _a2l_viewer_names(app) == [name for name, *_ in NEW_ROWS]
+            return None
+    
+        async def startup_body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            await wait_until(
+                pilot,
+                lambda: app.current_a2l_path is not None
+                and Path(app.current_a2l_path).name == "new.a2l",
+                "the start-up attach of new.a2l",
+            )
+            await settle_workers(pilot)
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_panel_state(_check_panel(app), NEW_ROWS)
+            _assert_panel_state(_patch_panel(app), NEW_ROWS)
+            assert _a2l_viewer_names(app) == [name for name, *_ in NEW_ROWS]
+            return None
+    
+        if route == "typed":
+            main = _run(base, typed_body)
+        elif route == "workarea":
+            main = _run(base, workarea_body)
+        else:
+            main = threading.get_ident()
+            # Class-level spies: the start-up attach begins during app start.
+            _arm_pipeline_spies(S19TuiApp, monkeypatch, events, main)
+            _run(base, startup_body, load_path=src / "new.a2l", base_dir=base)
+    
+        names = [e[0] for e in events]
+        assert names.count("enrichment") == 1, events
+        assert names.count("summary") == 1, events
+        assert names.count("describe") == 2, events
+        assert names.count("install") == 1, events
+        prep = [e for e in events if e[0] in {"enrichment", "summary", "describe"}]
+        installs = [e for e in events if e[0] == "install"]
+        assert all(thread != main for _, thread in prep), events
+        assert max(i for i, e in enumerate(events) if e[0] in {"enrichment", "summary", "describe"}) < min(
+            i for i, e in enumerate(events) if e[0] == "install"
+        ), events
+>       assert installs[0][1] == main, events
+E       AssertionError: [('UI', 52848), ('enrichment', 73300), ('summary', 73300), ('describe', 73300), ('describe', 73300), ('install', 52848)]
+E       assert 52848 == None
+
+tests\test_alp_inc2_a2l_attach.py:728: AssertionError
+_____________________ test_r029_worker_snapshot[workarea] _____________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40215/test_r029_worker_snapshot_work0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F1CF01E650>
+route = 'workarea'
+
+    @pytest.mark.parametrize("route", ["typed", "workarea", "startup"], ids=lambda x: x)
+    def test_r029_worker_snapshot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, route: str) -> None:
+        """R-A2L-REFRESH.029/1-/3: enrichment, summary and both picker describes
+        complete off the UI thread before the install; visible NEW cells exact."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        new = _new_a2l(src / "new.a2l")
+    
+        if route == "workarea":
+            workarea_temp = base / WORKAREA_DIRNAME / WORKAREA_SUBDIR / WORKAREA_TEMP
+            workarea_temp.mkdir(parents=True, exist_ok=True)
+            (workarea_temp / "new.a2l").write_bytes(new.read_bytes())
+    
+        events: list = []
+        copies = Spy(monkeypatch, app_module.deps, "copy_into_workarea")
+    
+        async def typed_body(app, pilot):
+            main = threading.get_ident()
+            _mount_views(app)
+            await pilot.pause()
+            _arm_pipeline_spies(app, monkeypatch, events, main)
+            await _typed_attach(app, pilot, new)
+            await settle_workers(pilot)
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_panel_state(_check_panel(app), NEW_ROWS)
+            _assert_panel_state(_patch_panel(app), NEW_ROWS)
+            assert _a2l_viewer_names(app) == [name for name, *_ in NEW_ROWS]
+            return None
+    
+        async def workarea_body(app, pilot):
+            main = threading.get_ident()
+            _mount_views(app)
+            await pilot.pause()
+            _arm_pipeline_spies(app, monkeypatch, events, main)
+            await _workarea_attach(app, pilot, "new.a2l")
+            await settle_workers(pilot)
+            assert len(copies.calls) == 0, copies.calls
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_panel_state(_check_panel(app), NEW_ROWS)
+            _assert_panel_state(_patch_panel(app), NEW_ROWS)
+            assert _a2l_viewer_names(app) == [name for name, *_ in NEW_ROWS]
+            return None
+    
+        async def startup_body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            await wait_until(
+                pilot,
+                lambda: app.current_a2l_path is not None
+                and Path(app.current_a2l_path).name == "new.a2l",
+                "the start-up attach of new.a2l",
+            )
+            await settle_workers(pilot)
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            _assert_panel_state(_check_panel(app), NEW_ROWS)
+            _assert_panel_state(_patch_panel(app), NEW_ROWS)
+            assert _a2l_viewer_names(app) == [name for name, *_ in NEW_ROWS]
+            return None
+    
+        if route == "typed":
+            main = _run(base, typed_body)
+        elif route == "workarea":
+            main = _run(base, workarea_body)
+        else:
+            main = threading.get_ident()
+            # Class-level spies: the start-up attach begins during app start.
+            _arm_pipeline_spies(S19TuiApp, monkeypatch, events, main)
+            _run(base, startup_body, load_path=src / "new.a2l", base_dir=base)
+    
+        names = [e[0] for e in events]
+        assert names.count("enrichment") == 1, events
+        assert names.count("summary") == 1, events
+        assert names.count("describe") == 2, events
+        assert names.count("install") == 1, events
+        prep = [e for e in events if e[0] in {"enrichment", "summary", "describe"}]
+        installs = [e for e in events if e[0] == "install"]
+        assert all(thread != main for _, thread in prep), events
+        assert max(i for i, e in enumerate(events) if e[0] in {"enrichment", "summary", "describe"}) < min(
+            i for i, e in enumerate(events) if e[0] == "install"
+        ), events
+>       assert installs[0][1] == main, events
+E       AssertionError: [('UI', 52848), ('enrichment', 4268), ('summary', 4268), ('describe', 4268), ('describe', 4268), ('install', 52848)]
+E       assert 52848 == None
+
+tests\test_alp_inc2_a2l_attach.py:728: AssertionError
+________________ test_r032_stale_direct_attach[a2l-generation] ________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40215/test_r032_stale_direct_attach_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F1D2914A90>
+arm = 'a2l-generation'
+
+    @pytest.mark.parametrize("arm", ["a2l-generation", "image-generation"], ids=lambda x: x)
+    def test_r032_stale_direct_attach(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.032/1-/2: a real NEW result whose recorded generation
+        is decremented after the real worker finishes and before the real
+        install is refused whole, with the exact superseded outcome and 0
+        install-side mutations."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        new = _new_a2l(src / "new.a2l")
+        img = _write_image(src / "img1.s19", dict(IMG1))
+        mac = _write_mac(src / "records.mac")
+    
+        real_install = S19TuiApp._install_attached_a2l
+        mutations: list = []
+    
+        def install_spy(self, result):
+            preparation = getattr(result, "preparation", None)
+            # The arm mutates only the NEW result, after the real worker.
+            if preparation is None or Path(result.request.source).name != "new.a2l":
+                return real_install(self, result)
+            new_preparation = dataclasses.replace(
+                preparation,
+                **{
+                    "expected_a2l_generation": preparation.expected_a2l_generation - 1
+                    if arm == "a2l-generation"
+                    else preparation.expected_a2l_generation,
+                    "expected_image_generation": preparation.expected_image_generation - 1
+                    if arm == "image-generation"
+                    else preparation.expected_image_generation,
+                },
+            )
+            mutated = dataclasses.replace(result, preparation=new_preparation)
+            mutations.append(("mutated", threading.get_ident()))
+            return real_install(self, mutated)
+    
+        monkeypatch.setattr(S19TuiApp, "_install_attached_a2l", install_spy)
+    
+        async def body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            await _load_image(app, pilot, img)
+            await _load_image(app, pilot, mac)
+            await _typed_attach(app, pilot, old)
+            before = _state_snapshot(app)
+            zero = _arm_zero_call_spies(app, monkeypatch)
+            outcomes: list = []
+    
+            real_end = app.end_busy
+    
+            def end(key, gen, outcome):
+                outcomes.append((key, str(outcome)))
+                return real_end(key, gen, outcome)
+    
+            monkeypatch.setattr(app, "end_busy", end)
+            await _submit_typed(app, pilot, str(new))
+            await settle_workers(pilot)
+            await wait_until(
+                pilot,
+                lambda: outcomes or mutations,
+                "the superseded outcome of the stale direct attach",
+                timeout=30.0,
+            )
+            assert len(outcomes) == 1 and outcomes[0][1] == SUPERSEDED_OUTCOME, outcomes
+            assert SUPERSEDED_OUTCOME in _log_lines(app), _log_lines(app)
+            after = _state_snapshot(app)
+            assert after == before, f"previous state changed: {before} -> {after}"
+            assert len(mutations) == 1, mutations
+            assert len(zero["recent"].calls) == 0, zero["recent"].calls
+            assert len(zero["cache"].calls) == 0, zero["cache"].calls
+            assert len(zero["replace"].calls) == 0, zero["replace"].calls
+            assert len(zero["install"].calls) == 0, zero["install"].calls
+            assert len(zero["fanout"].calls) == 0, zero["fanout"].calls
+            assert len(zero["sync"].calls) == 0, zero["sync"].calls
+            assert not any("A2L loaded" in text for text in _log_lines(app))
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1019: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        await _load_image(app, pilot, img)
+        await _load_image(app, pilot, mac)
+        await _typed_attach(app, pilot, old)
+        before = _state_snapshot(app)
+        zero = _arm_zero_call_spies(app, monkeypatch)
+        outcomes: list = []
+    
+        real_end = app.end_busy
+    
+        def end(key, gen, outcome):
+            outcomes.append((key, str(outcome)))
+            return real_end(key, gen, outcome)
+    
+        monkeypatch.setattr(app, "end_busy", end)
+        await _submit_typed(app, pilot, str(new))
+        await settle_workers(pilot)
+        await wait_until(
+            pilot,
+            lambda: outcomes or mutations,
+            "the superseded outcome of the stale direct attach",
+            timeout=30.0,
+        )
+        assert len(outcomes) == 1 and outcomes[0][1] == SUPERSEDED_OUTCOME, outcomes
+        assert SUPERSEDED_OUTCOME in _log_lines(app), _log_lines(app)
+        after = _state_snapshot(app)
+        assert after == before, f"previous state changed: {before} -> {after}"
+        assert len(mutations) == 1, mutations
+        assert len(zero["recent"].calls) == 0, zero["recent"].calls
+        assert len(zero["cache"].calls) == 0, zero["cache"].calls
+        assert len(zero["replace"].calls) == 0, zero["replace"].calls
+>       assert len(zero["install"].calls) == 0, zero["install"].calls
+E       AssertionError: [namespace(thread=52848, args=(A2LAttachResult(request=A2LAttachRequest(source=WindowsPath('<LOCAL_HOME>/AppData/Loc...l=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}))}))),), kwargs={})]
+E       assert 1 == 0
+E        +  where 1 = len([namespace(thread=52848, args=(A2LAttachResult(request=A2LAttachRequest(source=WindowsPath('<LOCAL_HOME>/AppData/Loc...l=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}))}))),), kwargs={})])
+E        +    where [namespace(thread=52848, args=(A2LAttachResult(request=A2LAttachRequest(source=WindowsPath('<LOCAL_HOME>/AppData/Loc...l=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}))}))),), kwargs={})] = <tests.test_alp_inc2_a2l_attach.Spy object at 0x000001F1CFABF790>.calls
+
+tests\test_alp_inc2_a2l_attach.py:1013: AssertionError
+_______________ test_r032_stale_direct_attach[image-generation] _______________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40215/test_r032_stale_direct_attach_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F1CE5C8C10>
+arm = 'image-generation'
+
+    @pytest.mark.parametrize("arm", ["a2l-generation", "image-generation"], ids=lambda x: x)
+    def test_r032_stale_direct_attach(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.032/1-/2: a real NEW result whose recorded generation
+        is decremented after the real worker finishes and before the real
+        install is refused whole, with the exact superseded outcome and 0
+        install-side mutations."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        new = _new_a2l(src / "new.a2l")
+        img = _write_image(src / "img1.s19", dict(IMG1))
+        mac = _write_mac(src / "records.mac")
+    
+        real_install = S19TuiApp._install_attached_a2l
+        mutations: list = []
+    
+        def install_spy(self, result):
+            preparation = getattr(result, "preparation", None)
+            # The arm mutates only the NEW result, after the real worker.
+            if preparation is None or Path(result.request.source).name != "new.a2l":
+                return real_install(self, result)
+            new_preparation = dataclasses.replace(
+                preparation,
+                **{
+                    "expected_a2l_generation": preparation.expected_a2l_generation - 1
+                    if arm == "a2l-generation"
+                    else preparation.expected_a2l_generation,
+                    "expected_image_generation": preparation.expected_image_generation - 1
+                    if arm == "image-generation"
+                    else preparation.expected_image_generation,
+                },
+            )
+            mutated = dataclasses.replace(result, preparation=new_preparation)
+            mutations.append(("mutated", threading.get_ident()))
+            return real_install(self, mutated)
+    
+        monkeypatch.setattr(S19TuiApp, "_install_attached_a2l", install_spy)
+    
+        async def body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            await _load_image(app, pilot, img)
+            await _load_image(app, pilot, mac)
+            await _typed_attach(app, pilot, old)
+            before = _state_snapshot(app)
+            zero = _arm_zero_call_spies(app, monkeypatch)
+            outcomes: list = []
+    
+            real_end = app.end_busy
+    
+            def end(key, gen, outcome):
+                outcomes.append((key, str(outcome)))
+                return real_end(key, gen, outcome)
+    
+            monkeypatch.setattr(app, "end_busy", end)
+            await _submit_typed(app, pilot, str(new))
+            await settle_workers(pilot)
+            await wait_until(
+                pilot,
+                lambda: outcomes or mutations,
+                "the superseded outcome of the stale direct attach",
+                timeout=30.0,
+            )
+            assert len(outcomes) == 1 and outcomes[0][1] == SUPERSEDED_OUTCOME, outcomes
+            assert SUPERSEDED_OUTCOME in _log_lines(app), _log_lines(app)
+            after = _state_snapshot(app)
+            assert after == before, f"previous state changed: {before} -> {after}"
+            assert len(mutations) == 1, mutations
+            assert len(zero["recent"].calls) == 0, zero["recent"].calls
+            assert len(zero["cache"].calls) == 0, zero["cache"].calls
+            assert len(zero["replace"].calls) == 0, zero["replace"].calls
+            assert len(zero["install"].calls) == 0, zero["install"].calls
+            assert len(zero["fanout"].calls) == 0, zero["fanout"].calls
+            assert len(zero["sync"].calls) == 0, zero["sync"].calls
+            assert not any("A2L loaded" in text for text in _log_lines(app))
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1019: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        await _load_image(app, pilot, img)
+        await _load_image(app, pilot, mac)
+        await _typed_attach(app, pilot, old)
+        before = _state_snapshot(app)
+        zero = _arm_zero_call_spies(app, monkeypatch)
+        outcomes: list = []
+    
+        real_end = app.end_busy
+    
+        def end(key, gen, outcome):
+            outcomes.append((key, str(outcome)))
+            return real_end(key, gen, outcome)
+    
+        monkeypatch.setattr(app, "end_busy", end)
+        await _submit_typed(app, pilot, str(new))
+        await settle_workers(pilot)
+        await wait_until(
+            pilot,
+            lambda: outcomes or mutations,
+            "the superseded outcome of the stale direct attach",
+            timeout=30.0,
+        )
+        assert len(outcomes) == 1 and outcomes[0][1] == SUPERSEDED_OUTCOME, outcomes
+        assert SUPERSEDED_OUTCOME in _log_lines(app), _log_lines(app)
+        after = _state_snapshot(app)
+        assert after == before, f"previous state changed: {before} -> {after}"
+        assert len(mutations) == 1, mutations
+        assert len(zero["recent"].calls) == 0, zero["recent"].calls
+        assert len(zero["cache"].calls) == 0, zero["cache"].calls
+        assert len(zero["replace"].calls) == 0, zero["replace"].calls
+>       assert len(zero["install"].calls) == 0, zero["install"].calls
+E       AssertionError: [namespace(thread=52848, args=(A2LAttachResult(request=A2LAttachRequest(source=WindowsPath('<LOCAL_HOME>/AppData/Loc...l=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}))}))),), kwargs={})]
+E       assert 1 == 0
+E        +  where 1 = len([namespace(thread=52848, args=(A2LAttachResult(request=A2LAttachRequest(source=WindowsPath('<LOCAL_HOME>/AppData/Loc...l=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}))}))),), kwargs={})])
+E        +    where [namespace(thread=52848, args=(A2LAttachResult(request=A2LAttachRequest(source=WindowsPath('<LOCAL_HOME>/AppData/Loc...l=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}))}))),), kwargs={})] = <tests.test_alp_inc2_a2l_attach.Spy object at 0x000001F1D2915150>.calls
+
+tests\test_alp_inc2_a2l_attach.py:1013: AssertionError
+___________________ test_r035_refresh_before_success[first] ___________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40215/test_r035_refresh_before_succe0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F1D1E15FD0>
+arm = 'first'
+
+    @pytest.mark.parametrize("arm", ["first", "replacement", "confirmed-same-path"], ids=lambda x: x)
+    def test_r035_refresh_before_success(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.035/1-/3: install -> one common refresh(UI) -> outcome;
+        no OLD value or intermediate empty state at the outcome."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        new = _new_a2l(src / "new.a2l")
+        same = src / "same.a2l"
+        same.write_bytes(old.read_bytes())
+    
+        async def body(app, pilot):
+            main = threading.get_ident()
+            _mount_views(app)
+            await pilot.pause()
+            hashes = None
+            listed = None
+            if arm == "replacement":
+                await _typed_attach(app, pilot, old)
+            elif arm == "confirmed-same-path":
+                project = _seed_project(app.workarea, "P_OLD", a2l=same)
+                await _load_project(app, pilot, "P_OLD")
+                app.current_project = "Proj One"
+                app.current_project_dir = project
+                hashes = _project_digests(app.current_project_dir)
+                listed = app.current_a2l_path
+            events: list = []
+            _arm_install_fanout_outcome(app, monkeypatch, events)
+            workers = Spy(monkeypatch, app, "_a2l_attach_worker")
+            if arm == "confirmed-same-path":
+                listed.write_bytes(new.read_bytes())
+                await _submit_typed(app, pilot, str(listed))
+                assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+                await pilot.press("y")
+            else:
+                await _typed_attach(app, pilot, old if arm == "first" else new)
+            await settle_workers(pilot)
+            kind = [e[0] for e in events]
+            assert kind.count("install") == 1 and kind.count("refresh") == 1, events
+            order = [e[0] for e in events if e[0] in {"install", "refresh", "outcome"}]
+            assert order == ["install", "refresh", "outcome"], events
+            refresh_thread = [t for n, t in events if n == "refresh"]
+            assert refresh_thread == [main], events
+            outcome = [o for n, _t, o in events if n == "outcome"]
+            assert len(outcome) == 1 and outcome[0].startswith("A2L loaded"), outcome
+            assert len(workers.calls) == 1, workers.calls
+            rows = OLD_ROWS if arm == "first" else NEW_ROWS
+            _assert_panel_state(_check_panel(app), rows)
+            _assert_panel_state(_patch_panel(app), rows)
+            assert _a2l_viewer_names(app) == [name for name, *_ in rows]
+            if arm == "confirmed-same-path":
+                assert workers.calls[0].args[0].sync_project is False, workers.calls[0]
+                assert _project_digests(app.current_project_dir) == hashes
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1433: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:1417: in body
+    refresh_thread = [t for n, t in events if n == "refresh"]
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+.0 = <list_iterator object at 0x000001F1D23EE0E0>
+
+>   refresh_thread = [t for n, t in events if n == "refresh"]
+                            ^^^^
+E   ValueError: too many values to unpack (expected 2)
+
+tests\test_alp_inc2_a2l_attach.py:1417: ValueError
+________________ test_r035_refresh_before_success[replacement] ________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40215/test_r035_refresh_before_succe1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F1D24CE9D0>
+arm = 'replacement'
+
+    @pytest.mark.parametrize("arm", ["first", "replacement", "confirmed-same-path"], ids=lambda x: x)
+    def test_r035_refresh_before_success(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.035/1-/3: install -> one common refresh(UI) -> outcome;
+        no OLD value or intermediate empty state at the outcome."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        new = _new_a2l(src / "new.a2l")
+        same = src / "same.a2l"
+        same.write_bytes(old.read_bytes())
+    
+        async def body(app, pilot):
+            main = threading.get_ident()
+            _mount_views(app)
+            await pilot.pause()
+            hashes = None
+            listed = None
+            if arm == "replacement":
+                await _typed_attach(app, pilot, old)
+            elif arm == "confirmed-same-path":
+                project = _seed_project(app.workarea, "P_OLD", a2l=same)
+                await _load_project(app, pilot, "P_OLD")
+                app.current_project = "Proj One"
+                app.current_project_dir = project
+                hashes = _project_digests(app.current_project_dir)
+                listed = app.current_a2l_path
+            events: list = []
+            _arm_install_fanout_outcome(app, monkeypatch, events)
+            workers = Spy(monkeypatch, app, "_a2l_attach_worker")
+            if arm == "confirmed-same-path":
+                listed.write_bytes(new.read_bytes())
+                await _submit_typed(app, pilot, str(listed))
+                assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+                await pilot.press("y")
+            else:
+                await _typed_attach(app, pilot, old if arm == "first" else new)
+            await settle_workers(pilot)
+            kind = [e[0] for e in events]
+            assert kind.count("install") == 1 and kind.count("refresh") == 1, events
+            order = [e[0] for e in events if e[0] in {"install", "refresh", "outcome"}]
+            assert order == ["install", "refresh", "outcome"], events
+            refresh_thread = [t for n, t in events if n == "refresh"]
+            assert refresh_thread == [main], events
+            outcome = [o for n, _t, o in events if n == "outcome"]
+            assert len(outcome) == 1 and outcome[0].startswith("A2L loaded"), outcome
+            assert len(workers.calls) == 1, workers.calls
+            rows = OLD_ROWS if arm == "first" else NEW_ROWS
+            _assert_panel_state(_check_panel(app), rows)
+            _assert_panel_state(_patch_panel(app), rows)
+            assert _a2l_viewer_names(app) == [name for name, *_ in rows]
+            if arm == "confirmed-same-path":
+                assert workers.calls[0].args[0].sync_project is False, workers.calls[0]
+                assert _project_digests(app.current_project_dir) == hashes
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1433: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:1417: in body
+    refresh_thread = [t for n, t in events if n == "refresh"]
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+.0 = <list_iterator object at 0x000001F1D2FA6320>
+
+>   refresh_thread = [t for n, t in events if n == "refresh"]
+                            ^^^^
+E   ValueError: too many values to unpack (expected 2)
+
+tests\test_alp_inc2_a2l_attach.py:1417: ValueError
+____________ test_r035_refresh_before_success[confirmed-same-path] ____________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40215/test_r035_refresh_before_succe2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F1D3382F50>
+arm = 'confirmed-same-path'
+
+    @pytest.mark.parametrize("arm", ["first", "replacement", "confirmed-same-path"], ids=lambda x: x)
+    def test_r035_refresh_before_success(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.035/1-/3: install -> one common refresh(UI) -> outcome;
+        no OLD value or intermediate empty state at the outcome."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        new = _new_a2l(src / "new.a2l")
+        same = src / "same.a2l"
+        same.write_bytes(old.read_bytes())
+    
+        async def body(app, pilot):
+            main = threading.get_ident()
+            _mount_views(app)
+            await pilot.pause()
+            hashes = None
+            listed = None
+            if arm == "replacement":
+                await _typed_attach(app, pilot, old)
+            elif arm == "confirmed-same-path":
+                project = _seed_project(app.workarea, "P_OLD", a2l=same)
+                await _load_project(app, pilot, "P_OLD")
+                app.current_project = "Proj One"
+                app.current_project_dir = project
+                hashes = _project_digests(app.current_project_dir)
+                listed = app.current_a2l_path
+            events: list = []
+            _arm_install_fanout_outcome(app, monkeypatch, events)
+            workers = Spy(monkeypatch, app, "_a2l_attach_worker")
+            if arm == "confirmed-same-path":
+                listed.write_bytes(new.read_bytes())
+                await _submit_typed(app, pilot, str(listed))
+                assert isinstance(app.screen, ConfirmQuestionScreen), list(app.log_lines)
+                await pilot.press("y")
+            else:
+                await _typed_attach(app, pilot, old if arm == "first" else new)
+            await settle_workers(pilot)
+            kind = [e[0] for e in events]
+            assert kind.count("install") == 1 and kind.count("refresh") == 1, events
+            order = [e[0] for e in events if e[0] in {"install", "refresh", "outcome"}]
+            assert order == ["install", "refresh", "outcome"], events
+            refresh_thread = [t for n, t in events if n == "refresh"]
+            assert refresh_thread == [main], events
+            outcome = [o for n, _t, o in events if n == "outcome"]
+            assert len(outcome) == 1 and outcome[0].startswith("A2L loaded"), outcome
+            assert len(workers.calls) == 1, workers.calls
+            rows = OLD_ROWS if arm == "first" else NEW_ROWS
+            _assert_panel_state(_check_panel(app), rows)
+            _assert_panel_state(_patch_panel(app), rows)
+            assert _a2l_viewer_names(app) == [name for name, *_ in rows]
+            if arm == "confirmed-same-path":
+                assert workers.calls[0].args[0].sync_project is False, workers.calls[0]
+                assert _project_digests(app.current_project_dir) == hashes
+            snapshot_map = _accepted_snapshots(app)
+            assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1433: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:1417: in body
+    refresh_thread = [t for n, t in events if n == "refresh"]
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+.0 = <list_iterator object at 0x000001F1CFB0FE20>
+
+>   refresh_thread = [t for n, t in events if n == "refresh"]
+                            ^^^^
+E   ValueError: too many values to unpack (expected 2)
+
+tests\test_alp_inc2_a2l_attach.py:1417: ValueError
+______________ test_r037_picker_snapshot_reuse[filter-page-noop] ______________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40215/test_r037_picker_snapshot_reus2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F1D0F61AD0>
+arm = 'filter-page-noop'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["initial", "changed-generation", "filter-page-noop", "adapter-mismatch", "headless-unmounted"],
+        ids=lambda x: x,
+    )
+    def test_r037_picker_snapshot_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.037/1-/5: one worker describe per picker per accepted
+        generation, zero for rebuilds/no-ops, mismatch invalidation and
+        unmounted-call preservation."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        new = _new_a2l(src / "new.a2l")
+        img = _write_image(src / "img1.s19", dict(IMG1))
+        img2 = _write_image(src / "img2.s19", dict(IMG2))
+        same = src / "same.a2l"
+        same.write_bytes(old.read_bytes())
+    
+        describes = _describe_spies(monkeypatch)
+        main = threading.get_ident()
+    
+        if arm == "initial":
+            async def body(app, pilot):
+                _mount_views(app)
+                await pilot.pause()
+                describes.clear()
+                await _typed_attach(app, pilot, old)
+                await settle_workers(pilot)
+                worker_describes = [c for c in describes if c["thread"] != main]
+                ui_describes = [c for c in describes if c["thread"] == main]
+                assert len(worker_describes) == 2, describes
+                assert len(ui_describes) == 0, describes
+                expected_names = [name for name, *_ in OLD_ROWS]
+                assert all(c["names"] == expected_names for c in worker_describes), describes
+                snapshot_map = _accepted_snapshots(app)
+                assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+                _assert_panel_state(_check_panel(app), OLD_ROWS)
+                _assert_panel_state(_patch_panel(app), OLD_ROWS)
+                return None
+    
+            _run(base, body)
+    
+        elif arm == "changed-generation":
+            async def body(app, pilot):
+                _mount_views(app)
+                await pilot.pause()
+                await _typed_attach(app, pilot, same)
+                await settle_workers(pilot)
+                describes.clear()
+                same.write_bytes(new.read_bytes())
+                await _typed_attach(app, pilot, same)
+                await settle_workers(pilot)
+                worker_describes = [c for c in describes if c["thread"] != main]
+                ui_describes = [c for c in describes if c["thread"] == main]
+                assert len(worker_describes) == 2, describes
+                assert len(ui_describes) == 0, describes
+                assert all(c["names"] == [name for name, *_ in NEW_ROWS] for c in worker_describes), describes
+                for panel in (_check_panel(app), _patch_panel(app)):
+                    assert _param_rows(panel)["ARR12"] == (0x2000, 8, "f32"), _param_rows(panel)
+                    visible = _picker_visible_shape(panel)
+                    assert ("ARR12", "0x00002000", "f32") in visible, visible
+                    assert not any(fmt == "u16" for name, _addr, fmt in visible if name == "ARR12"), visible
+                return None
+    
+            _run(base, body)
+    
+        elif arm == "filter-page-noop":
+            async def body(app, pilot):
+                _mount_views(app)
+                await pilot.pause()
+                await _typed_attach(app, pilot, same)
+                await settle_workers(pilot)
+                same.write_bytes(new.read_bytes())
+                await _typed_attach(app, pilot, same)
+                await settle_workers(pilot)
+                describes.clear()
+                picker_module = _picker_module()
+                rebuilds: list = []
+                real_rebuild = picker_module.A2LParameterPicker._rebuild_ledger
+    
+                def counting_rebuild(self):
+                    result = real_rebuild(self)
+                    rebuilds.append(self.query_one(f"#{self._ids.table}", DataTable).row_count)
+                    return result
+    
+                monkeypatch.setattr(picker_module.A2LParameterPicker, "_rebuild_ledger", counting_rebuild)
+                check = _check_panel(app)
+                patch = _patch_panel(app)
+                for index in range(10):
+                    check.query_one("#check_param_filter", Input).value = "ARR" if index % 2 == 0 else ""
+                    await pilot.pause(0.2)
+                    check.query_one("#check_param_page_next_button", Button).press()
+                    await pilot.pause(0.2)
+                key = app._a2l_enriched_key
+                rows = [t for t in app._a2l_enriched_tags if isinstance(t.get("address"), int)]
+                assert _picker_of(check).set_parameters(rows, key, a2l_data=app.current_a2l_data) is False
+                assert _picker_of(patch).set_parameters(rows, key, a2l_data=app.current_a2l_data) is False
+                assert len(rebuilds) >= 20, rebuilds
+                assert all(0 < count <= 200 for count in rebuilds), rebuilds
+                assert describes == [], describes
+                assert _param_rows(check)["ARR12"] == (0x2000, 8, "f32"), _param_rows(check)
+                assert _param_rows(patch)["ARR12"] == (0x2000, 8, "f32"), _param_rows(patch)
+                return None
+    
+>           _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1632: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        await _typed_attach(app, pilot, same)
+        await settle_workers(pilot)
+        same.write_bytes(new.read_bytes())
+        await _typed_attach(app, pilot, same)
+        await settle_workers(pilot)
+        describes.clear()
+        picker_module = _picker_module()
+        rebuilds: list = []
+        real_rebuild = picker_module.A2LParameterPicker._rebuild_ledger
+    
+        def counting_rebuild(self):
+            result = real_rebuild(self)
+            rebuilds.append(self.query_one(f"#{self._ids.table}", DataTable).row_count)
+            return result
+    
+        monkeypatch.setattr(picker_module.A2LParameterPicker, "_rebuild_ledger", counting_rebuild)
+        check = _check_panel(app)
+        patch = _patch_panel(app)
+        for index in range(10):
+            check.query_one("#check_param_filter", Input).value = "ARR" if index % 2 == 0 else ""
+            await pilot.pause(0.2)
+            check.query_one("#check_param_page_next_button", Button).press()
+            await pilot.pause(0.2)
+        key = app._a2l_enriched_key
+        rows = [t for t in app._a2l_enriched_tags if isinstance(t.get("address"), int)]
+        assert _picker_of(check).set_parameters(rows, key, a2l_data=app.current_a2l_data) is False
+        assert _picker_of(patch).set_parameters(rows, key, a2l_data=app.current_a2l_data) is False
+>       assert len(rebuilds) >= 20, rebuilds
+E       AssertionError: [1, 3, 1, 3, 1, 3, ...]
+E       assert 10 >= 20
+E        +  where 10 = len([1, 3, 1, 3, 1, 3, ...])
+
+tests\test_alp_inc2_a2l_attach.py:1625: AssertionError
+__________________ test_r038_preparation_failure[enrichment] __________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40215/test_r038_preparation_failure_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F1D32F8610>
+arm = 'enrichment'
+
+    @pytest.mark.parametrize("arm", ["enrichment", "summary", "definitions"], ids=lambda x: x)
+    def test_r038_preparation_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.038/1-/3: an injected exception in one real preparation
+        stage ends with the exact existing failure outcome, keeps the current
+        image and every A2L-dependent state/view, still refreshes Workarea
+        Files (copy=True) and runs no install/refresh/sync/success."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        new = _new_a2l(src / "new.a2l")
+        img = _write_image(src / "img1.s19", dict(IMG1))
+        mac = _write_mac(src / "records.mac")
+    
+        fl = _fl_module()
+        service = _service_module()
+        definition = _definition_module()
+        picker = _picker_module()
+        main = threading.get_ident()
+        fired: list = []
+        armed: dict = {"on": False}
+        timeline: list = []
+    
+        if arm == "enrichment":
+            real_enrich = getattr(fl, "enrich_tags_and_render", None)
+    
+            def boom(*args, **kwargs):
+                if armed["on"] and threading.get_ident() != main and not fired:
+                    fired.append(True)
+                    raise ValueError("enrichment boom")
+                return real_enrich(*args, **kwargs) if real_enrich is not None else None
+    
+            monkeypatch.setattr(fl, "enrich_tags_and_render", boom, raising=False)
+            monkeypatch.setattr(service, "enrich_tags_and_render", boom, raising=False)
+        elif arm == "summary":
+            real_enrich = getattr(fl, "enrich_tags_and_render", None)
+    
+            def enrich_ok(*args, **kwargs):
+                if armed["on"] and threading.get_ident() != main:
+                    timeline.append("enrichment")
+                return real_enrich(*args, **kwargs) if real_enrich is not None else None
+    
+            monkeypatch.setattr(fl, "enrich_tags_and_render", enrich_ok, raising=False)
+            real_render = getattr(service, "render_a2l_view", None)
+    
+            def render_boom(*args, **kwargs):
+                if armed["on"] and threading.get_ident() != main:
+                    timeline.append("summary")
+                    if not fired:
+                        fired.append(True)
+                        raise ValueError("summary boom")
+                return real_render(*args, **kwargs) if real_render is not None else None
+    
+            monkeypatch.setattr(service, "render_a2l_view", render_boom)
+        else:  # definitions
+            real_describe = definition.describe_definitions
+    
+            def describe_boom(names, a2l_data):
+                if armed["on"] and threading.get_ident() != main:
+                    timeline.append("describe")
+                    if not fired:
+                        fired.append(True)
+                        raise ValueError("definitions boom")
+                return real_describe(names, a2l_data)
+    
+            monkeypatch.setattr(definition, "describe_definitions", describe_boom)
+            monkeypatch.setattr(picker, "describe_definitions", describe_boom, raising=False)
+            monkeypatch.setattr(fl, "describe_definitions", describe_boom, raising=False)
+    
+        async def body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            await _load_image(app, pilot, img)
+            await _load_image(app, pilot, mac)
+            await _typed_attach(app, pilot, old)
+            before = _state_snapshot(app)
+            zero = _arm_zero_call_spies(app, monkeypatch)
+            outcomes: list = []
+    
+            real_end = app.end_busy
+    
+            def end(key, gen, outcome):
+                outcomes.append((key, str(outcome)))
+                return real_end(key, gen, outcome)
+    
+            monkeypatch.setattr(app, "end_busy", end)
+            armed["on"] = True
+            await _submit_typed(app, pilot, str(new))
+            await settle_workers(pilot)
+            await wait_until(pilot, lambda: outcomes, "the preparation-failure outcome", timeout=30.0)
+            expected = FAILURE_OUTCOME.format(name="new.a2l")
+            assert len(outcomes) == 1 and outcomes[0][1] == expected, outcomes
+            assert expected in _log_lines(app), _log_lines(app)
+            assert len(fired) == 1, fired
+            after = _state_snapshot(app)
+            assert after == before, f"previous state changed: {before} -> {after}"
+            assert len(zero["files"].calls) >= 1, zero["files"].calls
+            assert len(zero["install"].calls) == 0, zero["install"].calls
+            assert len(zero["fanout"].calls) == 0, zero["fanout"].calls
+            assert len(zero["sync"].calls) == 0, zero["sync"].calls
+            assert len(zero["cache"].calls) == 0, zero["cache"].calls
+            assert len(zero["recent"].calls) == 0, zero["recent"].calls
+            assert not any("A2L loaded" in text for text in _log_lines(app))
+            if arm == "summary":
+                assert timeline.count("enrichment") == 1 and timeline.count("summary") == 1, timeline
+            if arm == "definitions":
+                assert timeline == ["describe"], timeline
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1858: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        await _load_image(app, pilot, img)
+        await _load_image(app, pilot, mac)
+        await _typed_attach(app, pilot, old)
+        before = _state_snapshot(app)
+        zero = _arm_zero_call_spies(app, monkeypatch)
+        outcomes: list = []
+    
+        real_end = app.end_busy
+    
+        def end(key, gen, outcome):
+            outcomes.append((key, str(outcome)))
+            return real_end(key, gen, outcome)
+    
+        monkeypatch.setattr(app, "end_busy", end)
+        armed["on"] = True
+        await _submit_typed(app, pilot, str(new))
+        await settle_workers(pilot)
+        await wait_until(pilot, lambda: outcomes, "the preparation-failure outcome", timeout=30.0)
+        expected = FAILURE_OUTCOME.format(name="new.a2l")
+        assert len(outcomes) == 1 and outcomes[0][1] == expected, outcomes
+        assert expected in _log_lines(app), _log_lines(app)
+        assert len(fired) == 1, fired
+        after = _state_snapshot(app)
+        assert after == before, f"previous state changed: {before} -> {after}"
+        assert len(zero["files"].calls) >= 1, zero["files"].calls
+        assert len(zero["install"].calls) == 0, zero["install"].calls
+        assert len(zero["fanout"].calls) == 0, zero["fanout"].calls
+        assert len(zero["sync"].calls) == 0, zero["sync"].calls
+        assert len(zero["cache"].calls) == 0, zero["cache"].calls
+        assert len(zero["recent"].calls) == 0, zero["recent"].calls
+>       assert not any("A2L loaded" in text for text in _log_lines(app))
+E       assert not True
+E        +  where True = any(<generator object test_r038_preparation_failure.<locals>.body.<locals>.<genexpr> at 0x000001F1CFA281E0>)
+
+tests\test_alp_inc2_a2l_attach.py:1851: AssertionError
+___________________ test_r038_preparation_failure[summary] ____________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40215/test_r038_preparation_failure_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F1CEEF5090>
+arm = 'summary'
+
+    @pytest.mark.parametrize("arm", ["enrichment", "summary", "definitions"], ids=lambda x: x)
+    def test_r038_preparation_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.038/1-/3: an injected exception in one real preparation
+        stage ends with the exact existing failure outcome, keeps the current
+        image and every A2L-dependent state/view, still refreshes Workarea
+        Files (copy=True) and runs no install/refresh/sync/success."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        new = _new_a2l(src / "new.a2l")
+        img = _write_image(src / "img1.s19", dict(IMG1))
+        mac = _write_mac(src / "records.mac")
+    
+        fl = _fl_module()
+        service = _service_module()
+        definition = _definition_module()
+        picker = _picker_module()
+        main = threading.get_ident()
+        fired: list = []
+        armed: dict = {"on": False}
+        timeline: list = []
+    
+        if arm == "enrichment":
+            real_enrich = getattr(fl, "enrich_tags_and_render", None)
+    
+            def boom(*args, **kwargs):
+                if armed["on"] and threading.get_ident() != main and not fired:
+                    fired.append(True)
+                    raise ValueError("enrichment boom")
+                return real_enrich(*args, **kwargs) if real_enrich is not None else None
+    
+            monkeypatch.setattr(fl, "enrich_tags_and_render", boom, raising=False)
+            monkeypatch.setattr(service, "enrich_tags_and_render", boom, raising=False)
+        elif arm == "summary":
+            real_enrich = getattr(fl, "enrich_tags_and_render", None)
+    
+            def enrich_ok(*args, **kwargs):
+                if armed["on"] and threading.get_ident() != main:
+                    timeline.append("enrichment")
+                return real_enrich(*args, **kwargs) if real_enrich is not None else None
+    
+            monkeypatch.setattr(fl, "enrich_tags_and_render", enrich_ok, raising=False)
+            real_render = getattr(service, "render_a2l_view", None)
+    
+            def render_boom(*args, **kwargs):
+                if armed["on"] and threading.get_ident() != main:
+                    timeline.append("summary")
+                    if not fired:
+                        fired.append(True)
+                        raise ValueError("summary boom")
+                return real_render(*args, **kwargs) if real_render is not None else None
+    
+            monkeypatch.setattr(service, "render_a2l_view", render_boom)
+        else:  # definitions
+            real_describe = definition.describe_definitions
+    
+            def describe_boom(names, a2l_data):
+                if armed["on"] and threading.get_ident() != main:
+                    timeline.append("describe")
+                    if not fired:
+                        fired.append(True)
+                        raise ValueError("definitions boom")
+                return real_describe(names, a2l_data)
+    
+            monkeypatch.setattr(definition, "describe_definitions", describe_boom)
+            monkeypatch.setattr(picker, "describe_definitions", describe_boom, raising=False)
+            monkeypatch.setattr(fl, "describe_definitions", describe_boom, raising=False)
+    
+        async def body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            await _load_image(app, pilot, img)
+            await _load_image(app, pilot, mac)
+            await _typed_attach(app, pilot, old)
+            before = _state_snapshot(app)
+            zero = _arm_zero_call_spies(app, monkeypatch)
+            outcomes: list = []
+    
+            real_end = app.end_busy
+    
+            def end(key, gen, outcome):
+                outcomes.append((key, str(outcome)))
+                return real_end(key, gen, outcome)
+    
+            monkeypatch.setattr(app, "end_busy", end)
+            armed["on"] = True
+            await _submit_typed(app, pilot, str(new))
+            await settle_workers(pilot)
+            await wait_until(pilot, lambda: outcomes, "the preparation-failure outcome", timeout=30.0)
+            expected = FAILURE_OUTCOME.format(name="new.a2l")
+            assert len(outcomes) == 1 and outcomes[0][1] == expected, outcomes
+            assert expected in _log_lines(app), _log_lines(app)
+            assert len(fired) == 1, fired
+            after = _state_snapshot(app)
+            assert after == before, f"previous state changed: {before} -> {after}"
+            assert len(zero["files"].calls) >= 1, zero["files"].calls
+            assert len(zero["install"].calls) == 0, zero["install"].calls
+            assert len(zero["fanout"].calls) == 0, zero["fanout"].calls
+            assert len(zero["sync"].calls) == 0, zero["sync"].calls
+            assert len(zero["cache"].calls) == 0, zero["cache"].calls
+            assert len(zero["recent"].calls) == 0, zero["recent"].calls
+            assert not any("A2L loaded" in text for text in _log_lines(app))
+            if arm == "summary":
+                assert timeline.count("enrichment") == 1 and timeline.count("summary") == 1, timeline
+            if arm == "definitions":
+                assert timeline == ["describe"], timeline
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1858: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        await _load_image(app, pilot, img)
+        await _load_image(app, pilot, mac)
+        await _typed_attach(app, pilot, old)
+        before = _state_snapshot(app)
+        zero = _arm_zero_call_spies(app, monkeypatch)
+        outcomes: list = []
+    
+        real_end = app.end_busy
+    
+        def end(key, gen, outcome):
+            outcomes.append((key, str(outcome)))
+            return real_end(key, gen, outcome)
+    
+        monkeypatch.setattr(app, "end_busy", end)
+        armed["on"] = True
+        await _submit_typed(app, pilot, str(new))
+        await settle_workers(pilot)
+        await wait_until(pilot, lambda: outcomes, "the preparation-failure outcome", timeout=30.0)
+        expected = FAILURE_OUTCOME.format(name="new.a2l")
+        assert len(outcomes) == 1 and outcomes[0][1] == expected, outcomes
+        assert expected in _log_lines(app), _log_lines(app)
+        assert len(fired) == 1, fired
+        after = _state_snapshot(app)
+        assert after == before, f"previous state changed: {before} -> {after}"
+        assert len(zero["files"].calls) >= 1, zero["files"].calls
+        assert len(zero["install"].calls) == 0, zero["install"].calls
+        assert len(zero["fanout"].calls) == 0, zero["fanout"].calls
+        assert len(zero["sync"].calls) == 0, zero["sync"].calls
+        assert len(zero["cache"].calls) == 0, zero["cache"].calls
+        assert len(zero["recent"].calls) == 0, zero["recent"].calls
+>       assert not any("A2L loaded" in text for text in _log_lines(app))
+E       assert not True
+E        +  where True = any(<generator object test_r038_preparation_failure.<locals>.body.<locals>.<genexpr> at 0x000001F1CE120EE0>)
+
+tests\test_alp_inc2_a2l_attach.py:1851: AssertionError
+_________________ test_r038_preparation_failure[definitions] __________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40215/test_r038_preparation_failure_2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F1D2C33950>
+arm = 'definitions'
+
+    @pytest.mark.parametrize("arm", ["enrichment", "summary", "definitions"], ids=lambda x: x)
+    def test_r038_preparation_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.038/1-/3: an injected exception in one real preparation
+        stage ends with the exact existing failure outcome, keeps the current
+        image and every A2L-dependent state/view, still refreshes Workarea
+        Files (copy=True) and runs no install/refresh/sync/success."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        new = _new_a2l(src / "new.a2l")
+        img = _write_image(src / "img1.s19", dict(IMG1))
+        mac = _write_mac(src / "records.mac")
+    
+        fl = _fl_module()
+        service = _service_module()
+        definition = _definition_module()
+        picker = _picker_module()
+        main = threading.get_ident()
+        fired: list = []
+        armed: dict = {"on": False}
+        timeline: list = []
+    
+        if arm == "enrichment":
+            real_enrich = getattr(fl, "enrich_tags_and_render", None)
+    
+            def boom(*args, **kwargs):
+                if armed["on"] and threading.get_ident() != main and not fired:
+                    fired.append(True)
+                    raise ValueError("enrichment boom")
+                return real_enrich(*args, **kwargs) if real_enrich is not None else None
+    
+            monkeypatch.setattr(fl, "enrich_tags_and_render", boom, raising=False)
+            monkeypatch.setattr(service, "enrich_tags_and_render", boom, raising=False)
+        elif arm == "summary":
+            real_enrich = getattr(fl, "enrich_tags_and_render", None)
+    
+            def enrich_ok(*args, **kwargs):
+                if armed["on"] and threading.get_ident() != main:
+                    timeline.append("enrichment")
+                return real_enrich(*args, **kwargs) if real_enrich is not None else None
+    
+            monkeypatch.setattr(fl, "enrich_tags_and_render", enrich_ok, raising=False)
+            real_render = getattr(service, "render_a2l_view", None)
+    
+            def render_boom(*args, **kwargs):
+                if armed["on"] and threading.get_ident() != main:
+                    timeline.append("summary")
+                    if not fired:
+                        fired.append(True)
+                        raise ValueError("summary boom")
+                return real_render(*args, **kwargs) if real_render is not None else None
+    
+            monkeypatch.setattr(service, "render_a2l_view", render_boom)
+        else:  # definitions
+            real_describe = definition.describe_definitions
+    
+            def describe_boom(names, a2l_data):
+                if armed["on"] and threading.get_ident() != main:
+                    timeline.append("describe")
+                    if not fired:
+                        fired.append(True)
+                        raise ValueError("definitions boom")
+                return real_describe(names, a2l_data)
+    
+            monkeypatch.setattr(definition, "describe_definitions", describe_boom)
+            monkeypatch.setattr(picker, "describe_definitions", describe_boom, raising=False)
+            monkeypatch.setattr(fl, "describe_definitions", describe_boom, raising=False)
+    
+        async def body(app, pilot):
+            _mount_views(app)
+            await pilot.pause()
+            await _load_image(app, pilot, img)
+            await _load_image(app, pilot, mac)
+            await _typed_attach(app, pilot, old)
+            before = _state_snapshot(app)
+            zero = _arm_zero_call_spies(app, monkeypatch)
+            outcomes: list = []
+    
+            real_end = app.end_busy
+    
+            def end(key, gen, outcome):
+                outcomes.append((key, str(outcome)))
+                return real_end(key, gen, outcome)
+    
+            monkeypatch.setattr(app, "end_busy", end)
+            armed["on"] = True
+            await _submit_typed(app, pilot, str(new))
+            await settle_workers(pilot)
+            await wait_until(pilot, lambda: outcomes, "the preparation-failure outcome", timeout=30.0)
+            expected = FAILURE_OUTCOME.format(name="new.a2l")
+            assert len(outcomes) == 1 and outcomes[0][1] == expected, outcomes
+            assert expected in _log_lines(app), _log_lines(app)
+            assert len(fired) == 1, fired
+            after = _state_snapshot(app)
+            assert after == before, f"previous state changed: {before} -> {after}"
+            assert len(zero["files"].calls) >= 1, zero["files"].calls
+            assert len(zero["install"].calls) == 0, zero["install"].calls
+            assert len(zero["fanout"].calls) == 0, zero["fanout"].calls
+            assert len(zero["sync"].calls) == 0, zero["sync"].calls
+            assert len(zero["cache"].calls) == 0, zero["cache"].calls
+            assert len(zero["recent"].calls) == 0, zero["recent"].calls
+            assert not any("A2L loaded" in text for text in _log_lines(app))
+            if arm == "summary":
+                assert timeline.count("enrichment") == 1 and timeline.count("summary") == 1, timeline
+            if arm == "definitions":
+                assert timeline == ["describe"], timeline
+            return None
+    
+>       _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1858: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:256: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:254: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        await _load_image(app, pilot, img)
+        await _load_image(app, pilot, mac)
+        await _typed_attach(app, pilot, old)
+        before = _state_snapshot(app)
+        zero = _arm_zero_call_spies(app, monkeypatch)
+        outcomes: list = []
+    
+        real_end = app.end_busy
+    
+        def end(key, gen, outcome):
+            outcomes.append((key, str(outcome)))
+            return real_end(key, gen, outcome)
+    
+        monkeypatch.setattr(app, "end_busy", end)
+        armed["on"] = True
+        await _submit_typed(app, pilot, str(new))
+        await settle_workers(pilot)
+        await wait_until(pilot, lambda: outcomes, "the preparation-failure outcome", timeout=30.0)
+        expected = FAILURE_OUTCOME.format(name="new.a2l")
+        assert len(outcomes) == 1 and outcomes[0][1] == expected, outcomes
+        assert expected in _log_lines(app), _log_lines(app)
+        assert len(fired) == 1, fired
+        after = _state_snapshot(app)
+        assert after == before, f"previous state changed: {before} -> {after}"
+        assert len(zero["files"].calls) >= 1, zero["files"].calls
+        assert len(zero["install"].calls) == 0, zero["install"].calls
+        assert len(zero["fanout"].calls) == 0, zero["fanout"].calls
+        assert len(zero["sync"].calls) == 0, zero["sync"].calls
+        assert len(zero["cache"].calls) == 0, zero["cache"].calls
+        assert len(zero["recent"].calls) == 0, zero["recent"].calls
+>       assert not any("A2L loaded" in text for text in _log_lines(app))
+E       assert not True
+E        +  where True = any(<generator object test_r038_preparation_failure.<locals>.body.<locals>.<genexpr> at 0x000001F1CE916DC0>)
+
+tests\test_alp_inc2_a2l_attach.py:1851: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r029_worker_snapshot[typed] - ...
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r029_worker_snapshot[workarea]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r032_stale_direct_attach[a2l-generation]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r032_stale_direct_attach[image-generation]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r035_refresh_before_success[first]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r035_refresh_before_success[replacement]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r035_refresh_before_success[confirmed-same-path]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r037_picker_snapshot_reuse[filter-page-noop]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r038_preparation_failure[enrichment]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r038_preparation_failure[summary]
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r038_preparation_failure[definitions]
+11 failed, 12 passed in 390.99s (0:06:30)
+EXIT=1

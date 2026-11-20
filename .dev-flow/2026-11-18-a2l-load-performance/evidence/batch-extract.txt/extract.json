@@ -1,0 +1,2574 @@
+{
+  "marks": [
+    {
+      "name": "describe_definition",
+      "reqs": [
+        "R-A2L-DEF.136",
+        "R-A2L-DEF.138",
+        "R-A2L-DEF.139",
+        "R-A2L-DEF.140"
+      ],
+      "file": "s19_app/tui/a2l_definition.py",
+      "line": 588,
+      "def": {
+        "qualname": "describe_definition",
+        "line": 589,
+        "params": [
+          {
+            "name": "name",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "a2l_data",
+            "type": "dict",
+            "default": null
+          }
+        ],
+        "returns": "Definition"
+      }
+    },
+    {
+      "name": "describe_definitions",
+      "reqs": [
+        "R-A2L-DEF.136",
+        "R-A2L-DEF.138",
+        "R-A2L-DEF.139",
+        "R-A2L-DEF.140",
+        "R-A2L-DEF.156",
+        "R-A2L-DEF.157",
+        "R-A2L-DEF.158",
+        "R-A2L-DEF.161",
+        "R-A2L-DEF.162",
+        "R-A2L-DEF.164",
+        "R-A2L-DEF.165"
+      ],
+      "file": "s19_app/tui/a2l_definition.py",
+      "line": 611,
+      "def": {
+        "qualname": "describe_definitions",
+        "line": 612,
+        "params": [
+          {
+            "name": "names",
+            "type": "Iterable[str]",
+            "default": null
+          },
+          {
+            "name": "a2l_data",
+            "type": "dict",
+            "default": null
+          }
+        ],
+        "returns": "dict[str, Definition]"
+      }
+    },
+    {
+      "name": "_pair_exempt",
+      "reqs": [
+        "R-A2L-DEF.138",
+        "R-A2L-DEF.140"
+      ],
+      "file": "s19_app/tui/a2l_definition.py",
+      "line": 3801,
+      "def": {
+        "qualname": "_pair_exempt",
+        "line": 3802,
+        "params": [
+          {
+            "name": "definition",
+            "type": "Definition",
+            "default": null
+          },
+          {
+            "name": "entry",
+            "type": "tuple",
+            "default": null
+          },
+          {
+            "name": "mask_of",
+            "type": "Callable[[str], Optional[int]]",
+            "default": null
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "_entry_overlaps",
+      "reqs": [
+        "R-A2L-DEF.138",
+        "R-A2L-DEF.140"
+      ],
+      "file": "s19_app/tui/a2l_definition.py",
+      "line": 3834,
+      "def": {
+        "qualname": "_entry_overlaps",
+        "line": 3835,
+        "params": [
+          {
+            "name": "definition",
+            "type": "Definition",
+            "default": null
+          },
+          {
+            "name": "entry",
+            "type": "tuple",
+            "default": null
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "_build_occupancy_index",
+      "reqs": [
+        "R-A2L-DEF.140",
+        "R-A2L-DEF.156",
+        "R-A2L-DEF.157",
+        "R-A2L-DEF.158",
+        "R-A2L-DEF.162",
+        "R-A2L-DEF.164"
+      ],
+      "file": "s19_app/tui/a2l_definition.py",
+      "line": 3875,
+      "def": {
+        "qualname": "_build_occupancy_index",
+        "line": 3876,
+        "params": [
+          {
+            "name": "span_entries",
+            "type": "Sequence[tuple]",
+            "default": null
+          },
+          {
+            "name": "is_array_entry",
+            "type": "Callable[[tuple], bool]",
+            "default": null
+          },
+          {
+            "name": "definitions_by_position",
+            "type": "Mapping[int, Definition]",
+            "default": null
+          },
+          {
+            "name": "entry_cache",
+            "type": "Mapping[int, tuple]",
+            "default": null
+          }
+        ],
+        "returns": "_OccupancyIndex"
+      }
+    },
+    {
+      "name": "_occupancy_candidates",
+      "reqs": [
+        "R-A2L-DEF.138",
+        "R-A2L-DEF.140",
+        "R-A2L-DEF.158",
+        "R-A2L-DEF.159",
+        "R-A2L-DEF.160",
+        "R-A2L-DEF.161",
+        "R-A2L-DEF.163"
+      ],
+      "file": "s19_app/tui/a2l_definition.py",
+      "line": 3993,
+      "def": {
+        "qualname": "_occupancy_candidates",
+        "line": 3994,
+        "params": [
+          {
+            "name": "index",
+            "type": "_OccupancyIndex",
+            "default": null
+          },
+          {
+            "name": "definition",
+            "type": "Definition",
+            "default": null
+          },
+          {
+            "name": "own_position",
+            "type": "Optional[int]",
+            "default": null
+          }
+        ],
+        "returns": "Iterator[tuple]"
+      }
+    },
+    {
+      "name": "_shared_with",
+      "reqs": [
+        "R-A2L-DEF.138",
+        "R-A2L-DEF.140",
+        "R-A2L-DEF.158",
+        "R-A2L-DEF.159",
+        "R-A2L-DEF.160",
+        "R-A2L-DEF.161",
+        "R-A2L-DEF.163"
+      ],
+      "file": "s19_app/tui/a2l_definition.py",
+      "line": 4075,
+      "def": {
+        "qualname": "_shared_with",
+        "line": 4076,
+        "params": [
+          {
+            "name": "definition",
+            "type": "Definition",
+            "default": null
+          },
+          {
+            "name": "index",
+            "type": "_OccupancyIndex",
+            "default": null
+          },
+          {
+            "name": "own_position",
+            "type": "Optional[int]",
+            "default": null
+          },
+          {
+            "name": "mask_of",
+            "type": "Callable[[str], Optional[int]]",
+            "default": null
+          },
+          {
+            "name": "materialize",
+            "type": "Callable[[tuple], tuple]",
+            "default": null
+          }
+        ],
+        "returns": "Optional[str]"
+      }
+    },
+    {
+      "name": "A2LParameterPicker.set_parameters",
+      "reqs": [
+        "R-A2L-REFRESH.037",
+        "R-PICKER-CORRECT.018",
+        "R-PICKER-CORRECT.019"
+      ],
+      "file": "s19_app/tui/a2l_parameter_picker.py",
+      "line": 590,
+      "def": {
+        "qualname": "A2LParameterPicker.set_parameters",
+        "line": 591,
+        "params": [
+          {
+            "name": "rows",
+            "type": "Sequence[dict]",
+            "default": null
+          },
+          {
+            "name": "signature",
+            "type": "object",
+            "default": "None"
+          },
+          {
+            "name": "a2l_data",
+            "type": "Optional[dict]",
+            "default": "None"
+          },
+          {
+            "name": "prepared_definitions",
+            "type": "Optional[Mapping[str, Definition]]",
+            "default": "None"
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "FileLoadMixin.load_from_path",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.044",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "file": "s19_app/tui/app/file_load.py",
+      "line": 517,
+      "def": {
+        "qualname": "FileLoadMixin.load_from_path",
+        "line": 518,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "FileLoadMixin._start_a2l_load",
+      "reqs": [
+        "R-A2L-REFRESH.030",
+        "R-A2L-REFRESH.032",
+        "R-A2L-REFRESH.033",
+        "R-A2L-REFRESH.034"
+      ],
+      "file": "s19_app/tui/app/file_load.py",
+      "line": 828,
+      "def": {
+        "qualname": "FileLoadMixin._start_a2l_load",
+        "line": 829,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "normalized",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "copy",
+            "type": "bool",
+            "default": null
+          },
+          {
+            "name": "sync_project",
+            "type": "bool",
+            "default": "True"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "FileLoadMixin._a2l_attach_worker",
+      "reqs": [
+        "R-A2L-REFRESH.029",
+        "R-A2L-REFRESH.030",
+        "R-A2L-REFRESH.033",
+        "R-A2L-REFRESH.034",
+        "R-A2L-REFRESH.037",
+        "R-A2L-REFRESH.038"
+      ],
+      "file": "s19_app/tui/app/file_load.py",
+      "line": 921,
+      "def": {
+        "qualname": "FileLoadMixin._a2l_attach_worker",
+        "line": 923,
+        "params": [
+          {
+            "name": "request",
+            "type": "A2LAttachRequest",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "FileLoadMixin._prepare_a2l_attach_snapshot",
+      "reqs": [
+        "R-A2L-REFRESH.029",
+        "R-A2L-REFRESH.030",
+        "R-A2L-REFRESH.033",
+        "R-A2L-REFRESH.034",
+        "R-A2L-REFRESH.036",
+        "R-A2L-REFRESH.037",
+        "R-A2L-REFRESH.038"
+      ],
+      "file": "s19_app/tui/app/file_load.py",
+      "line": 987,
+      "def": {
+        "qualname": "FileLoadMixin._prepare_a2l_attach_snapshot",
+        "line": 988,
+        "params": [
+          {
+            "name": "a2l_path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "a2l_data",
+            "type": "dict",
+            "default": null
+          },
+          {
+            "name": "image_mem_map",
+            "type": "Mapping[int, int] | None",
+            "default": null
+          },
+          {
+            "name": "expected_a2l_generation",
+            "type": "int",
+            "default": null
+          },
+          {
+            "name": "expected_image_generation",
+            "type": "int",
+            "default": null
+          }
+        ],
+        "returns": "A2LAttachSnapshot"
+      }
+    },
+    {
+      "name": "FileLoadMixin._install_attached_a2l",
+      "reqs": [
+        "R-A2L-REFRESH.031",
+        "R-A2L-REFRESH.032",
+        "R-A2L-REFRESH.035",
+        "R-A2L-REFRESH.036",
+        "R-A2L-REFRESH.037"
+      ],
+      "file": "s19_app/tui/app/file_load.py",
+      "line": 1142,
+      "def": {
+        "qualname": "FileLoadMixin._install_attached_a2l",
+        "line": 1143,
+        "params": [
+          {
+            "name": "result",
+            "type": "A2LAttachResult",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "FileLoadMixin._load_workarea_file",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.044",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "file": "s19_app/tui/app/file_load.py",
+      "line": 1281,
+      "def": {
+        "qualname": "FileLoadMixin._load_workarea_file",
+        "line": 1282,
+        "params": [
+          {
+            "name": "name",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "FileLoadMixin._parse_loaded_file",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "file": "s19_app/tui/app/file_load.py",
+      "line": 1559,
+      "def": {
+        "qualname": "FileLoadMixin._parse_loaded_file",
+        "line": 1560,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "a2l_files",
+            "type": "Optional[list[Path]]",
+            "default": "None"
+          },
+          {
+            "name": "a2l_cache_out",
+            "type": "Optional[list[A2LCacheEntry]]",
+            "default": "None"
+          },
+          {
+            "name": "context",
+            "type": "Optional[FileLoadRequest]",
+            "default": "None"
+          }
+        ],
+        "returns": "Optional[LoadedFile]"
+      }
+    },
+    {
+      "name": "FileLoadMixin._prepare_load_payload",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.042",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "file": "s19_app/tui/app/file_load.py",
+      "line": 1662,
+      "def": {
+        "qualname": "FileLoadMixin._prepare_load_payload",
+        "line": 1663,
+        "params": [
+          {
+            "name": "loaded",
+            "type": "LoadedFile",
+            "default": null
+          },
+          {
+            "name": "a2l_view_generation",
+            "type": "Optional[int]",
+            "default": "None"
+          },
+          {
+            "name": "image_generation",
+            "type": "Optional[int]",
+            "default": "None"
+          },
+          {
+            "name": "prepare_a2l",
+            "type": "bool",
+            "default": "True"
+          }
+        ],
+        "returns": "PreparedLoad"
+      }
+    },
+    {
+      "name": "FileLoadMixin._start_load_worker",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.044",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "file": "s19_app/tui/app/file_load.py",
+      "line": 1854,
+      "def": {
+        "qualname": "FileLoadMixin._start_load_worker",
+        "line": 1856,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "a2l_files",
+            "type": "Optional[list[Path]]",
+            "default": "None"
+          },
+          {
+            "name": "gen",
+            "type": "int",
+            "default": null
+          },
+          {
+            "name": "sync_project",
+            "type": "bool",
+            "default": "True"
+          },
+          {
+            "name": "context",
+            "type": "Optional[FileLoadRequest]",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "LoadedStateMixin._apply_prepared_load",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.044",
+        "R-A2L-REFRESH.045",
+        "R-A2L-REFRESH.048"
+      ],
+      "file": "s19_app/tui/app/loaded_state.py",
+      "line": 549,
+      "def": {
+        "qualname": "LoadedStateMixin._apply_prepared_load",
+        "line": 550,
+        "params": [
+          {
+            "name": "prepared",
+            "type": "PreparedLoad",
+            "default": null
+          },
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "load_started",
+            "type": "float",
+            "default": null
+          },
+          {
+            "name": "publish_a2l",
+            "type": "bool",
+            "default": "True"
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "ProjectLoadMixin._handle_load_project",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.042",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "file": "s19_app/tui/app/project_load.py",
+      "line": 1217,
+      "def": {
+        "qualname": "ProjectLoadMixin._handle_load_project",
+        "line": 1218,
+        "params": [
+          {
+            "name": "name",
+            "type": "Optional[str]",
+            "default": null
+          },
+          {
+            "name": "routed",
+            "type": "bool",
+            "default": "False"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "ProjectLoadMixin._prepare_project_load",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.042",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "file": "s19_app/tui/app/project_load.py",
+      "line": 1442,
+      "def": {
+        "qualname": "ProjectLoadMixin._prepare_project_load",
+        "line": 1443,
+        "params": [
+          {
+            "name": "request",
+            "type": "ProjectLoadRequest",
+            "default": null
+          }
+        ],
+        "returns": "PreparedProjectLoad"
+      }
+    },
+    {
+      "name": "ProjectLoadMixin._install_prepared_project",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.042",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.045",
+        "R-A2L-REFRESH.046",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "file": "s19_app/tui/app/project_load.py",
+      "line": 1648,
+      "def": {
+        "qualname": "ProjectLoadMixin._install_prepared_project",
+        "line": 1649,
+        "params": [
+          {
+            "name": "prepared",
+            "type": "PreparedProjectLoad",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "CheckEditorPanel.set_a2l_parameters",
+      "reqs": [
+        "R-A2L-REFRESH.037",
+        "R-A2L-REFRESH.012"
+      ],
+      "file": "s19_app/tui/screens_directionb/check_editor.py",
+      "line": 202,
+      "def": {
+        "qualname": "CheckEditorPanel.set_a2l_parameters",
+        "line": 203,
+        "params": [
+          {
+            "name": "rows",
+            "type": "Sequence[dict]",
+            "default": null
+          },
+          {
+            "name": "signature",
+            "type": "object",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "A2lPickerMixin.set_a2l_parameters",
+      "reqs": [
+        "R-A2L-REFRESH.037",
+        "R-A2L-REFRESH.013"
+      ],
+      "file": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "line": 26,
+      "def": {
+        "qualname": "A2lPickerMixin.set_a2l_parameters",
+        "line": 27,
+        "params": [
+          {
+            "name": "rows",
+            "type": "Sequence[dict]",
+            "default": null
+          },
+          {
+            "name": "signature",
+            "type": "object",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "describe_definition",
+      "reqs": [
+        "R-A2L-DEF.136",
+        "R-A2L-DEF.138",
+        "R-A2L-DEF.139",
+        "R-A2L-DEF.140"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "a2l_data",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Definition",
+        "names": [
+          "definition"
+        ],
+        "raw": "Definition definition"
+      },
+      "module": "s19_app/tui/a2l_definition.py",
+      "examples": [
+        "(R-A2L-DEF.138/22) INLINE `BIG` at 0x10 with length 64, `LATE` at 0x40 declared before `EARLY` at 0x20 → `BIG.shared_with` is `LATE`",
+        "(R-A2L-DEF.140/10) length-refused `BIG` at 0x0 with declared length 1048577 and UBYTE `V` at 0x100000 → `V.shared_with` is `BIG`",
+        "(R-A2L-DEF.139/1) two UWORD VALUEs named `DUP` → refusal `A2L-DEF-NAME` and the duplicate-name message"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "unchanged public entry point; returns `describe_definitions([name], a2l_data)[name]` and does not mutate its input.",
+      "volatile": [],
+      "oracle": [],
+      "key": "describe_definition"
+    },
+    {
+      "name": "describe_definitions",
+      "reqs": [
+        "R-A2L-DEF.136",
+        "R-A2L-DEF.138",
+        "R-A2L-DEF.139",
+        "R-A2L-DEF.140",
+        "R-A2L-DEF.156",
+        "R-A2L-DEF.157",
+        "R-A2L-DEF.158",
+        "R-A2L-DEF.161",
+        "R-A2L-DEF.162",
+        "R-A2L-DEF.164",
+        "R-A2L-DEF.165"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Iterable[str]",
+          "name": "names",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "a2l_data",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "dict[str, Definition]",
+        "names": [
+          "definitions"
+        ],
+        "raw": "dict[str, Definition] definitions"
+      },
+      "module": "s19_app/tui/a2l_definition.py",
+      "examples": [
+        "(R-A2L-DEF.156/1) one requested name `A` in a three-object inline A2L → result keys `A`, central-index constructions `1`, per-name reconstructions `0`",
+        "(R-A2L-DEF.156/2) `A` and `B` at 0x10 and disjoint `C` at 0x80, requested as `A`, `B`, `C` → result keys `A`, `B`, `C`, `A.shared_with` `B`, `B.shared_with` `A`, `C.shared_with` `None`, constructions `1`",
+        "(R-A2L-DEF.156/3) names `A`, `A`, `B` at disjoint 0x10 and 0x20 → result keys `A`, `B` in that order, constructions `1`, additional construction for the repeat `0`",
+        "(R-A2L-DEF.158/1) for i from `0` through `999`, name `D` + str((i * 7919) % 10007) + `_` + str(i), address `0x1000 + i * 0x40 + (i % 7) * 4`, run with length `1` scalars and valid 4-byte VAL_BLKs → each parametrization has `1000` results, every `shared_with` `None`, at most `20000` checks, total constructions `1`; known-final VAL_BLK open ends `0`, builder describes/materializations `0`",
+        "(R-A2L-DEF.158/2) the same arithmetic fixture and two variants for i from `0` through `3999` → each has `4000` results, every `shared_with` `None`, at most `100000` checks, total constructions `1`; known-final VAL_BLK open ends `0`, builder describes/materializations `0`",
+        "(R-A2L-DEF.161/1) one requested disjoint `V` among `4000` pairwise-disjoint scalar objects → one result `V`, additional final-span materializations `0`, per-name definition builds `1`",
+        "(R-A2L-DEF.161/2) requested VALUE `V` at 0x40 inside earlier-starting CURVE `CX` at 0x20 whose unresolved final length is `64`, among `4000` objects → `V.shared_with` `CX`, additional materializations `1`, definition builds `2`",
+        "(R-A2L-DEF.161/3) request `V`, `V` with `CX` declared first → one result key `V`, `V.shared_with` `CX`, additional materializations of `CX` `1`, builds of `V` `1` and `CX` `1`",
+        "(R-A2L-DEF.165/1, AT-ALP-I1-1) public batch describe of every unique case_06 name after one warm-up → each of `3` measured runs returns exactly `220040` keys in request order with `0` oracle differences, median at most `30.0` seconds; planned E4 threshold, not measured here"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "changed: keep the public signature, one existing section walk, requested-name order and deduplication, and all existing describe/refusal behavior; after requested definitions are available, associate their already-final values with unique entry positions in request-local `definitions_by_position` without another describe, then call `_build_occupancy_index(span_entries, is_array_entry, definitions_by_position, entry_cache)` exactly once for the request; for each unique addressed result pass its `position_by_object[(name, section)]` and the same index to `_shared_with`; address-less results stay untouched, the input stays read-only, and lazy `materialize`/`entry_cache` reuse is unchanged.",
+      "volatile": [],
+      "oracle": [],
+      "key": "describe_definitions"
+    },
+    {
+      "name": "_entry_overlaps",
+      "reqs": [
+        "R-A2L-DEF.138",
+        "R-A2L-DEF.140"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Definition",
+          "name": "definition",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "tuple",
+          "name": "entry",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "overlaps"
+        ],
+        "raw": "bool overlaps"
+      },
+      "module": "s19_app/tui/a2l_definition.py",
+      "examples": [
+        "(R-A2L-DEF.140/10) `V` at 0x100000 with length 1 against `BIG` at 0x0 with length 1048577 → `True`",
+        "(R-A2L-DEF.140/2) UBYTE `VS` at 0x15 against AXIS_PTS `AXS` spanning 0x10 through 0x14 → `False`",
+        "(R-A2L-DEF.138/4) UBYTE at 0x10 against an unsized INSTANCE point at 0x10 → `True`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "unchanged semantic oracle; inclusive interval overlap, with an unreadable length on either side represented as a point at its declared address.",
+      "volatile": [],
+      "oracle": [],
+      "key": "_entry_overlaps"
+    },
+    {
+      "name": "_pair_exempt",
+      "reqs": [
+        "R-A2L-DEF.138",
+        "R-A2L-DEF.140"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Definition",
+          "name": "definition",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "tuple",
+          "name": "entry",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Callable",
+          "name": "mask_of",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "exempt"
+        ],
+        "raw": "bool exempt"
+      },
+      "module": "s19_app/tui/a2l_definition.py",
+      "examples": [
+        "(R-A2L-DEF.138/17) big-endian UWORD `MW` with mask 0x000F beside UBYTE `MU` with mask 0x0F at 0x10 → `True`, so `shared_with` is `None`",
+        "(R-A2L-DEF.140/4) AXIS_PTS `AXS` beside a homonymous disjoint masked VALUE → `False`; no homonymous mask is inherited"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "unchanged semantic oracle; only two clean scalar number or enum definitions with readable lengths and disjoint selected bits are exempt; arrays, curves, maps, AXIS_PTS, BLOB and INSTANCE are never exempt.",
+      "volatile": [],
+      "oracle": [],
+      "key": "_pair_exempt"
+    },
+    {
+      "name": "_shared_with",
+      "reqs": [
+        "R-A2L-DEF.138",
+        "R-A2L-DEF.140",
+        "R-A2L-DEF.158",
+        "R-A2L-DEF.159",
+        "R-A2L-DEF.160",
+        "R-A2L-DEF.161",
+        "R-A2L-DEF.163"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Definition",
+          "name": "definition",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "_OccupancyIndex",
+          "name": "index",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int | None",
+          "name": "own_position",
+          "default": null
+        },
+        {
+          "kind": "callable",
+          "type": "Callable[[str], int|None]",
+          "name": "mask_of",
+          "default": null
+        },
+        {
+          "kind": "callable",
+          "type": "Callable[[tuple], tuple]",
+          "name": "materialize",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[str]",
+        "names": [
+          "other"
+        ],
+        "raw": "Optional[str] other"
+      },
+      "module": "s19_app/tui/a2l_definition.py",
+      "examples": [
+        "(R-A2L-DEF.158/1) the `1000` non-uniform pairwise-disjoint arithmetic definitions as scalars and valid 4-byte VAL_BLKs → each variant's every result `None`, at most `20000` calls to `_entry_overlaps`, additional index constructions `0`, known-final VAL_BLK open ends `0`",
+        "(R-A2L-DEF.158/2) the corresponding `4000` definitions in both variants → each variant's every result `None`, at most `100000` calls to `_entry_overlaps`, additional index constructions `0`, known-final VAL_BLK open ends `0`",
+        "(R-A2L-DEF.159/1, R-A2L-DEF.138/22) `BIG` 0x10 through 0x4F overlaps lower-position `LATE` at 0x40 before higher-position `EARLY` at 0x20 → other `LATE`, consumed candidates at most `1`, final materializations at most `2`, complete-alias gathers `0`, whole-alias sorts `0`",
+        "(R-A2L-DEF.159/2) queried smallest position among `4000` same-span records whose names reverse position order, with `NEXT` immediately following → other `NEXT`, consumed candidates at most `1`, final materializations at most `2`, complete-alias gathers `0`, whole-alias sorts `0`",
+        "(R-A2L-DEF.159/3) first overlapping scalar pair `FREE` has clean disjoint masks and following `BLOCK` is unmasked → other `BLOCK`, consumed candidates at most `2`, final materializations at most `3`, complete-alias gathers `0`, whole-alias sorts `0`",
+        "(R-A2L-DEF.160/1) same-name, same-span records at positions `10` and `11`, queried own position `10` → position `11` is evaluated as the other record and its name `DUP` is returned; only position `10` is excluded",
+        "(R-A2L-DEF.160/2) different-name `A` and `B` with identical address, length and byte order, queried `A` at its own position → other `B`, so the other position is not mistaken for self",
+        "(R-A2L-DEF.160/3) same-name `DUP` at disjoint 0x10 and 0x80, queried position `10` → other `None`, with no name-only exclusion or grouping",
+        "(R-A2L-DEF.161/2, R-A2L-DEF.140/9) requested `V` at 0x40 and selected unresolved `CX` at 0x20 with final length `64` → other `CX`, additional materializations `1`, builds of `V` `1` and `CX` `1`",
+        "(R-A2L-DEF.140/10) over-cap `BIG` at 0x0 with length `1048577` covers `V` at 0x100000 → other `BIG`; no lower-window or decode-cap prune applies",
+        "(R-A2L-DEF.140/11) malformed `M` at 0x10 materializes to final point length `None` while `V` is at 0x12 → the conservative candidate fails `_entry_overlaps`, traversal continues, other `None`",
+        "(R-A2L-DEF.163/1, AT-ALP-I1-1) after one case_06 index build and warm-up, resolve every position through this selector → each of `3` measured runs resolves `220040` positions with `0` `shared_with` differences from the independent source-text oracle, median at most `18.0` seconds; planned E4 threshold"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "changed: replace both the global `span_index[None]` scan and the legacy page gather/sort with `_occupancy_candidates(index, definition, own_position)`; for each selected entry call the existing position-cached `materialize`, continue when `_entry_overlaps` is false or `_pair_exempt` is true, and otherwise return its name immediately; exhaustion or an address-less definition returns `None`, with self excluded only by position before materialization and no complete alias collection or sort.",
+      "volatile": [],
+      "oracle": [],
+      "key": "_shared_with"
+    },
+    {
+      "name": "_build_occupancy_index",
+      "reqs": [
+        "R-A2L-DEF.140",
+        "R-A2L-DEF.156",
+        "R-A2L-DEF.157",
+        "R-A2L-DEF.158",
+        "R-A2L-DEF.162",
+        "R-A2L-DEF.164"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[tuple]",
+          "name": "span_entries",
+          "default": null
+        },
+        {
+          "kind": "callable",
+          "type": "Callable[[tuple], bool]",
+          "name": "is_array_entry",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Mapping[int, Definition]",
+          "name": "definitions_by_position",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Mapping[int, tuple]",
+          "name": "entry_cache",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "_OccupancyIndex",
+        "names": [
+          "index"
+        ],
+        "raw": "_OccupancyIndex index"
+      },
+      "module": "s19_app/tui/a2l_definition.py",
+      "examples": [
+        "(R-A2L-DEF.157/1) one entry at position `10`, name `P`, kind `CHARACTERISTIC`, address 0x10, length `1` → exactly `1` interval record with first 0x10 and last 0x10, page-expansion records `0`",
+        "(R-A2L-DEF.157/2) one entry `C` at 0x10 with length `64` → exactly `1` interval record with first 0x10 and last 0x4F across four 16-byte pages, page-expansion records `0`",
+        "(R-A2L-DEF.157/3, R-A2L-DEF.140/10) over-cap `BIG` at 0x0 with length `1048577` and point `V` at 0x100000 → exactly `1` interval for `BIG`, last 0x100000, page-expansion records `0`, and `BIG` remains reachable for `V`",
+        "(R-A2L-DEF.158/1) valid disjoint VAL_BLK `VB` at position `20`, address 0x40 and final length `4` already in `definitions_by_position` → last 0x43, known-final open ends `0`, builder calls to describe/materialize `0`",
+        "(R-A2L-DEF.158/2) valid disjoint VAL_BLK `VC` at position `21`, address 0x80 and final length `4` already in `entry_cache` → last 0x83, known-final open ends `0`, builder calls to describe/materialize `0`",
+        "(R-A2L-DEF.158/1 negative, R-A2L-DEF.158/2 negative) force `last=None` despite the available final length `4` → known-final open ends exceed `0` and the disjoint VAL_BLK checks exceed `20000` or `100000` respectively; planned RED control, not executed",
+        "(R-A2L-DEF.140/9) CURVE `CX` at 0x20 absent from both final-length sources with unresolved final length and VALUE `V` at 0x40 → the `CX` record has first 0x20 and last `None`, build-time calls to `materialize` `0`, so the earlier-starting final span remains reachable",
+        "(R-A2L-DEF.140/11) malformed multi-value `M` at 0x10 absent from both sources whose tag length is provisionally `4` but whose final length is `None` → its record has last `None`, not provisional last 0x13; final materialization later reduces it to point 0x10",
+        "(R-A2L-DEF.162/1, AT-ALP-I1-1) one fresh index over the pinned case_06 tuple population after one warm-up → the warm-up and each of `3` runs retain exactly `220040` records and `220040` unique positions, median build at most `2.5` seconds; planned E4 threshold",
+        "(R-A2L-DEF.164/1, AT-ALP-I1-1) build and retain the same case_06 index → each of `3` runs retains `220040` unique positions, traced peak additional allocation at most `67108864` bytes, page-expansion records `0`; planned E4 threshold"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new private builder: in one position-order pass emit one `IntervalRecord` per entry; for each unique position read any already-materialized tuple from `entry_cache`, else any already-built definition from `definitions_by_position`, and use that final byte length for an exact bounded interval or known final point; only when neither source resolves the entry and its existing lazy route can change its length may an AXIS_PTS or array-like entry receive `last=None`; other entries use their existing final/provisional-as-final length and points; build the implicit complete tree's min/max summaries without sorting, retain every unique position, and build the unique-or-ambiguous `(name, kind)` to position lookup; never call `materialize`, `describe_name`, `_describe_one`, a page expander or a global per-entry rescan, and never retain either input map.",
+      "volatile": [],
+      "oracle": [],
+      "key": "_build_occupancy_index"
+    },
+    {
+      "name": "_occupancy_candidates",
+      "reqs": [
+        "R-A2L-DEF.138",
+        "R-A2L-DEF.140",
+        "R-A2L-DEF.158",
+        "R-A2L-DEF.159",
+        "R-A2L-DEF.160",
+        "R-A2L-DEF.161",
+        "R-A2L-DEF.163"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "_OccupancyIndex",
+          "name": "index",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Definition",
+          "name": "definition",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int | None",
+          "name": "own_position",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Iterator[tuple]",
+        "names": [
+          "candidates"
+        ],
+        "raw": "Iterator[tuple] candidates"
+      },
+      "module": "s19_app/tui/a2l_definition.py",
+      "examples": [
+        "(R-A2L-DEF.159/1) `BIG` position `1` spans 0x10 through 0x4F, `LATE` position `2` is at 0x40 and `EARLY` position `3` at 0x20, own position `1` → consumed candidates at most `1`, first candidate `LATE`, complete-alias gathers `0`, whole-alias sorts `0`, iterator materializations `0`",
+        "(R-A2L-DEF.159/2) `4000` records share one span in reverse name order, queried position `0`, next position `1` named `NEXT` → consumed candidates at most `1`, first candidate `NEXT`, complete-alias gathers `0`, whole-alias sorts `0`",
+        "(R-A2L-DEF.159/3) overlapping `FREE` at position `4` and `BLOCK` at position `5` follow the queried position `3` → consumed candidates at most `2`, in order `FREE`, `BLOCK`, complete-alias gathers `0`, whole-alias sorts `0`; gather-without-sort is a planned source-arm RED",
+        "(R-A2L-DEF.160/1) same-name, same-span records at positions `10` and `11`, own position `10` → only position `11` is yielded; name/address/span exclusions of position `11` `0`",
+        "(R-A2L-DEF.160/2) `A` position `4` and `B` position `5` have identical address, length and byte order, own position `4` → only `B` position `5` is yielded",
+        "(R-A2L-DEF.160/3) same-name `DUP` positions `10` and `11` at disjoint 0x10 and 0x80, own position `10` → no candidate is yielded and no name-based grouping occurs",
+        "(R-A2L-DEF.161/2) unresolved `CX` at 0x20 with open upper reachability and requested `V` at 0x40 → `CX` is selected before any final-span materialization, candidates materialized by this iterator `0`",
+        "(R-A2L-DEF.140/11) malformed `M` at 0x10 is conservative and queried `V` is at 0x12 → `M` may be yielded as a false positive, then traversal resumes at the next position after final materialization proves the point disjoint"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new private lazy iterator: derive the requested inclusive final span or point from `definition`, traverse the position-ordered tree iteratively in preorder-independent in-order sequence, prune only subtrees proved disjoint by the conservative summaries, skip the entry whose position equals `own_position`, and yield each remaining selected original entry without materializing it, collecting aliases or sorting; after a yielded entry proves non-overlapping, continue with the next position. The E4 private generator wrapper at this seam counts a yield only when `_shared_with` consumes it; the independent source arm rejects gather-without-sort, which that counter alone cannot observe.",
+      "volatile": [],
+      "oracle": [],
+      "key": "_occupancy_candidates"
+    },
+    {
+      "name": "FileLoadMixin._start_a2l_load",
+      "reqs": [
+        "R-A2L-REFRESH.030",
+        "R-A2L-REFRESH.032",
+        "R-A2L-REFRESH.033",
+        "R-A2L-REFRESH.034"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "FileLoadMixin",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "normalized",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "copy",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "sync_project",
+          "default": "True"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(R-A2L-REFRESH.030/1) empty session with A2L generation `0` and image generation `0` → request expects A2L generation `1`, image generation `0`, image mapping `None`; frozen request rejects writes",
+        "(R-A2L-REFRESH.030/2) IMG1 with `0x1000: 0x10`, expected A2L generation `3` and unchanged image generation `7`; then source address 0x1000 changes to 0xFF → request retains `0x1000: 0x10`, map size `3`, and rejects mapping writes",
+        "(R-A2L-REFRESH.033/6) `1000000` image bytes and keys `tab` then `shift+tab` queued immediately before request capture → both existing actions acknowledge before worker completion, each latency at most `1.0` s, and the worker receives an independent read-only copy",
+        "(R-A2L-REFRESH.034/4) `1000000` image bytes during request capture → existing busy line remains visible, every visible progress gap is at most `1.0` s, and no timer freeze or bar regression occurs"
+      ],
+      "modify": [
+        "[Data: A2L busy run]",
+        "[Data: A2L attach request]"
+      ],
+      "assign": [
+        "append",
+        "replace"
+      ],
+      "func": "changed A1. Preserve admission, recents, busy and sync decisions. After beginning the existing busy run, capture current A2L+1 and unchanged image generations and an independent read-only copy of the current image map into A5, then start exactly one existing worker; copy remains keyword-only.",
+      "volatile": [],
+      "oracle": [],
+      "key": "FileLoadMixin._start_a2l_load"
+    },
+    {
+      "name": "FileLoadMixin._a2l_attach_worker",
+      "reqs": [
+        "R-A2L-REFRESH.029",
+        "R-A2L-REFRESH.030",
+        "R-A2L-REFRESH.033",
+        "R-A2L-REFRESH.034",
+        "R-A2L-REFRESH.037",
+        "R-A2L-REFRESH.038"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "FileLoadMixin",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "A2LAttachRequest",
+          "name": "request",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(R-A2L-REFRESH.033/1) held real copy of `new.a2l` and keys `tab`, `shift+tab` → both acknowledgements occur before copy release and install, each at most `1.0` s, with attach progress ownership unchanged",
+        "(R-A2L-REFRESH.033/2) held real parse after byte progress value `33` and keys `tab`, `shift+tab` → both acknowledgements occur before parse release, each at most `1.0` s, and every parse bar value remains within `33`–`66`",
+        "(R-A2L-REFRESH.033/5) real `37742888`-byte case_06 attach with two existing navigation keys across post-parse/install/common-refresh windows → both acknowledgements are at most `1.0` s and terminal path, views and success describe NEW",
+        "(R-A2L-REFRESH.034/3) real `37742888`-byte case_06 attach sampled until terminal outcome → every visible progress gap through common refresh is at most `1.0` s, existing labels and `33`–`66` parse bounds hold, and outcome follows the last in-progress frame",
+        "(R-A2L-REFRESH.038/1) replacement enrichment raises ValueError `enrichment boom` → `File NOT loaded: 'new.a2l' could not be read — check that the file can be opened, then load again.`; current image and A2L-dependent generations/views stay exact, existing Workarea Files refresh runs and may list the new copy, with `0` installs, common refreshes, syncs or successes",
+        "(R-A2L-REFRESH.038/2) real enrichment completes once, then render_a2l_view raises ValueError `summary boom` before describe → the same exact failure, describe count `0`, no install/common refresh/sync/success, and unchanged Workarea Files refresh/new-copy behavior",
+        "(R-A2L-REFRESH.038/3) real enrichment and summary complete, then Check bulk describe raises ValueError `definitions boom` → the same exact failure, no partial NEW snapshot or Patch paint, `0` installs/common refreshes/syncs/successes, and the existing Workarea Files refresh may show the new copy"
+      ],
+      "modify": [
+        "[I/O: workarea A2L copy]",
+        "[Data: A2L attach result]"
+      ],
+      "assign": [
+        "replace",
+        "replace"
+      ],
+      "func": "changed A2. Inside the existing copy/parse Exception boundary, retain the selected path, parsed entry and parse timing, then call A3 after parsing with keyword-only a2l_path=path, a2l_data=entry[1], image_mem_map=request.image_mem_map, expected_a2l_generation=request.expected_a2l_generation and expected_image_generation=request.expected_image_generation. Construct one A6 from request, path, entry, parse_seconds and the returned A7 before dispatching the existing deferred install callback. Any preparation exception returns through the existing attach-failure callback; no result or partial snapshot is dispatched. Self is limited to existing logger, progress and thread-dispatch infrastructure.",
+      "volatile": [],
+      "oracle": [],
+      "key": "FileLoadMixin._a2l_attach_worker"
+    },
+    {
+      "name": "FileLoadMixin._prepare_a2l_attach_snapshot",
+      "reqs": [
+        "R-A2L-REFRESH.029",
+        "R-A2L-REFRESH.030",
+        "R-A2L-REFRESH.033",
+        "R-A2L-REFRESH.034",
+        "R-A2L-REFRESH.036",
+        "R-A2L-REFRESH.037",
+        "R-A2L-REFRESH.038"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "FileLoadMixin",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "a2l_path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "a2l_data",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[int, int]]",
+          "name": "image_mem_map",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "expected_a2l_generation",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "expected_image_generation",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "A2LAttachSnapshot",
+        "names": [
+          "preparation"
+        ],
+        "raw": "A2LAttachSnapshot preparation"
+      },
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(R-A2L-REFRESH.029/1) typed parsed NEW with `ARR12` length `12` and `u16` → one A7; enrichment `1`, summary `1`, Check describe `1`, Patch describe `1`, all off UI before install, and visible NEW cells are exact",
+        "(R-A2L-REFRESH.029/2) existing workarea NEW with copy `False` → the same complete off-UI A7 before install, copy calls `0`, and no OLD cell survives",
+        "(R-A2L-REFRESH.029/3) start-up load_path `new.a2l` → complete off-UI A7 before start-up install and outcome, with no component deferred to manual refresh",
+        "(R-A2L-REFRESH.030/1) no-image parsed OLD at `old.a2l` with explicit expected pair `1`, `0` and image_mem_map `None` → one frozen A7 with enriched-tag tuple, summary tuple and read-only check/patch mapping; field, tuple and mapping writes all fail and worker UI/session reads are `0`",
+        "(R-A2L-REFRESH.030/3) static census resolves worker/helper nodes `2` → forbidden widget/session reads `0`; one synthetic self.current_file read is detected once, while logger, progress-forwarder and thread-dispatch calls remain visible",
+        "(R-A2L-REFRESH.033/3) real enrichment held off UI and keys `tab`, `shift+tab` → both acknowledgements occur during enrichment, each at most `1.0` s, before install or outcome",
+        "(R-A2L-REFRESH.033/4) first real bulk describe held off UI and keys `tab`, `shift+tab` → both acknowledgements occur during definition preparation, each at most `1.0` s, and neither picker paints a partial generation",
+        "(R-A2L-REFRESH.034/1) enrichment held off UI for `1.5` s → existing busy line stays visible, at least `2` spinner/elapsed changes occur, every measured gap is at most `1.0` s, and no outcome appears during the hold",
+        "(R-A2L-REFRESH.034/2) bulk definitions held off UI for `1.5` s independently → existing busy line stays visible, at least `2` spinner/elapsed changes occur, every gap is at most `1.0` s, and no outcome appears during the hold",
+        "(R-A2L-REFRESH.037/1) OLD measurable names `ARR12`, `AUX2` with lengths `12`, `2` and `u16` → one all-names Check describe and one independent all-names Patch describe, both off UI before population; each A8 contains both definitions and UI describes `0`",
+        "(R-A2L-REFRESH.037/2) same-path NEW changes ARR12 to length `8` and `f32` → exactly one additional describe per picker for the new generation, distinct Check/Patch A8 entries, and no OLD `u16` definition or shared single-call shortcut"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new A3, route-neutral; all five inputs after self are keyword-only. On the worker, use a2l_path only as explicit parsed-source context and call the existing enrichment/summary service once with a2l_data and image_mem_map. Derive the enrichment key from the explicit expected pair and mem_size=-1 for None or len(image_mem_map), then derive measurable names using the existing address/name rules. Call describe_definitions independently once for Check and once for Patch over that same full name sequence; pack A7 and both A8 entries with a2l_source=a2l_data, signature=enrichment_key and read-only containers. Read no request, admission state, widget, mounted state, current session or live generation.",
+      "volatile": [],
+      "oracle": [],
+      "key": "FileLoadMixin._prepare_a2l_attach_snapshot"
+    },
+    {
+      "name": "FileLoadMixin._install_attached_a2l",
+      "reqs": [
+        "R-A2L-REFRESH.031",
+        "R-A2L-REFRESH.032",
+        "R-A2L-REFRESH.035",
+        "R-A2L-REFRESH.036",
+        "R-A2L-REFRESH.037"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "FileLoadMixin",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "A2LAttachResult",
+          "name": "result",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(R-A2L-REFRESH.031/1) empty session generations `0`, `0` and matching OLD result → installed key has A2L generation `1`, image generation `0`, mem_size `-1`; OLD_SCALAR shows size `2` and `u16` coherently before refresh",
+        "(R-A2L-REFRESH.031/2) A2L generation `1`, image generation `3`, IMG1 size `3` and matching OLD result → installed key is A2L generation `2`, image generation `3`, mem_size `3`; image identity and `0x1000: 0x10` remain and OLD cells match IMG1",
+        "(R-A2L-REFRESH.031/3) IMG1 plus OLD at `same.a2l`, generations `2`, `3`, map size `3`; overwrite with NEW → installed key is A2L generation `3`, image generation `3`, mem_size `3`; source and snapshot show ARR12 length `8`, `f32`, image bytes stay unchanged and OLD `u16` does not survive",
+        "(R-A2L-REFRESH.032/1) live generations A2L `5`, image `2`, but NEW A7 records A2L `5` instead of expected `6` → `Load superseded — current state kept.`; OLD/IMG1/MAC state and views stay exact, with `0` recent, cache, session, install, common-refresh, sync or success mutations",
+        "(R-A2L-REFRESH.032/2) live generations A2L `5`, image `2`, but NEW A7 records image `1` instead of expected `2` → `Load superseded — current state kept.`; no NEW enrichment, picker definition or fallback recompute reaches a view, and every install-side effect count is `0`",
+        "(R-A2L-REFRESH.035/1) first accepted `old.a2l` → exactly `install → common refresh(UI) → A2L loaded: old.a2l`, common-refresh count `1`, no manual refresh, and current OLD everywhere at outcome",
+        "(R-A2L-REFRESH.035/2) accepted OLD→NEW replacement → exactly `install → common refresh(UI) → A2L loaded: new.a2l`, common-refresh count `1`, and neither an OLD value nor an intermediate empty state is painted at outcome",
+        "(R-A2L-REFRESH.035/3) active one-A2L project, same-path OLD→NEW and modal answer Yes → one normal worker and one UI common refresh after complete NEW installation, before success; sync_project `False` and project bytes unchanged",
+        "(R-A2L-REFRESH.036/1) OLD without image → worker enrichment construction `1`, worker summary construction `1`, UI constructions `0`; common refresh consumes the installed tags/summary and paints OLD size `2`, `u16` and no-image values",
+        "(R-A2L-REFRESH.036/2) OLD over IMG1 → worker enrichment construction `1`, worker summary construction `1`, UI constructions `0`; the exact three-part key hits the installed caches and paints IMG1-backed OLD cells"
+      ],
+      "modify": [
+        "[Data: Current A2L]",
+        "[Data: A2L view caches]",
+        "[Data: Accepted A2L picker snapshots]",
+        "[Data: A2L busy run]"
+      ],
+      "assign": [
+        "replace",
+        "replace",
+        "replace",
+        "clear"
+      ],
+      "func": "changed A4 on UI. For a product result, first compare A7's pair with current A2L+1 and unchanged current image before recents, files refresh, cache, session, dependent-view or project-sync mutation. A mismatch directly ends busy with the exact superseded text and returns. A match preserves existing install order, uses _replace_current_a2l, attaches the same parsed payload to the unchanged image, installs enrichment key/tags/summary with summary start 0 and _accepted_a2l_picker_snapshots, then runs exactly one existing common refresh and the existing outcome tail. Legacy A6 preparation None retains only the direct-construction compatibility path.",
+      "volatile": [],
+      "oracle": [],
+      "key": "FileLoadMixin._install_attached_a2l"
+    },
+    {
+      "name": "A2LParameterPicker.set_parameters",
+      "reqs": [
+        "R-A2L-REFRESH.037",
+        "R-PICKER-CORRECT.018",
+        "R-PICKER-CORRECT.019"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "A2LParameterPicker",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[dict]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "signature",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "a2l_data",
+          "default": "None (keyword-only)"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Definition]]",
+          "name": "prepared_definitions",
+          "default": "None (keyword-only)"
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "repopulated"
+        ],
+        "raw": "bool repopulated"
+      },
+      "module": "s19_app/tui/a2l_parameter_picker.py",
+      "examples": [
+        "(R-A2L-REFRESH.037/1) matching Check and Patch populations receive their own prepared maps containing ARR12 length `12`, `u16` and AUX2 length `2`, `u16` → both return repopulated `True`, paint those exact cells and perform `0` UI describes",
+        "(R-A2L-REFRESH.037/2) changed-signature NEW population with prepared ARR12 length `8`, `f32` → repopulated `True`, current cells show `8` and `f32`, additional UI describes `0`, and definitions_source is the identical NEW a2l_data object",
+        "(R-A2L-REFRESH.037/3) after NEW, `20` real filter/page rebuilds plus one unchanged-signature request per picker → unchanged request returns `False` before prepared-map consumption; additional describes `0`, additional population describes `0`, each mounted page has at most `200` rows and current `f32` cells remain"
+      ],
+      "modify": [
+        "[Data: Picker population]"
+      ],
+      "assign": [
+        "replace"
+      ],
+      "func": "changed P1. Equal non-None signature returns False before consuming prepared input. Otherwise preserve row normalization, page, filter and pick behavior. A supplied read-only mapping, including empty, is installed as definitions with its a2l_data source and zero describes; omitted input preserves the existing one bulk direct describe. Definitions and definitions_source always describe the last real population.",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2LParameterPicker.set_parameters"
+    },
+    {
+      "name": "CheckEditorPanel.set_a2l_parameters",
+      "reqs": [
+        "R-A2L-REFRESH.037",
+        "R-A2L-REFRESH.012"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "CheckEditorPanel",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[dict]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "signature",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/check_editor.py",
+      "examples": [
+        "(R-A2L-REFRESH.037/1) matching accepted OLD check entry → Check consumes its own worker map and paints ARR12 length `12`, `u16` with `0` main describes",
+        "(R-A2L-REFRESH.037/2) matching same-path NEW check entry → Check consumes only the new-generation map and paints ARR12 length `8`, `f32`, never OLD `u16`",
+        "(R-A2L-REFRESH.037/3) unchanged Check signature → P1 returns `False`, filter/page/picks and definitions stay unchanged, and describes `0`",
+        "(R-A2L-REFRESH.037/4) same-source signature mismatch from `(3, 4, 3)` to `(3, 5, 3)` and different-source project.a2l variant → each present mismatch invalidates the whole accepted mapping to read-only empty before existing-route describe; current `f32` paints, stale `u16` does not, and the matching-signature control still consumes the worker map",
+        "(R-A2L-REFRESH.037/5) unmounted Check call with accepted mapping present → legacy a2l_data `None`, omitted prepared definitions, `0` app/mapping reads or invalidations, unchanged snapshot identity; later matching mount consumes the surviving worker map with `0` additional UI describes"
+      ],
+      "modify": [
+        "[Data: Accepted A2L picker snapshots]",
+        "[Data: Check picker population]"
+      ],
+      "assign": [
+        "replace",
+        "replace"
+      ],
+      "func": "changed C1 on UI. Before app access, an unmounted panel keeps legacy a2l_data None and omitted prepared definitions, reads or invalidates no accepted mapping and preserves its identity. A mounted adapter selects only the check A8 from the app's accepted read-only mapping. Pass its prepared definitions to P1 only when key, A2L-source identity and full signature match. On any present-entry mismatch, first replace the whole accepted mapping with an empty read-only mapping, then use the existing route describe. Preserve no-op, document, selection, demotion, layout and preview side effects.",
+      "volatile": [],
+      "oracle": [],
+      "key": "CheckEditorPanel.set_a2l_parameters"
+    },
+    {
+      "name": "A2lPickerMixin.set_a2l_parameters",
+      "reqs": [
+        "R-A2L-REFRESH.037",
+        "R-A2L-REFRESH.013"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "A2lPickerMixin",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[dict]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "signature",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py",
+      "examples": [
+        "(R-A2L-REFRESH.037/1) matching accepted OLD patch entry → Patch consumes its distinct worker map and paints ARR12 length `12`, `u16` with `0` main describes",
+        "(R-A2L-REFRESH.037/2) matching same-path NEW patch entry → Patch consumes the new-generation map and paints `8`, `f32`, never OLD `12`, `u16`",
+        "(R-A2L-REFRESH.037/3) Patch filter/page rebuilds and unchanged signature → additional describes `0`, current NEW definitions, filter, page, highlight and picks remain according to existing contracts",
+        "(R-A2L-REFRESH.037/4) same-source signature mismatch from `(3, 4, 3)` to `(3, 5, 3)` and different-source project.a2l variant → each present mismatch invalidates the whole accepted mapping to read-only empty before existing-route describe; current `f32` paints, stale `u16` does not, and the matching-signature control still consumes the worker map",
+        "(R-A2L-REFRESH.037/5) unmounted Patch call with accepted mapping present → legacy a2l_data `None`, omitted prepared definitions, `0` app/mapping reads or invalidations, unchanged snapshot identity; later matching mount consumes the surviving worker map with `0` additional UI describes"
+      ],
+      "modify": [
+        "[Data: Accepted A2L picker snapshots]",
+        "[Data: Patch picker population]"
+      ],
+      "assign": [
+        "replace",
+        "replace"
+      ],
+      "func": "changed PA1 on UI. Before app access, an unmounted panel keeps legacy a2l_data None and omitted prepared definitions, reads or invalidates no accepted mapping and preserves its identity. A mounted adapter selects only the patch A8 from the app's accepted read-only mapping. Pass its prepared definitions to P1 only on exact key, A2L-source identity and full-signature match. On any present-entry mismatch, replace the whole accepted mapping with an empty read-only mapping before the existing route describe. Preserve no-op, selection and layout invalidation side effects.",
+      "volatile": [],
+      "oracle": [],
+      "key": "A2lPickerMixin.set_a2l_parameters"
+    },
+    {
+      "name": "FileLoadRequest",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "a2l_path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "a2l_data",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[A2LCacheEntry]",
+          "name": "a2l_cache",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[LoadedFile]",
+          "name": "current_file",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "expected_a2l_generation",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "expected_image_generation",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "gen",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[tuple[Path, ...]]",
+          "name": "a2l_files",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "sync_project",
+          "default": "True"
+        }
+      ],
+      "out": {
+        "type": "FileLoadRequest",
+        "names": [
+          "request"
+        ],
+        "raw": "FileLoadRequest request"
+      },
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(EX-I3-039-B) UI capture with A=`8`, I=`4`, attached A2L and busy generation `12` → request expected pair (`9`, `5`), gen `12` and sync_project `True`; field reassignment is refused",
+        "(EX-I3-047-A) second admission of `image.s19` at one lexical path after equal-size OLD→NEW bytes → a new request with expected image generation `5`; unchanged A2L source bytes remain byte-identical while writer reinstallation permits final pair (`9`, `5`), and path equality does not reuse the old request",
+        "(EX-I3-048-A) request captured as (`9`, `5`) before a competing A2L install → request remains (`9`, `5`) for downstream stale comparison and never refreshes itself from live counters"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "F1 frozen data node captures every artifact/cache/generation input on UI before worker launch; fields are fixed and captured payloads are read-only for the worker.",
+      "volatile": [],
+      "oracle": [
+        "../E1-slice.md F1 and ../E1-rulings.md D-3/D-6"
+      ],
+      "key": "FileLoadRequest"
+    },
+    {
+      "name": "FileLoadMixin.load_from_path",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.044",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(EX-I3-039-B) admitted image with attached A2L at A=`8`, I=`4` → exactly `1` worker receives F1 with expected pair (`9`, `5`) and no live-session lookup is deferred to that worker",
+        "(EX-I3-040-A) image request with attached case_06 A2L of `37742888` bytes → existing admission/copy precede F1 capture and worker launch; independent total measurement starts before admission and includes copy and parse",
+        "(EX-I3-044-A) first image load with OLD A2L attached → one F1/worker dispatch and common-publication count `0` before final image/A2L installation"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "F2 preserves admission, copy, recents and busy behavior, then constructs F1 on UI with sync_project=True and starts the same worker with that explicit context.",
+      "volatile": [],
+      "oracle": [
+        "../02-test-cases.md EX-I3-039-B, EX-I3-040-A and EX-I3-044-A"
+      ],
+      "key": "FileLoadMixin.load_from_path"
+    },
+    {
+      "name": "FileLoadMixin._load_workarea_file",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.044",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(EX-I3-047-A) admitted in-place `image.s19` with changed equal-size content → F1 has sync_project `False`, copy count `0` and one worker receives a fresh expected pair",
+        "(EX-I3-039-B) workarea image with attached A2L → the same F1/F6 producer route is selected with exactly `1` eventual Inc2 producer call and no second enrichment pipeline"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "F3 preserves workarea admission/refusal and the in-place non-A2L go arm, then constructs F1 on UI with sync_project=False and no copy before starting the same worker contract.",
+      "volatile": [],
+      "oracle": [
+        "../E1-slice.md F3 and ../02-test-cases.md EX-I3-047-A"
+      ],
+      "key": "FileLoadMixin._load_workarea_file"
+    },
+    {
+      "name": "FileLoadMixin._parse_loaded_file",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[Path]]",
+          "name": "a2l_files",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[A2LCacheEntry]]",
+          "name": "a2l_cache_out",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[FileLoadRequest]",
+          "name": "context",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "Optional[LoadedFile]",
+        "names": [
+          "result"
+        ],
+        "raw": "Optional[LoadedFile] result"
+      },
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(EX-I3-039-B) context supplies attached A2L path/data/cache and the existing image → result merges the newly parsed image with that A2L while live current_a2l_path, current_a2l_data, current_file and current_project read count is `0`",
+        "(EX-I3-047-A) equal-size NEW bytes replace OLD at `image.s19` without a clear → result contains `NEW_IMAGE`, not `OLD_IMAGE`; captured A2L cache remains an explicit parse input and path alone is not a cache key",
+        "(EX-I3-048-A) live A2L state changes after F1 capture → result still uses the captured A2L input, leaving the later generation preflight to reject the whole candidate rather than mixing artifacts"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "F4 adds keyword-only context; the product arm uses context.a2l_files first, otherwise context path/data/cache/current-file inputs, ignores legacy standalone A2L arguments, reads no live session member including current_project, and preserves parser/cache handoff; None is legacy only.",
+      "volatile": [],
+      "oracle": [
+        "../E1-rulings.md D-3/D-6 and baseline premise P03"
+      ],
+      "key": "FileLoadMixin._parse_loaded_file"
+    },
+    {
+      "name": "FileLoadMixin._prepare_load_payload",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.042",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "LoadedFile",
+          "name": "loaded",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "a2l_view_generation",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "image_generation",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "prepare_a2l",
+          "default": "True"
+        }
+      ],
+      "out": {
+        "type": "PreparedLoad",
+        "names": [
+          "result"
+        ],
+        "raw": "PreparedLoad result"
+      },
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(EX-I3-039-B) loaded image+A2L, expected (`9`, `5`), mem_size `2` and prepare_a2l `True` → exactly `1` Inc2 producer call; result.a2l_preparation carries pair (`9`, `5`), key (`9`, `5`, `2`) and independent `check`/`patch` maps; direct enrichment calls `0`",
+        "(EX-I3-039-C) image-after-reset stage at A=`8`, I=`4` with prepare_a2l `False` and expected (`10`, `5`) → producer calls `0`, no A2L snapshot and generation-only PreparedLoad retains (`10`, `5`)",
+        "(EX-I3-039-C) MAC-after-image stage for the same load with prepare_a2l `True` and expected (`11`, `6`) → exactly `1` producer call and result snapshot pair (`11`, `6`); total A2L production for both stages is `1`",
+        "(EX-I3-039-E) project image+A2L without MAC with expected (`10`, `5`) → exactly `1` producer call at the image stage and no MAC fabrication or duplicate UI preparation",
+        "(EX-I3-040-A) parsed case_06 payload with `220040` tags and a `0.20` s producer gate → enrichment, summary, Check/Patch definitions and other payload preparation remain on the worker with UI construction count `0`",
+        "(EX-I3-043-B) Inc2 producer raises ValueError(`PREPARE_CONTROL`) for P-PAIR → exception propagates with no PreparedLoad result, no candidate installation and no synchronous UI-preparation fallback",
+        "(EX-I3-047-B) same-path `same.a2l` now yields `NEW_A2L` instead of `OLD_A2L` at captured A=`8`, I=`4` → producer receives NEW data, not a path identity, and the MAC-stage result carries (`11`, `6`); unchanged image bytes remain byte-identical while its reinstallation may move image generation",
+        "(EX-I3-047-C) same-path project image now yields `NEW_IMAGE` instead of `OLD_IMAGE` → producer receives the new image map and current A2L data and returns the prepared MAC-stage pair (`11`, `6`); unchanged A2L bytes remain byte-identical while reset/writer stages may move A2L generation",
+        "(EX-I3-048-C) MAC-stage candidate incorrectly carries (`10`, `6`) while required is (`11`, `6`) → result preserves the candidate pair for P5 pre-reset rejection; no generation is corrected by reading live state",
+        "(EX-I3-048-D) MAC-stage candidate incorrectly carries (`11`, `5`) while required is (`11`, `6`) → result preserves that stale image expectation for whole-load rejection before reset"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "F5 adds keyword-only prepare_a2l; with A2L and True it calls the Inc2 producer once using explicit source/data/map/stage generations and packs the returned I-ALP-2 snapshot with the other prepared data, never direct enrichment; False skips A2L production and omitted generations remain legacy synchronous behavior only.",
+      "volatile": [],
+      "oracle": [
+        "../../interfaces.md I-ALP-2.2 and I-ALP-3; ../E1-rulings.md D-1/D-3/D-5"
+      ],
+      "key": "FileLoadMixin._prepare_load_payload"
+    },
+    {
+      "name": "FileLoadMixin._start_load_worker",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.044",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[Path]]",
+          "name": "a2l_files",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "gen",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "sync_project",
+          "default": "True"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[FileLoadRequest]",
+          "name": "context",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/file_load.py",
+      "examples": [
+        "(EX-I3-040-A) `3` fresh serial case_06 image+A2L runs → request-to-outcome totals include admission/copy, parse, post-parse preparation and install/publication as `4` named phases; accept only median ≤`45` s and every run <`60` s, with `50` ms timer lateness ≤`100` ms and ≥`3` ticks during the `0.20` s worker hold; an independent `61` s hold fails total even if every tick passes",
+        "(EX-I3-043-A) F5 raises ValueError(`PREPARE_CONTROL`) → one UI `_handle_load_error` dispatch, candidate installs `0`, UI preparation calls `0`, success outcomes `0`, and previous state/views/project hashes remain equal",
+        "(EX-I3-044-A) first image with OLD A2L reaches expected (`9`, `5`) → ordered timeline final install → exactly `1` common publication → `Loaded image.s19`; pre-install publications `0`",
+        "(EX-I3-044-B) different-path NEW image with attached A2L → exactly `1` final common publication with NEW image and current A2L before success; outgoing-image publications `0`",
+        "(EX-I3-044-C) equal-size NEW image at the same path → `NEW_IMAGE` and its definitions are installed before exactly `1` final publication and success; `OLD_IMAGE` is absent",
+        "(EX-I3-048-A) candidate pair (`9`, `5`) reaches completion after required becomes (`10`, `5`) → L1 rejects before candidate cache/session/widget/sync/publication mutation and outcome is exactly `Load superseded — current state kept.`",
+        "(EX-I3-048-B) candidate pair (`9`, `5`) reaches completion after required becomes (`9`, `6`) → the whole candidate is rejected with the same exact superseded outcome and no stale image or enrichment is installed"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "F6 adds keyword-only context after sync_project; product calls consume F1 rather than live artifacts/counters, run F4 then F5 off UI, route preparation failure to the existing failure handler with no minimal-bundle fallback, and dispatch one UI completion; None is legacy only.",
+      "volatile": [],
+      "oracle": [
+        "../02-test-cases.md EX-I3-040-A, EX-I3-043-A, EX-I3-044-A/B/C and EX-I3-048-A/B"
+      ],
+      "key": "FileLoadMixin._start_load_worker"
+    },
+    {
+      "name": "ProjectLoadRequest",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.042",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "tuple[Path, ...]",
+          "name": "data_files",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "tuple[Path, ...]",
+          "name": "a2l_files",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[ProjectFileProblem]",
+          "name": "a2l_problem",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[A2LCacheEntry]",
+          "name": "a2l_cache",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "gen",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "routed",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "captured_a2l_generation",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "captured_image_generation",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "ProjectLoadRequest",
+        "names": [
+          "request"
+        ],
+        "raw": "ProjectLoadRequest request"
+      },
+      "module": "s19_app/tui/app/project_load.py",
+      "examples": [
+        "(EX-I3-039-C) admitted P-PAIR with current A=`7` and I=`4` → frozen request captures `7` and `4` before worker launch",
+        "(EX-I3-039-E) admitted P-PAIR-NOMAC with A=`7` and I=`4` → the same request contract captures both counters without a MAC-specific default",
+        "(EX-I3-048-F) P-ONLY request captures I=`4`, then a test-controlled UI change advances live I to `5` → request remains frozen at `4` for the already-running worker"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "P1 frozen UI-captured request retains every positional admission field and adds default-None captured generations; product requests always populate both and workers read no live counters",
+      "volatile": [],
+      "oracle": [
+        ".dev-flow/2026-11-18-a2l-load-performance/inc-3/E1-slice.md, P1 and stage matrix"
+      ],
+      "key": "ProjectLoadRequest"
+    },
+    {
+      "name": "PreparedProjectLoad",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.042",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.045",
+        "R-A2L-REFRESH.046",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ProjectLoadRequest",
+          "name": "request",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "refusal",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "ProjectVariantSet",
+          "name": "variant_set",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[ProjectManifest]",
+          "name": "manifest",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "tuple[ProjectFileProblem, ...]",
+          "name": "problems",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[A2LCacheEntry]",
+          "name": "a2l_cache",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "InstallSet",
+          "name": "install",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "PreparedLoad | LoadedFile | None",
+          "name": "image",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "tuple[VariantDescriptor, ...]",
+          "name": "unreadable",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "PreparedLoad | LoadedFile | None",
+          "name": "mac",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[RecordedDocumentState]",
+          "name": "document",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[A2LAttachSnapshot]",
+          "name": "a2l_only",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "PreparedProjectLoad",
+        "names": [
+          "prepared"
+        ],
+        "raw": "PreparedProjectLoad prepared"
+      },
+      "module": "s19_app/tui/app/project_load.py",
+      "examples": [
+        "(EX-I3-039-C) captured A=`7`, I=`4` → image bundle expects `9`, `5` with no A2L snapshot; MAC bundle expects `10`, `6` with the load's single A2L snapshot",
+        "(EX-I3-039-E) captured A=`7`, I=`4` and no MAC → image bundle expects `9`, `5` and carries one A2L snapshot; mac is `None`",
+        "(EX-I3-046-A) captured A=`0`, I=`0` for P-ONLY → image=`None`, mac=`None`, and a2l_only expects `2`, `0` without a synthetic LoadedFile"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "P2 frozen worker handoff carries prepared image/MAC bundles or legacy LoadedFile test values, plus one optional A2L-only Inc2 snapshot, without changing existing field order",
+      "volatile": [],
+      "oracle": [
+        ".dev-flow/2026-11-18-a2l-load-performance/interfaces.md, I-ALP-2.2 and I-ALP-3"
+      ],
+      "key": "PreparedProjectLoad"
+    },
+    {
+      "name": "ProjectLoadMixin._handle_load_project",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.042",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "name",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "routed",
+          "default": "False"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/project_load.py",
+      "examples": [
+        "(EX-I3-039-D) admitted P-ONLY with A=`7`, I=`4` → one worker receives captured generations `7`, `4` and no image or MAC is fabricated",
+        "(EX-I3-047-B) the same project name and same.a2l path contain equal-size NEW bytes after OLD, with no clear → admission starts a fresh worker instead of treating path equality as content equality",
+        "(EX-I3-043-C) admitted P-ONLY starts the normal worker with captured generations → later producer failure remains on the existing project failure route, with no UI preparation fallback"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "P3 preserves cheap refusals, admission and busy order, captures both current generations into P1 on the UI thread, and starts the existing worker without path-only reload short-circuiting",
+      "volatile": [],
+      "oracle": [
+        ".dev-flow/2026-11-18-a2l-load-performance/inc-3/02-test-cases.md, EX-I3-039-D and EX-I3-047-B"
+      ],
+      "key": "ProjectLoadMixin._handle_load_project"
+    },
+    {
+      "name": "ProjectLoadMixin._prepare_project_load",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.042",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ProjectLoadRequest",
+          "name": "request",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "PreparedProjectLoad",
+        "names": [
+          "result"
+        ],
+        "raw": "PreparedProjectLoad result"
+      },
+      "module": "s19_app/tui/app/project_load.py",
+      "examples": [
+        "(EX-I3-039-C) P-PAIR with A=`7`, I=`4` → image F5 uses prepare_a2l=`False` at `9`, `5`; MAC F5 uses prepare_a2l=`True` at `10`, `6`; Inc2 producer calls=`1`, UI constructions=`0`",
+        "(EX-I3-039-E) P-PAIR-NOMAC with A=`7`, I=`4` → image F5 uses prepare_a2l=`True` at `9`, `5`; Inc2 producer calls=`1`, mac=`None`, UI constructions=`0`",
+        "(EX-I3-039-D) P-ONLY with A=`7`, I=`4` → the Inc2 producer receives parsed A2L, image_mem_map=`None`, expected pair `9`, `4`; calls=`1`, synthetic LoadedFile count=`0`",
+        "(EX-I3-041-A) unexecuted oracle input for three P-PAIR runs has totals `44`, `45`, `46` seconds, all four phases present, and maximum tick lateness `100` ms → median=`45`, maximum=`46`, budget verdict=`True`",
+        "(EX-I3-041-A, total-negative) unexecuted totals `44`, `45`, `60` seconds with responsive ticks → median=`45` but individual maximum=`60`, so total-budget verdict=`False`",
+        "(EX-I3-041-B) unexecuted oracle input for three P-PAIR-NOMAC runs has totals `42`, `43`, `44` seconds and at least `3` ticks during a `0.20` second worker hold → median=`43`, maximum=`44`, responsiveness and budget verdict=`True`",
+        "(EX-I3-042-A) unexecuted oracle input for three P-ONLY runs has totals `43`, `44`, `45` seconds, admission/parse/preparation/install phases but no copy phase → median=`45`, maximum=`45`, budget verdict=`True`",
+        "(EX-I3-042-A, total-negative) unexecuted responsive P-ONLY hold of `61` seconds → individual duration bound verdict=`False` independently of tick results",
+        "(EX-I3-043-B) P-PAIR producer raises ValueError(\"PREPARE_CONTROL\") → exception reaches the existing project failure route; PreparedProjectLoad candidate count=`0`, reset count=`0`, UI preparation count=`0`",
+        "(EX-I3-043-C) P-ONLY producer raises ValueError(\"PREPARE_CONTROL\") → no A2L-only snapshot or candidate installs; cache/reset/widget/success counts=`0`",
+        "(EX-I3-043-D) P-PAIR-NOMAC producer raises ValueError(\"PREPARE_CONTROL\") → the existing project failure route receives it; candidates=`0`, resets=`0`, UI preparations=`0`, MAC fabrications=`0`, successes=`0`",
+        "(EX-I3-047-B) same-path equal-size A2L NEW replaces OLD with a changed write timestamp → parsing and the single snapshot contain NEW markers, never a path-keyed OLD reuse",
+        "(EX-I3-047-C) same-path equal-size image NEW replaces OLD in P-PAIR → image/MAC preparation reads NEW image bytes and current A2L, never OLD image bytes",
+        "(EX-I3-047-D) same-path equal-size P-ONLY A2L NEW replaces OLD → a2l_only carries NEW tags/summary/definitions with expected post-reset pair, with no image input invented",
+        "(EX-I3-048-F) P-ONLY captured A=`7`, I=`4` → worker snapshot expects `9`, `4`; a later live I=`5` is not read or hidden by this worker",
+        "(EX-I3-048-G) test-constructed keyless P-PAIR image bundle at current A=`7`, I=`4` carries A2L expectation `8` instead of required `9` and a2l_enriched_key=`None` → P4 preserves the stale generation-only candidate for P5 pre-reset rejection without repair or producer repair",
+        "(EX-I3-048-H) test-constructed keyless P-PAIR image bundle carries image expectation `4` instead of required `5` and a2l_enriched_key=`None` → P4 preserves it for P5 pre-reset rejection; no enrichment key is required"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "P4 parses and selects as before, prepares all product image/MAC bundles and A2L-only data off UI through F5 and the same Inc2 snapshot producer, uses stage-specific expected pairs, and propagates preparation exceptions without a candidate fallback",
+      "volatile": [],
+      "oracle": [
+        ".dev-flow/2026-11-18-a2l-load-performance/inc-3/E1-rulings.md, D-1, D-3, D-5 and D-7"
+      ],
+      "key": "ProjectLoadMixin._prepare_project_load"
+    },
+    {
+      "name": "ProjectLoadMixin._install_prepared_project",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.042",
+        "R-A2L-REFRESH.043",
+        "R-A2L-REFRESH.045",
+        "R-A2L-REFRESH.046",
+        "R-A2L-REFRESH.047",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PreparedProjectLoad",
+          "name": "prepared",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "module": "s19_app/tui/app/project_load.py",
+      "examples": [
+        "(EX-I3-045-A) empty session A=`0`, I=`0` accepts P-PAIR → preflight image `2`, `1` and MAC `3`, `2`; reset/image/MAC publications=`0`; final F=`1` after pair `3`, `2` and before OUTCOME",
+        "(EX-I3-045-B) outgoing P-PAIR A=`7`, I=`4` accepts incoming P-PAIR → both stages preflight before reset; only incoming final pair `10`, `6` reaches final F=`1`, then OUTCOME",
+        "(EX-I3-045-C) empty session A=`0`, I=`0` accepts P-PAIR-NOMAC → image preflight expects `2`, `1`; reset/image publications=`0`, MAC fabrications=`0`, and exactly `1` final F sees image+A2L/project identity before OUTCOME",
+        "(EX-I3-046-A) empty session A=`0`, I=`0` accepts P-ONLY → preflight `2`, `0`, reset without F, A2L writer and prepared cache/mapping install, final F=`1`; current_file=`None`, image/MAC count=`0`",
+        "(EX-I3-046-B) outgoing image+A2L A=`7`, I=`4` accepts P-ONLY → final A=`9`, I=`4`, F=`1`, current_file=`None`, phantom MAC/image count=`0`, reset publications=`0`",
+        "(EX-I3-047-B) same-path P-PAIR A2L OLD→NEW → final publication contains NEW A2L tags/definitions and a newer A2L generation; unchanged image bytes remain byte-identical while image-stage reinstallation may move image generation; OLD markers=`0`, final F=`1`",
+        "(EX-I3-047-C) same-path P-PAIR image OLD→NEW → final publication contains NEW image content and a newer image generation; unchanged A2L bytes remain byte-identical while reset/writer stages may move A2L generation; OLD image markers=`0`, mixed-pair publications=`0`",
+        "(EX-I3-047-D) same-path P-ONLY A2L OLD→NEW with prior A=`7`, I=`4` → final A=`9`, I=`4`, NEW A2L publishes once and OLD/no-A2L markers=`0`",
+        "(EX-I3-047-E) P-PAIR-NOMAC same-path A2L OLD→NEW with prior A=`7`, I=`4` → final pair `9`, `5` contains NEW A2L and its newer generation; unchanged image bytes remain byte-identical while image reinstall may move image generation; MAC/OLD markers=`0`",
+        "(EX-I3-047-F) P-PAIR-NOMAC same-path image OLD→NEW with prior A=`7`, I=`4` → final pair `9`, `5` contains NEW image and its newer generation; unchanged A2L bytes remain byte-identical while reset/writer may move A2L generation; MAC/OLD/mixed markers=`0`",
+        "(EX-I3-048-C) current A=`7`, I=`4` and MAC snapshot A2L expectation=`9` instead of required `10` → reject before reset; candidate/cache/session/widget/project/publication mutations=`0`; outcome=\"Load superseded — current state kept.\"",
+        "(EX-I3-048-D) current A=`7`, I=`4` and MAC snapshot image expectation=`5` instead of required `6` → reject before reset with kept project hashes and the same superseded outcome",
+        "(EX-I3-048-E) P-ONLY current A=`7`, I=`4` and snapshot A2L expectation=`8` instead of required `9` → reject before reset/A2L/cache/view/project mutation; success count=`0`",
+        "(EX-I3-048-F) P-ONLY snapshot expects `9`, `4`, but live I=`5` at installation requires `9`, `5` → reject the whole candidate before reset even though no image would install",
+        "(EX-I3-048-I) P-PAIR captured A=`7`, I=`4`, but live A=`8` before P5 entry makes image/MAC requirements (`10`, `5`)/(`11`, `6`) differ from captured (`9`, `5`)/(`10`, `6`) → reject before reset; L1/candidate/widget/sync/publication calls=`0`",
+        "(EX-I3-048-J) P-PAIR captured A=`7`, I=`4`, but live I=`5` before P5 entry makes image/MAC requirements (`9`, `6`)/(`10`, `7`) differ from captured (`9`, `5`)/(`10`, `6`) → reject before reset with previous project hashes equal and no L1 call",
+        "(EX-I3-048-K) P-PAIR-NOMAC current A=`7`, I=`4` and image snapshot A2L expectation=`8` instead of required `9` → reject before reset; MAC/L1/candidate/publication calls=`0` and outcome=\"Load superseded — current state kept.\"",
+        "(EX-I3-048-L) P-PAIR-NOMAC current A=`7`, I=`4` and image snapshot image expectation=`4` instead of required `5` → reject before reset with previous project hashes equal; MAC/L1/candidate/publication/success calls=`0`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "P5 preflights every product stage pair against current UI generations before reset or any candidate mutation, installs accepted prepared values with publish_a2l=False, installs A2L-only snapshots without LoadedFile synthesis, then publishes once after final project identity and before outcome",
+      "volatile": [],
+      "oracle": [
+        ".dev-flow/2026-11-18-a2l-load-performance/inc-3/E1-rulings.md, D-3 through D-6 and D-10"
+      ],
+      "key": "ProjectLoadMixin._install_prepared_project"
+    },
+    {
+      "name": "LoadedStateMixin._apply_prepared_load",
+      "reqs": [
+        "R-A2L-REFRESH.039",
+        "R-A2L-REFRESH.040",
+        "R-A2L-REFRESH.041",
+        "R-A2L-REFRESH.044",
+        "R-A2L-REFRESH.045",
+        "R-A2L-REFRESH.048"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PreparedLoad",
+          "name": "prepared",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "float",
+          "name": "load_started",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "publish_a2l",
+          "default": "True"
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "accepted"
+        ],
+        "raw": "bool accepted"
+      },
+      "module": "s19_app/tui/app/loaded_state.py",
+      "examples": [
+        "(EX-I3-039-A, DIRECT) direct attach with captured A=`7`, I=`4` supplies Inc2 pair `(8, 4)` and independent `check`/`patch` snapshots through A4 → expect none",
+        "(EX-I3-039-B) loose image with captured A=`7`, I=`4` carries snapshot pair `(8, 5)` and read-only `check`/`patch` entries → accepted `True`; that exact mapping is installed before F and UI preparation calls=`0`",
+        "(EX-I3-039-C) P-PAIR with captured A=`7`, I=`4` has keyless image pair `(9, 5)`, then MAC snapshot pair `(10, 6)` → both accepted `True`; the image stage leaves the mapping unchanged, the MAC stage installs it once, and route producer calls=`1`",
+        "(EX-I3-039-D, A2L_ONLY) P-ONLY with captured A=`7`, I=`4` supplies P2/P5 snapshot pair `(9, 4)` without a synthetic PreparedLoad or current_file → expect none",
+        "(EX-I3-039-E) P-PAIR-NOMAC with captured A=`7`, I=`4` carries image snapshot pair `(9, 5)` → accepted `True` with publish_a2l=`False`; its mapping precedes P5's sole F and route producer calls=`1`",
+        "(EX-I3-040-A) case_06 with `220040` tags, captured A=`7`, I=`4` and snapshot pair `(8, 5)` → accepted `True`; each of `3` serial request-to-outcome runs includes parse and `4` named phases, has total <`60` s and median ≤`45` s; the `0.20` s worker hold yields ≥`3` ticks each ≤`100` ms late and final current pair `(8, 5)`",
+        "(EX-I3-041-A) P-PAIR with captured A=`7`, I=`4`, keyless image pair `(9, 5)` and MAC snapshot pair `(10, 6)` → accepted `True` at both stages; each of `3` runs includes parse and `4` phases, has total <`60` s and median ≤`45` s, every tick is ≤`100` ms late, and no intermediate F occurs",
+        "(EX-I3-041-B) P-PAIR-NOMAC with captured A=`7`, I=`4` and image snapshot pair `(9, 5)` → accepted `True`; each of `3` runs has total <`60` s and median ≤`45` s with parse included, every tick is ≤`100` ms late, and no MAC or intermediate F appears",
+        "(EX-I3-042-A, INSTALL) P-ONLY case_06 uses P2/P5 pair `(9, 4)`, has no current_file/image/MAC, records admission/parse/preparation/install-publication with no copy phase, and each of `3` totals is <`60` s with median ≤`45` s → expect none",
+        "(EX-I3-043-A, PREPARE) image-route producer raises ValueError(\"PREPARE_CONTROL\") → expect none; candidate installs=`0`, UI preparation calls=`0`, success outcomes=`0`, and the existing image failure route keeps previous state",
+        "(EX-I3-043-B, PREPARE) P-PAIR producer raises ValueError(\"PREPARE_CONTROL\") → expect none; resets=`0`, candidate installs=`0`, UI preparation calls=`0`, and previous project files/state remain equal",
+        "(EX-I3-043-C, PREPARE) P-ONLY producer raises ValueError(\"PREPARE_CONTROL\") → expect none; resets=`0`, A2L/cache/widget mutations=`0`, UI preparation calls=`0`, and no success occurs",
+        "(EX-I3-044-A) first loose image over attached OLD A2L with matching pair `(8, 5)` → accepted `True`; timeline is final install → mapping/cache install → F count=`1` → OUTCOME, with no pre-install F",
+        "(EX-I3-044-B) different-path NEW image over outgoing image+OLD A2L with matching pair `(9, 6)` → accepted `True`; exactly `1` F sees NEW image and current A2L before OUTCOME and no outgoing pair is published",
+        "(EX-I3-044-C) same-path equal-size different-content NEW image replacement with matching pair `(10, 7)` → accepted `True`; exactly `1` F sees NEW raw values/definitions, OLD values are absent, and OUTCOME follows F",
+        "(EX-I3-045-A) empty session accepts P-PAIR image pair `(9, 5)` then MAC pair `(10, 6)` with publish_a2l=`False` → accepted `True` twice and L1 F count=`0`; P5 publishes final image+MAC+A2L/project identity exactly `1` time before OUTCOME",
+        "(EX-I3-045-B) outgoing P-PAIR replaced by incoming P-PAIR accepts final stage pair `(12, 8)` with publish_a2l=`False` → accepted `True`; no reset/image-only/MAC-stage F occurs and P5's sole F precedes OUTCOME",
+        "(EX-I3-048-A) loose image requires pair `(8, 5)` but snapshot records A2L generation `7` → accepted `False`; candidate cache/session/widget/sync/publication calls=`0`, previous state is equal, and OUTCOME is `Load superseded — current state kept.`",
+        "(EX-I3-048-B) loose image requires pair `(8, 5)` but snapshot records image generation `4` → accepted `False`; no candidate image, enrichment, picker mapping or success is installed and OUTCOME is `Load superseded — current state kept.`",
+        "(EX-I3-048-C, PRE_RESET) P-PAIR MAC stage requires `(10, 6)` but its snapshot A2L generation is `9` → expect none; P5 rejects before reset/project/widget/publication with `Load superseded — current state kept.`",
+        "(EX-I3-048-D, PRE_RESET) P-PAIR MAC stage requires `(10, 6)` but its snapshot image generation is `5` → expect none; P5 rejects before reset/install/sync/publication with previous project hashes equal",
+        "(EX-I3-048-E, PRE_RESET) P-ONLY requires `(9, 4)` but its P2 snapshot A2L generation is `8` → expect none; P5 rejects before reset/A2L/cache/view/project/publication and keeps the exact superseded outcome",
+        "(EX-I3-048-F, PRE_RESET) P-ONLY requires `(9, 4)` after a test-controlled live-image change but its snapshot image generation is `3` → expect none; P5 rejects before reset/publication even though no candidate image exists",
+        "(EX-I3-048-A, INCOMPLETE_PAIR) loose image has legacy A2L generation `8`, legacy image generation `None`, and no snapshot → accepted `False` before candidate mutation; an either-field guard may not compare or install a partial pair",
+        "(EX-I3-048-B, DISAGREEING_PAIRS) loose image legacy pair `(8, 5)` coexists with snapshot pair `(8, 4)` while the stage requires `(8, 5)` → accepted `False`; no representation may select a different generation truth"
+      ],
+      "modify": [
+        "[Data: Prepared load candidate]",
+        "[Data: S19TuiApp._accepted_a2l_picker_snapshots]",
+        "[Data: A2L-dependent publication]"
+      ],
+      "assign": [
+        "replace",
+        "replace",
+        "append"
+      ],
+      "func": "changed. Preflight every complete legacy or S1 snapshot generation pair, including a keyless generation-only bundle; reject an incomplete, mutually inconsistent or stale pair before any candidate mutation. Preserve the accepted install and finalization behavior; when S1 is present its enrichment key/tags/summary are authoritative, with one shallow list conversion of each tuple to preserve the existing cache types, and its independent read-only check/patch mapping replaces the accepted picker mapping without a copy before any common refresh. Keep the no-snapshot/two-None legacy constructor arm and publish only under publish_a2l; L1 never enriches or describes.",
+      "volatile": [
+        "path",
+        "load_started"
+      ],
+      "oracle": [
+        "../01-requirements.md R-A2L-REFRESH.039 through .045 and .048; ../E1-rulings.md D-3 through D-5"
+      ],
+      "key": "LoadedStateMixin._apply_prepared_load"
+    }
+  ],
+  "calls": [
+    {
+      "caller": "A2LParameterPicker.set_parameters",
+      "callee": "describe_definitions",
+      "sites": [
+        "s19_app/tui/a2l_parameter_picker.py:644"
+      ]
+    },
+    {
+      "caller": "A2lPickerMixin.set_a2l_parameters",
+      "callee": "A2LParameterPicker.set_parameters",
+      "sites": [
+        "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py:55",
+        "s19_app/tui/screens_directionb/patch_editor/a2l_picker.py:62"
+      ]
+    },
+    {
+      "caller": "CheckEditorPanel.set_a2l_parameters",
+      "callee": "A2LParameterPicker.set_parameters",
+      "sites": [
+        "s19_app/tui/screens_directionb/check_editor.py:245",
+        "s19_app/tui/screens_directionb/check_editor.py:252"
+      ]
+    },
+    {
+      "caller": "FileLoadMixin._a2l_attach_worker",
+      "callee": "FileLoadMixin._prepare_a2l_attach_snapshot",
+      "sites": [
+        "s19_app/tui/app/file_load.py:959"
+      ]
+    },
+    {
+      "caller": "FileLoadMixin._load_workarea_file",
+      "callee": "FileLoadMixin._start_load_worker",
+      "sites": [
+        "s19_app/tui/app/file_load.py:1387"
+      ]
+    },
+    {
+      "caller": "FileLoadMixin._prepare_a2l_attach_snapshot",
+      "callee": "describe_definitions",
+      "sites": [
+        "s19_app/tui/app/file_load.py:1102",
+        "s19_app/tui/app/file_load.py:1103"
+      ]
+    },
+    {
+      "caller": "FileLoadMixin._prepare_load_payload",
+      "callee": "FileLoadMixin._prepare_a2l_attach_snapshot",
+      "sites": [
+        "s19_app/tui/app/file_load.py:1765"
+      ]
+    },
+    {
+      "caller": "FileLoadMixin._start_a2l_load",
+      "callee": "FileLoadMixin._a2l_attach_worker",
+      "sites": [
+        "s19_app/tui/app/file_load.py:916"
+      ]
+    },
+    {
+      "caller": "FileLoadMixin._start_load_worker",
+      "callee": "FileLoadMixin._parse_loaded_file",
+      "sites": [
+        "s19_app/tui/app/file_load.py:1912"
+      ]
+    },
+    {
+      "caller": "FileLoadMixin._start_load_worker",
+      "callee": "FileLoadMixin._prepare_load_payload",
+      "sites": [
+        "s19_app/tui/app/file_load.py:1942",
+        "s19_app/tui/app/file_load.py:1962"
+      ]
+    },
+    {
+      "caller": "FileLoadMixin.load_from_path",
+      "callee": "FileLoadMixin._start_load_worker",
+      "sites": [
+        "s19_app/tui/app/file_load.py:633"
+      ]
+    },
+    {
+      "caller": "ProjectLoadMixin._handle_load_project",
+      "callee": "ProjectLoadMixin._prepare_project_load",
+      "sites": [
+        "s19_app/tui/app/project_load.py:1425"
+      ]
+    },
+    {
+      "caller": "_shared_with",
+      "callee": "_entry_overlaps",
+      "sites": [
+        "s19_app/tui/a2l_definition.py:4127"
+      ]
+    },
+    {
+      "caller": "_shared_with",
+      "callee": "_occupancy_candidates",
+      "sites": [
+        "s19_app/tui/a2l_definition.py:4125"
+      ]
+    },
+    {
+      "caller": "_shared_with",
+      "callee": "_pair_exempt",
+      "sites": [
+        "s19_app/tui/a2l_definition.py:4129"
+      ]
+    },
+    {
+      "caller": "describe_definition",
+      "callee": "describe_definitions",
+      "sites": [
+        "s19_app/tui/a2l_definition.py:608"
+      ]
+    },
+    {
+      "caller": "describe_definitions",
+      "callee": "_build_occupancy_index",
+      "sites": [
+        "s19_app/tui/a2l_definition.py:875"
+      ]
+    },
+    {
+      "caller": "describe_definitions",
+      "callee": "_shared_with",
+      "sites": [
+        "s19_app/tui/a2l_definition.py:889"
+      ]
+    }
+  ],
+  "top_level_sites": {
+    "LoadedStateMixin._apply_prepared_load": [
+      "docs/images/capture_readme_media.py:88"
+    ],
+    "CheckEditorPanel.set_a2l_parameters": [
+      "s19_app/tui/app/checks_diff.py:101",
+      "s19_app/tui/app/patch.py:1860"
+    ],
+    "A2lPickerMixin.set_a2l_parameters": [
+      "s19_app/tui/app/checks_diff.py:101",
+      "s19_app/tui/app/patch.py:1860"
+    ],
+    "FileLoadMixin.load_from_path": [
+      "s19_app/tui/app/file_load.py:432",
+      "s19_app/tui/app/projects.py:250"
+    ],
+    "FileLoadMixin._start_a2l_load": [
+      "s19_app/tui/app/file_load.py:725",
+      "s19_app/tui/app/file_load.py:813"
+    ],
+    "FileLoadMixin._load_workarea_file": [
+      "s19_app/tui/app/file_load.py:1279"
+    ],
+    "FileLoadMixin._parse_loaded_file": [
+      "s19_app/tui/app/file_load.py:1538",
+      "tools/e13/run.py:202"
+    ],
+    "describe_definition": [
+      "s19_app/tui/app/patch.py:393",
+      "s19_app/tui/app/patch.py:458"
+    ],
+    "ProjectLoadMixin._handle_load_project": [
+      "s19_app/tui/app/project_load.py:562"
+    ]
+  },
+  "findings": [
+    {
+      "kind": "info_nodes_replaced",
+      "where": "graphs",
+      "msg": "2 replaced by a later graph: `describe_definitions`, `_shared_with`"
+    },
+    {
+      "kind": "info_type_loose",
+      "where": "s19_app/tui/a2l_definition.py:3801",
+      "msg": "`mask_of`: graph `Callable` vs code `Callable[[str], Optional[int]]`"
+    },
+    {
+      "kind": "input_type_mismatch",
+      "where": "s19_app/tui/a2l_definition.py:4075",
+      "msg": "`mask_of`: graph `Callable[[str], int|None]` vs code `Callable[[str], Optional[int]]`"
+    },
+    {
+      "kind": "default_mismatch",
+      "where": "s19_app/tui/a2l_parameter_picker.py:590",
+      "msg": "`a2l_data`: graph default `None (keyword-only)` vs code default `None`"
+    },
+    {
+      "kind": "default_mismatch",
+      "where": "s19_app/tui/a2l_parameter_picker.py:590",
+      "msg": "`prepared_definitions`: graph default `None (keyword-only)` vs code default `None`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/app/file_load.py",
+      "msg": "`FileLoadRequest`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/app/project_load.py",
+      "msg": "`ProjectLoadRequest`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/app/project_load.py",
+      "msg": "`PreparedProjectLoad`"
+    }
+  ],
+  "parse_failures": [
+    {
+      "file": "tools/mutation_harness.py",
+      "error": "f-string expression part cannot include a backslash (<unknown>, line 190)"
+    }
+  ]
+}

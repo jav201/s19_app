@@ -1,0 +1,40 @@
+markers (rel s):
+  load-call         0.000
+  worker-start      0.000
+  worker-end        0.000
+  load-return       0.000
+  keys-ack          1.719
+  on-attached      82.109
+  install-start    82.140
+  refresh-start    82.156
+  refresh-end      83.750
+  install-end      83.765
+  terminal         84.234
+key latencies: (1.2030000000959262, 0.515999999945052)
+total gaps: 343
+big gaps (rel to markers):
+  gap[161]  0.969  at t=  23.141
+  gap[169]  1.594  at t=  26.266
+  gap[184]  1.093  at t=  31.360
+  gap[193]  1.203  at t=  34.094
+  gap[210]  1.156  at t=  39.125
+  gap[227]  1.312  at t=  44.438
+  gap[244]  1.532  at t=  49.906
+  gap[260]  1.640  at t=  55.141
+  gap[271]  1.407  at t=  58.906
+  gap[291]  1.640  at t=  65.063
+  gap[310]  1.500  at t=  71.891
+  gap[332]  1.734  at t=  78.422
+  gap[341]  1.890  at t=  82.266
+last 10 gaps:
+  gap[333]  0.282
+  gap[334]  0.406
+  gap[335]  0.187
+  gap[336]  0.422
+  gap[337]  0.203
+  gap[338]  0.172
+  gap[339]  0.360
+  gap[340]  0.078
+  gap[341]  1.890
+  gap[342]  0.188
+log lines: ['', '', '', 'A2L loaded: firmware.a2l']

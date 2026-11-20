@@ -1,0 +1,167 @@
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+____________________ test_r040_image_post_parse_responsive ____________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40322/test_r040_image_post_parse_res0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000289BC992650>
+
+    @pytest.mark.serial_timing
+    def test_r040_image_post_parse_responsive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """R-A2L-REFRESH.040/1: 3 serial case_06 image+A2L runs; request-to-
+        outcome total includes admission/copy and parse; 4 named phases;
+        median <= 45 s, every run < 60 s; 50 ms timer with every tick <= 100 ms
+        late, >= 3 ticks during the 0.20 s producer gate, zero failing."""
+        _guard_perf_seams()
+        runs = [
+            _one_image_run(tmp_path / f"run{i}", monkeypatch, f"{i + 1}/3")
+            for i in range(3)
+        ]
+>       _assert_budget("R-A2L-REFRESH.040 image+A2L case_06", runs, PHASES_IMAGE)
+
+tests\test_alp_inc3_load_responsiveness.py:448: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+label = 'R-A2L-REFRESH.040 image+A2L case_06'
+runs = [{'gate_elapsed': 10.113926699967124, 'gate_ticks': 153, 'label': '1/3', 'phases': {'admission/copy': 8.65858379995916...ll/publication': 12.103733099997044, 'parse': 0.003618599963374436, 'post-parse preparation': 51.11654710001312}, ...}]
+phase_names = ('admission/copy', 'parse', 'post-parse preparation', 'install/publication')
+
+    def _assert_budget(label: str, runs: list, phase_names: tuple) -> None:
+        totals = [run["total"] for run in runs]
+        median = statistics.median(totals)
+>       assert median <= report_margin(label, median, timing_bound(BUDGET_MEDIAN_S)), runs
+E       AssertionError: [{'gate_elapsed': 10.113926699967124, 'gate_ticks': 153, 'label': '1/3', 'phases': {'admission/copy': 8.65858379995916...ll/publication': 12.103733099997044, 'parse': 0.003618599963374436, 'post-parse preparation': 51.11654710001312}, ...}]
+E       assert 70.23907190002501 <= 45.0
+E        +  where 45.0 = report_margin('R-A2L-REFRESH.040 image+A2L case_06', 70.23907190002501, 45.0)
+E        +    where 45.0 = timing_bound(45.0)
+
+tests\test_alp_inc3_load_responsiveness.py:414: AssertionError
+______ test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/1] ______
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40322/test_r041_project_pair_post_pa0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028AE6EEBD50>
+shape = 'pair'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize(
+        "shape",
+        ["pair", "nomac"],
+        ids=[f"R-A2L-REFRESH.041/{i}" for i in range(1, 3)],
+    )
+    def test_r041_project_pair_post_parse_responsive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, shape: str) -> None:
+        """R-A2L-REFRESH.041/1-/2: 3 serial case_06 project-pair runs per shape
+        (with and without MAC); total includes parse; 4 named phases; median
+        <= 45 s, every run < 60 s; the unchanged 50 ms/100 ms timer, >= 3 gate
+        ticks; each final pair current."""
+        _guard_perf_seams()
+        runs = [
+            _one_project_run(tmp_path / f"run{i}", monkeypatch, f"{i + 1}/3", shape)
+            for i in range(3)
+        ]
+>       _assert_budget(f"R-A2L-REFRESH.041 project-pair {shape} case_06", runs, PHASES_PROJECT)
+
+tests\test_alp_inc3_load_responsiveness.py:467: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+label = 'R-A2L-REFRESH.041 project-pair pair case_06'
+runs = [{'gate_elapsed': 0.2418273000512272, 'gate_ticks': 4, 'label': '1/3', 'phases': {'admission': 0.1895679000299424, 'in...tall/publication': 13.700391199905425, 'parse': 15.866678500082344, 'post-parse preparation': 41.92197180003859}, ...}]
+phase_names = ('admission', 'parse', 'post-parse preparation', 'install/publication')
+
+    def _assert_budget(label: str, runs: list, phase_names: tuple) -> None:
+        totals = [run["total"] for run in runs]
+        median = statistics.median(totals)
+>       assert median <= report_margin(label, median, timing_bound(BUDGET_MEDIAN_S)), runs
+E       AssertionError: [{'gate_elapsed': 0.2418273000512272, 'gate_ticks': 4, 'label': '1/3', 'phases': {'admission': 0.1895679000299424, 'in...tall/publication': 13.700391199905425, 'parse': 15.866678500082344, 'post-parse preparation': 41.92197180003859}, ...}]
+E       assert 71.50344180001412 <= 45.0
+E        +  where 45.0 = report_margin('R-A2L-REFRESH.041 project-pair pair case_06', 71.50344180001412, 45.0)
+E        +    where 45.0 = timing_bound(45.0)
+
+tests\test_alp_inc3_load_responsiveness.py:414: AssertionError
+______ test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/2] ______
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40322/test_r041_project_pair_post_pa1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028AF2EE4A90>
+shape = 'nomac'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize(
+        "shape",
+        ["pair", "nomac"],
+        ids=[f"R-A2L-REFRESH.041/{i}" for i in range(1, 3)],
+    )
+    def test_r041_project_pair_post_parse_responsive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, shape: str) -> None:
+        """R-A2L-REFRESH.041/1-/2: 3 serial case_06 project-pair runs per shape
+        (with and without MAC); total includes parse; 4 named phases; median
+        <= 45 s, every run < 60 s; the unchanged 50 ms/100 ms timer, >= 3 gate
+        ticks; each final pair current."""
+        _guard_perf_seams()
+        runs = [
+            _one_project_run(tmp_path / f"run{i}", monkeypatch, f"{i + 1}/3", shape)
+            for i in range(3)
+        ]
+>       _assert_budget(f"R-A2L-REFRESH.041 project-pair {shape} case_06", runs, PHASES_PROJECT)
+
+tests\test_alp_inc3_load_responsiveness.py:467: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+label = 'R-A2L-REFRESH.041 project-pair nomac case_06'
+runs = [{'gate_elapsed': 0.21800160000566393, 'gate_ticks': 3, 'label': '1/3', 'phases': {'admission': 0.24586530006490648, '...all/publication': 12.233969600056298, 'parse': 15.083034000126645, 'post-parse preparation': 40.664999799919315}, ...}]
+phase_names = ('admission', 'parse', 'post-parse preparation', 'install/publication')
+
+    def _assert_budget(label: str, runs: list, phase_names: tuple) -> None:
+        totals = [run["total"] for run in runs]
+        median = statistics.median(totals)
+>       assert median <= report_margin(label, median, timing_bound(BUDGET_MEDIAN_S)), runs
+E       AssertionError: [{'gate_elapsed': 0.21800160000566393, 'gate_ticks': 3, 'label': '1/3', 'phases': {'admission': 0.24586530006490648, '...all/publication': 12.233969600056298, 'parse': 15.083034000126645, 'post-parse preparation': 40.664999799919315}, ...}]
+E       assert 68.1637831000844 <= 45.0
+E        +  where 45.0 = report_margin('R-A2L-REFRESH.041 project-pair nomac case_06', 68.1637831000844, 45.0)
+E        +    where 45.0 = timing_bound(45.0)
+
+tests\test_alp_inc3_load_responsiveness.py:414: AssertionError
+__________________ test_r042_a2l_only_post_parse_responsive ___________________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40322/test_r042_a2l_only_post_parse_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028AA6F018D0>
+
+    @pytest.mark.serial_timing
+    def test_r042_a2l_only_post_parse_responsive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """R-A2L-REFRESH.042/1: 3 serial case_06 P-ONLY runs; total includes
+        parse; admission/parse/preparation/install-publication reported with no
+        copy phase fabricated; median <= 45 s, every run < 60 s; the unchanged
+        timer bounds hold; final A2L-only state is current, no image/MAC."""
+        _guard_perf_seams()
+        runs = [
+            _one_project_run(tmp_path / f"run{i}", monkeypatch, f"{i + 1}/3", "only")
+            for i in range(3)
+        ]
+>       _assert_budget("R-A2L-REFRESH.042 A2L-only case_06", runs, PHASES_PROJECT)
+
+tests\test_alp_inc3_load_responsiveness.py:481: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+label = 'R-A2L-REFRESH.042 A2L-only case_06'
+runs = [{'gate_elapsed': 0.23004719999153167, 'gate_ticks': 3, 'label': '1/3', 'phases': {'admission': 0.24013429996557534, '...tall/publication': 9.820248999982141, 'parse': 15.239488700055517, 'post-parse preparation': 37.457373399985954}, ...}]
+phase_names = ('admission', 'parse', 'post-parse preparation', 'install/publication')
+
+    def _assert_budget(label: str, runs: list, phase_names: tuple) -> None:
+        totals = [run["total"] for run in runs]
+        median = statistics.median(totals)
+>       assert median <= report_margin(label, median, timing_bound(BUDGET_MEDIAN_S)), runs
+E       AssertionError: [{'gate_elapsed': 0.23004719999153167, 'gate_ticks': 3, 'label': '1/3', 'phases': {'admission': 0.24013429996557534, '...tall/publication': 9.820248999982141, 'parse': 15.239488700055517, 'post-parse preparation': 37.457373399985954}, ...}]
+E       assert 62.695857399958186 <= 45.0
+E        +  where 45.0 = report_margin('R-A2L-REFRESH.042 A2L-only case_06', 62.695857399958186, 45.0)
+E        +    where 45.0 = timing_bound(45.0)
+
+tests\test_alp_inc3_load_responsiveness.py:414: AssertionError
+============================ QC-TM timing margins =============================
+LOW -58.9%  71.503 s / 45.000 s  R-A2L-REFRESH.041 project-pair pair case_06  tests/test_alp_inc3_load_responsiveness.py::test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/1]
+LOW -56.1%  70.239 s / 45.000 s  R-A2L-REFRESH.040 image+A2L case_06  tests/test_alp_inc3_load_responsiveness.py::test_r040_image_post_parse_responsive
+LOW -51.5%  68.164 s / 45.000 s  R-A2L-REFRESH.041 project-pair nomac case_06  tests/test_alp_inc3_load_responsiveness.py::test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/2]
+LOW -39.3%  62.696 s / 45.000 s  R-A2L-REFRESH.042 A2L-only case_06  tests/test_alp_inc3_load_responsiveness.py::test_r042_a2l_only_post_parse_responsive
+QC-TM: 4 bounds, 4 under 20 % margin
+=========================== short test summary info ===========================
+FAILED tests/test_alp_inc3_load_responsiveness.py::test_r040_image_post_parse_responsive
+FAILED tests/test_alp_inc3_load_responsiveness.py::test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/1]
+FAILED tests/test_alp_inc3_load_responsiveness.py::test_r041_project_pair_post_parse_responsive[R-A2L-REFRESH.041/2]
+FAILED tests/test_alp_inc3_load_responsiveness.py::test_r042_a2l_only_post_parse_responsive
+4 failed in 1057.27s (0:17:37)
+EXIT=1

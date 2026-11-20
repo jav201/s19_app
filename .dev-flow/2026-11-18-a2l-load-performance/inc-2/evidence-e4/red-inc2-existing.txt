@@ -1,0 +1,5 @@
+................................................................         [100%]
+============================ QC-TM timing margins =============================
+44.1%  1.118 s / 2.000 s  R-PICKER-CORRECT.019 picker describe 13990  tests/test_b103_picker_model.py::test_r019_1_13990_object_population_has_one_timed_batch_per_generation
+QC-TM: 1 bounds, 0 under 20 % margin
+64 passed in 301.83s (0:05:01)

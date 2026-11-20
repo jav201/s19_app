@@ -1,0 +1,355 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <LOCAL_HOME>\anaconda3\envs\s19env\python.exe
+rootdir: <LOCAL_HOME>\Github\s19_app-a2l-load-performance
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 8 items
+
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_1_disjoint_1000_checks_bounded[scalar] FAILED [ 12%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_1_disjoint_1000_checks_bounded[val_blk] FAILED [ 25%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_2_disjoint_4000_checks_bounded[scalar] FAILED [ 37%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_2_disjoint_4000_checks_bounded[val_blk] FAILED [ 50%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_162_1_case06_index_build_bound FAILED [ 62%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_163_1_case06_all_queries_bound FAILED [ 75%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_164_1_case06_index_memory_bound FAILED [ 87%]
+tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_165_1_case06_integrated_describe_bound FAILED [100%]
+
+================================== FAILURES ===================================
+__________ test_r_a2l_def_158_1_disjoint_1000_checks_bounded[scalar] __________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40149/test_r_a2l_def_158_1_disjoint_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002849459DED0>
+variant = 'scalar'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("variant", ["scalar", "val_blk"])
+    def test_r_a2l_def_158_1_disjoint_1000_checks_bounded(tmp_path, monkeypatch, variant):
+        """R-A2L-DEF.158/1 - 1,000 pairwise-disjoint definitions, scalar and valid
+        4-byte VAL_BLK parametrizations: all shared_with None, at most 20,000
+        checks, exactly 1 construction."""
+>       _run_disjoint(tmp_path, monkeypatch, variant, 1000, 20_000)
+
+tests\test_alp_a2l_occupancy_perf.py:467: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40149/test_r_a2l_def_158_1_disjoint_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002849459DED0>
+variant = 'scalar', count = 1000, bound = 20000
+
+    def _run_disjoint(tmp_path, monkeypatch, variant, count, bound):
+        """The shared .158 body: the fixed-arithmetic disjoint population run once
+        as 1-byte scalars and once as valid 4-byte VAL_BLKs."""
+        mod = a2ldef
+        blocks = []
+        names = []
+        for i in range(count):
+            name = f"D{(i * 7919) % 10007}_{i}"
+            addr = 0x1000 + i * 0x40 + (i % 7) * 4
+            if variant == "scalar":
+                blocks.append(characteristic(name, "VALUE", f"0x{addr:X}", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+            else:
+                blocks.append(valblk(name, f"0x{addr:X}", "RL_U8", "NO_COMPU_METHOD", "0", "255",
+                                     extras=("NUMBER 4",)))
+            names.append(name)
+        assert len(names) == count and len(set(names)) == count
+        a2l = inline(tmp_path, *blocks)
+        assert len(a2l["tags"]) == count and len(a2l.get("errors") or []) == 0
+        state = _install_counters(monkeypatch, mod)
+        result = mod.describe_definitions(names, a2l)
+        assert list(result) == names and len(result) == count
+        assert all(definition.shared_with is None for definition in result.values())
+>       assert state["overlap_checks"] <= bound, (
+            f"{variant} variant: {state['overlap_checks']} candidate-overlap checks "
+            f"exceed the bound {bound} (the base runs the global candidate scan)"
+        )
+E       AssertionError: scalar variant: 999000 candidate-overlap checks exceed the bound 20000 (the base runs the global candidate scan)
+E       assert 999000 <= 20000
+
+tests\test_alp_a2l_occupancy_perf.py:432: AssertionError
+_________ test_r_a2l_def_158_1_disjoint_1000_checks_bounded[val_blk] __________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40149/test_r_a2l_def_158_1_disjoint_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028494600690>
+variant = 'val_blk'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("variant", ["scalar", "val_blk"])
+    def test_r_a2l_def_158_1_disjoint_1000_checks_bounded(tmp_path, monkeypatch, variant):
+        """R-A2L-DEF.158/1 - 1,000 pairwise-disjoint definitions, scalar and valid
+        4-byte VAL_BLK parametrizations: all shared_with None, at most 20,000
+        checks, exactly 1 construction."""
+>       _run_disjoint(tmp_path, monkeypatch, variant, 1000, 20_000)
+
+tests\test_alp_a2l_occupancy_perf.py:467: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40149/test_r_a2l_def_158_1_disjoint_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028494600690>
+variant = 'val_blk', count = 1000, bound = 20000
+
+    def _run_disjoint(tmp_path, monkeypatch, variant, count, bound):
+        """The shared .158 body: the fixed-arithmetic disjoint population run once
+        as 1-byte scalars and once as valid 4-byte VAL_BLKs."""
+        mod = a2ldef
+        blocks = []
+        names = []
+        for i in range(count):
+            name = f"D{(i * 7919) % 10007}_{i}"
+            addr = 0x1000 + i * 0x40 + (i % 7) * 4
+            if variant == "scalar":
+                blocks.append(characteristic(name, "VALUE", f"0x{addr:X}", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+            else:
+                blocks.append(valblk(name, f"0x{addr:X}", "RL_U8", "NO_COMPU_METHOD", "0", "255",
+                                     extras=("NUMBER 4",)))
+            names.append(name)
+        assert len(names) == count and len(set(names)) == count
+        a2l = inline(tmp_path, *blocks)
+        assert len(a2l["tags"]) == count and len(a2l.get("errors") or []) == 0
+        state = _install_counters(monkeypatch, mod)
+        result = mod.describe_definitions(names, a2l)
+        assert list(result) == names and len(result) == count
+        assert all(definition.shared_with is None for definition in result.values())
+>       assert state["overlap_checks"] <= bound, (
+            f"{variant} variant: {state['overlap_checks']} candidate-overlap checks "
+            f"exceed the bound {bound} (the base runs the global candidate scan)"
+        )
+E       AssertionError: val_blk variant: 999000 candidate-overlap checks exceed the bound 20000 (the base runs the global candidate scan)
+E       assert 999000 <= 20000
+
+tests\test_alp_a2l_occupancy_perf.py:432: AssertionError
+__________ test_r_a2l_def_158_2_disjoint_4000_checks_bounded[scalar] __________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40149/test_r_a2l_def_158_2_disjoint_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028494A82490>
+variant = 'scalar'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("variant", ["scalar", "val_blk"])
+    def test_r_a2l_def_158_2_disjoint_4000_checks_bounded(tmp_path, monkeypatch, variant):
+        """R-A2L-DEF.158/2 - 4,000 pairwise-disjoint definitions, scalar and valid
+        4-byte VAL_BLK parametrizations: all shared_with None, at most 100,000
+        checks, exactly 1 construction."""
+>       _run_disjoint(tmp_path, monkeypatch, variant, 4000, 100_000)
+
+tests\test_alp_a2l_occupancy_perf.py:476: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40149/test_r_a2l_def_158_2_disjoint_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028494A82490>
+variant = 'scalar', count = 4000, bound = 100000
+
+    def _run_disjoint(tmp_path, monkeypatch, variant, count, bound):
+        """The shared .158 body: the fixed-arithmetic disjoint population run once
+        as 1-byte scalars and once as valid 4-byte VAL_BLKs."""
+        mod = a2ldef
+        blocks = []
+        names = []
+        for i in range(count):
+            name = f"D{(i * 7919) % 10007}_{i}"
+            addr = 0x1000 + i * 0x40 + (i % 7) * 4
+            if variant == "scalar":
+                blocks.append(characteristic(name, "VALUE", f"0x{addr:X}", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+            else:
+                blocks.append(valblk(name, f"0x{addr:X}", "RL_U8", "NO_COMPU_METHOD", "0", "255",
+                                     extras=("NUMBER 4",)))
+            names.append(name)
+        assert len(names) == count and len(set(names)) == count
+        a2l = inline(tmp_path, *blocks)
+        assert len(a2l["tags"]) == count and len(a2l.get("errors") or []) == 0
+        state = _install_counters(monkeypatch, mod)
+        result = mod.describe_definitions(names, a2l)
+        assert list(result) == names and len(result) == count
+        assert all(definition.shared_with is None for definition in result.values())
+>       assert state["overlap_checks"] <= bound, (
+            f"{variant} variant: {state['overlap_checks']} candidate-overlap checks "
+            f"exceed the bound {bound} (the base runs the global candidate scan)"
+        )
+E       AssertionError: scalar variant: 15996000 candidate-overlap checks exceed the bound 100000 (the base runs the global candidate scan)
+E       assert 15996000 <= 100000
+
+tests\test_alp_a2l_occupancy_perf.py:432: AssertionError
+_________ test_r_a2l_def_158_2_disjoint_4000_checks_bounded[val_blk] __________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40149/test_r_a2l_def_158_2_disjoint_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000284963E2B90>
+variant = 'val_blk'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("variant", ["scalar", "val_blk"])
+    def test_r_a2l_def_158_2_disjoint_4000_checks_bounded(tmp_path, monkeypatch, variant):
+        """R-A2L-DEF.158/2 - 4,000 pairwise-disjoint definitions, scalar and valid
+        4-byte VAL_BLK parametrizations: all shared_with None, at most 100,000
+        checks, exactly 1 construction."""
+>       _run_disjoint(tmp_path, monkeypatch, variant, 4000, 100_000)
+
+tests\test_alp_a2l_occupancy_perf.py:476: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40149/test_r_a2l_def_158_2_disjoint_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000284963E2B90>
+variant = 'val_blk', count = 4000, bound = 100000
+
+    def _run_disjoint(tmp_path, monkeypatch, variant, count, bound):
+        """The shared .158 body: the fixed-arithmetic disjoint population run once
+        as 1-byte scalars and once as valid 4-byte VAL_BLKs."""
+        mod = a2ldef
+        blocks = []
+        names = []
+        for i in range(count):
+            name = f"D{(i * 7919) % 10007}_{i}"
+            addr = 0x1000 + i * 0x40 + (i % 7) * 4
+            if variant == "scalar":
+                blocks.append(characteristic(name, "VALUE", f"0x{addr:X}", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+            else:
+                blocks.append(valblk(name, f"0x{addr:X}", "RL_U8", "NO_COMPU_METHOD", "0", "255",
+                                     extras=("NUMBER 4",)))
+            names.append(name)
+        assert len(names) == count and len(set(names)) == count
+        a2l = inline(tmp_path, *blocks)
+        assert len(a2l["tags"]) == count and len(a2l.get("errors") or []) == 0
+        state = _install_counters(monkeypatch, mod)
+        result = mod.describe_definitions(names, a2l)
+        assert list(result) == names and len(result) == count
+        assert all(definition.shared_with is None for definition in result.values())
+>       assert state["overlap_checks"] <= bound, (
+            f"{variant} variant: {state['overlap_checks']} candidate-overlap checks "
+            f"exceed the bound {bound} (the base runs the global candidate scan)"
+        )
+E       AssertionError: val_blk variant: 15996000 candidate-overlap checks exceed the bound 100000 (the base runs the global candidate scan)
+E       assert 15996000 <= 100000
+
+tests\test_alp_a2l_occupancy_perf.py:432: AssertionError
+________________ test_r_a2l_def_162_1_case06_index_build_bound ________________
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_162_1_case06_index_build_bound():
+        """R-A2L-DEF.162/1 - the warm-up and each of 3 measured runs index exactly
+        220,040 unique positions of case_06; the isolated build median is at most
+        2.5 s under a 5.0 s watchdog."""
+        mod = a2ldef
+>       _require_seam(mod, "_build_occupancy_index")
+
+tests\test_alp_a2l_occupancy_perf.py:490: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+mod = <module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>
+name = '_build_occupancy_index'
+
+    def _require_seam(mod, name: str) -> None:
+        """Fail RED with AttributeError while the E3 private seam ``name`` does not
+        exist on the base — without running the seam-dependent body."""
+>       assert hasattr(mod, name), (
+            f"{name} is not implemented on the base: this white-box case is RED "
+            "until the E3 private seam exists"
+        )
+E       AssertionError: _build_occupancy_index is not implemented on the base: this white-box case is RED until the E3 private seam exists
+E       assert False
+E        +  where False = hasattr(<module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>, '_build_occupancy_index')
+
+tests\test_alp_a2l_occupancy.py:46: AssertionError
+________________ test_r_a2l_def_163_1_case06_all_queries_bound ________________
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_163_1_case06_all_queries_bound():
+        """R-A2L-DEF.163/1 - resolve the next overlap for every one of the 220,040
+        case_06 occupancy records after a fresh index per run: every run resolves
+        exactly 220,040 positions with 0 shared_with differences from the
+        independent full-case oracle; the median of 3 runs is at most 18.0 s under
+        a 36.0 s watchdog."""
+        mod = a2ldef
+>       _require_seam(mod, "_build_occupancy_index")
+
+tests\test_alp_a2l_occupancy_perf.py:530: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+mod = <module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>
+name = '_build_occupancy_index'
+
+    def _require_seam(mod, name: str) -> None:
+        """Fail RED with AttributeError while the E3 private seam ``name`` does not
+        exist on the base — without running the seam-dependent body."""
+>       assert hasattr(mod, name), (
+            f"{name} is not implemented on the base: this white-box case is RED "
+            "until the E3 private seam exists"
+        )
+E       AssertionError: _build_occupancy_index is not implemented on the base: this white-box case is RED until the E3 private seam exists
+E       assert False
+E        +  where False = hasattr(<module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>, '_build_occupancy_index')
+
+tests\test_alp_a2l_occupancy.py:46: AssertionError
+_______________ test_r_a2l_def_164_1_case06_index_memory_bound ________________
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_164_1_case06_index_memory_bound():
+        """R-A2L-DEF.164/1 - build and retain the case_06 index: each of 3 runs
+        retains exactly 220,040 unique indexed positions with 0 page-expansion
+        records, and the traced peak additional allocation stays at or below
+        64 MiB (67,108,864 bytes)."""
+        mod = a2ldef
+>       _require_seam(mod, "_build_occupancy_index")
+
+tests\test_alp_a2l_occupancy_perf.py:601: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+mod = <module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>
+name = '_build_occupancy_index'
+
+    def _require_seam(mod, name: str) -> None:
+        """Fail RED with AttributeError while the E3 private seam ``name`` does not
+        exist on the base — without running the seam-dependent body."""
+>       assert hasattr(mod, name), (
+            f"{name} is not implemented on the base: this white-box case is RED "
+            "until the E3 private seam exists"
+        )
+E       AssertionError: _build_occupancy_index is not implemented on the base: this white-box case is RED until the E3 private seam exists
+E       assert False
+E        +  where False = hasattr(<module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>, '_build_occupancy_index')
+
+tests\test_alp_a2l_occupancy.py:46: AssertionError
+____________ test_r_a2l_def_165_1_case06_integrated_describe_bound ____________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40149/test_r_a2l_def_165_1_case06_in0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002849472BB10>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_165_1_case06_integrated_describe_bound(tmp_path, monkeypatch):
+        """R-A2L-DEF.165/1 - public batch describe of every unique case_06 name:
+        each of 3 measured runs returns exactly the 220,040 requested keys in
+        request order with 0 oracle differences, median at most 30.0 s; the
+        semantic pins of R-A2L-DEF.159 and R-A2L-DEF.160 also pass."""
+        mod = a2ldef
+>       median, runs, oracle_seconds, comparison_seconds = _run_integrated_case06(
+            tmp_path, monkeypatch, mod
+        )
+
+tests\test_alp_a2l_occupancy_perf.py:632: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_a2l_occupancy_perf.py:365: in _run_integrated_case06
+    _require_seam(mod, "_build_occupancy_index")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+mod = <module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>
+name = '_build_occupancy_index'
+
+    def _require_seam(mod, name: str) -> None:
+        """Fail RED with AttributeError while the E3 private seam ``name`` does not
+        exist on the base — without running the seam-dependent body."""
+>       assert hasattr(mod, name), (
+            f"{name} is not implemented on the base: this white-box case is RED "
+            "until the E3 private seam exists"
+        )
+E       AssertionError: _build_occupancy_index is not implemented on the base: this white-box case is RED until the E3 private seam exists
+E       assert False
+E        +  where False = hasattr(<module 's19_app.tui.a2l_definition' from 'C:\\Users\\<user>\\Github\\s19_app-a2l-load-performance\\s19_app\\tui\\a2l_definition.py'>, '_build_occupancy_index')
+
+tests\test_alp_a2l_occupancy.py:46: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_1_disjoint_1000_checks_bounded[scalar]
+FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_1_disjoint_1000_checks_bounded[val_blk]
+FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_2_disjoint_4000_checks_bounded[scalar]
+FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_158_2_disjoint_4000_checks_bounded[val_blk]
+FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_162_1_case06_index_build_bound
+FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_163_1_case06_all_queries_bound
+FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_164_1_case06_index_memory_bound
+FAILED tests/test_alp_a2l_occupancy_perf.py::test_r_a2l_def_165_1_case06_integrated_describe_bound
+============================= 8 failed in 17.25s ==============================

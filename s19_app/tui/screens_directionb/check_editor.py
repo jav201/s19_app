@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from types import MappingProxyType
 from typing import Mapping, Optional, Sequence
 from rich.cells import cell_len
 from rich.text import Text
@@ -217,10 +218,40 @@ class CheckEditorPanel(ScrollableContainer):
         panel or an app without parsed A2L data supplies ``None``.
         """
         kept = list(self._picker.picked_params)
-        a2l_data = (
-            getattr(self.app, "current_a2l_data", None) if self.is_mounted else None
-        )
-        if not self._picker.set_parameters(rows, signature, a2l_data=a2l_data):
+        # Inc 2 (I-ALP-2.3): an unmounted panel keeps the legacy
+        # ``a2l_data=None`` call with prepared definitions omitted and reads
+        # or invalidates no accepted mapping; the surviving snapshot stays
+        # consumable for a later matching mount. A mounted panel reads the
+        # app's accepted read-only mapping and selects only its own literal
+        # ``check`` entry, which it passes to the picker only when the full
+        # signature and the A2L-source identity both match the live
+        # population; a present-but-mismatched entry empties the whole
+        # mapping on the UI thread before the existing route describe.
+        a2l_data = None
+        prepared_definitions = None
+        if self.is_mounted:
+            a2l_data = getattr(self.app, "current_a2l_data", None)
+            snapshots = getattr(
+                self.app, "_accepted_a2l_picker_snapshots", MappingProxyType({})
+            )
+            entry = snapshots.get("check")
+            if entry is not None:
+                if entry.signature == signature and entry.a2l_source is a2l_data:
+                    prepared_definitions = entry.definitions
+                else:
+                    self.app._accepted_a2l_picker_snapshots = MappingProxyType({})
+        if prepared_definitions is not None:
+            repopulated = self._picker.set_parameters(
+                rows,
+                signature,
+                a2l_data=a2l_data,
+                prepared_definitions=prepared_definitions,
+            )
+        else:
+            repopulated = self._picker.set_parameters(
+                rows, signature, a2l_data=a2l_data
+            )
+        if not repopulated:
             return
         rows_before = len(self._memory_rows)
         kept = self._demote_moved_spec_params(kept)

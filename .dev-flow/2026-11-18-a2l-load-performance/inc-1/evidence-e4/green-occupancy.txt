@@ -1,0 +1,24 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <LOCAL_HOME>\anaconda3\envs\s19env\python.exe
+rootdir: <LOCAL_HOME>\Github\s19_app-a2l-load-performance
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 15 items
+
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_156_1_single_name_uses_one_index PASSED [  6%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_156_2_batch_uses_one_index PASSED [ 13%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_156_3_repeated_name_does_not_rebuild PASSED [ 20%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_157_1_point_like_span_is_compact PASSED [ 26%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_157_2_cross_page_span_is_one_interval PASSED [ 33%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_157_3_over_cap_span_is_not_expanded PASSED [ 40%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_159_1_position_not_address_selects_next PASSED [ 46%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_159_2_aliases_are_not_gathered_or_sorted PASSED [ 53%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_159_3_exempt_alias_does_not_hide_next PASSED [ 60%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_160_1_homonym_identity_is_position PASSED [ 66%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_160_2_same_span_is_not_self PASSED [ 73%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_160_3_same_name_elsewhere_is_not_self PASSED [ 80%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_161_1_narrow_query_is_not_eager PASSED [ 86%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_161_2_only_selected_unresolved_candidate_materializes PASSED [ 93%]
+tests/test_alp_a2l_occupancy.py::test_r_a2l_def_161_3_repeated_query_reuses_final_span PASSED [100%]
+
+============================= 15 passed in 0.65s ==============================

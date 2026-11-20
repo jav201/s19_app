@@ -1,0 +1,8 @@
+=== tests/test_b103_a2l_definition.py -k '138 or 139' ===
+.........................                                                [100%]
+25 passed, 285 deselected in 1.00s
+
+=== tests/test_b103_a2l_definition_arrays_write.py (familia .140) ===
+90.6%  0.047 s / 0.500 s  R-A2L-DEF.131/2  tests/test_b103_a2l_definition_arrays_write.py::test_r_a2l_def_131_2_inverse_table_cost_does_not_grow_per_cell
+QC-TM: 1 bounds, 0 under 20 % margin
+64 passed in 2.29s

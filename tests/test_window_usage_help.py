@@ -177,8 +177,9 @@ _ALL_SECTION_KEYS = frozenset(
 #: The pinned step count of every section (R-WHELP.7 (c)). A later increment
 #: that changes a count updates its pin by named supersession.
 #: batch-103 Inc 8 (E3A-06, R-PE-DEF.83 … .87): Patch 43 -> 49.
+#: batch-103 fix round G7 (c579fa46, D10-23): the Format step, Patch 49 -> 50.
 _PINNED_STEP_COUNTS = {
-    "patch": 49,
+    "patch": 50,
     "checks": 6,
     "crc_designer": 6,
     "reports": 6,

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
+from ..a2l_definition import release_in_slices
 from ..a2l_extract import enrich_a2l_tags_with_values
 from ..a2l_render import render_a2l_view
 from ..a2l_validate import validate_a2l_tags
@@ -24,4 +25,5 @@ def enrich_tags_and_render(
     for tag in source_tags:
         merged.append({**tag, **check_map.get((tag.get("section"), tag.get("name")), {})})
     summary_lines = render_a2l_view(a2l_data, checked_tags, max_tag_lines=max_tag_lines).splitlines()
+    release_in_slices(source_tags, checked_tags, check_map)  # private containers only; R-A2L-REFRESH.050
     return merged, summary_lines

@@ -1,0 +1,8 @@
+Working directory: <repo>
+Outer timeout: 150s
+Closed stdin: </dev/null
+Combined stdout/stderr: evidence-e1/qwen-census.txt
+Observed exit: 55
+Observed wall time from the tool: 22.875s
+
+qwen --safe-mode --approval-mode plan --max-wall-time 120s --max-tool-calls 8 --output-format text 'Read-only bounded census for INC 1. In repository <repo>, inspect only s19_app/tui/a2l_definition.py, direct callers of describe_definition/describe_definitions under s19_app/, tests/test_b103_a2l_definition*.py, and .dev-flow/2026-11-05-batch-103/inc-2/codewire/graph-inc2.md plus inc-3/codewire/graph-inc3.md. Enumerate every definition and assignment/use of span_entries, span_index, entry_cache, materialize, describe_name and _shared_with in a2l_definition.py; identify the exact current candidate-selection and final-span materialization behavior; list direct production callers of the two public describe functions; and state which inherited graph contracts constrain a compact interval index that must preserve section-walk position order, lazy final spans, homonyms, mask exemptions and over-cap/earlier-starting candidates. Give file:line references and explicit counts. Do not edit anything, do not propose product code, and do not access secrets or clipboard.'

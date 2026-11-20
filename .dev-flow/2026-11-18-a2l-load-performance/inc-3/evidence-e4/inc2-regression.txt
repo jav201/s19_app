@@ -1,0 +1,218 @@
+.............................F.......                                    [100%]
+================================== FAILURES ===================================
+______________ test_r037_picker_snapshot_reuse[adapter-mismatch] ______________
+
+tmp_path = WindowsPath('<LOCAL_HOME>/AppData/Local/Temp/pytest-of-<user>/pytest-40276/test_r037_picker_snapshot_reus3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000240275ED090>
+arm = 'adapter-mismatch'
+
+    @pytest.mark.parametrize(
+        "arm",
+        ["initial", "changed-generation", "filter-page-noop", "adapter-mismatch", "headless-unmounted"],
+        ids=lambda x: x,
+    )
+    def test_r037_picker_snapshot_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+        """R-A2L-REFRESH.037/1-/5: one worker describe per picker per accepted
+        generation, zero for rebuilds/no-ops, mismatch invalidation and
+        unmounted-call preservation."""
+        _guard_attach_snapshot_seams()
+    
+        base = tmp_path / "app"
+        src = tmp_path / "src"
+        src.mkdir(parents=True)
+        old = _old_a2l(src / "old.a2l")
+        new = _new_a2l(src / "new.a2l")
+        img = _write_image(src / "img1.s19", dict(IMG1))
+        img2 = _write_image(src / "img2.s19", dict(IMG2))
+        same = src / "same.a2l"
+        same.write_bytes(old.read_bytes())
+    
+        describes = _describe_spies(monkeypatch)
+        main = threading.get_ident()
+    
+        if arm == "initial":
+            async def body(app, pilot):
+                _mount_views(app)
+                await pilot.pause()
+                describes.clear()
+                await _typed_attach(app, pilot, old)
+                await settle_workers(pilot)
+                worker_describes = [c for c in describes if c["thread"] != main]
+                ui_describes = [c for c in describes if c["thread"] == main]
+                assert len(worker_describes) == 2, describes
+                assert len(ui_describes) == 0, describes
+                expected_names = [name for name, *_ in OLD_ROWS]
+                assert all(c["names"] == expected_names for c in worker_describes), describes
+                snapshot_map = _accepted_snapshots(app)
+                assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
+                _assert_panel_state(_check_panel(app), OLD_ROWS)
+                _assert_panel_state(_patch_panel(app), OLD_ROWS)
+                return None
+    
+            _run(base, body)
+    
+        elif arm == "changed-generation":
+            async def body(app, pilot):
+                _mount_views(app)
+                await pilot.pause()
+                await _typed_attach(app, pilot, same)
+                await settle_workers(pilot)
+                describes.clear()
+                same.write_bytes(new.read_bytes())
+                await _typed_attach(app, pilot, same)
+                await settle_workers(pilot)
+                worker_describes = [c for c in describes if c["thread"] != main]
+                ui_describes = [c for c in describes if c["thread"] == main]
+                assert len(worker_describes) == 2, describes
+                assert len(ui_describes) == 0, describes
+                assert all(c["names"] == [name for name, *_ in NEW_ROWS] for c in worker_describes), describes
+                for panel in (_check_panel(app), _patch_panel(app)):
+                    assert _param_rows(panel)["ARR12"] == (0x2000, 8, "f32"), _param_rows(panel)
+                    visible = _picker_visible_shape(panel)
+                    assert ("ARR12", "0x00002000", "f32") in visible, visible
+                    assert not any(fmt == "u16" for name, _addr, fmt in visible if name == "ARR12"), visible
+                return None
+    
+            _run(base, body)
+    
+        elif arm == "filter-page-noop":
+            big = _big_a2l(src / "big.a2l", 4200)
+    
+            async def body(app, pilot):
+                _mount_views(app)
+                await pilot.pause()
+                await _typed_attach(app, pilot, big)
+                await settle_workers(pilot)
+                describes.clear()
+                picker_module = _picker_module()
+                rebuilds: list = []
+                real_rebuild = picker_module.A2LParameterPicker._rebuild_ledger
+    
+                def counting_rebuild(self):
+                    result = real_rebuild(self)
+                    rebuilds.append(self.query_one(f"#{self._ids.table}", DataTable).row_count)
+                    return result
+    
+                monkeypatch.setattr(picker_module.A2LParameterPicker, "_rebuild_ledger", counting_rebuild)
+                check = _check_panel(app)
+                patch = _patch_panel(app)
+                # 4,200 mounted definitions -> 21 pages of 200 rows: every Next
+                # press turns a real page and rebuilds (the 3-row graph fixture
+                # would leave Next disabled on its single page).
+                for index in range(10):
+                    check.query_one("#check_param_filter", Input).value = "BIG" if index % 2 == 0 else ""
+                    await pilot.pause(0.2)
+                    check.query_one("#check_param_page_next_button", Button).press()
+                    await pilot.pause(0.2)
+                key = app._a2l_enriched_key
+                rows = [t for t in app._a2l_enriched_tags if isinstance(t.get("address"), int)]
+                assert _picker_of(check).set_parameters(rows, key, a2l_data=app.current_a2l_data) is False
+                assert _picker_of(patch).set_parameters(rows, key, a2l_data=app.current_a2l_data) is False
+                assert len(rebuilds) >= 20, rebuilds
+                assert all(0 < count <= 200 for count in rebuilds), rebuilds
+                assert describes == [], describes
+                assert _param_rows(check)["BIG_0000"] == (0x5000, 2, "u16"), _param_rows(check)["BIG_0000"]
+                assert _param_rows(patch)["BIG_4199"] == (0x5000 + 4199 * 8, 2, "u16"), _param_rows(patch)["BIG_4199"]
+                return None
+    
+            _run(base, body)
+    
+        elif arm == "adapter-mismatch":
+            async def body(app, pilot):
+                _mount_views(app)
+                await pilot.pause()
+                describes.clear()
+                await _typed_attach(app, pilot, old)
+                await settle_workers(pilot)
+                first_snapshot = _accepted_snapshots(app)
+                assert first_snapshot is not None and set(first_snapshot) == {"check", "patch"}, first_snapshot
+                check = _check_panel(app)
+                patch = _patch_panel(app)
+                # Variant (a): image reload, same A2L source, changed signature.
+                describes.clear()
+                await _load_image(app, pilot, img2)
+                await settle_workers(pilot)
+                invalidated = _accepted_snapshots(app)
+                assert invalidated is not None and len(invalidated) == 0, invalidated
+                assert invalidated is not first_snapshot, "the accepted mapping was not replaced"
+                ui_describes = [c for c in describes if c["thread"] == main]
+                assert ui_describes, "the existing route describe did not run after the mismatch"
+                assert all(c["names"] == [name for name, *_ in OLD_ROWS] for c in ui_describes), describes
+                _assert_panel_state(check, OLD_ROWS)
+                _assert_panel_state(patch, OLD_ROWS)
+                # Variant (b): project install, different A2L source object.
+                proj_a2l = _project_a2l(src / "proj.a2l")
+                _seed_project(app.workarea, "P_MIX", a2l=proj_a2l, image=img)
+                describes.clear()
+                await _load_project(app, pilot, "P_MIX")
+                await settle_workers(pilot)
+                invalidated = _accepted_snapshots(app)
+                assert invalidated is not None and len(invalidated) == 0, invalidated
+                ui_describes = [c for c in describes if c["thread"] == main]
+                assert ui_describes, "the existing route describe did not run after the source mismatch"
+                for panel in (check, patch):
+                    assert _param_rows(panel)["ARR12"] == (0x2000, 6, "u16"), _param_rows(panel)
+                # Matching control: an accepted direct attach repopulates the
+                # mapping and the mounted panels consume the worker snapshot.
+                describes.clear()
+                await _typed_attach(app, pilot, new)
+                await settle_workers(pilot)
+                worker_describes = [c for c in describes if c["thread"] != main]
+                ui_describes = [c for c in describes if c["thread"] == main]
+                assert len(worker_describes) == 2, describes
+                assert len(ui_describes) == 0, describes
+                repopulated = _accepted_snapshots(app)
+                assert repopulated is not None and set(repopulated) == {"check", "patch"}, repopulated
+                _assert_panel_state(check, NEW_ROWS)
+                _assert_panel_state(patch, NEW_ROWS)
+                return None
+    
+>           _run(base, body)
+
+tests\test_alp_inc2_a2l_attach.py:1879: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_alp_inc2_a2l_attach.py:301: in _run
+    return asyncio.run(drive())
+           ^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_alp_inc2_a2l_attach.py:299: in drive
+    return await body(app, pilot)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        describes.clear()
+        await _typed_attach(app, pilot, old)
+        await settle_workers(pilot)
+        first_snapshot = _accepted_snapshots(app)
+        assert first_snapshot is not None and set(first_snapshot) == {"check", "patch"}, first_snapshot
+        check = _check_panel(app)
+        patch = _patch_panel(app)
+        # Variant (a): image reload, same A2L source, changed signature.
+        describes.clear()
+        await _load_image(app, pilot, img2)
+        await settle_workers(pilot)
+        invalidated = _accepted_snapshots(app)
+>       assert invalidated is not None and len(invalidated) == 0, invalidated
+E       AssertionError: mappingproxy({'check': A2LPickerSnapshot(picker='check', signature=(2, 1, 3), a2l_source={'path': 'C:\\Users\\<user>\\A...with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}))})
+E       assert (mappingproxy({'check': A2LPickerSnapshot(picker='check', signature=(2, 1, 3), a2l_source={'path': 'C:\\Users\\<user>\\A...with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}))}) is not None and 2 == 0)
+E        +  where 2 = len(mappingproxy({'check': A2LPickerSnapshot(picker='check', signature=(2, 1, 3), a2l_source={'path': 'C:\\Users\\<user>\\A...with=None, refusal=None, shape=(), element_count=1, index_mode=None, values_offset=0, record_layout=None, axes=())}))}))
+
+tests\test_alp_inc2_a2l_attach.py:1845: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r037_picker_snapshot_reuse[adapter-mismatch]
+1 failed, 36 passed in 991.32s (0:16:31)
+EXIT=1

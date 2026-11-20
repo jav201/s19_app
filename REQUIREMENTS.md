@@ -532,7 +532,7 @@ R-DOC-ARCHIVE.2 (keep in the architecture archive each line that batch-101 Inc 1
 | R-TST-007 | U | The system shall give in its test conventions the release gate as the parallel lane `pytest -n 8 -m "not serial_timing"` followed by the serial lane `pytest -m serial_timing`, both on the LAN Linux host. |
 | R-TST-009 | When | When the release gate runs on the LAN Linux host, the system shall finish both lanes within 75 min of wall time in total. |
 | R-TST-010 | When | When a pull request runs the CI workflow, the system shall run `pytest -v -rs -n auto -m "not slow and not serial_timing"` and then `pytest -q -rs -m "serial_timing and not slow"` in that workflow. |
-| R-TST-011 | When | When a push runs the CI workflow, the system shall run `pytest -v -rs -n auto -m "not serial_timing"` and then `pytest -q -rs -m serial_timing` in that workflow. |
+| R-TST-011 | When | When a push runs the CI workflow, the system shall run `pytest -v -rs -n auto -m "not serial_timing"` and then `pytest -q -rs -m "serial_timing and not slow"` in that workflow. |
 | R-TST-012 | If | If the first lane of a CI run fails, then the system shall still run the serial lane of that CI run and mark the job failed. |
 | R-TST-013 | U | The system shall check out the repository with its full history in the `tui-ci` job of its CI workflow. |
 | R-TST-014 | When | When the CI workflow runs, the system shall run the 6 history arms without skipping them. |
@@ -540,6 +540,8 @@ R-DOC-ARCHIVE.2 (keep in the architecture archive each line that batch-101 Inc 1
 | R-TST-016 | U | The system shall stop the `tui-ci` job of its CI workflow after 300 minutes. |
 | R-TST-017 | If | If lane 1 of a push run reaches its time limit, then the system shall still run lane 2 of that run. |
 | R-TST-018 | U | The system shall install pytest-xdist 3.8.0 in the `tui-ci` job of its CI workflow. |
+| R-TST-019 | When | When a push runs the CI workflow, the system shall run `pytest -q -rs -m "slow and serial_timing"` in the `tui-ci-heavy` job of that workflow. |
+| R-TST-026 | U | The system shall stop the `tui-ci-heavy` job of its CI workflow after 123 minutes. |
 | R-TST-020 | U | The system shall bound the wait of each shared wait helper by the wall clock, 60 s by default. |
 | R-TST-021 | U | The system shall make each shared wait helper yield the event loop for at least 0.05 s between two checks of its predicate. |
 | R-TST-022 | U | The system shall make the `settled` shared wait let the app process one pause before its first check of the predicate. |
@@ -1787,7 +1789,19 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-DEF.153.2 | If | If the system encodes a definition of kind number, enum or text through `encode_values` at a position other than `(0,)`, then the system shall refuse that position with `A2L-DEF-INDEX`. |
 | R-A2L-DEF.154 | If | If an axis declares a monotony rule the system cannot read, then the system shall refuse an edit of one of its points with `A2L-DEF-MONOTONY` and the message `<axis point name>: the monotony rule <rule> is not supported`. |
 | R-A2L-DEF.155 | If | If the system cannot evaluate a point needed to check an edited axis's monotony, then the system shall give that point's decode refusal or, when the point decodes and breaks the rule, `A2L-DEF-MONOTONY` with its bounded display text. |
-
+| R-A2L-DEF.156 | When | When the system describes one or more A2L object names in one request, the system shall use one central occupancy index for all occupancy records evaluated by that request. |
+| R-A2L-DEF.157 | When | When the system indexes an occupancy record, the system shall represent its span with one compact interval record and zero per-page expansion records. |
+| R-A2L-DEF.158 | When | When the system evaluates pairwise-disjoint definitions, the system shall perform at most 20,000 candidate-overlap checks for 1,000 definitions and at most 100,000 candidate-overlap checks for 4,000 definitions. |
+| R-A2L-DEF.159 | When | When more than one occupancy record overlaps a definition, the system shall give the name of the first non-exempt record in section-walk position order without collecting or sorting the complete alias population. |
+| R-A2L-DEF.160 | When | When the system excludes a definition's own occupancy record, the system shall identify that record by its section-walk position rather than by name, address or span equality. |
+| R-A2L-DEF.161 | When | When the system describes a narrow query, the system shall materialize final spans only for requested definitions and candidates selected by the central occupancy index. |
+| R-A2L-DEF.162 | When | When the system builds the central occupancy index for all 220,040 occupancy records of case_06, the system shall finish within 2.5 seconds as the median of 3 measured runs on the reference host. |
+| R-A2L-DEF.163 | When | When the system resolves the next overlap for every occupancy record of case_06 after its index has been built, the system shall finish all 220,040 resolutions within 18.0 seconds as the median of 3 measured runs on the reference host. |
+| R-A2L-DEF.164 | When | When the system builds and retains the central occupancy index for all 220,040 occupancy records of case_06, the system shall keep its peak additional traced allocation at or below 64 MiB in each of 3 measured runs on the reference host. |
+| R-A2L-DEF.165 | When | When the system describes every unique name of case_06 through the public batch-describe route, the system shall return all 220,040 requested definitions within 30.0 seconds as the median of 3 measured runs on the reference host. |
+| R-A2L-DEF.166 | When | When the system indexes an unresolved array-like occupancy record, the system shall give that record an unbounded upper end. |
+| R-A2L-DEF.167 | When | When the system evaluates 8,000 pairwise-disjoint definitions declared in address order, in shuffled address order or with 1,000 AXIS_PTS declared first, the system shall visit on average at most 4·log2(8,000) + 16 (67.9) index nodes per definition. |
+| R-A2L-DEF.168 | When | When the system evaluates 8,000 pairwise-disjoint definitions with 1,000 AXIS_PTS declared first, the system shall perform at most 200,000 candidate-overlap checks in total. |
 
 #### S2.8 · A2L label matching (batch-103 Inc 4)
 
@@ -1870,7 +1884,32 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-REFRESH.026 | When | When A2L copy, parse or precompute work runs on a worker, the system shall confine that worker to data preparation and perform every common-refresh view mutation on the UI thread. |
 | R-A2L-REFRESH.027 | When | When a direct A2L attach or A2L-only project install completes without installing a primary image, the system shall publish a new A2L view generation while keeping the current image generation unchanged. |
 | R-A2L-REFRESH.028 | If | If a worker-prepared A2L enrichment snapshot's expected post-install A2L or image generation differs from its recorded generation, then the system shall discard the whole prepared load before installing any file, A2L, enrichment, MAC or Issues state. |
-
+| R-A2L-REFRESH.029 | When | When a direct A2L attach has parsed its admitted source, the system shall build one immutable attach snapshot containing its enriched tags, summary lines and per-picker bulk definitions on the existing attach worker before dispatching installation. |
+| R-A2L-REFRESH.030 | While | While the direct A2L attach worker performs post-parse work, the system shall confine its inputs to the immutable request and parsed payload, including the expected pair and read-only image mapping, without reading widgets or mutable application state. |
+| R-A2L-REFRESH.031 | When | When a direct attach result's recorded pair matches the live expected post-install pair, the system shall install its parsed A2L and attach snapshot coherently before starting the common refresh. |
+| R-A2L-REFRESH.032 | If | If a direct attach result's recorded A2L or image generation differs from its live expected post-install generation, then the system shall discard the whole result before any recent, cache, session, view or project-sync mutation and end with `Load superseded — current state kept.` |
+| R-A2L-REFRESH.033 | While | While a direct A2L attach copies, parses or performs post-parse work on its worker, the system shall acknowledge each operator key within 1.0 second of its delivery to the application. |
+| R-A2L-REFRESH.034 | While | While a direct A2L attach captures its request snapshot or performs post-parse work, the system shall update its existing busy progress line at least once per 1.0 second. |
+| R-A2L-REFRESH.035 | When | When an accepted direct attach snapshot completes installation, the system shall run exactly one common refresh on the UI thread after all snapshot state is installed and before the successful load outcome. |
+| R-A2L-REFRESH.036 | When | When the common refresh consumes an accepted direct attach snapshot, the system shall reuse its installed enriched tags and summary lines without recomputing either on the UI thread. |
+| R-A2L-REFRESH.037 | When | When a picker handles an accepted direct-attach generation or a later population request, the system shall make the generation's single worker-built bulk definition snapshot, shared read-only by the Check and Patch pickers, available exclusively to a matching mounted request while preserving the legacy `a2l_data=None` call and the accepted snapshot for an unmounted panel. |
+| R-A2L-REFRESH.038 | If | If enrichment, summary construction or picker definition preparation raises an exception during a direct attach, then the system shall keep the current image and all previous A2L-dependent state/views, retain the existing Workarea Files refresh and its possible new-copy listing, run no common refresh or project sync and end with `File NOT loaded: '<file>' could not be read — check that the file can be opened, then load again.` |
+| R-A2L-REFRESH.039 | U | The system shall prepare A2L enrichment, summary and definition data for direct A2L attach, image+A2L load, project image+A2L load and project A2L-only load through one immutable generation-bound prepared-snapshot interface. |
+| R-A2L-REFRESH.040 | When | When the system loads a primary image with case_06 A2L attached, the system shall complete the image+A2L load with a median total duration of at most 54 s over 3 runs and no individual run of 68 s or more on the reference host. |
+| R-A2L-REFRESH.041 | When | When the system loads a project containing a primary image and case_06 A2L, the system shall complete the project load with a median total duration of at most 60 s over 3 runs and no individual run of 75 s or more on the reference host. |
+| R-A2L-REFRESH.042 | When | When the system loads an A2L-only project containing case_06, the system shall complete the project load with a median total duration of at most 52 s over 3 runs and no individual run of 65 s or more on the reference host. |
+| R-A2L-REFRESH.043 | If | If prepared-snapshot creation fails during an image+A2L or project load, then the system shall end the load through its existing failure route without installing the candidate or running A2L preparation synchronously on the UI thread. |
+| R-A2L-REFRESH.044 | When | When an image+A2L load completes, the system shall publish the prepared final image+A2L state exactly once before showing the successful load outcome. |
+| R-A2L-REFRESH.045 | When | When a project containing both a primary image and an A2L completes installation, the system shall publish the prepared final pair exactly once before showing the project-load outcome. |
+| R-A2L-REFRESH.046 | When | When an A2L-only project completes installation, the system shall publish the prepared A2L-only state exactly once before showing the project-load outcome. |
+| R-A2L-REFRESH.047 | When | When the operator reloads changed content from the same source path without an intervening clear through an image+A2L or project route, the system shall publish the changed content under a new generation for each changed artifact. |
+| R-A2L-REFRESH.048 | If | If a prepared snapshot's expected post-install A2L or image generation differs from the generation required at its installation stage, then the system shall discard the whole prepared load before any candidate cache, session, view, project or publication mutation. |
+| R-A2L-REFRESH.049 | While | While a direct A2L attach captures its request snapshot on the UI thread, the system shall acknowledge each operator key within 1.0 second of its delivery to the application. |
+| R-A2L-REFRESH.050 | While | While the system performs post-parse preparation for an image+A2L or project load, the system shall fire each due 50 ms UI timer tick no more than 100 ms late. |
+| R-A2L-REFRESH.051 | When | When a direct A2L attach, image load or project load ends with any outcome, the system shall leave the cyclic garbage collector enabled. |
+| R-A2L-REFRESH.052 | When | When a direct A2L attach, image load or project load installs its result, the system shall run at most one full cyclic garbage collection. |
+| R-A2L-REFRESH.053 | When | When the system loads the same A2L five times in a row, the system shall retain at most 10 % more garbage-collector-tracked objects after the fifth load than after the second. |
+| R-A2L-REFRESH.054 | When | When the system completes an install's full cyclic garbage collection, the system shall log the collection's duration in seconds. |
 ##### List of labels (CTX-A2L-LIST; batch-103 Inc 7)
 
 | Id | Form | Requirement |

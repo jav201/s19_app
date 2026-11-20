@@ -1,0 +1,9 @@
+s19_app.__file__=<repo>\s19_app\__init__.py
+path=<repo>\examples\case_06_large_nested_a2l\firmware.a2l
+size_bytes=37742888
+sha256=45243458427f43da695f4e01e494d69444c1b921588bcd040cfcaf025fed43d9
+tags=220040
+distinct_names=220040
+errors=0
+first_name=CHAR_00000_00
+last_name=MEAS_05500_19

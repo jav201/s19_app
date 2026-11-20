@@ -1,0 +1,5 @@
+probe1: write_text size=42 (CRLF) write_bytes size=39 (LF)
+probe1: equal-size assertion on the E1 host -> False
+probe2: src payload path=<LOCAL_HOME>\AppData\Local\Temp\tmp75xq126d\src\probe.a2l
+probe2: copy payload path=<LOCAL_HOME>\AppData\Local\Temp\tmp75xq126d\workarea\probe.a2l
+probe2: full-dict equality src vs workarea copy -> False

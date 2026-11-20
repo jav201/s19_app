@@ -1,0 +1,31 @@
+======================================================================
+Inc 3 E4 — regression transcript (green-inc3-existing.txt)
+Tree: branch a2l-load-performance over base ceac08cf (Inc 2 E4).
+Changed files: s19_app/tui/app/{shared,file_load,project_load,loaded_state}.py
+Python: Python 3.11.15
+======================================================================
+
+--- tests/test_alp_inc2_a2l_attach.py (FULL) — inc2-regression.txt ---
+=========================== short test summary info ===========================
+FAILED tests/test_alp_inc2_a2l_attach.py::test_r037_picker_snapshot_reuse[adapter-mismatch]
+1 failed, 36 passed in 991.32s (0:16:31)
+EXIT=1
+
+--- tests/test_b103_a2l_refresh.py (FULL) — b103-regression-run2.txt ---
+149:FAILED tests/test_b103_a2l_refresh.py::test_r005_unload_publication[R-A2L-REFRESH.005/3]
+150:1 failed, 102 passed in 1832.77s (0:30:32)
+
+--- tests/test_b100_workers.py -q — b100-regression.txt ---
+137:        ok, failed, project, has_image = run(base, scenario)
+217:FAILED tests/test_b100_workers.py::test_tc_b100_53_every_a2l_attach_route_parses_on_a_worker
+218:FAILED tests/test_b100_workers.py::test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install
+219:FAILED tests/test_b100_workers.py::test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size]
+220:3 failed, 79 passed, 1 xfailed in 1436.68s (0:23:56)
+
+--- Pre-existing verification (stash to base ceac08cf) ---
+* test_tc_b100_53_reset_runs_after_the_worker_and_before_the_first_install: FAILS on base with the same assertion (['worker_end','reset@main'] vs 2 'install' events).
+* test_tc_b100_54_a2l_attach_refuses_when_its_folder_or_file_vanished[a2l_size]: FAILS on base (same refusal-line assertion).
+* test_b103 r004+r005 group: 2 failures reproduced in one BASE run (same deferred-outcome race class).
+* test_tc_b100_53_every_a2l_attach_route_parses_on_a_worker: passes 3/3 in isolation on this tree and passed on base; full-run failure is the order/timing flake class.
+
+See conflicts.md for the Inc 2 r037[adapter-mismatch] superseded-by-I-ALP-3 ruling.

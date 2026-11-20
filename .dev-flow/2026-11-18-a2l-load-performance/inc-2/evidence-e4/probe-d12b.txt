@@ -1,0 +1,26 @@
+events (rel s, thread):
+  load-call          0.000  28464
+  load-return        0.000  28464
+  parse-entry        0.266  71232
+  keys-ack           1.969  28464
+  parse-exit        21.704  71232
+  prepare-entry     21.704  71232
+  prepare-exit      79.469  71232
+  refresh-entry     79.532  28464
+  refresh-exit      81.141  28464
+  terminal          81.750  28464
+key latencies: (1.6099999999860302, 0.35900000005494803)
+big gaps:
+  gap[158]  0.922  at t=  24.015
+  gap[171]  1.312  at t=  27.828
+  gap[177]  0.985  at t=  30.921
+  gap[192]  1.344  at t=  35.265
+  gap[211]  1.250  at t=  40.718
+  gap[229]  1.265  at t=  46.250
+  gap[246]  1.531  at t=  51.484
+  gap[258]  1.687  at t=  55.750
+  gap[276]  1.657  at t=  61.546
+  gap[296]  1.657  at t=  68.046
+  gap[316]  1.703  at t=  75.031
+  gap[329]  2.188  at t=  79.640
+log: ['', '', '', 'A2L loaded: firmware.a2l']
