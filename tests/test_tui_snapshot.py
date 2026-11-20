@@ -1104,45 +1104,6 @@ def _batch94_inc001_drift_marks(screen: str, density: str, size_key: str) -> tup
 # batch-47 bridge above is RETIRED, so this is a NEW live mark, not a revival.
 # RETIRE this mark when that regen lands: under strict=False a stale mark XPASSes
 # silently and masks regressions (the batch-77 retirement note is the precedent).
-def _batch103_inc7_a2l_drift_marks(screen: str, density: str, size_key: str) -> tuple:
-    """Return the batch-103 Inc 7 drift mark for the six ``a2l`` cells (canonical-CI regen pending)."""
-    del density, size_key
-    if screen != "a2l":
-        return ()
-    return (
-        pytest.mark.xfail(
-            reason=(
-                "batch-103 Inc 7: R-A2L-LIST.007/.008 (mode tag), .019-.021 (chips lines) and "
-                ".040 (Paste list button) change the A2L Explorer filter row; canonical-CI regen pending"
-            ),
-            strict=False,
-        ),
-    )
-
-
-def _batch103_inc8_patch_drift_marks(screen: str, density: str, size_key: str) -> tuple:
-    """Return the batch-103 Inc 8 Patch Editor drift marks (the 2 ``patch`` cells).
-
-    Inc 8 R-TUI-063.1 / R-TUI-063.3 / R-PE-DEF.1.1: the Patch Editor re-composes (filter row,
-    staging sheet, landing pane with four tabs), so both ``patch`` scaffold cells (comfortable
-    x {80x24, 120x30}) drift. Marked ``xfail(strict=False)`` until the canonical-CI baseline
-    regen lands (HT-09: the two SVGs are regenerated only by the canonical CI, never locally),
-    then RETIRED - the batch-46/48 pattern. Remove this mark in the regen PR.
-    """
-    del density
-    if screen == "patch" and size_key in ("80x24", "120x30"):
-        return (
-            pytest.mark.xfail(
-                reason=(
-                    "batch-103 Inc 8 R-TUI-063.1/.3, R-PE-DEF.1.1: the Patch Editor "
-                    "layout is the approved mix (filter row, STAGING SHEET, LANDS IN); "
-                    "the two patch SVG baselines wait for the canonical-CI regen (HT-09); "
-                    "tracked as PENDING P-048: remove this mark in the regen PR"
-                ),
-                strict=False,
-            ),
-        )
-    return ()
 
 
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
@@ -1161,8 +1122,7 @@ _RESTYLED_CELLS = [
         + _batch47_mac_drift_marks(screen, density, size_key)
         + _batch47_theme_drift_marks(screen, density, size_key)
         + _discoverability_drift_marks(screen, density, size_key)
-        + _batch94_inc001_drift_marks(screen, density, size_key)
-        + _batch103_inc7_a2l_drift_marks(screen, density, size_key),
+        + _batch94_inc001_drift_marks(screen, density, size_key),
     )
     for screen in _RESTYLED_SCREENS
     for density in ("compact", "comfortable")
@@ -1217,8 +1177,7 @@ _SCAFFOLD_CELLS = [
         + _batch48_patch_drift_marks(screen, "comfortable", size_key)
         + _fdf_json_height_drift_marks(screen, "comfortable", size_key)
         + _batch77_map_drift_marks(screen, "comfortable", size_key)
-        + _batch94_inc001_drift_marks(screen, "comfortable", size_key)
-        + _batch103_inc8_patch_drift_marks(screen, "comfortable", size_key),
+        + _batch94_inc001_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (
