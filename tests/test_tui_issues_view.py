@@ -417,6 +417,8 @@ def test_tc082_4_border_titles_and_summary_plain_and_spans(tmp_path: Path) -> No
     byte-identical to the former " | ".join(...) string, and whose spans carry
     the RED/YELLOW/CYAN palette constants (colours flow from insight_style, not
     hard-coded hex in the view logic).
+
+    Traces: R-ISSUES.1, R-ISSUES.2.
     """
 
     async def _drive() -> tuple[str, str, str, Text]:
@@ -566,7 +568,10 @@ def test_at082c_group_headers_lead_with_severity_glyph(tmp_path: Path) -> None:
 
 
 def test_at082d_summary_line_carries_palette_spans(tmp_path: Path) -> None:
-    """AT-082d / HLR-082 — the summary line carries the RED/YELLOW/CYAN palette spans."""
+    """AT-082d / HLR-082 — the summary line carries the RED/YELLOW/CYAN palette spans.
+
+    Traces: R-ISSUES.2.
+    """
 
     async def _drive() -> object:
         app = S19TuiApp(base_dir=tmp_path)
@@ -591,6 +596,58 @@ def test_at082d_summary_line_carries_palette_spans(tmp_path: Path) -> None:
     assert any(RED in style for style in styles), styles
     assert any(YELLOW in style for style in styles), styles
     assert any(CYAN in style for style in styles), styles
+
+
+def test_r_issues_2_each_severity_field_in_its_colour(tmp_path: Path) -> None:
+    """Traces: R-ISSUES.2.
+
+    WHY: the summary line must show each severity field in ITS colour (errors
+    red, warnings pale yellow, info cyan). The existing nodes only ask that each
+    colour appears somewhere, so a field<->colour swap (errors in yellow,
+    warnings in red) stays green. With an asymmetric 3/1/2 list, the span
+    covering ``errors=3`` must be RED, ``warnings=1`` YELLOW, ``info=2`` CYAN,
+    and no span may touch ``total=6``, ``filter=all`` or the ``page ...`` field.
+    """
+
+    async def _drive() -> object:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            _render_issue_list(
+                app,
+                tmp_path,
+                [
+                    _issue("E1", ValidationSeverity.ERROR),
+                    _issue("E2", ValidationSeverity.ERROR),
+                    _issue("E3", ValidationSeverity.ERROR),
+                    _issue("W1", ValidationSeverity.WARNING),
+                    _issue("I1", ValidationSeverity.INFO),
+                    _issue("I2", ValidationSeverity.INFO),
+                ],
+            )
+            await pilot.pause()
+            return _static_content(app.query_one("#validation_issues_summary", Label))
+
+    summary = asyncio.run(_drive())
+    assert isinstance(summary, Text), type(summary)
+    plain = summary.plain
+    assert plain.startswith("total=6 | errors=3 | warnings=1 | info=2 | filter=all | page "), plain
+
+    def _styles_over(field: str) -> set[str]:
+        start = plain.index(field)
+        end = start + len(field)
+        return {
+            str(span.style)
+            for span in summary.spans
+            if span.start < end and span.end > start
+        }
+
+    assert _styles_over("errors=3") == {RED}, summary.spans
+    assert _styles_over("warnings=1") == {YELLOW}, summary.spans
+    assert _styles_over("info=2") == {CYAN}, summary.spans
+    for plain_field in ("total=6", "filter=all", plain[plain.index("page ") :]):
+        assert _styles_over(plain_field) == set(), (plain_field, summary.spans)
 
 
 def test_at082e_zero_issues_renders_zeros_no_crash(tmp_path: Path) -> None:

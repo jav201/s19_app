@@ -425,7 +425,7 @@ The legend rows themselves, and the rule that the report and the legend window s
 |---|---|---|---|
 | R-RPT-ENT.1 | When | When the system writes a reported variant, the system shall write an Entropy section after its Memory regions section. | Yes; tested (test_report_contains_entropy_section_on_disk). |
 | R-RPT-ENT.2 | When | When the system writes an Entropy section, the system shall write one band line per band of S4 CTX-ENTROPY that holds a window of the variant's image, in band order. | Yes; tested (test_entropy_lines_shape_direct_call). |
-| R-RPT-ENT.3 | If | If some of a band's windows are low confidence (S4 R-ENT-004), then the system shall add ` (<k> low-confidence)` to its band line. | Yes. |
+| R-RPT-ENT.3 | If | If some of a band's windows are low confidence (S4 R-ENT.4), then the system shall add ` (<k> low-confidence)` to its band line. | Yes. |
 | R-RPT-ENT.4 | If | If the variant's image holds no byte, then the system shall write `No mapped bytes - entropy not computed.` in its Entropy section. | Yes; tested (test_entropy_lines_empty_mem_map_no_crash). |
 | R-RPT-ENT.5 | U | The system shall write no byte value in an Entropy section. | Yes; tested (test_entropy_section_confidentiality_no_raw_bytes_or_logging). |
 
@@ -677,7 +677,7 @@ None. No S12 finding changes the screen layout, widths, colours or glyphs. (The 
 
 - **S1**: the Reports dialog's report view shows text from a file: the system's own reports (already report-safe, CTX-RPT-TEXT) and any other `.md` file placed in `reports/`, rendered as Markdown with links and raw HTML off. Add the report view to the safe-text views for control characters and markup, keeping Markdown structure; the report list and the filter dropdown are already on S7's list (D7-28).
 - **S3**: the report's legend section (R-LEGEND-REPORT-001.1 … .3) prints the same rows as the legend window; S3's D3-19 legend changes reach the report through R-LEGEND-SOURCE.1 with no S12 change.
-- **S4**: R-ENT-004 (low confidence) is now shown in the report by R-RPT-ENT.3. The report's hexdump row format (CTX-RPT-HEX, `render/hexview.py:250-277`) differs from the screens' row format of CTX-HEX; S4 owns the renderer.
+- **S4**: R-ENT.4 (low confidence) is now shown in the report by R-RPT-ENT.3. The report's hexdump row format (CTX-RPT-HEX, `render/hexview.py:250-277`) differs from the screens' row format of CTX-HEX; S4 owns the renderer.
 - **S5**: the 📂 folder chips have no rows anywhere (S0 HLR-139, LLR-139.1, LLR-139.2, LLR-148.10; S9 and S10 point to S5). S12 keeps only the Reports target (R-RPT-CHIP.1). The filter path box follows S5.3, so D5-8 applies to it (R-RPT-FILTER-001.8).
 - **S6**: the `t` key and the palette entry that open the Reports dialog.
 - **S7**: the Reports dialog's common behaviour (Escape D7-20, focus, button keys D7-31). R-RPT-002.13 adds a status where R-DLG.10 only keeps the dialog open.

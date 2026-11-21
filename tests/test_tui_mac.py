@@ -13,7 +13,7 @@ from s19_app.tui.mac import parse_mac_file
 
 
 def test_parse_mac_file_emits_summary_log(tmp_path: Path, caplog: pytest.LogCaptureFixture):
-    """Traces: R-MAC-012."""
+    """Traces: R-MAC.12."""
     mac_path = tmp_path / "sample.mac"
     mac_path.write_text("RPM=0x1000\nTORQUE=0x2000\n", encoding="utf-8")
 

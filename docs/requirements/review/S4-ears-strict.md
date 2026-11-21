@@ -28,12 +28,12 @@ Result:
 | R-TUI-041 | The statement still describes the retired cell grid and an "Open in Hex View" button; the stats strip lists "largest-gap bytes", computed but never shown. | Grid and button gone from the rows; largest gap removed (D4-28). |
 | R-TUI-061 | "At a glance" histogram + sparkline docked beside the band bar. Retired in batch-93; one line of chips replaced it. The histogram and sparkline code remains, unused. | Rows describe the chips; dead code removed (D4-31). |
 | R-TUI-061 / 062 | "≥ 120 columns side by side, < 120 stacked". The map actually switches on its own panel width: < 86 columns stacked. | Rows follow the code (R-TUI-061.4, .5). |
-| R-TUI-010 | "occupy the full right column height". There is no right column: the hex view is the middle of three Workspace panes. | Restated (R-TUI-010). |
+| R-TUI.10 | "occupy the full right column height". There is no right column: the hex view is the middle of three Workspace panes. | Restated (R-TUI.10). |
 | R-TUI-007 | "should provide context … truncate large outputs safely": "should", "context" and "safely" cannot be tested. | The window, its size and its notice lines (S4.2). |
 | R-TUI-017 / 040 | Find next and go-to run only from their buttons; Enter in either input does nothing. | Enter runs them (D4-1). |
 | R-TUI-040 | "the typed address": no notation stated. The input reads `1000` as decimal and rejects `ABCD`, although its placeholder says `Goto 0xADDR` and every address in the app is shown in hex. | Hexadecimal, with or without `0x` (D4-7). |
 | R-TUI-018 / 040 | Where the target lands differs by view and by action: main view somewhere in its page with no scroll, A2L/MAC search and go-to on row 65, selections near the top. | One rule: the target row is second from the top (D4-2). |
-| R-TUI-038 | "resumes from the first address visible" holds, but all three hex views share one search state: a query typed in the MAC view continues from a hit in the Workspace, and its highlight appears in all three. | One search state per view (D4-4). |
+| R-TUI.38 | "resumes from the first address visible" holds, but all three hex views share one search state: a query typed in the MAC view continues from a hit in the Workspace, and its highlight appears in all three. | One search state per view (D4-4). |
 | R-TUI-050 / 051 | Retired (entropy viewer modal), still ~80 lines of text. | Marked retired; the code is confirmed gone. |
 | R-TUI-103 (band-bar clause) | Shares its id with an unrelated safe-text rule (S1). | New ids R-TUI-103B.x here. |
 
@@ -184,7 +184,7 @@ Form column: U = ubiquitous. "Code today": **Yes**, **Yes; tested**, **Partly** 
 | R-TUI-017.2 | U | The system shall find a search text only inside one range, never across a gap. | Yes. |
 | R-TUI-017.3 | If | If the search text differs from the last search of that view, then the system shall search from the start of the image. | Yes. |
 | R-TUI-017.4 | If | If the search text is the last search of that view, then the system shall search from the byte after its last hit. | Yes; tested. |
-| R-TUI-038 | If | If the view has paged, jumped to another target, or missed since its last hit, then the system shall search from the first shown row. | Yes; tested. |
+| R-TUI.38 | If | If the view has paged, jumped to another target, or missed since its last hit, then the system shall search from the first shown row. | Yes; tested. |
 | R-TUI-017.5 | U | The system shall keep the search text, last hit and highlight of each hex view apart from the others. | No: the three views share them (D4-4). |
 | R-TUI-017.6 | When | When a search finds the text, the system shall draw the found bytes in the focus colour. | Yes; tested. |
 | R-TUI-017.7 | When | When a search finds the text, the system shall show its row as the target row. | Partly: placement as R-TUI-040.4 (D4-2). |
@@ -195,7 +195,7 @@ Form column: U = ubiquitous. "Code today": **Yes**, **Yes; tested**, **Partly** 
 
 ### S4.5 · Jumps and marks
 
-Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC-054 … 056); these rows set where any jump lands.
+Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC.54 … R-MAC.56); these rows set where any jump lands.
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
@@ -212,7 +212,7 @@ Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC-054 … 
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-TUI-010 | While | While the Workspace is shown, the system shall give the main hex view the whole height of the middle pane. | Yes; tested. |
+| R-TUI.10 | While | While the Workspace is shown, the system shall give the main hex view the whole height of the middle pane. | Yes; tested. |
 | R-WS-HEXROW-001.1 | While | While the Workspace is shown, the system shall show each hex row on one line. | Yes; tested. |
 | R-WS-HEXROW-001.2 | If | If the middle pane is narrower than a hex row, then the system shall let the operator scroll it sideways. | Yes; tested. |
 | R-WS-HEXROW-001.3 | While | While the Workspace is shown, the system shall keep its three panes visible. | Yes; tested. |
@@ -222,11 +222,11 @@ Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC-054 … 
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-ENT-001 | When | When a primary image loads, the system shall compute its entropy windows once. | Yes. |
-| R-ENT-002 | U | The system shall cut the image into entropy windows as CTX-ENTROPY defines them. | Yes; tested. |
-| R-ENT-003 | U | The system shall give each entropy window its entropy and its band. | Yes; tested. |
-| R-ENT-004 | If | If an entropy window has fewer than 64 bytes, then the system shall mark it low confidence. | Yes; tested. |
-| R-ENT-005 | If | If the primary image is unloaded, then the system shall drop its entropy windows. | Yes. |
+| R-ENT.1 | When | When a primary image loads, the system shall compute its entropy windows once. | Yes. |
+| R-ENT.2 | U | The system shall cut the image into entropy windows as CTX-ENTROPY defines them. | Yes; tested. |
+| R-ENT.3 | U | The system shall give each entropy window its entropy and its band. | Yes; tested. |
+| R-ENT.4 | If | If an entropy window has fewer than 64 bytes, then the system shall mark it low confidence. | Yes; tested. |
+| R-ENT.5 | If | If the primary image is unloaded, then the system shall drop its entropy windows. | Yes. |
 
 ### S4.8 · The Memory Map (CTX-MAP)
 
@@ -318,7 +318,7 @@ Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC-054 … 
 
 | # | The situation | Recommendation (applied) |
 |---|---|---|
-| D4-17 | R-TUI-010 names a "right column" that no longer exists. | The hex view is the Workspace's middle pane, full height (R-TUI-010). |
+| D4-17 | R-TUI.10 names a "right column" that no longer exists. | The hex view is the Workspace's middle pane, full height (R-TUI.10). |
 | D4-18 | R-TUI-007 "context … truncate safely". | The window, page size and notice lines (S4.2). |
 | D4-20 | R-TUI-062 "single click → hex"; the code and its amendments: one click inspects, two navigate. | Follow the code (R-TUI-062.1, .2). |
 | D4-29 | R-TUI-061 "≥ 120 / < 120 columns". | The map's own panel width, 86 columns (R-TUI-061.4, .5). |
@@ -372,14 +372,14 @@ Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC-054 … 
 - **S3**: the hex peek's marked row (R-HEX-MARK.3); the legend's Hex block names the focus colour and MAC mark of CTX-HEX.
 - **S5**: the Workspace section list (R-TUI-009) and the memory strip's place on the Workspace.
 - **S6**: the hex page size in the viewer settings, shared with the A2L and MAC tables (S2 R-TUI-019.3).
-- **S12**: the report reads `low confidence` (R-ENT-004); the map does not show it.
+- **S12**: the report reads `low confidence` (R-ENT.4); the map does not show it.
 
 ---
 
 **Received from later groups** (after S6–S17 were written)
 
 - **S6**: the `.` key (Hex+) is bound under a name Textual does not send (S6 D6-20); R-TUI-007.3 now reads Partly. `g` stays R-TUI-040.1; Enter in the boxes stays D4-1.
-- **S12**: low confidence (R-ENT-004) is now also printed in the report (R-RPT-ENT.3). The report's hexdump rows (S12 CTX-RPT-HEX) differ from the screens' rows of CTX-HEX. Keep both: the report is a file format owned by S12, and D4-15 ("one renderer") covers the screens only.
+- **S12**: low confidence (R-ENT.4) is now also printed in the report (R-RPT-ENT.3). The report's hexdump rows (S12 CTX-RPT-HEX) differ from the screens' rows of CTX-HEX. Keep both: the report is a file format owned by S12, and D4-15 ("one renderer") covers the screens only.
 
 **Received from later groups** (after all groups were written)
 

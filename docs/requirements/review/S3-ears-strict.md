@@ -254,7 +254,7 @@ Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED.
 
 ### S3.4 · Colours and the legend (CTX-LEGEND)
 
-Replaces: the A2L and MAC colour blocks (their rules are S2 R-A2L-080 … 088 and R-MAC-031 … 035), amendments C and F, R-LEGEND-SOURCE.1, R-LEGEND-MODAL-001, R-LEGEND-GEOMETRY-001, R-TUI.47.
+Replaces: the A2L and MAC colour blocks (their rules are S2 R-A2L-080 … 088 and R-MAC.31 … R-MAC.35), amendments C and F, R-LEGEND-SOURCE.1, R-LEGEND-MODAL-001, R-LEGEND-GEOMETRY-001, R-TUI.47.
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
@@ -329,7 +329,7 @@ Focus on `Close` and closing with Esc: R-LEGEND-MODAL-001.11, .12 (tested on the
 | D3-15 | Overlap issues: S19 only (never HEX), computed by re-reading the file on disk, and for a tag only its start address. | Use the loaded image's overlap addresses (S1 R-IMG-002, both formats) and the whole tag span. |
 | D3-16 | A tag with an address and no length is "not checked" (grey) in the table, but the issue check treats it as 1 byte and may warn it is out of range. | Same rule as the table: no length, not checked, no issue. |
 | D3-17 | Five codes lower-case the name (`MAC_DUPLICATE_NAME`, `A2L_DUPLICATE_SYMBOL`, the triple and both "only" codes), so the issue shows `engspeed` for `EngSpeed`; `TRIPLE_NAME_ADDRESS_MISMATCH` carries no address, so its hex peek is empty. | The name as written (first occurrence); the triple issue carries the A2L address (R-VAL.47, R-VAL.48). |
-| D3-18 | Three palettes: Issues rows use the legend's (`#fd8383` …), the A2L and MAC tables use terminal colours (`red`, `green`, `grey70`), and MAC warning rows are `orange3` while the legend says pale yellow. | One palette (CTX-LEGEND) everywhere. Orange stays as the MAC-only cue (⚠ glyph, hex mark). S2 rows R-MAC-032 updated to pale yellow. |
+| D3-18 | Three palettes: Issues rows use the legend's (`#fd8383` …), the A2L and MAC tables use terminal colours (`red`, `green`, `grey70`), and MAC warning rows are `orange3` while the legend says pale yellow. | One palette (CTX-LEGEND) everywhere. Orange stays as the MAC-only cue (⚠ glyph, hex mark). S2 rows R-MAC.32 updated to pale yellow. |
 | D3-19 | Legend rows describe intentions, not what the screens do (MAC pale yellow "alias, overlap"; A2L red "malformed field"; Issues "Optional info"). | Rows rewritten from the S2 and S3 rules (CTX-LEGEND). |
 | D3-20 | Hex legend rows show the colour word but no colour; the Workspace (whose hex view uses both colours) shows no block. | Hex rows in their colour; Workspace shows the Hex block. |
 | D3-21 | The Issues card shows `✗ ERRORS (3)` and `symbol · 0xADDR · message`; the screen shows `✗ ERRORS  (3)` and two-space separators, and the card's "Info rows appear only under All" is false. | Card text copied from the real output. |

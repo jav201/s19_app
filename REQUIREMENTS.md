@@ -458,8 +458,14 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-072 · LLR-072.3 | **absorbed** · S4: R-TUI-072.1, R-TUI-072.2 | Batch 2026-07-15-batch-47, as amended by 2026-08-01-batch-77 (Amendment B); the 5-tick text it replaced was superseded there (I1-D2). |
 | HLR-073 · LLR-073.2 | **absorbed** · S4: R-TUI-073.1, R-TUI-062.2 | Batch 2026-07-15-batch-47. The ↵ glyph closes each region row (CTX-MAP); what Enter does is S4 D4-21. |
 | HLR-074 · LLR-074.2 | **absorbed** · S4: R-TUI-074.6, R-TUI-074.7 | Batch 2026-07-15-batch-47. The 3-row peek was superseded by HLR-126 and HLR-128 (peek rows). |
-| HLR-084 · LLR-084.1, .4, .5, .8 | **absorbed** · S9: R-CHKS.1 … R-CHKS.14; S5: R-TUI-029.4 | Batch 2026-07-18-batch-49: the Checks screen is S9.3 (S9 D9-3). .1 → R-CHKS.5 … .7, .10; .4 → R-CHKS.8, R-CHKS-009; .5 → R-CHKS.13; .8 → R-CHKS.14 (I1-D3). |
+| HLR-082 · LLR-082.2 | **absorbed** · S3: R-TUI-025.2 | Batch 2026-07-18-batch-49. The severity strip above the issue list (CTX-ISSUES-SCREEN). .4 and .5 entered the canon as folds R-ISSUES.1 and R-ISSUES.2 (I2-D6, I2-D7); HLR-082 and its other LLRs are other increments' rows. |
+| HLR-083 · LLR-083.1, .3, .5 | **absorbed** · S6: R-TUI-021.1, R-TUI-021.3, R-TUI-021.7, R-TUI-022.2; S9: R-CHKS.1, R-CHKS.8, R-CHKS.13; S5: R-TUI-029.4 | Batch 2026-07-18-batch-49. Checks is the rail item ☑ on key 9 (CTX-SHELL; the 9th place of batch-49 moved as later items came); the screen's parts are CTX-CHECKS-SCREEN. LLR-083.6 waits for P-279 (I2-D9). |
+| HLR-084 · LLR-084.1, .3, .4, .5, .6, .8 | **absorbed** · S9: R-CHKS.1 … R-CHKS.14; S5: R-TUI-029.4 | Batch 2026-07-18-batch-49: the Checks screen is S9.3 (S9 D9-3). .1 → R-CHKS.5 … .7, .10; .3 → R-CHKS.1 … R-CHKS.5, R-CHKS.8; .4 → R-CHKS.8, R-CHKS-009; .5 → R-CHKS.13; .6 → R-TUI-029.4, R-CHKS.4; .8 → R-CHKS.14 (I1-D3). |
+| HLR-119 · LLR-119.2, .4 | **absorbed** · S6: R-TUI-033.2, R-TUI-033.3 | Batch 2026-08-06-batch-78. .2: one status notice where the window has no box. .4 is a test method (each focus test clears the focus and asserts it first). HLR-119 and its other LLRs are other increments' rows. |
+| HLR-120 · LLR-120.1, .2, .5 | **absorbed** · S6: R-TUI-036.1, R-TUI-016.1 … R-TUI-016.4, R-TUI-036.4, R-TUI-023.3; S5: R-WS-LOADED.1, R-WS-LOADED.17 | Batch 2026-08-06-batch-78, built in 2026-08-07-batch-79. The names moved from the command bar to the context line and the loaded panel's PROJ row, both in the forms of CTX-SHELL (S6 D6-3); one update entry point for both (.1) is design. |
+| HLR-121 · LLR-121.2, .4 | **absorbed** · S6: R-SHELL-START.1, R-TUI-033.1, R-TUI-016.1; S4: R-TUI-040.1; S5: R-WS-LOADED.1 | Batch 2026-08-06-batch-78, built in 2026-08-07-batch-79. The command bar's find and go-to boxes are gone: the frame of CTX-SHELL has none, `/` and `g` use the window's own boxes (S6 D6-3). .2: the search and go-to rows of S4.3 and S4.4 hold unchanged; the frozen-payload check is a test method. .4: process (increment order); its test helpers read the loaded panel and the context line. Not retired (I2-D5). |
 | HLR-N8-3 · LLR-N8-3.2 | **absorbed** · S3: R-LEGEND-MAP.2, R-LEGEND-MAP.3 | Batch 2026-07-23-batch-n8. Band rows derived from S4 CTX-ENTROPY (CTX-LEGEND "map sheet"). |
+| HLR-V1 | **absorbed** · S13: R-CRC-PRESET-001.1 … R-CRC-PRESET-001.8 | Batch 2026-07-20-batch-58. The form is CTX-DESIGNER column 1 and Store placement; a preset pick fills it and leaves the preset unchanged. LLR-V1.1, .2 are other increments' rows. |
 | HLR-111 · LLR-111.1, .2 | **absorbed** · S4: R-TUI-103B.4, R-TUI-103B.3, R-TUI-062.9 | Batch 2026-08-01-batch-77. Widths by mapped bytes; one ╱ column per gap. |
 
 
@@ -1267,7 +1273,7 @@ MAC line        <name> = <address>. Spaces around = are allowed.
 comment line    A line whose first non-blank character is #.
 MAC record      One MAC line, with its line number, name, address and parse result.
 MAC-only session  A session with a MAC file and no primary image.
-MAC status      (conditions; the order that decides between them is R-MAC-030)
+MAC status      (conditions; the order that decides between them is R-MAC.30)
   ERR_PARSE           the line is not a valid MAC line
   NO_ADDR             the record has no address
   A2L_ADDR_MISMATCH   an A2L tag has the same name and another address
@@ -1652,29 +1658,29 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-MAC-001 | When | When the system reads a MAC file, the system shall skip empty lines and comment lines. |
-| R-MAC-002 | When | When the system reads a MAC file, the system shall create one MAC record from every other line. |
-| R-MAC-003 | U | The system shall number MAC lines by their physical position in the file, from 1. |
-| R-MAC-004 | If | If a MAC line does not hold exactly one `=`, then the system shall record on its MAC record the parse error `Line <n>: expected one '=' separator`. |
-| R-MAC-005 | If | If the name of a MAC line is not a valid name, then the system shall record on its MAC record the parse error `Line <n>: invalid tag name`. |
-| R-MAC-006 | If | If the address of a MAC line is not a valid address, then the system shall record on its MAC record the parse error `Line <n>: invalid hex address`. |
-| R-MAC-007 | If | If a MAC line has a parse error, then the system shall read the line that follows it. |
-| R-MAC-008 | If | If a MAC file cannot be read, then the system shall create no MAC record. |
-| R-MAC-009 | If | If a MAC file cannot be read, then the system shall record the diagnostic `Failed to read file: <reason>`. |
-| R-MAC-010 | When | When a MAC file loads without a primary image, the system shall show the status `Loaded <file name> (MAC only)`. |
-| R-MAC-011 | When | When a MAC file loads with a primary image, the system shall show the status `Loaded <image name> (S19+MAC: <MAC file name>)`. |
-| R-MAC-012 | When | When the system has read a MAC file, the system shall write the INFO log line `MAC parse summary: path=<path> rows=<n> parse_ok=<k> diagnostics=<d> valid_addresses=<a>`. |
+| R-MAC.1 | When | When the system reads a MAC file, the system shall skip empty lines and comment lines. |
+| R-MAC.2 | When | When the system reads a MAC file, the system shall create one MAC record from every other line. |
+| R-MAC.3 | U | The system shall number MAC lines by their physical position in the file, from 1. |
+| R-MAC.4 | If | If a MAC line does not hold exactly one `=`, then the system shall record on its MAC record the parse error `Line <n>: expected one '=' separator`. |
+| R-MAC.5 | If | If the name of a MAC line is not a valid name, then the system shall record on its MAC record the parse error `Line <n>: invalid tag name`. |
+| R-MAC.6 | If | If the address of a MAC line is not a valid address, then the system shall record on its MAC record the parse error `Line <n>: invalid hex address`. |
+| R-MAC.7 | If | If a MAC line has a parse error, then the system shall read the line that follows it. |
+| R-MAC.8 | If | If a MAC file cannot be read, then the system shall create no MAC record. |
+| R-MAC.9 | If | If a MAC file cannot be read, then the system shall record the diagnostic `Failed to read file: <reason>`. |
+| R-MAC.10 | When | When a MAC file loads without a primary image, the system shall show the status `Loaded <file name> (MAC only)`. |
+| R-MAC.11 | When | When a MAC file loads with a primary image, the system shall show the status `Loaded <image name> (S19+MAC: <MAC file name>)`. |
+| R-MAC.12 | When | When the system has read a MAC file, the system shall write the INFO log line `MAC parse summary: path=<path> rows=<n> parse_ok=<k> diagnostics=<d> valid_addresses=<a>`. |
 
 **Status of a MAC record**
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-MAC-030 | If | If more than one MAC status applies to a record, then the system shall give it the first in this order: ERR_PARSE, NO_ADDR, A2L_ADDR_MISMATCH, NOT_IN_A2L, OUT_OF_IMAGE, NO_A2L, OK. |
-| R-MAC-031 | When | When the system shows a MAC record, the system shall colour its row red for ERR_PARSE, NO_ADDR and A2L_ADDR_MISMATCH. |
-| R-MAC-032 | When | When the system shows a MAC record, the system shall colour its row pale yellow for NOT_IN_A2L. |
-| R-MAC-033 | When | When the system shows a MAC record, the system shall colour its row white for OUT_OF_IMAGE. |
-| R-MAC-034 | When | When the system shows a MAC record, the system shall colour its row grey for NO_A2L. |
-| R-MAC-035 | When | When the system shows a MAC record, the system shall colour its row green for OK. |
+| R-MAC.30 | If | If more than one MAC status applies to a record, then the system shall give it the first in this order: ERR_PARSE, NO_ADDR, A2L_ADDR_MISMATCH, NOT_IN_A2L, OUT_OF_IMAGE, NO_A2L, OK. |
+| R-MAC.31 | When | When the system shows a MAC record, the system shall colour its row red for ERR_PARSE, NO_ADDR and A2L_ADDR_MISMATCH. |
+| R-MAC.32 | When | When the system shows a MAC record, the system shall colour its row pale yellow for NOT_IN_A2L. |
+| R-MAC.33 | When | When the system shows a MAC record, the system shall colour its row white for OUT_OF_IMAGE. |
+| R-MAC.34 | When | When the system shows a MAC record, the system shall colour its row grey for NO_A2L. |
+| R-MAC.35 | When | When the system shows a MAC record, the system shall colour its row green for OK. |
 
 **MAC View**
 
@@ -1682,23 +1688,23 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 |---|---|---|
 | R-TUI-039.1 | While | While the MAC View is shown, the system shall give the hex pane the larger of 82 columns and 3/7 of the screen width. |
 | R-TUI-039.2 | While | While the MAC View is shown, the system shall give the MAC table the rest of the screen width. |
-| R-MAC-040 | When | When the system shows the MAC table, the system shall show the columns CTX-MAC lists, in that order. |
-| R-MAC-041 | If | If a MAC record has no valid name, then the system shall show `(invalid)` in its Tag cell. |
-| R-MAC-042 | If | If a MAC record has no address, then the system shall show `n/a` in its Address cell. |
-| R-MAC-043 | If | If no primary image is loaded, then the system shall show `n/a` in every InMem cell. |
-| R-MAC-044 | When | When the system shows a MAC record whose name matches an A2L tag, the system shall show `<section>:<name>` of the first such tag in its A2LMatch cell. |
+| R-MAC.40 | When | When the system shows the MAC table, the system shall show the columns CTX-MAC lists, in that order. |
+| R-MAC.41 | If | If a MAC record has no valid name, then the system shall show `(invalid)` in its Tag cell. |
+| R-MAC.42 | If | If a MAC record has no address, then the system shall show `n/a` in its Address cell. |
+| R-MAC.43 | If | If no primary image is loaded, then the system shall show `n/a` in every InMem cell. |
+| R-MAC.44 | When | When the system shows a MAC record whose name matches an A2L tag, the system shall show `<section>:<name>` of the first such tag in its A2LMatch cell. |
 | R-TUI-070.1 | When | When the system shows a MAC record, the system shall start its Tag cell with its status glyph. |
 | R-TUI-070.2 | If | If a MAC record has a parse error, then the system shall show the glyph `✗` in red. |
 | R-TUI-070.3 | If | If a MAC record is out of the primary image, then the system shall show the glyph `⚠` in orange. |
 | R-TUI-070.4 | If | If a MAC record is in the primary image, then the system shall show the glyph `✓` in green. |
 | R-TUI-070.5 | If | If a MAC record was not checked against a primary image, then the system shall show the glyph `·` in grey. |
-| R-MAC-050 | When | When the system shows the MAC table, the system shall show under it the summary `Page <p>/<P> \| rows <a>-<b> / <T> (page size <S>; +/- for MAC page)` followed by one count per MAC status. |
-| R-MAC-051 | If | If a primary image is loaded, then the system shall show under the MAC summary the line `Coverage MAC->S19=<x>%  A2L->S19=<y>%  A2L<->MAC=<z>%`. |
-| R-MAC-052 | If | If no MAC file is loaded, then the system shall show `No MAC loaded.` as the MAC summary. |
-| R-MAC-053 | If | If a loaded MAC file has no MAC record, then the system shall show `MAC file has no records.` as the MAC summary. |
-| R-MAC-054 | When | When the operator selects a MAC row, the system shall show its address near the top of the MAC hex pane. |
-| R-MAC-055 | When | When the operator selects a MAC row, the system shall show the status `MAC tag at <address>`. |
-| R-MAC-056 | If | If the selected MAC row has a parse error, then the system shall leave the hex pane unchanged. |
+| R-MAC.50 | When | When the system shows the MAC table, the system shall show under it the summary `Page <p>/<P> \| rows <a>-<b> / <T> (page size <S>; +/- for MAC page)` followed by one count per MAC status. |
+| R-MAC.51 | If | If a primary image is loaded, then the system shall show under the MAC summary the line `Coverage MAC->S19=<x>%  A2L->S19=<y>%  A2L<->MAC=<z>%`. |
+| R-MAC.52 | If | If no MAC file is loaded, then the system shall show `No MAC loaded.` as the MAC summary. |
+| R-MAC.53 | If | If a loaded MAC file has no MAC record, then the system shall show `MAC file has no records.` as the MAC summary. |
+| R-MAC.54 | When | When the operator selects a MAC row, the system shall show its address near the top of the MAC hex pane. |
+| R-MAC.55 | When | When the operator selects a MAC row, the system shall show the status `MAC tag at <address>`. |
+| R-MAC.56 | If | If the selected MAC row has a parse error, then the system shall leave the hex pane unchanged. |
 
 **Coverage strip**
 
@@ -2146,6 +2152,11 @@ severity strip  Errors <E> <bar>  Warnings <W> <bar>  Info <I> <bar>
                 Each bar is 5 cells; filled cells = round(count / total × 5).
 summary line    total=<T> | errors=<E> | warnings=<W> | info=<I> | filter=<all|error|warning>
                 | page <p>/<P> rows <a>-<b>/<F>
+pane titles     Issue list: border title "Issues", border subtitle "grouped".
+                Hex peek: border title "Hex Peek".
+severity field  A field of the summary line that counts one severity: errors=<E> in
+                red, warnings=<W> in pale yellow, info=<I> in cyan (CTX-LEGEND).
+                The summary line's text does not change.
 group header    ✗ ERRORS  (<n>) · ⚠ WARNINGS  (<n>) · • INFO  (<n>)   (two spaces)
 issue row       code chip (the code, or -) · detail (<symbol or ->  <address or no-addr>
                 <message>, two spaces apart) · related (the related artifacts joined by
@@ -2297,8 +2308,10 @@ Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED.
 |---|---|---|
 | R-TUI-025.1 | While | While the Issues screen is shown, the system shall give the issue list 2/3 of the width. |
 | R-TUI-025.18 | While | While the Issues screen is shown, the system shall give the hex peek 1/3 of the width. |
+| R-ISSUES.1 | When | When the system shows the Issues screen, the system shall show the pane titles of CTX-ISSUES-SCREEN on the issue list and the hex peek. |
 | R-TUI-025.2 | When | When the system shows the Issues screen, the system shall show the severity strip with the counts of the whole issue list. |
 | R-TUI-025.3 | When | When the system shows the Issues screen, the system shall show the summary line. |
+| R-ISSUES.2 | When | When the system shows the summary line, the system shall show each severity field in its colour of CTX-ISSUES-SCREEN. |
 | R-TUI-042b.1 | When | When the system shows an issue page, the system shall group its issues by severity in the order ERROR, WARNING, INFO. |
 | R-TUI-042b.2 | When | When the system shows a group, the system shall head it with its group header, counting the issues of that severity in the whole filtered list. |
 | R-TUI-042b.3 | If | If an issue page holds no issue of a severity, then the system shall show no header for that severity. |
@@ -2326,7 +2339,7 @@ Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED.
 
 #### S3.4 · Colours and the legend (CTX-LEGEND)
 
-Replaces: the A2L and MAC colour blocks (their rules are S2 R-A2L-080 … 088 and R-MAC-031 … 035), amendments C and F, R-LEGEND-SOURCE.1, R-LEGEND-MODAL-001, R-LEGEND-GEOMETRY-001, R-TUI.47.
+Replaces: the A2L and MAC colour blocks (their rules are S2 R-A2L-080 … 088 and R-MAC.31 … R-MAC.35), amendments C and F, R-LEGEND-SOURCE.1, R-LEGEND-MODAL-001, R-LEGEND-GEOMETRY-001, R-TUI.47.
 
 | Id | Form | Requirement |
 |---|---|---|
@@ -2531,7 +2544,7 @@ memory strip    The one-row band above the Workspace panes: the whole image span
 | R-TUI-017.2 | U | The system shall find a search text only inside one range, never across a gap. |
 | R-TUI-017.3 | If | If the search text differs from the last search of that view, then the system shall search from the start of the image. |
 | R-TUI-017.4 | If | If the search text is the last search of that view, then the system shall search from the byte after its last hit. |
-| R-TUI-038 | If | If the view has paged, jumped to another target, or missed since its last hit, then the system shall search from the first shown row. |
+| R-TUI.38 | If | If the view has paged, jumped to another target, or missed since its last hit, then the system shall search from the first shown row. |
 | R-TUI-017.5 | U | The system shall keep the search text, last hit and highlight of each hex view apart from the others. |
 | R-TUI-017.6 | When | When a search finds the text, the system shall draw the found bytes in the focus colour. |
 | R-TUI-017.7 | When | When a search finds the text, the system shall show its row as the target row. |
@@ -2542,7 +2555,7 @@ memory strip    The one-row band above the Workspace panes: the whole image span
 
 #### S4.5 · Jumps and marks
 
-Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC-054 … 056); these rows set where any jump lands.
+Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC.54 … R-MAC.56); these rows set where any jump lands.
 
 | Id | Form | Requirement |
 |---|---|---|
@@ -2560,7 +2573,7 @@ Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC-054 … 
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-TUI-010 | While | While the Workspace is shown, the system shall give the main hex view the whole height of the middle pane. |
+| R-TUI.10 | While | While the Workspace is shown, the system shall give the main hex view the whole height of the middle pane. |
 | R-WS-HEXROW-001.1 | While | While the Workspace is shown, the system shall show each hex row on one line. |
 | R-WS-HEXROW-001.2 | If | If the middle pane is narrower than a hex row, then the system shall let the operator scroll it sideways. |
 | R-WS-HEXROW-001.3 | While | While the Workspace is shown, the system shall keep its three panes visible. |
@@ -2570,11 +2583,11 @@ Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC-054 … 
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-ENT-001 | When | When a primary image loads, the system shall compute its entropy windows once. |
-| R-ENT-002 | U | The system shall cut the image into entropy windows as CTX-ENTROPY defines them. |
-| R-ENT-003 | U | The system shall give each entropy window its entropy and its band. |
-| R-ENT-004 | If | If an entropy window has fewer than 64 bytes, then the system shall mark it low confidence. |
-| R-ENT-005 | If | If the primary image is unloaded, then the system shall drop its entropy windows. |
+| R-ENT.1 | When | When a primary image loads, the system shall compute its entropy windows once. |
+| R-ENT.2 | U | The system shall cut the image into entropy windows as CTX-ENTROPY defines them. |
+| R-ENT.3 | U | The system shall give each entropy window its entropy and its band. |
+| R-ENT.4 | If | If an entropy window has fewer than 64 bytes, then the system shall mark it low confidence. |
+| R-ENT.5 | If | If the primary image is unloaded, then the system shall drop its entropy windows. |
 
 #### S4.8 · The Memory Map (CTX-MAP)
 
@@ -7181,7 +7194,7 @@ The legend rows themselves, and the rule that the report and the legend window s
 |---|---|---|
 | R-RPT-ENT.1 | When | When the system writes a reported variant, the system shall write an Entropy section after its Memory regions section. |
 | R-RPT-ENT.2 | When | When the system writes an Entropy section, the system shall write one band line per band of S4 CTX-ENTROPY that holds a window of the variant's image, in band order. |
-| R-RPT-ENT.3 | If | If some of a band's windows are low confidence (S4 R-ENT-004), then the system shall add ` (<k> low-confidence)` to its band line. |
+| R-RPT-ENT.3 | If | If some of a band's windows are low confidence (S4 R-ENT.4), then the system shall add ` (<k> low-confidence)` to its band line. |
 | R-RPT-ENT.4 | If | If the variant's image holds no byte, then the system shall write `No mapped bytes - entropy not computed.` in its Entropy section. |
 | R-RPT-ENT.5 | U | The system shall write no byte value in an Entropy section. |
 

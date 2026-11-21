@@ -59,9 +59,9 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 | D2-18 | Find brings the address near the top | R-A2L-094 | open |
 | D2-19 | Active filter-mode button; `No tag matches the filter.` | R-A2L-007.9, R-TUI-068.4 | open |
 | D2-20 | MAC-only session: no tag checked | R-A2L-071 | open (re-verified at 570b4b5) |
-| D2-21 | MAC status order: errors first | R-MAC-030 | open |
-| D2-22 | MAC summary: one count per status | R-MAC-050 | open |
-| D2-23 | `MAC file has no records.` | R-MAC-053 | open |
+| D2-21 | MAC status order: errors first | R-MAC.30 | open |
+| D2-22 | MAC summary: one count per status | R-MAC.50 | open |
+| D2-23 | `MAC file has no records.` | R-MAC.53 | open |
 | D2-24 | Coverage strip with no image: `MAC→S19 no image` | R-TUI-071.4 | open |
 | D2-25 | JSON export: catch the write error | R-A2L-003.5 | open |
 | D2-26 | Remove `overlap_conflict` | — | open |
@@ -84,7 +84,7 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 | D3-15 | Overlap issues from the loaded image, both formats, whole tag span | R-VAL.41, R-VAL.43 | open |
 | D3-16 | Tag with no length: not checked, no issue | R-VAL.42, R-VAL.53 | open |
 | D3-17 | Names as written; triple issue carries the A2L address | R-VAL.47, R-VAL.48 | open |
-| D3-18 | One palette on every surface; MAC warnings pale yellow | R-LEGEND.10, R-MAC-032 | open |
+| D3-18 | One palette on every surface; MAC warnings pale yellow | R-LEGEND.10, R-MAC.32 | open |
 | D3-19 | Legend rows rewritten from the screens' rules | R-LEGEND.11 | open |
 | D3-20 | Hex legend rows in colour; Workspace shows the Hex block | R-LEGEND-MODAL-001.7, .9 | open |
 | D3-21 | Issues card text matches the real rows | R-LEGEND-MODAL-001.10 | open |

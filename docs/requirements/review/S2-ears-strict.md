@@ -2,7 +2,7 @@
 
 Input: `REQUIREMENTS.by-module.md` chapter S2 (lines 564–917): 8 blocks of unnumbered "shall" lists, plus 16 rows (R-A2L-001 … 007, R-TUI-019, 020, 037, 039, 068 … 071, R-A2L-ISSUE-RECONCILE-002).
 Code: `base/s19_app/tui/a2l.py`, `mac.py`, `a2l_describe.py`, `services/a2l_service.py`, the S2 functions of `app.py`, the `#a2l_*` / `#mac_*` rules of `styles.tcss`. Two read-only code readings gave every fact with `file:line`; I re-checked the four that change rows the most (the A2L summary pane is still on screen, COMPU_VTAB is read but never applied, the `get_*` API has no caller, the CLI-style facts in section 6). No test was run.
-Reconciled with s19_app 570b4b5 (batch-100) on 2026-11-01: rows and cites in S2.1 (the A2L load rows R-A2L-004.x) and S2.6 Reading (R-MAC-010, 011) verified at 570b4b5; the parser rows of S2.1 … S2.3 keep their cells (`a2l.py` changed only by the progress report, D2-32); other cites refer to 093a7c0.
+Reconciled with s19_app 570b4b5 (batch-100) on 2026-11-01: rows and cites in S2.1 (the A2L load rows R-A2L-004.x) and S2.6 Reading (R-MAC.10, R-MAC.11) verified at 570b4b5; the parser rows of S2.1 … S2.3 keep their cells (`a2l.py` changed only by the progress report, D2-32); other cites refer to 093a7c0.
 
 Result:
 - **Context notes first** (section 3): six notes, one per subchapter, terms and formats only (rule E6).
@@ -186,7 +186,7 @@ MAC line        <name> = <address>. Spaces around = are allowed.
 comment line    A line whose first non-blank character is #.
 MAC record      One MAC line, with its line number, name, address and parse result.
 MAC-only session  A session with a MAC file and no primary image.
-MAC status      (conditions; the order that decides between them is R-MAC-030)
+MAC status      (conditions; the order that decides between them is R-MAC.30)
   ERR_PARSE           the line is not a valid MAC line
   NO_ADDR             the record has no address
   A2L_ADDR_MISMATCH   an A2L tag has the same name and another address
@@ -477,28 +477,28 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-MAC-001 | When | When the system reads a MAC file, the system shall skip empty lines and comment lines. | Yes. |
-| R-MAC-002 | When | When the system reads a MAC file, the system shall create one MAC record from every other line. | Yes; tested. |
-| R-MAC-003 | U | The system shall number MAC lines by their physical position in the file, from 1. | Yes. |
-| R-MAC-004 | If | If a MAC line does not hold exactly one `=`, then the system shall record on its MAC record the parse error `Line <n>: expected one '=' separator`. | Yes; tested. |
-| R-MAC-005 | If | If the name of a MAC line is not a valid name, then the system shall record on its MAC record the parse error `Line <n>: invalid tag name`. | Yes; tested. |
-| R-MAC-006 | If | If the address of a MAC line is not a valid address, then the system shall record on its MAC record the parse error `Line <n>: invalid hex address`. | Yes; tested. |
-| R-MAC-007 | If | If a MAC line has a parse error, then the system shall read the line that follows it. | Yes; tested. |
-| R-MAC-008 | If | If a MAC file cannot be read, then the system shall create no MAC record. | Yes. |
-| R-MAC-009 | If | If a MAC file cannot be read, then the system shall record the diagnostic `Failed to read file: <reason>`. | Yes. |
-| R-MAC-010 | When | When a MAC file loads without a primary image, the system shall show the status `Loaded <file name> (MAC only)`. | Yes; tested. |
-| R-MAC-011 | When | When a MAC file loads with a primary image, the system shall show the status `Loaded <image name> (S19+MAC: <MAC file name>)`. | Partly: on some load paths the `: <MAC file name>` part is left out (not traced which). |
+| R-MAC.1 | When | When the system reads a MAC file, the system shall skip empty lines and comment lines. | Yes. |
+| R-MAC.2 | When | When the system reads a MAC file, the system shall create one MAC record from every other line. | Yes; tested. |
+| R-MAC.3 | U | The system shall number MAC lines by their physical position in the file, from 1. | Yes. |
+| R-MAC.4 | If | If a MAC line does not hold exactly one `=`, then the system shall record on its MAC record the parse error `Line <n>: expected one '=' separator`. | Yes; tested. |
+| R-MAC.5 | If | If the name of a MAC line is not a valid name, then the system shall record on its MAC record the parse error `Line <n>: invalid tag name`. | Yes; tested. |
+| R-MAC.6 | If | If the address of a MAC line is not a valid address, then the system shall record on its MAC record the parse error `Line <n>: invalid hex address`. | Yes; tested. |
+| R-MAC.7 | If | If a MAC line has a parse error, then the system shall read the line that follows it. | Yes; tested. |
+| R-MAC.8 | If | If a MAC file cannot be read, then the system shall create no MAC record. | Yes. |
+| R-MAC.9 | If | If a MAC file cannot be read, then the system shall record the diagnostic `Failed to read file: <reason>`. | Yes. |
+| R-MAC.10 | When | When a MAC file loads without a primary image, the system shall show the status `Loaded <file name> (MAC only)`. | Yes; tested. |
+| R-MAC.11 | When | When a MAC file loads with a primary image, the system shall show the status `Loaded <image name> (S19+MAC: <MAC file name>)`. | Partly: on some load paths the `: <MAC file name>` part is left out (not traced which). |
 
 **Status of a MAC record**
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-MAC-030 | If | If more than one MAC status applies to a record, then the system shall give it the first in this order: ERR_PARSE, NO_ADDR, A2L_ADDR_MISMATCH, NOT_IN_A2L, OUT_OF_IMAGE, NO_A2L, OK. | Partly: OUT_OF_IMAGE comes before the A2L statuses today and hides an address mismatch (D2-21). |
-| R-MAC-031 | When | When the system shows a MAC record, the system shall colour its row red for ERR_PARSE, NO_ADDR and A2L_ADDR_MISMATCH. | Yes. |
-| R-MAC-032 | When | When the system shows a MAC record, the system shall colour its row pale yellow for NOT_IN_A2L. | No: orange today (S3 D3-18). |
-| R-MAC-033 | When | When the system shows a MAC record, the system shall colour its row white for OUT_OF_IMAGE. | Yes. |
-| R-MAC-034 | When | When the system shows a MAC record, the system shall colour its row grey for NO_A2L. | Yes. |
-| R-MAC-035 | When | When the system shows a MAC record, the system shall colour its row green for OK. | Yes. |
+| R-MAC.30 | If | If more than one MAC status applies to a record, then the system shall give it the first in this order: ERR_PARSE, NO_ADDR, A2L_ADDR_MISMATCH, NOT_IN_A2L, OUT_OF_IMAGE, NO_A2L, OK. | Partly: OUT_OF_IMAGE comes before the A2L statuses today and hides an address mismatch (D2-21). |
+| R-MAC.31 | When | When the system shows a MAC record, the system shall colour its row red for ERR_PARSE, NO_ADDR and A2L_ADDR_MISMATCH. | Yes. |
+| R-MAC.32 | When | When the system shows a MAC record, the system shall colour its row pale yellow for NOT_IN_A2L. | No: orange today (S3 D3-18). |
+| R-MAC.33 | When | When the system shows a MAC record, the system shall colour its row white for OUT_OF_IMAGE. | Yes. |
+| R-MAC.34 | When | When the system shows a MAC record, the system shall colour its row grey for NO_A2L. | Yes. |
+| R-MAC.35 | When | When the system shows a MAC record, the system shall colour its row green for OK. | Yes. |
 
 **MAC View**
 
@@ -506,23 +506,23 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 |---|---|---|---|
 | R-TUI-039.1 | While | While the MAC View is shown, the system shall give the hex pane the larger of 82 columns and 3/7 of the screen width. | Yes; tested. |
 | R-TUI-039.2 | While | While the MAC View is shown, the system shall give the MAC table the rest of the screen width. | Yes; tested. |
-| R-MAC-040 | When | When the system shows the MAC table, the system shall show the columns CTX-MAC lists, in that order. | Yes. |
-| R-MAC-041 | If | If a MAC record has no valid name, then the system shall show `(invalid)` in its Tag cell. | Yes. |
-| R-MAC-042 | If | If a MAC record has no address, then the system shall show `n/a` in its Address cell. | Yes. |
-| R-MAC-043 | If | If no primary image is loaded, then the system shall show `n/a` in every InMem cell. | Yes; tested. |
-| R-MAC-044 | When | When the system shows a MAC record whose name matches an A2L tag, the system shall show `<section>:<name>` of the first such tag in its A2LMatch cell. | Yes. |
+| R-MAC.40 | When | When the system shows the MAC table, the system shall show the columns CTX-MAC lists, in that order. | Yes. |
+| R-MAC.41 | If | If a MAC record has no valid name, then the system shall show `(invalid)` in its Tag cell. | Yes. |
+| R-MAC.42 | If | If a MAC record has no address, then the system shall show `n/a` in its Address cell. | Yes. |
+| R-MAC.43 | If | If no primary image is loaded, then the system shall show `n/a` in every InMem cell. | Yes; tested. |
+| R-MAC.44 | When | When the system shows a MAC record whose name matches an A2L tag, the system shall show `<section>:<name>` of the first such tag in its A2LMatch cell. | Yes. |
 | R-TUI-070.1 | When | When the system shows a MAC record, the system shall start its Tag cell with its status glyph. | Yes; tested. |
 | R-TUI-070.2 | If | If a MAC record has a parse error, then the system shall show the glyph `✗` in red. | Yes; tested. |
 | R-TUI-070.3 | If | If a MAC record is out of the primary image, then the system shall show the glyph `⚠` in orange. | Yes; tested. |
 | R-TUI-070.4 | If | If a MAC record is in the primary image, then the system shall show the glyph `✓` in green. | Yes; tested. |
 | R-TUI-070.5 | If | If a MAC record was not checked against a primary image, then the system shall show the glyph `·` in grey. | Yes; tested. |
-| R-MAC-050 | When | When the system shows the MAC table, the system shall show under it the summary `Page <p>/<P> \| rows <a>-<b> / <T> (page size <S>; +/- for MAC page)` followed by one count per MAC status. | Partly: Neutral counts warnings and info together (D2-22). |
-| R-MAC-051 | If | If a primary image is loaded, then the system shall show under the MAC summary the line `Coverage MAC->S19=<x>%  A2L->S19=<y>%  A2L<->MAC=<z>%`. | Yes. |
-| R-MAC-052 | If | If no MAC file is loaded, then the system shall show `No MAC loaded.` as the MAC summary. | Yes. |
-| R-MAC-053 | If | If a loaded MAC file has no MAC record, then the system shall show `MAC file has no records.` as the MAC summary. | No: shows `No MAC loaded.` (D2-23). |
-| R-MAC-054 | When | When the operator selects a MAC row, the system shall show its address near the top of the MAC hex pane. | Yes; tested. |
-| R-MAC-055 | When | When the operator selects a MAC row, the system shall show the status `MAC tag at <address>`. | Yes; tested. |
-| R-MAC-056 | If | If the selected MAC row has a parse error, then the system shall leave the hex pane unchanged. | Yes; tested. |
+| R-MAC.50 | When | When the system shows the MAC table, the system shall show under it the summary `Page <p>/<P> \| rows <a>-<b> / <T> (page size <S>; +/- for MAC page)` followed by one count per MAC status. | Partly: Neutral counts warnings and info together (D2-22). |
+| R-MAC.51 | If | If a primary image is loaded, then the system shall show under the MAC summary the line `Coverage MAC->S19=<x>%  A2L->S19=<y>%  A2L<->MAC=<z>%`. | Yes. |
+| R-MAC.52 | If | If no MAC file is loaded, then the system shall show `No MAC loaded.` as the MAC summary. | Yes. |
+| R-MAC.53 | If | If a loaded MAC file has no MAC record, then the system shall show `MAC file has no records.` as the MAC summary. | No: shows `No MAC loaded.` (D2-23). |
+| R-MAC.54 | When | When the operator selects a MAC row, the system shall show its address near the top of the MAC hex pane. | Yes; tested. |
+| R-MAC.55 | When | When the operator selects a MAC row, the system shall show the status `MAC tag at <address>`. | Yes; tested. |
+| R-MAC.56 | If | If the selected MAC row has a parse error, then the system shall leave the hex pane unchanged. | Yes; tested. |
 
 **Coverage strip**
 
@@ -586,9 +586,9 @@ D2-n are S2's decisions. "Code change" items become backlog for the batch that t
 | D2-18 | Find highlights the tag in the hex pane but does not bring it near the top, unlike row selection. | Same as row selection (R-A2L-094). |
 | D2-19 | The filter-mode buttons show no active state; `No A2L tags.` appears both with nothing loaded and with a filter that matches nothing. | Mark the active mode; `No tag matches the filter.` for the second case (R-A2L-007.9, R-TUI-068.4). |
 | D2-20 | In a MAC-only session the hex view gets a placeholder byte 0 at each MAC address; a 1-byte A2L tag at one of them reads as "in image" (false green). | With no primary image, no tag is checked (R-A2L-071). The placeholder may stay for the hex view, but it is not an image. |
-| D2-21 | A MAC record out of the image shows OUT_OF_IMAGE (info) even when its address disagrees with the A2L (error). | Errors first (R-MAC-030). |
-| D2-22 | The MAC summary's `Neutral` count lumps warnings and info together. | One count per status (R-MAC-050). |
-| D2-23 | An empty MAC file shows `No MAC loaded.` while the status line says it loaded; `No MAC records parsed.` exists in the code but can never appear. | `MAC file has no records.` (R-MAC-053). |
+| D2-21 | A MAC record out of the image shows OUT_OF_IMAGE (info) even when its address disagrees with the A2L (error). | Errors first (R-MAC.30). |
+| D2-22 | The MAC summary's `Neutral` count lumps warnings and info together. | One count per status (R-MAC.50). |
+| D2-23 | An empty MAC file shows `No MAC loaded.` while the status line says it loaded; `No MAC records parsed.` exists in the code but can never appear. | `MAC file has no records.` (R-MAC.53). |
 | D2-24 | With no S19/HEX loaded, the coverage strip reads `0 of 0 … 0 matches` even when rows say `OK`. | `MAC→S19 no image  ·  A2L↔MAC <N> matches`, with N counted (R-TUI-071.4). |
 | D2-25 | A failed JSON write is not caught. | Status `Cannot save A2L JSON: <reason>` (R-A2L-003.5). |
 
@@ -615,7 +615,7 @@ Code-change items for the batch: D2-3, D2-5 … D2-25, plus the removals D2-1, D
 
 - Rows added (7): R-A2L-004.7 … .13 (a failed load keeps the earlier A2L; the guard text; the unreadable project folder; input and screen kept live; parse progress by bytes; the in-place pick at the Parse step; no stale tags after an unload).
 - Rows changed (2): R-A2L-004.3 (adds the size-read arm), R-A2L-004.6 (the `could not be read` text, D2-31). Cells changed: R-A2L-004.1 (now tested), .4 (test named).
-- Cells re-checked, unchanged: R-A2L-004.2 (still No, D2-13), .5; R-MAC-010, 011 (the MAC load functions only take their inputs as arguments now; texts unchanged, `app.py:17791`).
+- Cells re-checked, unchanged: R-A2L-004.2 (still No, D2-13), .5; R-MAC.10, R-MAC.11 (the MAC load functions only take their inputs as arguments now; texts unchanged, `app.py:17791`).
 - Rows retired: none. Decisions added: D2-30 … D2-33. Decisions superseded: none (R-A2L-004.6's old text is a row change, D2-31).
 - Passed (scratch `passed-sweep.md`): S5 (a failed A2L load records no recent source), S6 (the A2L load steps and progress rows live here), S11 (the A2L sync's unreadable-folder line).
 - Consolidation (items from S5 and S6): cell changed R-A2L-004.6 (cites `test_tc_b100_50_a2l_raise_ends_the_action_first`, uncited by S6). Already here: the failure text and the kept A2L (R-A2L-004.6, .7, D2-31), the guard text (R-A2L-004.8), the early refusals (R-A2L-004.3, .9), the A2L load as a long action (R-A2L-004.1, .10 … .12), the TC-B100-73 nodes (R-A2L-004.11, D2-33). The A2L slot with no primary is S5's (R-WS-LOADED.3).
