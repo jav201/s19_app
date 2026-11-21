@@ -45,7 +45,10 @@ class A2lPickerMixin:
         on an I-ALP-2.3 snapshot hit, the prepared definitions. A headless
         panel forwards ``a2l_data=None`` (legacy: no data, and the snapshot
         survives for a later mount) and ignores a passed
-        ``prepared_definitions``.
+        ``prepared_definitions``. A mounted panel also forwards a passed
+        ``describe_context`` (the lazy path, P-279) to the embedded picker,
+        where it wins over ``prepared_definitions``; an unmounted panel
+        ignores it like the prepared definitions.
         """
         if not self.is_mounted:
             repopulated = self._a2l_picker.set_parameters(

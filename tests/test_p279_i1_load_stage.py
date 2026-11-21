@@ -18,6 +18,7 @@ from __future__ import annotations
 import gc
 import importlib
 import logging
+import os
 import statistics
 import sys
 import threading
@@ -47,7 +48,8 @@ HOSTILE = {
     "lead_space": " lazy",
     "trail_newline": "lazy\n",
     "empty": "",
-    "long_32767": ("lazy" * 8192)[:32767],
+    # the longest value settable on Windows: ``NAME=value`` is capped at 32,767 characters
+    "long_32750": ("lazy" * 8192)[:32750],
     "escape": "\x1b[31mlazy",
 }
 
@@ -302,6 +304,18 @@ def test_r_a2l_refresh_055_lazy_prepares_every_route(tmp_path, monkeypatch, rout
     assert out.rec.defs == [], f"{route}: bulk describes ran on the lazy path: {out.rec.defs}"
 
 
+@pytest.mark.parametrize("flag", ["LAZY", "Lazy"])
+@pytest.mark.parametrize("route", ROUTES)
+def test_r_a2l_refresh_055_case_variants_select_eager(tmp_path, monkeypatch, route, flag):
+    """055/5-12: only the exact value ``lazy`` selects the lazy path: ``LAZY``
+    and ``Lazy`` prepare eager (no context, the bulk definitions)."""
+    out = _drive(tmp_path, monkeypatch, route, _fx("case_01", tmp_path), flag=flag)
+    check, patch = _entries(out)
+    assert _entry_ctx(check) is None and _entry_ctx(patch) is None, f"{flag!r} selected lazy"
+    assert dict(patch.definitions) == out.rec.real_describe(out.names, out.data)
+    assert len(patch.definitions) > 0
+
+
 @pytest.mark.parametrize("flag", [None, "eager"], ids=["unset", "eager"])
 @pytest.mark.parametrize("route", ROUTES)
 def test_r_a2l_refresh_056_eager_is_todays_snapshot(tmp_path, monkeypatch, route, flag):
@@ -331,6 +345,7 @@ def test_r_a2l_refresh_057_hostile_values_use_eager_and_log_once(tmp_path, monke
     exactly once per load, and no byte of the value reaches the log."""
     value = HOSTILE[label]
     out = _drive(tmp_path, monkeypatch, route, _fx("case_01", tmp_path), flag=value)
+    assert os.environ.get(FLAG) == value, f"{label}: the platform did not accept the value"
     check, patch = _entries(out)
     assert _entry_ctx(check) is None and _entry_ctx(patch) is None, f"{label}: a hostile value selected lazy"
     assert dict(patch.definitions) == out.rec.real_describe(out.names, out.data)
@@ -658,11 +673,19 @@ def test_r_a2l_refresh_067_previous_context_is_released(tmp_path, monkeypatch, r
     assert i2._run(tmp_path / "app", body), "the previous generation's context is still alive after gc.collect()"
 
 
-def _interleaved_counts(tmp_path, monkeypatch, a2l) -> tuple:
-    """Settled GC-tracked object counts of 3 eager and 3 lazy loads of
-    ``a2l`` in ONE app (the variable is read at each load), so a
-    drift of the process mostly cancels (E L L E E L: the lazy loads sit one
-    third of a slot later on average, the conservative side)."""
+def _live_definitions() -> int:
+    """The ``Definition`` objects alive now (the retained mapping or memo a
+    leak would keep; the settled whole-process count drifts too much to see it)."""
+    kind = _definition().Definition
+    return sum(1 for obj in gc.get_objects() if type(obj) is kind)
+
+
+def _interleaved_counts(tmp_path, monkeypatch, a2l) -> dict:
+    """Per path, the ``(objects, definitions)`` after each of 3 eager and 3
+    lazy loads of ``a2l`` in ONE app (the variable is read at each load), once
+    the workers settled and ``gc.collect()`` ran. Order E L L E E L: a drift of
+    the process mostly cancels (the lazy loads sit one third of a slot later
+    on average, the conservative side)."""
     from tests.support.b100_workers import settle_workers
 
     _set_flag(monkeypatch, "eager")
@@ -677,18 +700,25 @@ def _interleaved_counts(tmp_path, monkeypatch, a2l) -> tuple:
             await i2._typed_attach(app, pilot, a2l)
             await settle_workers(pilot)
             gc.collect()
-            counts[flag].append(len(gc.get_objects()) + gc.get_freeze_count())
+            objects = len(gc.get_objects()) + gc.get_freeze_count()
+            counts[flag].append((objects, _live_definitions()))
 
     i2._run(tmp_path, body)
-    return counts["lazy"], counts["eager"]
+    return counts
 
 
 @pytest.mark.parametrize("name", ["ASAP2_Demo_V171.a2l", "ASAP2_Demo_V161.a2l"])
 def test_r_a2l_refresh_068_lazy_holds_no_more_objects_than_eager(tmp_path, monkeypatch, name):
-    """068/1-2: 3 loads per path, ordered E L L E E L in one app, median of the
-    settled GC-tracked object counts: lazy <= eager."""
-    lazy, eager = _interleaved_counts(tmp_path, monkeypatch, PUBLIC / name)
-    assert statistics.median(lazy) <= statistics.median(eager), (lazy, eager)
+    """068/1-2: 3 loads per path, ordered E L L E E L in one app: the median of
+    the settled GC-tracked object counts has lazy <= eager, and the retained
+    ``Definition`` objects (a memo kept per load would grow them) never exceed
+    what the eager path holds."""
+    counts = _interleaved_counts(tmp_path, monkeypatch, PUBLIC / name)
+    lazy_objects, lazy_defs = zip(*counts["lazy"])
+    eager_objects, eager_defs = zip(*counts["eager"])
+    assert statistics.median(lazy_objects) <= statistics.median(eager_objects), counts
+    assert min(eager_defs) > 0, f"control: the eager path holds its definitions: {counts}"
+    assert max(lazy_defs) <= min(eager_defs), f"lazy retains more definitions than eager: {counts}"
 
 
 # ---------------------------------------------------------------------------

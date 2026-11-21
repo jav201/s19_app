@@ -1057,13 +1057,18 @@ class FileLoadMixin:
             - Measurable names are the enriched tags with an integer
               address, in enrichment order — the same sequence the prefill
               seams hand to the pickers.
-            - ``describe_definitions`` runs once over that same full name
-              sequence and its result is wrapped in one
+            - On the eager path (``S19_A2L_DESCRIBE`` unset or any value
+              other than ``lazy``) ``describe_definitions`` runs once over
+              that same full name sequence and its result is wrapped in one
               :class:`MappingProxyType` shared read-only by both the
               ``check`` and ``patch`` :class:`A2LPickerSnapshot` entries
               (R-A2L-REFRESH.037 E4R / operator D10); both entries also
               share the exact ``a2l_data`` object as their source for
               identity comparison.
+            - On the lazy path (the value is exactly ``lazy``) no bulk
+              describe runs: ``build_describe_context`` builds one
+              read-only context, the entries carry empty definitions and
+              both hold that same context (R-A2L-REFRESH.058).
             - No request, admission state, widget, mounted state, session
               member or live generation is read here.
 

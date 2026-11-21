@@ -4221,13 +4221,22 @@ class _OccupancyIndex(NamedTuple):
     directly to ``leaf_records[k]``.  ``min_first`` is the minimum address
     below a node, ``max_last`` the maximum upper end (``None`` meaning +∞) and
     ``min_pos`` the minimum walk position below a node; all three are the
-    lists the builder built (no return-time tuple copy).  ``max_last``
+    lists the builder built (no return-time tuple copy) on the request-local
+    path.  ``max_last``
     tightens monotonically toward materialized final spans within the request
     (R-A2L-DEF.166–.168, E4R).  ``position_by_object`` resolves a unique
     ``(name, kind)`` to its walk position, with ``None`` for a repeated key.
     Neither input map is retained.  ``records`` and ``position_by_object`` are
     the list and dict the builder built, so the request can release them in
     slices before it returns (R-A2L-REFRESH.050).
+
+    On the describe-context path the index is frozen: ``records``, the three
+    node arrays and ``leaf_records`` are tuples and ``position_by_object`` is
+    a read-only mapping. ``_tighten_occupancy`` returns before any write
+    there, because the leaves are seeded from the final spans and its
+    ``max_last[node] == new_last`` check comes first. That early return is
+    the invariant ``describe_in_context`` relies on: a write would raise
+    ``TypeError`` on a tuple.
     """
 
     records: list

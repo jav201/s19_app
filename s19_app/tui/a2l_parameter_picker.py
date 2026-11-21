@@ -534,6 +534,15 @@ class A2LParameterPicker(Vertical):
         the last page only. A raise inside the context describe falls back to
         the non-context describe and logs one fixed line (no exception text,
         no name). Without a context: the population definitions.
+
+        Returns:
+            Mapping[str, Definition]: One definition per name of the shown
+                page. With a context: a fresh dict, memoized for the last
+                page. Without one: the read-only population mapping.
+
+        Raises:
+            Exception: The non-context fallback describe is outside the
+                guard, so its failure propagates as it does on the eager path.
         """
         context = self._describe_context
         if context is None:
@@ -669,6 +678,11 @@ class A2LParameterPicker(Vertical):
             prepared_definitions (Optional[Mapping[str, Definition]]): An
                 already-built read-only definition mapping to consume
                 verbatim instead of describing.
+            describe_context (Optional[DescribeContext]): A built read-only
+                describe context. It wins over ``prepared_definitions``:
+                the format cells come from its format fields, the
+                population definitions stay empty and the shown page is
+                described through it by :meth:`page_definitions`.
 
         Returns:
             bool: ``True`` when the ledger was repopulated, ``False`` on the

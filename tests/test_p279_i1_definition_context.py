@@ -155,6 +155,26 @@ def _two_curves_a2l(tmp_path: Path) -> dict:
     return parse_a2l_file(cut)
 
 
+def _axis_record_a2l(tmp_path: Path) -> dict:
+    """A MAP whose Y axis refers to AXIS_PTS ``AXIS_P``, whose layout gives a
+    fixed X count (6) that differs from the point count (4): the map records
+    the axis span (its letter is Y, so the fixed X count does not refuse it),
+    while the span placed from the layout alone is undefined. ``OVER`` sits
+    inside the recorded span, so the order of the two steps is visible in its
+    ``shared_with``."""
+    from tests.support.b103_a2l_arrays import axis, axis_pts, characteristic, inline, mapchar, rl
+
+    axo = axis_pts("AXIS_P", "0x200", "RL_AXP", "4",
+                   extras=rl("RL_AXP", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT", "FIX_NO_AXIS_PTS_X 6"))
+    layout = rl("RL_MQ", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT", "FNC_VALUES 2 UWORD ROW_DIR DIRECT")
+    return inline(
+        tmp_path, axo,
+        mapchar("MAP_Q", "0x100", "RL_MQ", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                axis("COM_AXIS", "CM_IDENT", "8", "0", "255", "AXIS_PTS_REF AXIS_P"), extras=layout),
+        characteristic("OVER", "VALUE", "0x204", "RL_U8", "NO_COMPU_METHOD", "0", "255"),
+    )
+
+
 def _homonym_a2l(tmp_path: Path) -> dict:
     from tests.support.b103_a2l_arrays import characteristic, inline
 
@@ -261,6 +281,23 @@ def test_r_a2l_def_169_two_curves_one_axis_pts_equal_bulk(tmp_path):
     for order in ORDERS:
         page = _ordered(asked, order)
         _assert_equal_to_bulk(mod.describe_in_context(page, context), page, bulk)
+
+
+def test_r_a2l_def_169_axis_span_recorded_by_a_map_equal_bulk(tmp_path):
+    """R-A2L-DEF.169/5 (E3 F5, the order): an AXIS_PTS span a described map
+    recorded wins over the span placed from the layout, so an object inside it
+    shares occupancy with the axis object, as in the bulk describe."""
+    mod = _definition_module()
+    data = _bundle(_axis_record_a2l(tmp_path))
+    bulk = data["bulk"]
+    record = bulk["MAP_Q"].axes[1].axis_object_record
+    assert bulk["MAP_Q"].refusal is None and record is not None and record.byte_length,         "control: the map is described and records the span of its axis object"
+    assert bulk["OVER"].shared_with is not None and "AXIS_P" in str(bulk["OVER"].shared_with),         "control: OVER lies inside the recorded span of AXIS_P"
+    context = mod.build_describe_context(data["a2l"], data["names"])
+    for order in ORDERS:
+        page = _ordered(data["unique"], order)
+        _assert_equal_to_bulk(mod.describe_in_context(page, context), page, bulk)
+    assert mod.describe_in_context(["OVER"], context)["OVER"].shared_with == bulk["OVER"].shared_with
 
 
 # ----------------------------------------------------------------------------
@@ -506,7 +543,9 @@ def test_r_a2l_def_174_unit_is_object_unit_not_method_unit():
 
 
 # ----------------------------------------------------------------------------
-# K-2 oracle arm: single-name describe against the bulk describe (base behaviour)
+# K-2 arm: single-name describe against the bulk describe, both on the tree
+# (narrow = bulk; that the bulk output equals the base revision's is not shown
+# here, it is a recorded probe)
 # ----------------------------------------------------------------------------
 
 def _k2_names(data: dict) -> list:
@@ -520,7 +559,7 @@ def _k2_names(data: dict) -> list:
 
 @pytest.mark.parametrize("key", list(CORPUS))
 def test_k2_describe_definition_equals_bulk(key):
-    """K-2: describe_definition(name, a2l) equals the bulk describe on the corpus (sampled when large)."""
+    """K-2: describe_definition(name, a2l) equals the bulk describe on the corpus (sampled when large), both on the tree."""
     mod = _definition_module()
     data = _corpus(key)
     different = [n for n in _k2_names(data)
