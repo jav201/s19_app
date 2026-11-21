@@ -656,6 +656,7 @@ class _DescribeMaps:
     tag_consumed: dict = field(default_factory=dict)
     order: int = 0
     ds_index: int = 0
+    section_scans: Optional[dict] = None
 
 
 def describe_definition(name: str, a2l_data: dict) -> Definition:
@@ -956,6 +957,17 @@ def _clean_mask(other: Optional[Definition]) -> Optional[int]:
     return other.bit_mask
 
 
+def _entry_matrix(name: str, section: dict, walked: _DescribeMaps):
+    """The MATRIX_DIM of an entry's section.  In a context build the section is
+    lexed once here and its ``(id, matrix, unit)`` scan is kept under ``name``
+    for ``_format_fields``."""
+    if walked.section_scans is None:
+        return _read_matrix_dim(section)
+    scan = _scan_object_section(section)
+    walked.section_scans[name] = scan
+    return scan[1]
+
+
 def _is_array_entry(entry: tuple, walked: _DescribeMaps) -> bool:
     """Whether an entry's final length can still change: a homonym or an
     array-like object (VAL_BLK, CURVE, MAP, MATRIX_DIM)."""
@@ -966,11 +978,11 @@ def _is_array_entry(entry: tuple, walked: _DescribeMaps) -> bool:
     tag = tags[0]
     if tag.get("section") == "CHARACTERISTIC":
         if tag.get("char_type") == "VALUE":
-            matrix = _read_matrix_dim(sections[0])
+            matrix = _entry_matrix(entry[1], sections[0], walked)
             return matrix is not None and _is_multi_value_matrix(matrix[0])
         return tag.get("char_type") in ("VAL_BLK", "CURVE", "MAP")
     if tag.get("section") == "MEASUREMENT":
-        matrix = _read_matrix_dim(sections[0])
+        matrix = _entry_matrix(entry[1], sections[0], walked)
         return matrix is not None and (
             matrix[1] is None or _is_multi_value_matrix(matrix[0])
         )
@@ -1020,7 +1032,12 @@ def _format_fields(
     if found is None or isinstance(found, Refusal):
         return FormatFields(None, "", "")
     tag, section = found
-    matrix = _read_matrix_dim(section)
+    scan = (walked.section_scans or {}).get(name)
+    if scan is None or scan[0] != id(section):
+        scan = (
+            _scan_object_section(section) if section is not None else (id(None), None, None)
+        )
+    matrix = scan[1]
     fields, _ = _conversion_fields(
         _echo(name),
         tag.get("conversion"),
@@ -1043,7 +1060,9 @@ def _format_fields(
             _helper_maps(walked, reads),
         )
         return FormatFields(full.datatype, full.kind, full.unit)
-    unit = _read_object_lines(section).get("unit")
+    unit = scan[2]
+    if unit is _UNIT_UNREAD:
+        unit = _read_object_lines(section).get("unit")
     if unit is None:
         unit = fields["record_unit"] or ""
     return FormatFields(_resolve_datatype(tag, a2l_data, reads), kind or "", unit or "")
@@ -1176,6 +1195,7 @@ def build_describe_context(a2l_data: dict, names: Sequence[str]) -> DescribeCont
         None expected; a helper's raise propagates to the caller.
     """
     walked = _walk_describe_maps(a2l_data)
+    walked.section_scans = {}
     reads: dict[object, object] = {}
     table = _build_span_table(a2l_data, names, walked, _helper_maps(walked, reads))
     entries = [entry[:6] for entry in walked.span_entries]
@@ -1192,7 +1212,9 @@ def build_describe_context(a2l_data: dict, names: Sequence[str]) -> DescribeCont
         _span_table=MappingProxyType(table),
         _index=index,
     )
-    release_in_slices(entries, walked.span_entries, walked.tag_consumed, reads)
+    release_in_slices(
+        entries, walked.span_entries, walked.tag_consumed, reads, walked.section_scans
+    )
     return context
 
 
@@ -1718,11 +1740,48 @@ def _read_matrix_dim(
 ) -> Optional[tuple[tuple[str, ...], Optional[tuple[int, ...]]]]:
     """The first MATRIX_DIM line's ``(words, shape)`` of the object's own lines,
     or ``None`` when there is no such line."""
-    for words in _object_line_words(section):
+    return _matrix_from_words(_object_line_words(section))
+
+
+def _matrix_from_words(line_words: list[list[str]]):
+    for words in line_words:
         if words and words[0] == "MATRIX_DIM":
             dims = tuple(words[1:])
             return (dims, _matrix_shape(dims))
     return None
+
+
+#: Anything the line splitter and the canonical lexer could read differently:
+#: a character outside tab and printable ASCII, or a comment marker.
+_UNSAFE_LEX_RE = re.compile(r"[^\t -~]|/\*|//|\*/")
+
+#: The scan's unit when the section must be read by ``_read_object_lines``.
+_UNIT_UNREAD = False
+
+
+def _lexes_alike(meta: str, lines: list[str]) -> bool:
+    """True when ``_flatten_body_tokens`` and the line splitter give the same
+    words: no unsafe character, no comment marker, no quoted string that runs
+    over a line end."""
+    if _UNSAFE_LEX_RE.search(meta) or _UNSAFE_LEX_RE.search(" ".join(lines)):
+        return False
+    return not any(text.count('"') & 1 for text in (meta, *lines))
+
+
+def _scan_object_section(section: dict) -> tuple:
+    """``(id(section), matrix, unit)`` from ONE lex of the section's own lines:
+    the ``_read_matrix_dim`` result and the ``_read_object_lines`` unit (the
+    first ``PHYS_UNIT`` / ``UNIT`` word of the record, ``None`` when there is
+    none, ``_UNIT_UNREAD`` when the section needs the flatten lex)."""
+    line_words = _object_line_words(section)
+    meta = section.get("meta", "") or ""
+    unit = _UNIT_UNREAD
+    if _lexes_alike(meta, section.get("lines") or []):
+        tokens = _split_line_respecting_quotes(meta)
+        for words in line_words:
+            tokens.extend(words)
+        unit = _object_record(tokens, section.get("name"))["unit"]
+    return (id(section), _matrix_from_words(line_words), unit)
 
 
 def _array_shape(
@@ -3079,6 +3138,16 @@ def _read_object_lines(section: Optional[dict]) -> dict:
     header (``FORMAT``, ``EXTENDED_LIMITS`` + two finite numbers, ``PHYS_UNIT``
     / ``UNIT``, ``BIT_MASK``).  Section ``None`` → every key empty.
     """
+    if section is None:
+        return _object_record([], None)
+    tokens = _flatten_body_tokens(
+        [section.get("meta", "") or ""] + (section.get("lines") or [])
+    )
+    return _object_record(tokens, section.get("name"))
+
+
+def _object_record(tokens: list[str], section_name: Optional[str]) -> dict:
+    """The record keys of ``_read_object_lines`` from the section's tokens."""
     result: dict = {
         "header": [],
         "format": None,
@@ -3088,12 +3157,7 @@ def _read_object_lines(section: Optional[dict]) -> dict:
         "bit_mask_count": 0,
         "byte_order_count": 0,
     }
-    if section is None:
-        return result
-    tokens = _flatten_body_tokens(
-        [section.get("meta", "") or ""] + (section.get("lines") or [])
-    )
-    header_len = 8 if section.get("name") == "MEASUREMENT" else 9
+    header_len = 8 if section_name == "MEASUREMENT" else 9
     result["header"] = tokens[:header_len]
     body = tokens[header_len:]
     result["bit_mask_count"] = sum(1 for word in body if word == "BIT_MASK")

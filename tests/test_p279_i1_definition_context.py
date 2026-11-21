@@ -565,3 +565,113 @@ def test_k2_describe_definition_equals_bulk(key):
     different = [n for n in _k2_names(data)
                  if mod.describe_definition(n, data["a2l"]) != data["bulk"][n]]
     assert not different, f"{key}: single-name describe differs from bulk for {different[:5]}"
+
+
+# ----------------------------------------------------------------------------
+# R-A2L-DEF.174 - the build lexes each object section once (change A)
+# ----------------------------------------------------------------------------
+
+def _count_lexes(mod, monkeypatch) -> dict:
+    """Count the lexes the span and format passes pay themselves: a call of
+    ``_object_line_words``, or of ``_flatten_body_tokens`` from an object
+    section's ``_read_object_lines`` (a compu method record is read once per
+    method and is no object section), made while a span-table or a format pass
+    runs and no full ``_describe_one`` (the array-kind path, which owns its own
+    reads) is on the stack. ``walk`` and ``describe_one`` count the
+    rest, so the control sees every call."""
+    counts = {"_object_line_words": 0, "_flatten_body_tokens": 0, "walk": 0, "describe_one": 0}
+    state = {"passes": 0, "describe": 0, "objread": 0}
+
+    def scoped(attr, key):
+        real = getattr(mod, attr)
+
+        def wrapper(*args, **kwargs):
+            state[key] += 1
+            try:
+                return real(*args, **kwargs)
+            finally:
+                state[key] -= 1
+
+        monkeypatch.setattr(mod, attr, wrapper)
+
+    def counted(seam):
+        real = getattr(mod, seam)
+
+        def wrapper(*args, **kwargs):
+            owned = state["passes"] and not state["describe"]
+            if owned and (seam == "_object_line_words" or state["objread"]):
+                counts[seam] += 1
+            else:
+                counts["describe_one" if state["describe"] else "walk"] += 1
+            return real(*args, **kwargs)
+
+        monkeypatch.setattr(mod, seam, wrapper)
+
+    scoped("_build_span_table", "passes")
+    scoped("_format_fields", "passes")
+    scoped("_describe_one", "describe")
+    scoped("_read_object_lines", "objread")
+    counted("_object_line_words")
+    counted("_flatten_body_tokens")
+    return counts
+
+
+@pytest.mark.parametrize("key", ["d171", "d161"])
+def test_r_a2l_def_174_build_lexes_each_section_once(key, monkeypatch):
+    """R-A2L-DEF.174: the span and format passes of the context build lex each
+    measurable object section at most once: no ``_flatten_body_tokens`` and at
+    most one ``_object_line_words`` per span entry outside the array-kind
+    describes. Equality with the bulk describe stays pinned by the
+    formats_equal_bulk arm above."""
+    mod = _definition_module()
+    data = _corpus(key)
+    span_entries = len(mod._walk_describe_maps(data["a2l"]).span_entries)
+    counts = _count_lexes(mod, monkeypatch)
+    context = mod.build_describe_context(data["a2l"], data["names"])
+    assert len(context.formats) >= len(data["measurable"]), "control: the build ran"
+    assert counts["_object_line_words"] > 0, "control: the lex seam is observed"
+    assert counts["describe_one"] > 0, "control: the array-kind describe is observed"
+    assert counts["_flatten_body_tokens"] == 0, counts
+    assert counts["_object_line_words"] <= span_entries, (counts, span_entries)
+
+
+def _unit_edge_a2l(tmp_path: Path) -> dict:
+    """Object sections the line splitter and the canonical lexer could read
+    differently: comments, tabs, a description running over a line end, an
+    escaped quote, a keyword that is another keyword's value, a MATRIX_DIM."""
+    from tests.support.b103_a2l_arrays import inline
+
+    def char(name, address, *body):
+        head = f'/begin CHARACTERISTIC {name} "d" VALUE {address} RL_U8 0 NO_COMPU_METHOD 0 255'
+        return "\n".join([head, *body, "/end CHARACTERISTIC"])
+
+    meas = (
+        '/begin MEASUREMENT E_MEAS "d" UBYTE NO_COMPU_METHOD 1 0 0 255\n'
+        '  ECU_ADDRESS 0x400\n  MATRIX_DIM 2 1 1\n  PHYS_UNIT "rpm"\n/end MEASUREMENT'
+    )
+    return inline(
+        tmp_path,
+        char("E_PLAIN", "0x100", '  PHYS_UNIT "km/h"'),
+        char("E_TAB", "0x110", '\tPHYS_UNIT\t"tab unit"'),
+        char("E_BLOCK", "0x120", '  /* PHYS_UNIT "no" */ PHYS_UNIT "yes"'),
+        char("E_LINE", "0x130", '  // PHYS_UNIT "no"', '  UNIT "line"'),
+        char("E_FORMAT", "0x140", '  FORMAT "PHYS_UNIT"', '  UNIT "after"'),
+        char("E_ESCAPED", "0x150", '  PHYS_UNIT "a \\" b"'),
+        char("E_NONE", "0x160", "  BIT_MASK 0x0F"),
+        '/begin CHARACTERISTIC E_MULTI "first line\nsecond line" VALUE 0x170 RL_U8 0 '
+        'NO_COMPU_METHOD 0 255\n  PHYS_UNIT "multi"\n/end CHARACTERISTIC',
+        meas,
+    )
+
+
+def test_r_a2l_def_174_unit_edge_sections_equal_bulk(tmp_path):
+    """R-A2L-DEF.174/2: the one-lex unit and shape equal the bulk describe for
+    sections whose words the two lexers could split differently."""
+    mod = _definition_module()
+    data = _bundle(_unit_edge_a2l(tmp_path))
+    formats = mod.build_describe_context(data["a2l"], data["names"]).formats
+    assert len(data["measurable"]) >= 9, "control: every edge object is measurable"
+    assert any(d.unit for d in data["bulk"].values()), "control: an edge object has a unit"
+    for name in data["measurable"]:
+        got = (formats[name].datatype, formats[name].kind, formats[name].unit)
+        assert got == _fmt(data["bulk"][name]), name
