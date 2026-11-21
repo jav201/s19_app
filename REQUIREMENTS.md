@@ -248,6 +248,52 @@ removed file    A file the tree holds no longer (it stays in git history):
   examples/case_00_public/s19_sample.txt             read by no test, loader or tool
 ```
 
+#### CTX-IDMAP · The old→new id map (S0.15)
+
+```text
+  map            The file docs/requirements/id-map.tsv: UTF-8, LF line ends, tab-separated, one header line
+                 `old_id<TAB>new_id<TAB>change<TAB>origin`, then one entry per line.
+  entry          One line of the map after the header.
+  change         One of: rename (a canon row keeps its text under a new id), fold (a row that lived only in a
+                 batch record enters the canon under a new id), retire (the id leaves with no successor).
+  origin         rename/fold: the old id's defining place `<repo-relative path>:<line>@<commit>` (line = a positive
+                 integer, commit = 7 to 40 lower-case hex digits); retire: non-empty decision text that names a
+                 decision id (upper-case letters, an optional `-`, digits: e.g. `N6 = A (P-308)`).
+  old id         An id in the old_id column, in one of two forms.
+  R-form old id  R-<FAM>-<digits>[<letter>] (FAM = upper-case letters, digits and inner hyphens; digits = one or
+                 more, unpadded allowed: R-ZZQ-7); the old id of a rename, or of a retire of a canon row.
+  qualified batch id  <batch folder>/<batch id>: the batch folder name (e.g. 2026-07-01-batch-22), `/`, then any
+                 id of that batch's record (HLR-…, LLR-…, US-…, R-…); the old id of a fold, or of a retire of an id
+                 that lived only in a batch record. It resolves to exactly one record; it is never matched in text.
+  new id         An id in the new_id column: R-<FAM>.<n> (n = a positive integer, no leading zero), or `-` for retire.
+  canon row      The first cell of a row of a table headed exactly `| Id | Form | Requirement |` in REQUIREMENTS.md
+                 (the parse_canon rule of tests/test_requirements_canon.py).
+  pointer table  A table of S0.2 (CTX-RETIRED) in REQUIREMENTS.md headed exactly `| Id | Where it lives now | Note |`;
+                 the ids it names are already resolved by S0.2 and never enter the map.
+  highest number For a family FAM: the highest n among canon rows R-<FAM>.<n>, map new ids R-<FAM>.<n> and ids
+                 R-<FAM>.<n> planned in this run (0 when there is none).
+  free number    A number n with no canon row R-<FAM>.<n>, no entry whose new id is R-<FAM>.<n> and no id
+                 R-<FAM>.<n> planned in this run.
+  id token       An occurrence of an R-form old id in text not preceded by a letter, digit, `.` or `-`, and not
+                 followed by a letter, a digit, `-<letter or digit>` or `.<digit>` (so R-ZZT-001 never matches
+                 inside R-ZZT-001.1, and R-ZZQ-7 never inside R-ZZQ-70).
+  shorthand citation  An R-form old id followed by shorthand: optional spaces, one of `/`, `..`, `…`, `–`, `,`,
+                 optional spaces and a three-digit number with an optional letter (R-ZZT-010/011, R-ZZT-001 .. 007,
+                 R-ZZT-003, 006, R-ZZT-103 … 103b); or `-<lower-case letter>` lists (R-ZZT-043-g/h); or `*`.
+                 `/` with a 1- or 2-digit number is a test-case suffix (R-ZZT-005/5) and leaves a plain id token.
+  citation       An id token or a shorthand citation.
+  live file      A file tracked in git, other than the map the run reads, docs/requirements/id-map.tsv, files under docs/requirements/history/,
+                 files under .dev-flow/ (records leave the repo in F4), AT-TC-REGISTRY.jsonl (append-only) and
+                 tools/seed_id_registry.py (history, by its own docstring).
+  runtime-read file  A live file on the tool's fixed list whose ids the program or the test collector reads as
+                 data: tests/test_suite_hygiene.py in I0, plus any file an increment's E1 adds after re-checking
+                 F0-B.
+  skip report    The lines the rename tool prints after `# skipped`: `<path>:<line><TAB><class><TAB><id>` for a
+                 citation, `<path><TAB><class>` for a whole file.
+  exclusion list A text file, one repository-relative path or glob per line with `/` separators (a leading `./` is
+                 dropped, `\` reads as `/`), `#` comments allowed.
+```
+
 ### Requirements
 
 
@@ -604,6 +650,36 @@ R-DOC-ARCHIVE.2 (keep in the architecture archive each line that batch-101 Inc 1
 | R-TST-201 | U | The system shall keep the address-origin tool `tools/address_origin.py` to the contract its docstrings state. |
 | R-TST-202 | When | When the generator `tests/fixtures/synth/generate.py` writes the synthetic corpus, the system shall give the corpus the same bytes on every run, at least one file of each coverage class and the Intel HEX extents its manifest pins. |
 | R-TST-203 | If | If a report golden would keep a host path after canonicalisation, or the AT-B77-02 fixture would hold runs of equal length or a gap, then the system shall fail the guard of that oracle. |
+
+#### S0.15 · The old→new id map (CTX-IDMAP; from batch 2026-11-20-cleanup I0)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-DOC-IDMAP.1 | U | The system shall keep its old→new id map in `docs/requirements/id-map.tsv` with the header `old_id`, `new_id`, `change`, `origin`, in that order (CTX-IDMAP). |
+| R-DOC-IDMAP.2 | U | The system shall give each field of each map entry the form that CTX-IDMAP defines for the entry's change. |
+| R-DOC-IDMAP.3 | U | The system shall give no old id of the map more than one entry. |
+| R-DOC-IDMAP.4 | U | The system shall give each new id of the map at most one entry. |
+| R-DOC-IDMAP.6 | U | The system shall define in `REQUIREMENTS.md` a row for the new id of each rename and fold entry of the map. |
+| R-DOC-IDMAP.7 | U | The system shall define in `REQUIREMENTS.md` no row for an old id of the map. |
+| R-DOC-IDMAP.8 | U | The system shall cite no R-form old id of the map in a live file. |
+| R-DOC-IDMAP.9 | When | When the rename tool plans a new id for an R-form old id R-<FAM>-<digits> without a letter suffix, the system shall give it R-<FAM>.<n> with n the integer value of the digits if that number is free, else the family's highest number plus 1. |
+| R-DOC-IDMAP.10 | When | When the rename tool plans a new id for an R-form old id with a letter suffix, the system shall give it the family's highest number plus 1, in the canon order of the old rows. |
+| R-DOC-IDMAP.11 | When | When the rename tool runs with `--apply`, the system shall replace each id token of a rename entry's old id in each live file with that entry's new id. |
+| R-DOC-IDMAP.12 | When | When the rename tool runs without `--apply`, the system shall print one line `<path><TAB><count>` per live file with replaceable id tokens, without changing any file. |
+| R-DOC-IDMAP.13 | If | If an id token lies in a runtime-read file, then the system shall list it as `<path>:<line><TAB>runtime-read<TAB><id>` in the skip report instead of replacing it. |
+| R-DOC-IDMAP.14 | If | If the rename tool runs with `--apply` and a live file that the exclusion list matches cites an R-form old id of the map, then the system shall stop with status 2 and the message `id-map: excluded file <path> holds <id>` before it changes any file. |
+| R-DOC-IDMAP.15 | If | If the map has a line with a field count other than 4, a duplicate old id, a reused new id, a new id equal to an old id, an unknown change, an id or an origin outside its form or a control character other than tab, or the map holds more than 1,048,576 bytes, then the system shall stop with status 2 and the message `id-map: line <n>: <reason>` (line 0 for the size) before it changes any file. |
+| R-DOC-IDMAP.16 | If | If a live file is not valid UTF-8 or holds more than 8,388,608 bytes, then the system shall list it in the skip report with class `binary` or `too-large` instead of changing it. |
+| R-DOC-IDMAP.17 | If | If `--repo` names a folder that is not the top level of a git work tree, then the system shall stop with status 2 and the message `id-map: not a git work tree: <path>` before it changes any file. |
+| R-DOC-IDMAP.18 | If | If a citation of an R-form old id of the map is a shorthand citation, then the system shall list it as `<path>:<line><TAB>shorthand<TAB><id>` in the skip report instead of replacing it. |
+| R-DOC-IDMAP.19 | When | When the rename tool plans with an exclusion list, the system shall print `# deferred: <old id> cited in <path>` instead of an entry line for each old id that a file of the list cites. |
+| R-DOC-IDMAP.20 | If | If the rename tool runs without `--apply` and a live file that the exclusion list matches cites an R-form old id of the map, then the system shall list the citation as `<path>:<line><TAB>excluded<TAB><id>` in the skip report. |
+| R-DOC-IDMAP.21 | U | The system shall hold in the map no old id that the first cell of a pointer table of `REQUIREMENTS.md` names. |
+| R-DOC-IDMAP.22 | U | The system shall pin the map's line ends to LF in `.gitattributes`. |
+| R-DOC-IDMAP.23 | If | If a tracked path has git mode 120000 (symlink) or 160000 (gitlink), or is a symlink or lies under a symlinked folder in the work tree, then the system shall list it as `<path><TAB>not-a-file` in the skip report instead of reading it. |
+| R-DOC-IDMAP.24 | If | If a tracked path is missing from the work tree, then the system shall list it as `<path><TAB>missing` in the skip report instead of reading it. |
+| R-DOC-IDMAP.25 | When | When the rename tool runs with `--apply`, the system shall compute the new content of every live file before it writes the first file. |
+| R-DOC-IDMAP.26 | If | If the exclusion list is not valid UTF-8 or holds more than 1,048,576 bytes, then the system shall stop with status 2 and the message `id-map: bad exclusion list <path>: <reason>` before it changes any file. |
 
 <a id="s1"></a>
 

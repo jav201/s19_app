@@ -243,7 +243,7 @@ from tools.id_registry import (
 # test_alp_inc2_a2l_attach.py, test_alp_inc3_snapshot_parity.py,
 # test_alp_inc3_load_responsiveness.py); 366 -> 372.
 # a2l-load-performance E4R FA-TICK2u: +1 (tests/test_alp_s19_read_once.py); 372 -> 373.
-EXPECTED_SCANNED_TEST_FILES = 373
+EXPECTED_SCANNED_TEST_FILES = 374
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,
