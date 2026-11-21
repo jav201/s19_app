@@ -87,7 +87,7 @@ def test_ac1_checks_panel_clears_after_undo_and_redo(tmp_path: Path) -> None:
     clears it (AC-1.2). RED counterfactual (pre-fix): ``last_check_result``
     survives the move so the stale rows persist (>0) after Undo and after Redo.
 
-    Traces: R-CHK-PE-012.
+    Traces: R-CHK-PE.12.
     """
     from textual.widgets import Button
 

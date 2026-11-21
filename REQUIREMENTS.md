@@ -308,7 +308,7 @@ removed file    A file the tree holds no longer (it stays in git history):
 
 #### S0.2 · Retired batch ids: where each lives now (CTX-RETIRED)
 
-The table below replaces the earlier canon's table of batch ids. It holds no requirement: each line is a pointer. A second table after it points the batch-100 ids (D0-13). A third table keeps the batch-101 event rows as history (operator decision 2026-11-19). A fourth table points the batch-102 clipboard ids that batch-103 Inc 1a reconciled (`.dev-flow/2026-11-05-batch-103/inc-1a/E1-rulings.md` section 4).
+The table below replaces the earlier canon's table of batch ids. It holds no requirement: each line is a pointer. A second table after it points the batch-100 ids (D0-13). A third table keeps the batch-101 event rows as history (operator decision 2026-11-19). A fourth table points the batch-102 clipboard ids that batch-103 Inc 1a reconciled (`.dev-flow/2026-11-05-batch-103/inc-1a/E1-rulings.md` section 4). A fifth table points the batch-only ids that batch 2026-11-20-cleanup reconciled (TR-02).
 
 | Id | Where it lives now | Note |
 |---|---|---|
@@ -320,9 +320,9 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-006 · LLR-006.1, .2 | **retired** | Deleted behaviour: the variant dropdown and variant help were removed in batch-94 (S10 D10-4). |
 | HLR-007 · LLR-007.1, .2 | **absorbed** · S10: R-PE-080, R-PE-081 | The apply itself is S8.5. |
 | HLR-008 · LLR-008.1, .2 | **absorbed** · S10: R-PE-010, R-PE-011, R-TUI-052.1 … .3 | Refresh rescans the folder (D10-5). |
-| HLR-009 · LLR-009.1 … .3 | **absorbed** · S9: R-CHKED-001 … R-CHKED-053 | The Check Editor, S9.4 (D9-3). |
+| HLR-009 · LLR-009.1 … .3 | **absorbed** · S9: R-CHKED-001 … R-CHKED.53 | The Check Editor, S9.4 (D9-3). |
 | HLR-010 · LLR-010.1, .2 | **absorbed** · S14: R-DIFF-CHK.1 … R-DIFF-CHK.11 | Check-spec addendum of the diff report, S14.6 (D14-6). |
-| HLR-011 · LLR-011.1, .2 | **absorbed** · S9: R-CHKED-048 | Plain text on the Check Editor (S1 CTX-TEXT). |
+| HLR-011 · LLR-011.1, .2 | **absorbed** · S9: R-CHKED.48 | Plain text on the Check Editor (S1 CTX-TEXT). |
 | HLR-012 · LLR-012.1, .2 | **absorbed** · S3: R-VAL-032.1 … .3 | S3 replaces the INFO re-label: standard block names raise no issue (D3-12). |
 | HLR-013 · LLR-013.1 … .3 | **retired** | Superseded by HLR-146 (one row of cards, S16 D16-3). LLR-013.3 (A2B diff block) is S15: R-FLOW-A2B.1 … .11. |
 | HLR-014 · LLR-014.1, .2 | **absorbed** · S15: R-FLOW-A2B.1 … R-FLOW-A2B.11; S16: R-FB-ADD.1 … R-FB-ADD.18 | A2B diff block inputs and provenance. |
@@ -356,16 +356,16 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-142 · LLR-142.1, .2 | **absorbed** · S15: R-FLOW-SRC.1 … .10, R-FLOW-PATCH.4; S16: R-FB-ADD.17 | The Builder's A2L field is prototype first (S16 D16-25). |
 | HLR-143 · LLR-143.1, .2 | **absorbed** · S15: R-FLOW-RPT.1 … .14; S14: R-DIFF-FLOWCHG.1 … .8 | Flow report and flow changes in the diff report. |
 | HLR-144 · LLR-144.1 … .12 | **absorbed** · S10: R-TUI-063.1 … R-TUI-049.3.2 | The Patch Editor, S10.1 … S10.8 (D10-3, D10-12). |
-| HLR-145 · LLR-145.1 … .10 | **absorbed** · S9: R-CHKED-001 … R-CHKED-053 | The Check Editor, S9.4. |
+| HLR-145 · LLR-145.1 … .10 | **absorbed** · S9: R-CHKED-001 … R-CHKED.53 | The Check Editor, S9.4. |
 | HLR-146 · LLR-146.1 … .14 | **absorbed** · S16: R-TUI-059.20 … R-FB-PIPE.5 | The Flow Builder, S16.1 … S16.3. |
 | HLR-147 · LLR-147.1 … .13 | **absorbed** · S16: R-FX-SCR.1 … R-FX-WAIT.13 | Flow Execution, S16.7 … S16.9. |
-| HLR-148 · LLR-148.1 … .10 | **absorbed** · S5: R-CHIP-001.1 … .11; S7: R-WHELP.1 … .15; S9: R-CHKED-002, R-CHKED-017; S10: R-PE-060, R-PE-073; S16: R-FB-RUN.1 | Chips, help entries, empty-state lines. Glyph vocabularies (LLR-148.7) are design. |
-| HLR-149 · LLR-149.1 … .6 | **absorbed** · S10: R-TUI-064.1 … .3; S9: R-CHKED-049, R-CHKED-050; S16: R-FB-RIB.5, R-FB-RIB.6, R-FX-SIZE.1, R-FX-SIZE.2 | The four editor windows at 118 × 54 or more and below it. |
+| HLR-148 · LLR-148.1 … .10 | **absorbed** · S5: R-CHIP-001.1 … .11; S7: R-WHELP.1 … .15; S9: R-CHKED-002, R-CHKED.17; S10: R-PE-060, R-PE-073; S16: R-FB-RUN.1 | Chips, help entries, empty-state lines. Glyph vocabularies (LLR-148.7) are design. |
+| HLR-149 · LLR-149.1 … .6 | **absorbed** · S10: R-TUI-064.1 … .3; S9: R-CHKED.49, R-CHKED.50; S16: R-FB-RIB.5, R-FB-RIB.6, R-FX-SIZE.1, R-FX-SIZE.2 | The four editor windows at 118 × 54 or more and below it. |
 | HLR-150 · LLR-150.1 … .7 | **absorbed** · S7: R-KEYBAR.1 … R-KEYBAR.15 | The key bar, S7.5. |
 | HLR-151 · LLR-151.1 | **absorbed** · S7: R-LOADDLG.1, R-LOADDLG.54, R-LOADDLG.60, R-LOADDLG.70 | LLR-151.1 (the Load project dialog) is superseded by batch-100 HLR-173 (Inc 9b): the one Load dialog, S7.2. S11 R-TUI-013.4 is retired (S11 D11-55). |
 | HLR-152 · LLR-152.1 … .3 | **retired** | Test tooling: the corpus generator `tests/fixtures/synth/generate.py` is not delivered. |
-| HLR-153 · LLR-153.1 … .4 | **absorbed** · S1: R-IMG-006; S8: R-IMG-WRITE.1, R-S19-S0HEADER-001.1 | Image from data records; a written image keeps the source S0 (S8 D8-27; exports: S17 D17-33). |
-| HLR-154 · LLR-154.1 … .3 | **absorbed** · S1: R-READ-005, R-READ-006.1, R-READ-006.2, R-READ-007.1 … .5, R-READ-008; S15: R-FLOW-SRC.1 … .10 | Integrity notices (S1 D-10); LLR-154.3 is the flow LOAD. |
+| HLR-153 · LLR-153.1 … .4 | **absorbed** · S1: R-IMG.6; S8: R-IMG-WRITE.1, R-S19-S0HEADER-001.1 | Image from data records; a written image keeps the source S0 (S8 D8-27; exports: S17 D17-33). |
+| HLR-154 · LLR-154.1 … .3 | **absorbed** · S1: R-READ.5, R-READ-006.1, R-READ-006.2, R-READ-007.1 … .5, R-READ.8; S15: R-FLOW-SRC.1 … .10 | Integrity notices (S1 D-10); LLR-154.3 is the flow LOAD. |
 | HLR-155 · LLR-155.1 … .8 | **absorbed** · S5: R-TUI-002.5, R-TUI-006.1, R-TUI-006.2; S8: R-PATCH-SAVE-FOLDER-001.10, R-CHG-003.18, R-CHG-003.19; S11: R-TUI-012.14; S13: R-CRC-WRITE-001.5 … .26; S15: R-FLOW-WRITE.1 … .8, R-FLOW-CHAIN.1 … .10 | Private staging and exclusive create are design. Reports that probe a free name first: S14 D14-11, S15 D15-12. |
 | HLR-156 · LLR-156.1 … .4 | **absorbed** · S15: R-FLOW-PATCH.1 … .11, R-FLOW-RPT.1 … .14, R-FLOW-CHAIN.11 … .18 | PATCH step status. |
 | HLR-157 · LLR-157.1 … .4 | **absorbed** · S8: R-CHG-002.1, R-CHG-003.8, R-CHG-003.21, R-CHG-003.23 | Save-back writes source plus document (S8 D8-3); the Patch Editor controls are S10.8 (D10-12). |
@@ -420,7 +420,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-177a · LLR-177.3 … .3i | **absorbed** · S6: R-BUSY-REFUSE.1 … .8; S10: R-PE-110, R-PE-111; S12: R-RPT-002.28 | The busy line and the refused list are S6 CTX-BUSY; reports are never refused (R-BUSY-REFUSE.7). |
 | HLR-177b · LLR-177.4, .4a, .4b, .4d | **absorbed** · S6: R-SHELL-START.5, R-QUIT.1 … .6 | Supersedes S6 D6-9 for the "session action running" state (S6 D6-36). |
 | HLR-177c · LLR-177.4c, .4e | **absorbed** · S6: R-QUIT.7 … .12 | Quit waits for the end; withdrawn on a failure or unsaved work. |
-| HLR-178 · LLR-178.1 … .3 | **absorbed** · S11: R-TUI-013.12, .13, R-LOADRES-1 … R-LOADRES-18; S7: R-LOADDLG.83; S3: R-LEGEND-010 | Problem rows bounded at 102 (S11 D11-54); the panel's colours are the S3 palette. The open project's preview of the last load result (LLR-178.3, last sentence) is not built at 570b4b5: S7 R-LOADDLG.83 reads No (S7 D7-35). |
+| HLR-178 · LLR-178.1 … .3 | **absorbed** · S11: R-TUI-013.12, .13, R-LOADRES-1 … R-LOADRES-18; S7: R-LOADDLG.83; S3: R-LEGEND.10 | Problem rows bounded at 102 (S11 D11-54); the panel's colours are the S3 palette. The open project's preview of the last load result (LLR-178.3, last sentence) is not built at 570b4b5: S7 R-LOADDLG.83 reads No (S7 D7-35). |
 
 **Batch-101 event rows** (CTX-RETIRED "batch-101 event row"; operator decision 2026-11-19). One line per R-TST row of batch-101 whose obligation names one fixed CI run, merge or tree. Each line keeps the row's approved text (FORWARD's "Final text") and its source; none is a requirement.
 
@@ -445,6 +445,18 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | R-B102-CLIP-004 | **absorbed** · S7: R-PASTE.9, R-PASTE.3, R-PASTE.10 | Every OS write fails: the app clipboard is kept, with the warning and the log line. |
 | R-B102-CLIP-005 | **retired** | Superseded by batch-103 Inc 1a (D-1 A, D-3 A): the 2.0 s PowerShell rescue is a design value; the observable bound is S7: R-TUI-043.10.2, R-PASTE.13 (2.5 s). |
 | R-B102-CLIP-006 | **absorbed** · S7: R-TUI-043.6 … R-TUI-043.8, R-PASTE.18 | No OS value: the app clipboard; both empty: the box text is selected and the paste failure warning shows. |
+
+**Batch-only ids** (batch 2026-11-20-cleanup, TR-02; ruling I1-D4). One line per HLR; each points batch-only LLRs that canon rows already cover.
+
+| Id | Where it lives now | Note |
+|---|---|---|
+| HLR-059 · LLR-059.3 | **absorbed** · S3: R-TUI.47 | Batch 2026-07-11-batch-36. Hex-block colour names derived from the hex view's styles; the scoped severity-orphan guard of the same LLR is a test method (I1-D1). |
+| HLR-072 · LLR-072.3 | **absorbed** · S4: R-TUI-072.1, R-TUI-072.2 | Batch 2026-07-15-batch-47, as amended by 2026-08-01-batch-77 (Amendment B); the 5-tick text it replaced was superseded there (I1-D2). |
+| HLR-073 · LLR-073.2 | **absorbed** · S4: R-TUI-073.1, R-TUI-062.2 | Batch 2026-07-15-batch-47. The ↵ glyph closes each region row (CTX-MAP); what Enter does is S4 D4-21. |
+| HLR-074 · LLR-074.2 | **absorbed** · S4: R-TUI-074.6, R-TUI-074.7 | Batch 2026-07-15-batch-47. The 3-row peek was superseded by HLR-126 and HLR-128 (peek rows). |
+| HLR-084 · LLR-084.1, .4, .5, .8 | **absorbed** · S9: R-CHKS.1 … R-CHKS.14; S5: R-TUI-029.4 | Batch 2026-07-18-batch-49: the Checks screen is S9.3 (S9 D9-3). .1 → R-CHKS.5 … .7, .10; .4 → R-CHKS.8, R-CHKS-009; .5 → R-CHKS.13; .8 → R-CHKS.14 (I1-D3). |
+| HLR-N8-3 · LLR-N8-3.2 | **absorbed** · S3: R-LEGEND-MAP.2, R-LEGEND-MAP.3 | Batch 2026-07-23-batch-n8. Band rows derived from S4 CTX-ENTROPY (CTX-LEGEND "map sheet"). |
+| HLR-111 · LLR-111.1, .2 | **absorbed** · S4: R-TUI-103B.4, R-TUI-103B.3, R-TUI-062.9 | Batch 2026-08-01-batch-77. Widths by mapped bytes; one ╱ column per gap. |
 
 
 #### S0.3 · The requirements file (CTX-CANON; from batch-101 Inc 1)
@@ -722,10 +734,10 @@ CTX-LOAD  Loading a file
 | R-VAL-002.2 | If | If a line before the end of reading has one or more line defects, then the system shall record exactly one diagnostic for it. |
 | R-VAL-002.3 | If | If a line has more than one line defect, then the system shall give its diagnostic the message of the first defect in check order. |
 | R-VAL-002.4 | If | If a line has a line defect, then the system shall read the line that follows it. |
-| R-READ-003 | If | If a line has defect L-1, then the system shall record the diagnostic `Invalid UTF-8: not valid UTF-8 text`. |
+| R-READ.3 | If | If a line has defect L-1, then the system shall record the diagnostic `Invalid UTF-8: not valid UTF-8 text`. |
 | R-READ-004.1 | If | If the file to load does not exist, then the system shall end the load with a file-not-found error. |
 | R-READ-004.2 | If | If the file to load does not exist, then the system shall give no load result. |
-| R-READ-005 | If | If an S19 file has no terminator, then the system shall attach the integrity notice `S19-NO-TERMINATOR`. |
+| R-READ.5 | If | If an S19 file has no terminator, then the system shall attach the integrity notice `S19-NO-TERMINATOR`. |
 | R-READ-006.1 | If | If the data-record tally of an S19 file is at most 0xFFFF and differs from the count in its S5 record, then the system shall attach the integrity notice `S19-COUNT-MISMATCH`. |
 | R-READ-006.2 | If | If the data-record tally of an S19 file is at most 0xFFFFFF and differs from the count in its S6 record, then the system shall attach the integrity notice `S19-COUNT-MISMATCH`. |
 | R-READ-006.3 | If | If an S19 file holds more than one S5 record or more than one S6 record, then the system shall compare the data-record tally with the count in the last record of that type. |
@@ -734,7 +746,7 @@ CTX-LOAD  Loading a file
 | R-READ-007.3 | If | If an S19 file has trailing lines, then the system shall attach the integrity notice `S19-AFTER-TERMINATOR`. |
 | R-READ-007.4 | If | If an Intel HEX file has trailing lines, then the system shall attach the integrity notice `HEX-AFTER-EOF`. |
 | R-READ-007.5 | If | If a file has trailing lines, then the system shall state their number in its after-the-end integrity notice. |
-| R-READ-008 | If | If an Intel HEX file has no EOF record, then the system shall attach the integrity notice `HEX-NO-EOF`. |
+| R-READ.8 | If | If an Intel HEX file has no EOF record, then the system shall attach the integrity notice `HEX-NO-EOF`. |
 | R-LOG-001.1 | When | When the load of an S19 file ends, the system shall write the INFO log line `S19 load summary: path=<path> records=<n> errors=<e> validation_errors=<v> parse_errors=<p>`. |
 | R-LOG-001.2 | When | When the load of an Intel HEX file ends, the system shall write the INFO log line `HEX load summary: path=<path> records=<n> addresses=<a> errors=<e>`. |
 
@@ -770,15 +782,15 @@ CTX-S19  Motorola S-record (S19)
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-PARSE-001 | If | If an S19 line has defect S-1, then the system shall record the diagnostic `Invalid S-record format: <line>`. |
-| R-PARSE-001b | If | If an S19 line has defect S-2, then the system shall record the diagnostic `Unsupported S-record type: <type>`. |
+| R-PARSE.1 | If | If an S19 line has defect S-1, then the system shall record the diagnostic `Invalid S-record format: <line>`. |
+| R-PARSE.7 | If | If an S19 line has defect S-2, then the system shall record the diagnostic `Unsupported S-record type: <type>`. |
 | R-PARSE-002 | If | If an S19 line has defect S-3, then the system shall record the diagnostic `Invalid byte count hex: <count>`. |
-| R-PARSE-002a | If | If an S19 line has defect S-4, then the system shall record the diagnostic `Length mismatch: expected <n> chars, found <m>`. |
-| R-PARSE-003a | If | If an S19 line has defect S-5, then the system shall record the diagnostic `Line too short for address field`. |
-| R-PARSE-003 | If | If an S19 line has defect S-6, then the system shall record the diagnostic `Invalid address hex: <address>`. |
-| R-PARSE-004 | If | If an S19 line has defect S-7, then the system shall record the diagnostic `Invalid data byte hex: <xx>` for the first such byte. |
-| R-PARSE-005 | If | If an S19 line has defect S-8, then the system shall record the diagnostic `Invalid checksum hex: <xx>`. |
-| R-PARSE-006 | U | The system shall read the hexadecimal digits a–f as the same values as A–F. |
+| R-PARSE.8 | If | If an S19 line has defect S-4, then the system shall record the diagnostic `Length mismatch: expected <n> chars, found <m>`. |
+| R-PARSE.9 | If | If an S19 line has defect S-5, then the system shall record the diagnostic `Line too short for address field`. |
+| R-PARSE.3 | If | If an S19 line has defect S-6, then the system shall record the diagnostic `Invalid address hex: <address>`. |
+| R-PARSE.4 | If | If an S19 line has defect S-7, then the system shall record the diagnostic `Invalid data byte hex: <xx>` for the first such byte. |
+| R-PARSE.5 | If | If an S19 line has defect S-8, then the system shall record the diagnostic `Invalid checksum hex: <xx>`. |
+| R-PARSE.6 | U | The system shall read the hexadecimal digits a–f as the same values as A–F. |
 | R-VAL-001.1 | If | If an S19 record does not follow the checksum rule, then the system shall mark the record invalid. |
 | R-VAL-001.2 | If | If an S19 record does not follow the checksum rule, then the system shall record the diagnostic `Checksum mismatch: expected <XX>, found <YY>`. |
 
@@ -814,22 +826,22 @@ CTX-HEX  Intel HEX
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-HEX-004 | If | If an Intel HEX line has defect H-1, then the system shall record the diagnostic `Missing ':' prefix`. |
+| R-HEX.4 | If | If an Intel HEX line has defect H-1, then the system shall record the diagnostic `Missing ':' prefix`. |
 | R-HEX-005.1 | If | If an Intel HEX line has defect H-2, then the system shall record the diagnostic `Line too short: <n> chars`. |
 | R-HEX-005.2 | If | If an Intel HEX line has defect H-3, then the system shall record the diagnostic `Invalid byte count hex: <xx>`. |
-| R-HEX-006 | If | If an Intel HEX line has defect H-4, then the system shall record the diagnostic `Length mismatch: expected <n>, found <m>`. |
+| R-HEX.6 | If | If an Intel HEX line has defect H-4, then the system shall record the diagnostic `Length mismatch: expected <n>, found <m>`. |
 | R-HEX-005.3 | If | If an Intel HEX line has defect H-5, then the system shall record the diagnostic `Invalid address hex: <xxxx>`. |
 | R-HEX-005.4 | If | If an Intel HEX line has defect H-6, then the system shall record the diagnostic `Invalid record type hex: <xx>`. |
 | R-HEX-005.5 | If | If an Intel HEX line has defect H-8, then the system shall record the diagnostic `Invalid data byte hex: <xx>` for the first such byte. |
 | R-HEX-005.6 | If | If an Intel HEX line has defect H-9, then the system shall record the diagnostic `Invalid checksum hex: <xx>`. |
 | R-HEX-007.1 | If | If an Intel HEX record does not follow the checksum rule, then the system shall mark the record invalid. |
 | R-HEX-007.2 | If | If an Intel HEX record does not follow the checksum rule, then the system shall record the diagnostic `Checksum mismatch`. |
-| R-HEX-008 | If | If an Intel HEX line has defect H-7, then the system shall record the diagnostic `Unsupported record type: <XX>`. |
-| R-HEX-009 | While | While no address-base record has been applied, the system shall place each data byte at the record offset + the byte index. |
-| R-HEX-001 | While | While the most recently applied address-base record is type 04, the system shall place each data byte at the linear base + the record offset + the byte index. |
+| R-HEX.8 | If | If an Intel HEX line has defect H-7, then the system shall record the diagnostic `Unsupported record type: <XX>`. |
+| R-HEX.9 | While | While no address-base record has been applied, the system shall place each data byte at the record offset + the byte index. |
+| R-HEX.1 | While | While the most recently applied address-base record is type 04, the system shall place each data byte at the linear base + the record offset + the byte index. |
 | R-HEX-001a.1 | If | If a type-04 record does not hold exactly 2 data bytes, then the system shall keep the current address base. |
 | R-HEX-001a.2 | If | If a type-04 record does not hold exactly 2 data bytes, then the system shall record the diagnostic `Invalid extended linear address record length`. |
-| R-HEX-002 | While | While the most recently applied address-base record is type 02, the system shall place each data byte at the segment base + ((the record offset + the byte index) mod 0x10000). |
+| R-HEX.2 | While | While the most recently applied address-base record is type 02, the system shall place each data byte at the segment base + ((the record offset + the byte index) mod 0x10000). |
 | R-HEX-002a.1 | If | If a type-02 record does not hold exactly 2 data bytes, then the system shall keep the current address base. |
 | R-HEX-002a.2 | If | If a type-02 record does not hold exactly 2 data bytes, then the system shall record the diagnostic `Invalid extended segment address record length`. |
 | R-HEX-003.1 | When | When the system reads a type-03 or type-05 record, the system shall add no byte to the image. |
@@ -852,19 +864,19 @@ CTX-IMAGE  The memory image
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-IMG-006 | U | The system shall place in the image only bytes of data records. |
-| R-IMG-001 | If | If more than one data record writes an address, then the system shall keep in the image the byte of the data record that comes last in the file. |
+| R-IMG.6 | U | The system shall place in the image only bytes of data records. |
+| R-IMG.1 | If | If more than one data record writes an address, then the system shall keep in the image the byte of the data record that comes last in the file. |
 | R-IMG-002.1 | If | If a file has overlap addresses, then the system shall include each one in the load result. |
 | R-IMG-002.2 | If | If a file has overlap addresses, then the system shall list them in ascending order. |
-| R-IMG-003 | If | If an S19 file has an out-of-order record, then the system shall include in the load result its line number, its start address and the start address of the data record before it. |
+| R-IMG.3 | If | If an S19 file has an out-of-order record, then the system shall include in the load result its line number, its start address and the start address of the data record before it. |
 | R-IMG-004.1 | When | When a load ends, the system shall include the ranges of the image in the load result. |
 | R-IMG-004.2 | When | When a load ends, the system shall list the ranges in ascending order of start address. |
 | R-IMG-005.1 | When | When a caller asks whether a span that one range holds whole lies in the image, the system shall answer yes. |
 | R-IMG-005.2 | When | When a caller asks whether a span that no single range holds whole lies in the image, the system shall answer no. |
 | R-IMG-005.3 | If | If a caller asks whether a span of length 0 or less lies in the image, then the system shall answer no. |
-| R-VAL-001a | If | If a data record is invalid, then the system shall place its data bytes in the image. |
-| R-VAL-001b | If | If a data record is invalid, then the system shall mark as invalid each range that holds its bytes. |
-| R-HEX-007a | If | If an Intel HEX address-base record is invalid, then the system shall apply its address base. |
+| R-VAL.57 | If | If a data record is invalid, then the system shall place its data bytes in the image. |
+| R-VAL.58 | If | If a data record is invalid, then the system shall mark as invalid each range that holds its bytes. |
+| R-HEX.10 | If | If an Intel HEX address-base record is invalid, then the system shall apply its address base. |
 
 #### S1.5 · Text from a file, on screen
 
@@ -915,7 +927,7 @@ CTX-TEXT  Text from a file, on screen
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-VER-001 | When | When the system reports its version, the system shall report the version declared in the package metadata. |
+| R-VER.1 | When | When the system reports its version, the system shall report the version declared in the package metadata. |
 
 The command-line tool (`python -m s19_app.cli`) is removed (D-11): its 59 strict rows, CTX-CLI, D-12, D-13 and Q-F go with it. The rows stay in revision 1 of this file (`review/archive/S1-ears-strict.rev1.md`) if the decision is reversed.
 
@@ -2208,17 +2220,17 @@ map sheet       Four boxes in one column, each a title and its lines:
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-VAL-010 | When | When the system adds an issue to the issue list, the system shall remove ANSI escape sequences from its message. |
-| R-VAL-011 | When | When the system adds an issue to the issue list, the system shall remove the characters U+0000–U+001F and U+007F from its message. |
-| R-VAL-012 | If | If an issue message is longer than 500 characters, then the system shall cut it to 500 characters ending in `…[truncated]`. |
-| R-VAL-013 | If | If the issue list would hold the same issue twice, then the system shall keep only the first. |
-| R-VAL-014 | When | When the operator loads an S19, Intel HEX, A2L or MAC file, the system shall rebuild the issue list. |
-| R-VAL-015 | If | If no file is loaded, then the system shall hold an empty issue list. |
-| R-VAL-016 | If | If a load has an integrity notice (S1 R-READ-005 … 008), then the system shall raise an ERROR issue whose code is the notice's code and whose message is the notice's text. |
-| R-VAL-017 | If | If a load records a line diagnostic (S1), then the system shall raise the ERROR issue `LOAD_LINE_DIAGNOSTIC` with the diagnostic's line number and message. |
-| R-VAL-018 | If | If a MAC file cannot be read, then the system shall raise the ERROR issue `MAC_READ_FAILED` with the read error as its message. |
-| R-VAL-055 | When | When the system builds the issue list for an A2L that has an enriched tag list, the system shall check the tags of that enriched list. |
-| R-VAL-056 | If | If the system builds the issue list for an A2L that has no enriched tag list, then the system shall check the A2L's parsed tags. |
+| R-VAL.10 | When | When the system adds an issue to the issue list, the system shall remove ANSI escape sequences from its message. |
+| R-VAL.11 | When | When the system adds an issue to the issue list, the system shall remove the characters U+0000–U+001F and U+007F from its message. |
+| R-VAL.12 | If | If an issue message is longer than 500 characters, then the system shall cut it to 500 characters ending in `…[truncated]`. |
+| R-VAL.13 | If | If the issue list would hold the same issue twice, then the system shall keep only the first. |
+| R-VAL.14 | When | When the operator loads an S19, Intel HEX, A2L or MAC file, the system shall rebuild the issue list. |
+| R-VAL.15 | If | If no file is loaded, then the system shall hold an empty issue list. |
+| R-VAL.16 | If | If a load has an integrity notice (S1 R-READ.5 … R-READ.8), then the system shall raise an ERROR issue whose code is the notice's code and whose message is the notice's text. |
+| R-VAL.17 | If | If a load records a line diagnostic (S1), then the system shall raise the ERROR issue `LOAD_LINE_DIAGNOSTIC` with the diagnostic's line number and message. |
+| R-VAL.18 | If | If a MAC file cannot be read, then the system shall raise the ERROR issue `MAC_READ_FAILED` with the read error as its message. |
+| R-VAL.55 | When | When the system builds the issue list for an A2L that has an enriched tag list, the system shall check the tags of that enriched list. |
+| R-VAL.56 | If | If the system builds the issue list for an A2L that has no enriched tag list, then the system shall check the A2L's parsed tags. |
 
 #### S3.2 · Issue producers (CTX-ISSUE)
 
@@ -2226,56 +2238,56 @@ map sheet       Four boxes in one column, each a title and its lines:
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-VAL-020 | If | If a MAC record has a parse error, then the system shall raise the ERROR issue `MAC_PARSE_ERROR` with the record's line number and its parse error as the message. |
-| R-VAL-021 | If | If two or more valid MAC records have the same name, ignoring case, then the system shall raise one ERROR issue `MAC_DUPLICATE_NAME` with the message `MAC symbol '<name>' is defined multiple times.` |
-| R-VAL-022 | If | If a shared address is a hard conflict, then the system shall raise one ERROR issue `MAC_DUPLICATE_ADDRESS` for it. |
-| R-VAL-023 | If | If a shared address is a segment ambiguity or an alias candidate, then the system shall raise one WARNING issue `MAC_DUPLICATE_ADDRESS` for it. |
-| R-VAL-024 | If | If a shared address is a bit-field sharing, then the system shall raise one INFO issue `MAC_DUPLICATE_ADDRESS` for it. |
-| R-VAL-025 | When | When the system raises `MAC_DUPLICATE_ADDRESS`, the system shall give it the message `Address <address> has duplicate MAC symbols (<kind>): <names>.` |
+| R-VAL.20 | If | If a MAC record has a parse error, then the system shall raise the ERROR issue `MAC_PARSE_ERROR` with the record's line number and its parse error as the message. |
+| R-VAL.21 | If | If two or more valid MAC records have the same name, ignoring case, then the system shall raise one ERROR issue `MAC_DUPLICATE_NAME` with the message `MAC symbol '<name>' is defined multiple times.` |
+| R-VAL.22 | If | If a shared address is a hard conflict, then the system shall raise one ERROR issue `MAC_DUPLICATE_ADDRESS` for it. |
+| R-VAL.23 | If | If a shared address is a segment ambiguity or an alias candidate, then the system shall raise one WARNING issue `MAC_DUPLICATE_ADDRESS` for it. |
+| R-VAL.24 | If | If a shared address is a bit-field sharing, then the system shall raise one INFO issue `MAC_DUPLICATE_ADDRESS` for it. |
+| R-VAL.25 | When | When the system raises `MAC_DUPLICATE_ADDRESS`, the system shall give it the message `Address <address> has duplicate MAC symbols (<kind>): <names>.` |
 
 **A2L** (any session with an A2L file)
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-VAL-030 | If | If the A2L file has a parse error (S2 R-A2L-001.4 … 001.6), then the system shall raise the ERROR issue `A2L_STRUCTURE_ERROR` with the parse error as its message. |
+| R-VAL.30 | If | If the A2L file has a parse error (S2 R-A2L-001.4 … 001.6), then the system shall raise the ERROR issue `A2L_STRUCTURE_ERROR` with the parse error as its message. |
 | R-VAL-031 | If | If two or more tags have the same name, ignoring case, then the system shall raise one ERROR issue `A2L_DUPLICATE_SYMBOL` with the message `A2L symbol '<name>' is defined multiple times.` |
 | R-VAL-032.1 | If | If an A2L section's name is not an ASAM block name and the section is not inside an IF_DATA block, then the system shall raise the WARNING issue `A2L_UNRECOGNIZED_BLOCK` with the section's line number and the message `Unrecognized A2L block '<NAME>'.` |
 | R-VAL-032.2 | U | The system shall raise no `A2L_UNRECOGNIZED_BLOCK` issue for an A2L section whose name is an ASAM block name. |
 | R-VAL-032.3 | U | The system shall raise no `A2L_UNRECOGNIZED_BLOCK` issue for an A2L section inside an IF_DATA block. |
 | R-VAL-033 | If | If a GROUP or FUNCTION refers, inline or in a child REF_CHARACTERISTIC, REF_MEASUREMENT, DEF_CHARACTERISTIC, IN_MEASUREMENT or OUT_MEASUREMENT block, to a name that no tag has, then the system shall raise the WARNING issue `A2L_BROKEN_REFERENCE` with the message `<GROUP\|FUNCTION> references unknown symbol '<name>'.` |
-| R-VAL-034 | U | The system shall compare a reference with tag names respecting case. |
-| R-VAL-035 | If | If a tag's schema is not complete (S2 R-A2L-072) and no ERROR A2L issue names it, then the system shall raise the ERROR issue `A2L_TAG_SCHEMA_INCOMPLETE` with the message `A2L tag '<name>' is schema-incomplete: <reason>.` |
-| R-VAL-036 | If | If a tag's address is more than 0xFFFFFFFF, then the system shall raise the WARNING issue `A2L_ADDRESS_EXCEEDS_32BIT` with the message `A2L tag '<name>' address <address> exceeds the 32-bit address range (> 0xFFFFFFFF).` |
-| R-VAL-037 | If | If a tag's BYTE_ORDER value is not a byte order (S2 R-A2L-028), then the system shall raise the WARNING issue `A2L_UNKNOWN_BYTE_ORDER` with the message `A2L tag '<name>' has unknown byte order '<value>'.` |
-| R-VAL-038 | If | If an A2L issue would name an unnamed tag, then the system shall use `Unnamed A2L tag at address <address>` in its message, or `Unnamed A2L tag (no address recorded)` when the tag has no address. |
+| R-VAL.34 | U | The system shall compare a reference with tag names respecting case. |
+| R-VAL.35 | If | If a tag's schema is not complete (S2 R-A2L-072) and no ERROR A2L issue names it, then the system shall raise the ERROR issue `A2L_TAG_SCHEMA_INCOMPLETE` with the message `A2L tag '<name>' is schema-incomplete: <reason>.` |
+| R-VAL.36 | If | If a tag's address is more than 0xFFFFFFFF, then the system shall raise the WARNING issue `A2L_ADDRESS_EXCEEDS_32BIT` with the message `A2L tag '<name>' address <address> exceeds the 32-bit address range (> 0xFFFFFFFF).` |
+| R-VAL.37 | If | If a tag's BYTE_ORDER value is not a byte order (S2 R-A2L-028), then the system shall raise the WARNING issue `A2L_UNKNOWN_BYTE_ORDER` with the message `A2L tag '<name>' has unknown byte order '<value>'.` |
+| R-VAL.38 | If | If an A2L issue would name an unnamed tag, then the system shall use `Unnamed A2L tag at address <address>` in its message, or `Unnamed A2L tag (no address recorded)` when the tag has no address. |
 
 **Between files** (primary session)
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-VAL-040 | If | If a valid MAC record's address is not in the primary image, then the system shall raise the WARNING issue `CROSS_MAC_S19_OUT_OF_RANGE` with the message `MAC symbol '<name>' address <address> not present in S19 image.` |
-| R-VAL-041 | If | If a valid MAC record's address is an overlap address of the primary image, then the system shall raise the WARNING issue `CROSS_MAC_S19_OVERLAP_AMBIGUOUS` with the message `MAC symbol '<name>' points to overlapped S19 address <address>.` |
-| R-VAL-042 | If | If a checked tag is out of image (S2 CTX-A2L-CHECK), then the system shall raise the WARNING issue `CROSS_A2L_S19_OUT_OF_RANGE` with the message `A2L symbol '<name>' range is not fully present in S19 image.` |
-| R-VAL-043 | If | If any byte of a checked tag's span is an overlap address, then the system shall raise the WARNING issue `CROSS_A2L_S19_OVERLAP_AMBIGUOUS` with the message `A2L symbol '<name>' points to overlapped S19 address <address>.` |
-| R-VAL-044 | If | If an A2L tag and a valid MAC record have the same name, ignoring case, and different addresses, then the system shall raise the ERROR issue `TRIPLE_NAME_ADDRESS_MISMATCH` with the message `Symbol '<name>' has address mismatch (A2L=<address>, MAC=<address>).` |
-| R-VAL-045 | If | If a MAC file is loaded and a tag with an address has no valid MAC record of the same name, then the system shall raise the WARNING issue `CROSS_A2L_ONLY_SYMBOL` with the message `A2L symbol '<name>' missing from MAC.` |
-| R-VAL-046 | If | If an A2L file is loaded and a valid MAC record has no tag of the same name, then the system shall raise the WARNING issue `CROSS_MAC_ONLY_SYMBOL` with the message `MAC symbol '<name>' missing from A2L.` |
-| R-VAL-047 | When | When the system names a tag or MAC record in an issue, the system shall use the name as the file writes it, from its first occurrence. |
-| R-VAL-048 | When | When the system raises `TRIPLE_NAME_ADDRESS_MISMATCH`, the system shall give the issue the A2L tag's address. |
+| R-VAL.40 | If | If a valid MAC record's address is not in the primary image, then the system shall raise the WARNING issue `CROSS_MAC_S19_OUT_OF_RANGE` with the message `MAC symbol '<name>' address <address> not present in S19 image.` |
+| R-VAL.41 | If | If a valid MAC record's address is an overlap address of the primary image, then the system shall raise the WARNING issue `CROSS_MAC_S19_OVERLAP_AMBIGUOUS` with the message `MAC symbol '<name>' points to overlapped S19 address <address>.` |
+| R-VAL.42 | If | If a checked tag is out of image (S2 CTX-A2L-CHECK), then the system shall raise the WARNING issue `CROSS_A2L_S19_OUT_OF_RANGE` with the message `A2L symbol '<name>' range is not fully present in S19 image.` |
+| R-VAL.43 | If | If any byte of a checked tag's span is an overlap address, then the system shall raise the WARNING issue `CROSS_A2L_S19_OVERLAP_AMBIGUOUS` with the message `A2L symbol '<name>' points to overlapped S19 address <address>.` |
+| R-VAL.44 | If | If an A2L tag and a valid MAC record have the same name, ignoring case, and different addresses, then the system shall raise the ERROR issue `TRIPLE_NAME_ADDRESS_MISMATCH` with the message `Symbol '<name>' has address mismatch (A2L=<address>, MAC=<address>).` |
+| R-VAL.45 | If | If a MAC file is loaded and a tag with an address has no valid MAC record of the same name, then the system shall raise the WARNING issue `CROSS_A2L_ONLY_SYMBOL` with the message `A2L symbol '<name>' missing from MAC.` |
+| R-VAL.46 | If | If an A2L file is loaded and a valid MAC record has no tag of the same name, then the system shall raise the WARNING issue `CROSS_MAC_ONLY_SYMBOL` with the message `MAC symbol '<name>' missing from A2L.` |
+| R-VAL.47 | When | When the system names a tag or MAC record in an issue, the system shall use the name as the file writes it, from its first occurrence. |
+| R-VAL.48 | When | When the system raises `TRIPLE_NAME_ADDRESS_MISMATCH`, the system shall give the issue the A2L tag's address. |
 
 **Coverage**
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-VAL-050 | U | The system shall compute MAC→S19 coverage as CTX-ISSUE defines it, in percent. |
-| R-VAL-053 | U | The system shall compute A2L→S19 coverage as CTX-ISSUE defines it, in percent. |
-| R-VAL-054 | U | The system shall compute A2L↔MAC coverage as CTX-ISSUE defines it, in percent. |
-| R-VAL-051 | If | If the count a coverage divides by is 0, then the system shall give that coverage as 0.0 %. |
-| R-VAL-052 | If | If no primary image is loaded, then the system shall compute no coverage. |
+| R-VAL.50 | U | The system shall compute MAC→S19 coverage as CTX-ISSUE defines it, in percent. |
+| R-VAL.53 | U | The system shall compute A2L→S19 coverage as CTX-ISSUE defines it, in percent. |
+| R-VAL.54 | U | The system shall compute A2L↔MAC coverage as CTX-ISSUE defines it, in percent. |
+| R-VAL.51 | If | If the count a coverage divides by is 0, then the system shall give that coverage as 0.0 %. |
+| R-VAL.52 | If | If no primary image is loaded, then the system shall compute no coverage. |
 
 #### S3.3 · The Issues screen (CTX-ISSUES-SCREEN)
 
-Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED-001. File-derived text here follows S1's R-TUI-103 family (the Issues view is on its list).
+Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED.1. File-derived text here follows S1's R-TUI-103 family (the Issues view is on its list).
 
 | Id | Form | Requirement |
 |---|---|---|
@@ -2289,7 +2301,7 @@ Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED-
 | R-TUI-042b.4 | When | When the system shows an issue, the system shall show its issue row in the colour of its severity. |
 | R-TUI-042b.5 | U | The system shall order the filtered list by severity rank, keeping the order of the issue list among issues of the same severity. |
 | R-TUI-042b.6 | U | The system shall show no text between a group header and the group's first issue row. |
-| R-ISSUES-RELATED-001 | When | When the system shows an issue row, the system shall show the issue's related artifacts joined by `, `, or `-` when it has none. |
+| R-ISSUES-RELATED.1 | When | When the system shows an issue row, the system shall show the issue's related artifacts joined by `, `, or `-` when it has none. |
 | R-TUI-025.4 | When | When the operator presses `Issues: All`, the system shall show every issue. |
 | R-TUI-025.5 | When | When the operator presses `Errors`, the system shall show only ERROR issues. |
 | R-TUI-025.6 | When | When the operator presses `Warnings`, the system shall show only WARNING issues. |
@@ -2310,14 +2322,14 @@ Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED-
 
 #### S3.4 · Colours and the legend (CTX-LEGEND)
 
-Replaces: the A2L and MAC colour blocks (their rules are S2 R-A2L-080 … 088 and R-MAC-031 … 035), amendments C and F, R-LEGEND-SOURCE-001, R-LEGEND-MODAL-001, R-LEGEND-GEOMETRY-001, R-TUI-047.
+Replaces: the A2L and MAC colour blocks (their rules are S2 R-A2L-080 … 088 and R-MAC-031 … 035), amendments C and F, R-LEGEND-SOURCE.1, R-LEGEND-MODAL-001, R-LEGEND-GEOMETRY-001, R-TUI.47.
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-LEGEND-010 | U | The system shall draw every severity colour, on every screen, from the palette of CTX-LEGEND. |
-| R-LEGEND-011 | U | The system shall show the legend rows of CTX-LEGEND. |
-| R-LEGEND-SOURCE-001 | U | The system shall show the same legend rows in the legend window and in the project report. |
-| R-TUI-047 | U | The system shall name each colour of the Hex block after the style the hex view uses for it. |
+| R-LEGEND.10 | U | The system shall draw every severity colour, on every screen, from the palette of CTX-LEGEND. |
+| R-LEGEND.11 | U | The system shall show the legend rows of CTX-LEGEND. |
+| R-LEGEND-SOURCE.1 | U | The system shall show the same legend rows in the legend window and in the project report. |
+| R-TUI.47 | U | The system shall name each colour of the Hex block after the style the hex view uses for it. |
 | R-LEGEND-MODAL-001.1 | When | When the operator presses `k` outside a text box, the system shall open the legend window. |
 | R-LEGEND-MODAL-001.2 | When | When the operator presses `Legend` on the MAC View or the Issues screen, the system shall open the legend window. |
 | R-LEGEND-MODAL-001.3 | If | If no file is loaded, then the system shall still open the legend window with its blocks. |
@@ -2611,7 +2623,7 @@ Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC-054 … 
 | R-TUI-062.8 | When | When the system opens the main hex view from the Memory Map, the system shall switch to the Workspace and jump to the region's start (S4.5). |
 | R-TUI-074.1 | If | If no region is selected, then the system shall show `Click a region to inspect it.` and `Double-click to open in hex.` in the inspector. |
 | R-TUI-074.2 | When | When the inspector shows a region, the system shall title it `Inspector — <start address>`. |
-| R-TUI-074.3 | When | When the inspector shows a region, the system shall show its Status: `VALID` or `INVALID` from the validity of its range (S1 R-VAL-001b). |
+| R-TUI-074.3 | When | When the inspector shows a region, the system shall show its Status: `VALID` or `INVALID` from the validity of its range (S1 R-VAL.58). |
 | R-TUI-074.4 | When | When the inspector shows a region, the system shall show its first and last address. |
 | R-TUI-074.10 | When | When the inspector shows a region, the system shall show its size, human-readable. |
 | R-TUI-074.11 | When | When the inspector shows a region, the system shall show its band glyph and name. |
@@ -4346,7 +4358,7 @@ destination       The open project's folder; the work area (.s19tool/workarea/) 
                   project is open.
 saved image       The source image plus the encoded bytes of every inside entry of the
                   open change document.
-invalid range     A range that holds a byte of an invalid record (S1 R-VAL-001b).
+invalid range     A range that holds a byte of an invalid record (S1 R-VAL.58).
 header data       The data of the S0 record of a written S19 file.
 save suffix       " — <n> entries applied before this save (<A8>, …)", then, when the
                   saved image holds entries the last apply did not apply,
@@ -4723,7 +4735,7 @@ field loaded from a spec  A field that stands for one entry of the last picked s
                  spec entry) and has stayed in the field set since with its spec
                  entry's address and byte count: a field the pick created, or the
                  memory row the system put in place of such a parameter when the
-                 loaded A2L changed (R-CHKED-056). Its expected bytes belong to that
+                 loaded A2L changed (R-CHKED.56). Its expected bytes belong to that
                  address and byte count. A parameter excluded and included again, and
                  a memory row removed and added again, are fields included in this
                  session.
@@ -4793,19 +4805,19 @@ The Run checks button and its help text are S10 (R-PATCH-CHECKS-CLARITY-001).
 | R-CHK-PE-001 | When | When a check run started from the Patch Editor ends, the system shall show one result row per entry, in document order, on the Checks tab. |
 | R-CHK-PE-002 | When | When a check run started from the Patch Editor ends, the system shall colour each result row with its outcome colour. |
 | R-CHK-PE-003 | When | When a check run that is not blocked ends, the system shall show the count line as the Checks tab status. |
-| R-CHK-PE-004 | If | If a check run started from the Patch Editor was blocked, then the system shall show the blocked line as the Checks tab status. |
-| R-CHK-PE-005 | When | When a check run started from the Patch Editor ends, the system shall show the patch strip on the Checks tab. |
-| R-CHK-PE-006 | When | When a check run started from the Patch Editor ends, the system shall write its count line or blocked line to the status log. |
-| R-CHK-PE-007 | When | When a check run started from the Patch Editor ends, the system shall write one status line `[<code>] <severity>: <message>` per finding of the document. |
+| R-CHK-PE.4 | If | If a check run started from the Patch Editor was blocked, then the system shall show the blocked line as the Checks tab status. |
+| R-CHK-PE.5 | When | When a check run started from the Patch Editor ends, the system shall show the patch strip on the Checks tab. |
+| R-CHK-PE.6 | When | When a check run started from the Patch Editor ends, the system shall write its count line or blocked line to the status log. |
+| R-CHK-PE.7 | When | When a check run started from the Patch Editor ends, the system shall write one status line `[<code>] <severity>: <message>` per finding of the document. |
 | R-CHK-PE-008 | While | While the Checks tab is shown and a current run with n entries exists, the system shall show the inspector subtitle `<n> checked`. |
 | R-CHK-PE-009 | While | While the Checks tab is shown and no current run exists, the system shall show the inspector subtitle `no run yet`. |
-| R-CHK-PE-010 | While | While no current run exists, the system shall show `No check run yet: press Run checks.` as the Checks tab status. |
-| R-CHK-PE-011 | While | While no current run exists, the system shall show the patch strip with zero counts and an empty bar. |
-| R-CHK-PE-012 | While | While no current run exists, the system shall show no result row on the Checks tab. |
-| R-CHK-PE-013 | While | While a current run exists, the system shall lead each ledger row's Kind cell with the check glyph of that entry's outcome. |
-| R-CHK-PE-014 | While | While no current run exists, the system shall lead each ledger row's Kind cell with `·`. |
-| R-CHK-PE-015 | U | The system shall colour the check glyphs ✓ green, ✗ red, ◐ pale yellow and · grey. |
-| R-CHK-PE-016 | U | The system shall show result rows and run reasons in the Patch Editor as plain text, never as markup. |
+| R-CHK-PE.10 | While | While no current run exists, the system shall show `No check run yet: press Run checks.` as the Checks tab status. |
+| R-CHK-PE.11 | While | While no current run exists, the system shall show the patch strip with zero counts and an empty bar. |
+| R-CHK-PE.12 | While | While no current run exists, the system shall show no result row on the Checks tab. |
+| R-CHK-PE.13 | While | While a current run exists, the system shall lead each ledger row's Kind cell with the check glyph of that entry's outcome. |
+| R-CHK-PE.14 | While | While no current run exists, the system shall lead each ledger row's Kind cell with `·`. |
+| R-CHK-PE.15 | U | The system shall colour the check glyphs ✓ green, ✗ red, ◐ pale yellow and · grey. |
+| R-CHK-PE.16 | U | The system shall show result rows and run reasons in the Patch Editor as plain text, never as markup. |
 
 #### S9.3 · The Checks screen (CTX-CHECKS-SCREEN)
 
@@ -4813,20 +4825,20 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-CHKS-001 | When | When the operator opens the Checks screen, the system shall show the current run. |
-| R-CHKS-002 | When | When a check run started from the Patch Editor ends, the system shall update the Checks screen. |
-| R-CHKS-003 | When | When the operator undoes or redoes a Patch Editor change, the system shall update the Checks screen. |
-| R-CHKS-004 | If | If a file is loaded and no current run exists, then the system shall show the note `No check run yet — run checks from the Patch Editor.` in the grouped list. |
-| R-CHKS-005 | When | When the Checks screen shows a current run, the system shall group its result rows by outcome in the group order. |
-| R-CHKS-006 | When | When the Checks screen shows a current run, the system shall lead each non-empty group with its group header. |
-| R-CHKS-007 | When | When the Checks screen shows a current run, the system shall colour each group header and result row with the group's outcome colour. |
-| R-CHKS-008 | When | When the Checks screen shows a current run, the system shall show the aggregate line above the grouped list. |
+| R-CHKS.1 | When | When the operator opens the Checks screen, the system shall show the current run. |
+| R-CHKS.2 | When | When a check run started from the Patch Editor ends, the system shall update the Checks screen. |
+| R-CHKS.3 | When | When the operator undoes or redoes a Patch Editor change, the system shall update the Checks screen. |
+| R-CHKS.4 | If | If a file is loaded and no current run exists, then the system shall show the note `No check run yet — run checks from the Patch Editor.` in the grouped list. |
+| R-CHKS.5 | When | When the Checks screen shows a current run, the system shall group its result rows by outcome in the group order. |
+| R-CHKS.6 | When | When the Checks screen shows a current run, the system shall lead each non-empty group with its group header. |
+| R-CHKS.7 | When | When the Checks screen shows a current run, the system shall colour each group header and result row with the group's outcome colour. |
+| R-CHKS.8 | When | When the Checks screen shows a current run, the system shall show the aggregate line above the grouped list. |
 | R-CHKS-009 | While | While no current run exists, the system shall show the aggregate line with zero counts and an empty bar. |
-| R-CHKS-010 | If | If a current run holds more than 40 entries, then the system shall show the first 40 result rows in group order and the note `More check entries than shown — see the Patch Editor.` |
-| R-CHKS-011 | If | If a current run holds no entry, then the system shall show the note `No check entries to group.` |
-| R-CHKS-012 | When | When a result row's entry is linked, the system shall show the entry's linkage symbol in a cell beside the row. |
-| R-CHKS-013 | When | When the operator activates a result row by click or Enter, the system shall show the hex peek window of that entry's start address. |
-| R-CHKS-014 | U | The system shall show reasons and linkage symbols on the Checks screen as plain text, never as markup. |
+| R-CHKS.10 | If | If a current run holds more than 40 entries, then the system shall show the first 40 result rows in group order and the note `More check entries than shown — see the Patch Editor.` |
+| R-CHKS.11 | If | If a current run holds no entry, then the system shall show the note `No check entries to group.` |
+| R-CHKS.12 | When | When a result row's entry is linked, the system shall show the entry's linkage symbol in a cell beside the row. |
+| R-CHKS.13 | When | When the operator activates a result row by click or Enter, the system shall show the hex peek window of that entry's start address. |
+| R-CHKS.14 | U | The system shall show reasons and linkage symbols on the Checks screen as plain text, never as markup. |
 
 #### S9.4 · The Check Editor (CTX-CHECK-EDITOR)
 
@@ -4834,64 +4846,64 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 |---|---|---|
 | R-CHKED-001 | When | When the operator opens the Check Editor, the system shall list in the ledger's pages every parameter of the loaded A2L, one row each. |
 | R-CHKED-002 | If | If no A2L is loaded, then the system shall show the line `No A2L parameters — load an A2L (^L) to list them.` under the ledger. |
-| R-CHKED-003 | When | When the operator types in Filter, the system shall list only the parameters whose name contains the filter text, ignoring case. |
+| R-CHKED.3 | When | When the operator types in Filter, the system shall list only the parameters whose name contains the filter text, ignoring case. |
 | R-CHKED-004 | If | If no parameter matches the filter, then the system shall show the line `No parameter matches the filter.` under the ledger. |
-| R-CHKED-005 | U | The system shall show every ledger address in full. |
-| R-CHKED-006 | If | If a parameter name is wider than its column, then the system shall show its first dot-separated part, one `…` and the end of the name that fills the column. |
-| R-CHKED-007 | When | When the operator highlights a ledger row, the system shall show its address, its Fmt · Unit and its name on the full-name line. |
-| R-CHKED-008 | When | When the operator presses Include parameter, space or Enter on a ledger row, the system shall toggle that parameter's inclusion. |
-| R-CHKED-009 | U | The system shall mark each included parameter with `✓` in the ledger. |
-| R-CHKED-010 | When | When the operator returns to the Check Editor, the system shall keep included every parameter that the loaded A2L still lists. |
-| R-CHKED-011 | When | When the operator presses Add row, the system shall add a memory row from the Address, Label and Size inputs. |
-| R-CHKED-012 | If | If the Address input is not `0x` followed by hex digits, or decimal digits, then the system shall refuse the memory row with the Fields status `Check Editor: bad memory address '<text>'.` |
-| R-CHKED-013 | If | If the Size input is a number outside 1–8, then the system shall refuse the memory row with the Fields status `Check Editor: size must be 1..8 bytes, got <n>.` |
-| R-CHKED-014 | If | If the Size input is not empty and not a number, then the system shall refuse the memory row with the Fields status `Check Editor: bad size '<text>'.` |
-| R-CHKED-015 | When | When the operator presses Remove row, the system shall remove the highlighted memory row. |
-| R-CHKED-016 | When | When the field set changes, the system shall show the Fields tab lines of CTX-CHECK-EDITOR. |
-| R-CHKED-017 | If | If no field is included, then the system shall show `No fields included yet.` under the Fields head line. |
-| R-CHKED-018 | When | When the field set changes, the system shall show the field count `<n> field(s) → report` in the action row. |
-| R-CHKED-019 | When | When the operator opens the JSON tab, the system shall show the spec that Write would write. |
-| R-CHKED-020 | If | If the JSON tab text is longer than 5000 lines, then the system shall show its first 5000 lines and the line `showing 5000 of <N> lines`. |
-| R-CHKED-021 | When | When the field set changes, the system shall show the Addendum tab text of CTX-CHECK-EDITOR. |
-| R-CHKED-022 | U | The system shall offer no apply action in the Check Editor. |
-| R-CHKED-023 | U | The system shall show the struck text `APPLY — not available` in the Check Editor's action row. |
-| R-CHKED-024 | When | When the operator presses Write .chk.json, the system shall write the spec of the declared fields. |
-| R-CHKED-025 | When | When the system builds a spec, the system shall take as the expected bytes of a field included in this session the image bytes of its range. |
+| R-CHKED.5 | U | The system shall show every ledger address in full. |
+| R-CHKED.6 | If | If a parameter name is wider than its column, then the system shall show its first dot-separated part, one `…` and the end of the name that fills the column. |
+| R-CHKED.7 | When | When the operator highlights a ledger row, the system shall show its address, its Fmt · Unit and its name on the full-name line. |
+| R-CHKED.8 | When | When the operator presses Include parameter, space or Enter on a ledger row, the system shall toggle that parameter's inclusion. |
+| R-CHKED.9 | U | The system shall mark each included parameter with `✓` in the ledger. |
+| R-CHKED.10 | When | When the operator returns to the Check Editor, the system shall keep included every parameter that the loaded A2L still lists. |
+| R-CHKED.11 | When | When the operator presses Add row, the system shall add a memory row from the Address, Label and Size inputs. |
+| R-CHKED.12 | If | If the Address input is not `0x` followed by hex digits, or decimal digits, then the system shall refuse the memory row with the Fields status `Check Editor: bad memory address '<text>'.` |
+| R-CHKED.13 | If | If the Size input is a number outside 1–8, then the system shall refuse the memory row with the Fields status `Check Editor: size must be 1..8 bytes, got <n>.` |
+| R-CHKED.14 | If | If the Size input is not empty and not a number, then the system shall refuse the memory row with the Fields status `Check Editor: bad size '<text>'.` |
+| R-CHKED.15 | When | When the operator presses Remove row, the system shall remove the highlighted memory row. |
+| R-CHKED.16 | When | When the field set changes, the system shall show the Fields tab lines of CTX-CHECK-EDITOR. |
+| R-CHKED.17 | If | If no field is included, then the system shall show `No fields included yet.` under the Fields head line. |
+| R-CHKED.18 | When | When the field set changes, the system shall show the field count `<n> field(s) → report` in the action row. |
+| R-CHKED.19 | When | When the operator opens the JSON tab, the system shall show the spec that Write would write. |
+| R-CHKED.20 | If | If the JSON tab text is longer than 5000 lines, then the system shall show its first 5000 lines and the line `showing 5000 of <N> lines`. |
+| R-CHKED.21 | When | When the field set changes, the system shall show the Addendum tab text of CTX-CHECK-EDITOR. |
+| R-CHKED.22 | U | The system shall offer no apply action in the Check Editor. |
+| R-CHKED.23 | U | The system shall show the struck text `APPLY — not available` in the Check Editor's action row. |
+| R-CHKED.24 | When | When the operator presses Write .chk.json, the system shall write the spec of the declared fields. |
+| R-CHKED.25 | When | When the system builds a spec, the system shall take as the expected bytes of a field included in this session the image bytes of its range. |
 | R-CHKED-026 | When | When the system builds a spec, the system shall take as the expected bytes of a field loaded from a spec the bytes that spec declared. |
 | R-CHKED-027 | If | If a field is not a declared field, then the system shall leave it out of the spec. |
-| R-CHKED-028 | If | If fields were left out of a spec, then the system shall show the status `Check Editor: <k> field(s) outside the loaded image — not declared.` |
-| R-CHKED-029 | When | When the operator writes a spec, the system shall name it after the Write as input, or `spec.chk.json` when the input is empty. |
-| R-CHKED-030 | If | If the Write as name does not end with `.chk.json`, then the system shall append `.chk.json` to it. |
-| R-CHKED-031 | When | When the operator writes a spec, the system shall place it in the check home. |
+| R-CHKED.28 | If | If fields were left out of a spec, then the system shall show the status `Check Editor: <k> field(s) outside the loaded image — not declared.` |
+| R-CHKED.29 | When | When the operator writes a spec, the system shall name it after the Write as input, or `spec.chk.json` when the input is empty. |
+| R-CHKED.30 | If | If the Write as name does not end with `.chk.json`, then the system shall append `.chk.json` to it. |
+| R-CHKED.31 | When | When the operator writes a spec, the system shall place it in the check home. |
 | R-CHKED-032 | When | When a spec is written, the system shall show the status `Check Editor: wrote <listed name> (<n> fields, kind=check).`, where `<listed name>` is the written file's value in the Spec list: `checks/<name>` with a project open, `<name>` without one. |
-| R-CHKED-033 | When | When a spec is written, the system shall refresh the spec lists of the Check Editor, the Patch Editor and the A2B Diff screen. |
-| R-CHKED-034 | If | If the writer refuses a spec, then the system shall show the status `Check Editor: spec NOT written.` |
-| R-CHKED-035 | If | If the writer refuses a spec, then the system shall show `Write refused: <codes>.` as the Fields status. |
-| R-CHKED-036 | When | When the operator presses Validate, the system shall run the spec that Write would write against the loaded image. |
-| R-CHKED-037 | When | When a Validate run ends, the system shall show one result row per entry, coloured by outcome, under the memory form. |
-| R-CHKED-038 | When | When a Validate run ends, the system shall show `validation complete` as the Fields status. |
-| R-CHKED-039 | When | When a Validate run ends, the system shall write its count line to the status log. |
-| R-CHKED-040 | When | When the operator opens the Check Editor, writes a spec, or a project load or a Save project completes, the system shall fill the Spec dropdown with the spec list. |
+| R-CHKED.33 | When | When a spec is written, the system shall refresh the spec lists of the Check Editor, the Patch Editor and the A2B Diff screen. |
+| R-CHKED.34 | If | If the writer refuses a spec, then the system shall show the status `Check Editor: spec NOT written.` |
+| R-CHKED.35 | If | If the writer refuses a spec, then the system shall show `Write refused: <codes>.` as the Fields status. |
+| R-CHKED.36 | When | When the operator presses Validate, the system shall run the spec that Write would write against the loaded image. |
+| R-CHKED.37 | When | When a Validate run ends, the system shall show one result row per entry, coloured by outcome, under the memory form. |
+| R-CHKED.38 | When | When a Validate run ends, the system shall show `validation complete` as the Fields status. |
+| R-CHKED.39 | When | When a Validate run ends, the system shall write its count line to the status log. |
+| R-CHKED.40 | When | When the operator opens the Check Editor, writes a spec, or a project load or a Save project completes, the system shall fill the Spec dropdown with the spec list. |
 | R-CHKED-041.1 | When | When the operator picks a spec, the system shall replace the field set with one field per entry of the spec. |
 | R-CHKED-041.2 | When | When the operator picks a spec, the system shall include the named parameter of each entry that has one, in entry order. |
 | R-CHKED-041.3 | If | If an entry of a picked spec has no named parameter, then the system shall load it as a memory row with no label. |
 | R-CHKED-042 | When | When the operator picks a spec, the system shall set the Write as input to the spec's name ending in `.chk.json`. |
-| R-CHKED-043 | When | When the operator picks a spec, the system shall show the status `Check Editor: loaded '<name>' (<n> fields).` |
-| R-CHKED-044 | If | If the picked file is a link or lies outside its folder, then the system shall refuse it with the status `Check Editor: file '<name>' is outside the patches folder — not loaded.` |
-| R-CHKED-045 | If | If the picked file carries an ERROR finding, then the system shall write one status line `[<code>] <severity>: <message>` per finding. |
-| R-CHKED-046 | If | If the picked file carries an ERROR finding, then the system shall refuse it with the status `Check Editor: spec NOT loaded.` |
-| R-CHKED-047 | If | If the picked document's kind is not `check`, then the system shall refuse it with the status `Check Editor: '<name>' is a kind='<kind>' document — not a check spec.` |
-| R-CHKED-048 | U | The system shall show parameter names, labels and file names in the Check Editor as plain text, never as markup. |
-| R-CHKED-049 | While | While the Check Editor is shown at 118 × 54 or more, the system shall show Validate and Write .chk.json without scrolling. |
-| R-CHKED-050 | While | While the Check Editor is shown below 118 × 54, the system shall keep every control reachable by scrolling. |
-| R-CHKED-051 | U | The system shall show every Check Editor button as a one-row chip. |
-| R-CHKED-052 | U | The system shall give Write .chk.json the only filled style of the Check Editor. |
-| R-CHKED-053 | U | The system shall show the Check Editor legend of CTX-CHECK-EDITOR under the action row. |
-| R-CHKED-054 | When | When the system writes a spec, the system shall keep the field set unchanged. |
-| R-CHKED-055 | If | If the loaded A2L no longer lists a parameter included in this session when the operator returns to the Check Editor, then the system shall drop that parameter from the field set. |
-| R-CHKED-056 | If | If the loaded A2L no longer lists a parameter loaded from a spec when the operator returns to the Check Editor, then the system shall replace that parameter in the field set with a memory row with no label that has the address, byte count and expected bytes of its spec entry. |
+| R-CHKED.43 | When | When the operator picks a spec, the system shall show the status `Check Editor: loaded '<name>' (<n> fields).` |
+| R-CHKED.44 | If | If the picked file is a link or lies outside its folder, then the system shall refuse it with the status `Check Editor: file '<name>' is outside the patches folder — not loaded.` |
+| R-CHKED.45 | If | If the picked file carries an ERROR finding, then the system shall write one status line `[<code>] <severity>: <message>` per finding. |
+| R-CHKED.46 | If | If the picked file carries an ERROR finding, then the system shall refuse it with the status `Check Editor: spec NOT loaded.` |
+| R-CHKED.47 | If | If the picked document's kind is not `check`, then the system shall refuse it with the status `Check Editor: '<name>' is a kind='<kind>' document — not a check spec.` |
+| R-CHKED.48 | U | The system shall show parameter names, labels and file names in the Check Editor as plain text, never as markup. |
+| R-CHKED.49 | While | While the Check Editor is shown at 118 × 54 or more, the system shall show Validate and Write .chk.json without scrolling. |
+| R-CHKED.50 | While | While the Check Editor is shown below 118 × 54, the system shall keep every control reachable by scrolling. |
+| R-CHKED.51 | U | The system shall show every Check Editor button as a one-row chip. |
+| R-CHKED.52 | U | The system shall give Write .chk.json the only filled style of the Check Editor. |
+| R-CHKED.53 | U | The system shall show the Check Editor legend of CTX-CHECK-EDITOR under the action row. |
+| R-CHKED.54 | When | When the system writes a spec, the system shall keep the field set unchanged. |
+| R-CHKED.55 | If | If the loaded A2L no longer lists a parameter included in this session when the operator returns to the Check Editor, then the system shall drop that parameter from the field set. |
+| R-CHKED.56 | If | If the loaded A2L no longer lists a parameter loaded from a spec when the operator returns to the Check Editor, then the system shall replace that parameter in the field set with a memory row with no label that has the address, byte count and expected bytes of its spec entry. |
 | R-CHKED-057 | When | When the system makes an in-place write to the loaded image, the system shall clear the Check Editor's validation results. |
-| R-CHKED-058 | U | The system shall show every widget with an id of the Check Editor in at least one state of the Check Editor. |
+| R-CHKED.58 | U | The system shall show every widget with an id of the Check Editor in at least one state of the Check Editor. |
 
 
 
@@ -6806,7 +6818,7 @@ sections, in this order (a section that a rule leaves out keeps the others in or
   filter block   ## Report filter applied                 (only with a filter; CTX-RPT-FILTER)
   header lines   - Project: <project>
                  - Generated (UTC): <time>
-                 - Tool version: <version>                (S1 R-VER-001)
+                 - Tool version: <version>                (S1 R-VER.1)
                  - Context bytes: <c>
                  - Execution mode: <mode>
                  - Assignment source: <source>
@@ -7116,7 +7128,7 @@ log line          report kind=project source=<project folder name> output=<repor
 | R-LEGEND-REPORT-001.2 | When | When the system writes a legend row whose label is its colour name, the system shall write it as `- **<label>** — <meaning>`. |
 | R-LEGEND-REPORT-001.3 | When | When the system writes a legend row whose label is not its colour name, the system shall write it as `- **<label>** (<colour>) — <meaning>`. |
 
-The legend rows themselves, and the rule that the report and the legend window show the same rows, are S3's (R-LEGEND-SOURCE-001, R-LEGEND-011).
+The legend rows themselves, and the rule that the report and the legend window show the same rows, are S3's (R-LEGEND-SOURCE.1, R-LEGEND.11).
 
 #### S12.3 · The sections of a variant (CTX-RPT-FILE, CTX-RPT-CELLS)
 

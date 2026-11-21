@@ -995,7 +995,7 @@ class ReportsMixin:
         """Resolve the check home path without creating anything (Inc 6).
 
         Summary:
-            The one Check-Editor Write destination (R-CHKED-031): with a
+            The one Check-Editor Write destination (R-CHKED.31): with a
             project ``<project>/checks/``, without one the COMMON
             ``workarea/patches/`` library. Path arithmetic only — Write's
             placement creates and containment-checks the folder, so this
@@ -1187,7 +1187,7 @@ class ReportsMixin:
         Summary:
             The one pick guard shared by the Patch Editor change-file pick,
             the Check Editor spec pick and the A2B Diff check-spec pick
-            (R-PATCH-DOC-DROPDOWN-001.3/.4, R-CHKED-044, R-DIFF-CHK.5). Pick
+            (R-PATCH-DOC-DROPDOWN-001.3/.4, R-CHKED.44, R-DIFF-CHK.5). Pick
             the home whose prefix starts ``value`` (the empty prefix matches
             only when it is the sole home); ``name = value[len(prefix):]``;
             ``path = folder / name`` (UNRESOLVED). Refuse — return ``None``

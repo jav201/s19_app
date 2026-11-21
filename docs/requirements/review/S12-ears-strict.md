@@ -65,7 +65,7 @@ sections, in this order (a section that a rule leaves out keeps the others in or
   filter block   ## Report filter applied                 (only with a filter; CTX-RPT-FILTER)
   header lines   - Project: <project>
                  - Generated (UTC): <time>
-                 - Tool version: <version>                (S1 R-VER-001)
+                 - Tool version: <version>                (S1 R-VER.1)
                  - Context bytes: <c>
                  - Execution mode: <mode>
                  - Assignment source: <source>
@@ -376,7 +376,7 @@ Form column: U = ubiquitous. "Code today": **Yes; tested** (test name given), **
 | R-LEGEND-REPORT-001.2 | When | When the system writes a legend row whose label is its colour name, the system shall write it as `- **<label>** — <meaning>`. | Yes; tested (test_legend_lines_renders_shared_table). |
 | R-LEGEND-REPORT-001.3 | When | When the system writes a legend row whose label is not its colour name, the system shall write it as `- **<label>** (<colour>) — <meaning>`. | Yes; tested (test_legend_lines_renders_shared_table). |
 
-The legend rows themselves, and the rule that the report and the legend window show the same rows, are S3's (R-LEGEND-SOURCE-001, R-LEGEND-011).
+The legend rows themselves, and the rule that the report and the legend window show the same rows, are S3's (R-LEGEND-SOURCE.1, R-LEGEND.11).
 
 ### S12.3 · The sections of a variant (CTX-RPT-FILE, CTX-RPT-CELLS)
 
@@ -676,7 +676,7 @@ None. No S12 finding changes the screen layout, widths, colours or glyphs. (The 
 **Passed to other groups**
 
 - **S1**: the Reports dialog's report view shows text from a file: the system's own reports (already report-safe, CTX-RPT-TEXT) and any other `.md` file placed in `reports/`, rendered as Markdown with links and raw HTML off. Add the report view to the safe-text views for control characters and markup, keeping Markdown structure; the report list and the filter dropdown are already on S7's list (D7-28).
-- **S3**: the report's legend section (R-LEGEND-REPORT-001.1 … .3) prints the same rows as the legend window; S3's D3-19 legend changes reach the report through R-LEGEND-SOURCE-001 with no S12 change.
+- **S3**: the report's legend section (R-LEGEND-REPORT-001.1 … .3) prints the same rows as the legend window; S3's D3-19 legend changes reach the report through R-LEGEND-SOURCE.1 with no S12 change.
 - **S4**: R-ENT-004 (low confidence) is now shown in the report by R-RPT-ENT.3. The report's hexdump row format (CTX-RPT-HEX, `render/hexview.py:250-277`) differs from the screens' row format of CTX-HEX; S4 owns the renderer.
 - **S5**: the 📂 folder chips have no rows anywhere (S0 HLR-139, LLR-139.1, LLR-139.2, LLR-148.10; S9 and S10 point to S5). S12 keeps only the Reports target (R-RPT-CHIP.1). The filter path box follows S5.3, so D5-8 applies to it (R-RPT-FILTER-001.8).
 - **S6**: the `t` key and the palette entry that open the Reports dialog.
@@ -690,7 +690,7 @@ None. No S12 finding changes the screen layout, widths, colours or glyphs. (The 
 
 **Received from later groups** (after all groups were written)
 
-- S12.1 (S3: the report's legend follows R-LEGEND-SOURCE-001; S3's defect items) → covered by R-LEGEND-REPORT-001.1 … .3; S3's changes reach the report with no S12 change (note above).
+- S12.1 (S3: the report's legend follows R-LEGEND-SOURCE.1; S3's defect items) → covered by R-LEGEND-REPORT-001.1 … .3; S3's changes reach the report with no S12 change (note above).
 - S12.2 (S4: low confidence) → covered by R-RPT-ENT.3.
 - S12.3 (S7: the Reports dialog) → covered by S12.9, S12.12, S12.13 (R-RPT-002.x, R-RPT-ADDENDUM-002.x, R-RPT-REGION-SKIP-001.x).
 - S12.4 (S11: region box, Generate, the last execution) → covered by R-RPT-ADDENDUM-002.1, R-RPT-002.16 … .18, .23; keeping the regions is S11's (R-RPT-REGION-PERSIST-001.1, 002.3), keeping the execution is S11 R-VAR-002.42.

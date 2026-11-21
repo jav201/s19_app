@@ -11,9 +11,9 @@ Covers (cases of ``.dev-flow/2026-11-01-batch-101/inc-6/02-test-cases.md``):
     kept by a Save project.
   - R-TUI-049.3.2/1 .. /9 - the same for the save-back prompt (a redo with no
     step keeps it).
-  - R-CHK-PE-008 .. 012, 014 - the Checks tab (subtitle, status, strip, result
+  - R-CHK-PE-008 .. R-CHK-PE.12, R-CHK-PE.14 - the Checks tab (subtitle, status, strip, result
     rows, ledger glyphs) shows a run only while it is current.
-  - R-CHKS-001, -004, -009 - the Checks screen does the same, also while it
+  - R-CHKS.1, R-CHKS.4, R-CHKS-009 - the Checks screen does the same, also while it
     stays displayed.
 
 Written from the requirements (``01-requirements.md``) and the cases, never
@@ -572,7 +572,7 @@ def test_r_tui_049_3_2_prompt_redo_with_no_step_keeps_it(tmp_path: Path) -> None
 
 
 # --------------------------------------------------------------------------- #
-# R-CHK-PE-008 .. 014 - the Checks tab shows a current run only
+# R-CHK-PE-008 .. R-CHK-PE.14 - the Checks tab shows a current run only
 # --------------------------------------------------------------------------- #
 
 
@@ -675,7 +675,7 @@ def test_r_chk_pe_009_no_run(tmp_path: Path, how: str) -> None:
 
 @pytest.mark.parametrize("how", ["load", "project"])
 def test_r_chk_pe_010_status(tmp_path: Path, how: str) -> None:
-    """R-CHK-PE-010/1, /2: after another document load / a project load the
+    """R-CHK-PE.10/1, /2: after another document load / a project load the
     Checks tab status is ``No check run yet: press Run checks.``."""
 
     async def scenario(app, pilot, log):
@@ -695,7 +695,7 @@ def test_r_chk_pe_010_status(tmp_path: Path, how: str) -> None:
 
 @pytest.mark.parametrize("how", ["load", "project"])
 def test_r_chk_pe_011_strip(tmp_path: Path, how: str) -> None:
-    """R-CHK-PE-011/1, /2: after another document load / a project load the
+    """R-CHK-PE.11/1, /2: after another document load / a project load the
     patch strip reads ``✓0 ✗0 ◐0`` over an empty bar ``░░░░░░░░``."""
 
     async def scenario(app, pilot, log):
@@ -712,7 +712,7 @@ def test_r_chk_pe_011_strip(tmp_path: Path, how: str) -> None:
 
 @pytest.mark.parametrize("how", ["load", "project"])
 def test_r_chk_pe_012_rows(tmp_path: Path, how: str) -> None:
-    """R-CHK-PE-012/1, /2: after another document load / a project load the
+    """R-CHK-PE.12/1, /2: after another document load / a project load the
     Checks tab holds no result row."""
 
     async def scenario(app, pilot, log):
@@ -732,7 +732,7 @@ def test_r_chk_pe_012_rows(tmp_path: Path, how: str) -> None:
 
 
 def test_r_chk_pe_014_glyph_after_save_back(tmp_path: Path) -> None:
-    """R-CHK-PE-014/1: a save-back that ends a run repaints the ledger: the Kind
+    """R-CHK-PE.14/1: a save-back that ends a run repaints the ledger: the Kind
     cell leads with ``·`` and the subtitle reads ``no run yet``. Before it the
     blocked run's entries read ``◐``. Base: ``◐`` stays."""
 
@@ -759,13 +759,13 @@ def test_r_chk_pe_014_glyph_after_save_back(tmp_path: Path) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# R-CHKS-001 / -004 / -009 - the Checks screen shows a current run only
+# R-CHKS.1 / R-CHKS.4 / R-CHKS-009 - the Checks screen shows a current run only
 # --------------------------------------------------------------------------- #
 
 
 @pytest.mark.parametrize("case", ["current", "stale"])
 def test_r_chks_001_screen(tmp_path: Path, case: str) -> None:
-    """R-CHKS-001/1 (``current``): the Checks screen shows the failed group
+    """R-CHKS.1/1 (``current``): the Checks screen shows the failed group
     then the passed group with their rows. /2 (``stale``): after another
     document load it shows no group, only the no-run note. Base: the stale
     groups stay."""
@@ -788,7 +788,7 @@ def test_r_chks_001_screen(tmp_path: Path, case: str) -> None:
 
 
 def test_r_chks_004_note_after_image_load(tmp_path: Path) -> None:
-    """R-CHKS-004/1: after a run and another image's load, opening the Checks
+    """R-CHKS.4/1: after a run and another image's load, opening the Checks
     screen shows ``No check run yet — run checks from the Patch Editor.``."""
 
     async def scenario(app, pilot, log):
@@ -802,7 +802,7 @@ def test_r_chks_004_note_after_image_load(tmp_path: Path) -> None:
 
 
 def test_r_chks_004_note_while_displayed(tmp_path: Path) -> None:
-    """R-CHKS-004/2: the Checks screen stays displayed while another image
+    """R-CHKS.4/2: the Checks screen stays displayed while another image
     loads; once the load's file status is painted the note is painted without
     reopening the screen, and no group header. Base: the groups stay."""
 

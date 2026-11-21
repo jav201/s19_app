@@ -193,7 +193,7 @@ destination       The open project's folder; the work area (.s19tool/workarea/) 
                   project is open.
 saved image       The source image plus the encoded bytes of every inside entry of the
                   open change document.
-invalid range     A range that holds a byte of an invalid record (S1 R-VAL-001b).
+invalid range     A range that holds a byte of an invalid record (S1 R-VAL.58).
 header data       The data of the S0 record of a written S19 file.
 save suffix       " — <n> entries applied before this save (<A8>, …)", then, when the
                   saved image holds entries the last apply did not apply,
@@ -487,7 +487,7 @@ Form column: U = ubiquitous. "Code today": **Yes**, **Yes; tested**, **Partly** 
 | D8-23 | A load with a file defect shows `Loaded : 0 entries, 1 error(s)` (`change_service.py:1599`). | `Change file not loaded: <e> error(s)` (R-CHG-001.20). |
 | D8-24 | In a MAC-only session the image has an empty range list (`app.py:11535` on a MAC load, `:1418` after a primary unload), so apply says `skipped-outside` for every entry. | Treat a session with no primary as no image: `skipped-no-image` (R-CHG-002.11). |
 | D8-25 | A blocked apply only says `Apply: 0 applied, 0 skipped, <n> blocked` (`app.py:3552`): no reason. | Name the reason (R-CHG-002.5, .6). |
-| D8-26 | S1 D-2 asked. A record with a wrong checksum keeps its bytes in the image (S1 R-VAL-001a); the save-back writes them with new, valid checksums (`io.py:1857-1862`), silently. Refusing would also block the repair of such a record by a patch. | Write, and warn naming the count and the first invalid range (R-CHG-003.22). |
+| D8-26 | S1 D-2 asked. A record with a wrong checksum keeps its bytes in the image (S1 R-VAL.57); the save-back writes them with new, valid checksums (`io.py:1857-1862`), silently. Refusing would also block the repair of such a record by a patch. | Write, and warn naming the count and the first invalid range (R-CHG-003.22). |
 | D8-27 | At width 16 the save-back writes an empty S0 (`app.py:3696-3697`), dropping the source's; HLR-153 (batch-99, newer) says the source S0 is always kept. | Keep the source S0 at both widths (R-S19-S0HEADER-001.1); synthesize only at 32 when the source has none (.2, .3). |
 | D8-28 | The synthesized header uses the name as typed (`app.py:3693-3695`), for example `..\x` or a name without suffix, not the name written. | Use the written file name (R-S19-S0HEADER-001.2). |
 | D8-29 | Every S19 terminator is written with address 0 (`io.py:1823`); the source's start address (`LoadedFile.entry_point`, `load_service.py:65-68`) is lost. A flasher that uses it starts at 0. | Write the source's terminator address on save-back (R-S19-EMIT.11); other writers keep 0 until their groups decide (S11, S13, S15, S17). |
@@ -520,7 +520,7 @@ Form column: U = ubiquitous. "Code today": **Yes**, **Yes; tested**, **Partly** 
 
 **Received from later groups** (after all groups were written)
 
-- S8.1 (S9: containment, linkage, finding codes, wire form, the apply gate for a check document; `.chk.json`) → covered by CTX-APPLY, R-CHG-LINK.1 … .6, CTX-FINDING, CTX-CHGDOC, R-CHG-002.3, .6; the `.chk.json` suffix stays S9 R-CHKED-030 (D9-14).
+- S8.1 (S9: containment, linkage, finding codes, wire form, the apply gate for a check document; `.chk.json`) → covered by CTX-APPLY, R-CHG-LINK.1 … .6, CTX-FINDING, CTX-CHGDOC, R-CHG-002.3, .6; the `.chk.json` suffix stays S9 R-CHKED.30 (D9-14).
 - S8.2 (S10: the example text and the per-entry JSON read) → rows R-CHG-001.43, .44.
 - S8.3 (S11: Save project writes through S8.7 and verifies through S8.8; terminator) → covered by S11 R-PROJ-IMAGE.6 … .9, which cite S8.7 and S8.8; the terminator is S11 D11-42; D11-33 agrees with D8-27.
 - S8.4 (S13: the CRC write) → covered by S13 R-CRC-RECWIDTH-001.4, R-CRC-WRITE-001.17, .18 (D13-28).

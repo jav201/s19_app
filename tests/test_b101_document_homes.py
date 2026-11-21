@@ -12,7 +12,7 @@ Group: where a document lives and what the three lists show.
     project: ``checks/<n>``, ``patches/<n>``, then the common library as
     ``library/<n>``; a library pick opens it; links and linked folders are
     refused with the row's exact text; the unsaved-changes popup checks again.
-  - R-CHKED-031 / -034 / -040 / -042 / -044 - the Check Editor writes into the
+  - R-CHKED.31 / R-CHKED.34 / R-CHKED.40 / R-CHKED-042 / R-CHKED.44 - the Check Editor writes into the
     check home, lists it, sets Write as to the bare name, refuses links.
   - R-DIFF-CHK.1 / .3 / .5 / .8 - the A2B Diff check-spec list follows the
     spec list.
@@ -741,7 +741,7 @@ def test_r_patch_doc_dropdown_001_4_refused(tmp_path: Path, arm: str) -> None:
 
 
 # ===========================================================================
-# R-CHKED-031 / -034 - where Write puts the spec
+# R-CHKED.31 / R-CHKED.34 - where Write puts the spec
 # ===========================================================================
 
 
@@ -749,7 +749,7 @@ def test_r_patch_doc_dropdown_001_4_refused(tmp_path: Path, arm: str) -> None:
     "arm", ["project", "no-project", "after-library-pick", "never-overwrites"]
 )
 def test_r_chked_031_write_home(tmp_path: Path, arm: str) -> None:
-    """Cases R-CHKED-031/1 .. /3, plus the free-name claim of revised D-3.
+    """Cases R-CHKED.31/1 .. /3, plus the free-name claim of revised D-3.
 
     /1: Write as ``s1.chk.json`` in a project -> ``proj/checks/s1.chk.json``
     and no ``workarea/patches/s1.chk.json``. /2: with no project -> the common
@@ -850,7 +850,7 @@ def test_r_chked_032_write_status_names_the_home(tmp_path: Path, arm: str) -> No
 
 
 def test_r_chked_034_linked_check_home(tmp_path: Path) -> None:
-    """Case R-CHKED-034/1: with ``proj/checks`` a linked folder, Write writes
+    """Case R-CHKED.34/1: with ``proj/checks`` a linked folder, Write writes
     nothing: status ``Check Editor: spec NOT written.``, the Fields status
     starts ``Write refused: MF-WRITE-CONTAINMENT``, the link target holds no
     new file.
@@ -880,7 +880,7 @@ def test_r_chked_034_linked_check_home(tmp_path: Path) -> None:
 
 
 # ===========================================================================
-# R-CHKED-040 / -042 / -044 - the Spec list
+# R-CHKED.40 / R-CHKED-042 / R-CHKED.44 - the Spec list
 # ===========================================================================
 
 
@@ -888,7 +888,7 @@ def test_r_chked_034_linked_check_home(tmp_path: Path) -> None:
     "arm", ["project", "after-write", "save-project", "project-load"]
 )
 def test_r_chked_040_spec_list(tmp_path: Path, arm: str) -> None:
-    """Cases R-CHKED-040/1 .. /3 and the project-load trigger of E3A-18.
+    """Cases R-CHKED.40/1 .. /3 and the project-load trigger of E3A-18.
 
     /1: in a project the Spec dropdown lists ``checks/k.chk.json`` then
     ``library/w.chk.json``, both labelled `` CHECK``. /2: after a Write as
@@ -970,7 +970,7 @@ def test_r_chked_042_write_as_bare_name(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("arm", ["link", "linked-folder"])
 def test_r_chked_044_refused(tmp_path: Path, arm: str) -> None:
-    """Cases R-CHKED-044/1 and /2: a pick that is a link, or lies under a
+    """Cases R-CHKED.44/1 and /2: a pick that is a link, or lies under a
     linked check home, is refused with ``Check Editor: file '<name>' is outside
     the patches folder — not loaded.`` and the collector is unchanged.
 

@@ -1014,7 +1014,7 @@ def test_tc_b97_61_every_control_displayed_in_its_home(tmp_path: Path, size) -> 
     two disabled page controls, 8 read-outs), and every control-typed shipped
     id is in the table (16). The batch-102 Inc 4 bulk-add button (E3
     ruling 5) homes in the ledger column, after Include. A control mounted and
-    never shown is the guard of R-CHKED-058/1 (the walk in
+    never shown is the guard of R-CHKED.58/1 (the walk in
     ``tests/test_b101_shown_widgets.py``).
 
     Mutation: a control left under a hidden pane; a shipped control dropped

@@ -35,21 +35,21 @@ These are the rows that broke more than form. Form-only breaks (two responses in
 |---|---|---|
 | R-READ-002 | "load the same records and the same image": the same as what? The row names no second load to compare with. | Ubiquitous: `The system shall treat CR, LF and CR LF as line ends.` |
 | R-VAL-002 | Trigger "When the system rejects a line" is the system's own response. The row then repeats what every reject row already says. | Dropped. One generic reject row, one "exactly one diagnostic" row, one precedence row, one "keep reading" row (R-VAL-002.1 … .4). |
-| R-PARSE-001 … 005, R-HEX-004 … 006 | No precedence. A line with two defects (bad address *and* bad checksum) satisfies two rows, so two diagnostics are required; the code records one. The rows contradict the code and each other. | Line defects are listed in check order in the context note; R-VAL-002.3 says the first one gives the message. |
+| R-PARSE.1 … R-PARSE.5, R-HEX.4, R-HEX-005.1 … R-HEX-005.6, R-HEX.6 | No precedence. A line with two defects (bad address *and* bad checksum) satisfies two rows, so two diagnostics are required; the code records one. The rows contradict the code and each other. | Line defects are listed in check order in the context note; R-VAL-002.3 says the first one gives the message. |
 | R-READ-006 | Says nothing of the limits the code applies on purpose: S5 is compared only while the tally is at most 0xFFFF (S6: 0xFFFFFF), and rejected lines that start with S1/S2/S3 count toward the tally. As written, the row asks for a mismatch notice the code deliberately does not give. | "Data-record tally" defined in CTX-S19; the limit is in the condition (R-READ-006.1, .2). |
-| R-HEX-009 | "While the address base is 0" is also true after a type-04 record with value 0, or a type-02 record with value 0, and the 02 rule wraps at 64 KiB. Two rows apply to the same byte. | `While no address-base record has been applied …` |
+| R-HEX.9 | "While the address base is 0" is also true after a type-04 record with value 0, or a type-02 record with value 0, and the 02 rule wraps at 64 KiB. Two rows apply to the same byte. | `While no address-base record has been applied …` |
 | R-HEX-005 | "a diagnostic that names the field": no text, so no test can check it. | One row per field with an exact message (Q-C). |
-| R-IMG-006 | "every count derived from them": which counts? Not verifiable. | Row keeps only `place in the image only bytes of data records`; ranges and overlaps follow from the definitions in CTX-IMAGE. |
+| R-IMG.6 | "every count derived from them": which counts? Not verifiable. | Row keeps only `place in the image only bytes of data records`; ranges and overlaps follow from the definitions in CTX-IMAGE. |
 | R-LOG-001 | "the diagnostic count": the log's `errors=` counts diagnostics **and** integrity notices, and the two formats log different fields. | Two rows with the exact log text (Q-G). |
 | R-CLI-005 | `--output` exists only for `dump-by-range`, not for `dump` or `dump-all`. The "`.` for an unprintable byte" rule is false for bytes 0x80–0xFF: the code prints `�`. | Split per command; the 0x80–0xFF case marked "Partly". |
 | R-CLI-003 | The `Endian:` line has no stated rule, so it cannot be verified (an S19 file carries no byte order; the value is a guess). | Row kept, Q-F asks whether to drop the line. |
 | R-CLI-007 | "`Error: <reason>`": reason not given, not verifiable. | One row per refusal with its exact reason. |
 | R-CLI-001 | "read no file": `version` takes no file argument. Not necessary (29148). | Dropped. |
-| R-VAL-001a/b, R-HEX-007a | `While a data record is invalid`: a record being invalid is not a state of the system (E4). | `If a data record is invalid, then …` |
+| R-VAL.57/b, R-HEX.10 | `While a data record is invalid`: a record being invalid is not a state of the system (E4). | `If a data record is invalid, then …` |
 
 Context notes that carried behaviour (E6):
-- CTX-S19: "Files are written in uppercase; a reader takes a–f as the same digits" → rows R-PARSE-006 and R-CLI-008.3.
-- CTX-LOAD: "Lines after it are not records" → R-READ-007.1. The list of integrity-notice codes → the codes live only in rows R-READ-005 … 008.
+- CTX-S19: "Files are written in uppercase; a reader takes a–f as the same digits" → rows R-PARSE.6 and R-CLI-008.3.
+- CTX-LOAD: "Lines after it are not records" → R-READ-007.1. The list of integrity-notice codes → the codes live only in rows R-READ.5 … R-READ.8.
 - CTX-CLI: "Addresses: printed as …", "Ranges: printed by …" → restated as format terms (`hex address`, `range line`) that rows use.
 
 Context notes that were incomplete:
@@ -96,10 +96,10 @@ CTX-LOAD  Loading a file
 | R-VAL-002.2 | If | If a line before the end of reading has one or more line defects, then the system shall record exactly one diagnostic for it. | Does it; tested. |
 | R-VAL-002.3 | If | If a line has more than one line defect, then the system shall give its diagnostic the message of the first defect in check order. | Does it for S19; HEX after Q-C. |
 | R-VAL-002.4 | If | If a line has a line defect, then the system shall read the line that follows it. | Partly: L-1 stops an S19 load today; code changes (D-3). |
-| R-READ-003 | If | If a line has defect L-1, then the system shall record the diagnostic `Invalid UTF-8: not valid UTF-8 text`. | HEX yes; S19 no: code changes (D-3). |
+| R-READ.3 | If | If a line has defect L-1, then the system shall record the diagnostic `Invalid UTF-8: not valid UTF-8 text`. | HEX yes; S19 no: code changes (D-3). |
 | R-READ-004.1 | If | If the file to load does not exist, then the system shall end the load with a file-not-found error. | Does it; tested. |
 | R-READ-004.2 | If | If the file to load does not exist, then the system shall give no load result. | Does it; tested. |
-| R-READ-005 | If | If an S19 file has no terminator, then the system shall attach the integrity notice `S19-NO-TERMINATOR`. | Does it; tested (batch-99). From HLR-154 (decision 10). |
+| R-READ.5 | If | If an S19 file has no terminator, then the system shall attach the integrity notice `S19-NO-TERMINATOR`. | Does it; tested (batch-99). From HLR-154 (decision 10). |
 | R-READ-006.1 | If | If the data-record tally of an S19 file is at most 0xFFFF and differs from the count in its S5 record, then the system shall attach the integrity notice `S19-COUNT-MISMATCH`. | Does it; tested (batch-99). From LLR-154.1 (decision 10). |
 | R-READ-006.2 | If | If the data-record tally of an S19 file is at most 0xFFFFFF and differs from the count in its S6 record, then the system shall attach the integrity notice `S19-COUNT-MISMATCH`. | Does it (read from the code). From LLR-154.1 (decision 10). |
 | R-READ-006.3 | If | If an S19 file holds more than one S5 record or more than one S6 record, then the system shall compare the data-record tally with the count in the last record of that type. | Does it (read from the code). New (Q-H). |
@@ -108,7 +108,7 @@ CTX-LOAD  Loading a file
 | R-READ-007.3 | If | If an S19 file has trailing lines, then the system shall attach the integrity notice `S19-AFTER-TERMINATOR`. | Does it; tested (batch-99). |
 | R-READ-007.4 | If | If an Intel HEX file has trailing lines, then the system shall attach the integrity notice `HEX-AFTER-EOF`. | Does it; tested (batch-99). |
 | R-READ-007.5 | If | If a file has trailing lines, then the system shall state their number in its after-the-end integrity notice. | Does it; tested (batch-99). |
-| R-READ-008 | If | If an Intel HEX file has no EOF record, then the system shall attach the integrity notice `HEX-NO-EOF`. | Does it; tested (batch-99). From LLR-154.2 (decision 10). |
+| R-READ.8 | If | If an Intel HEX file has no EOF record, then the system shall attach the integrity notice `HEX-NO-EOF`. | Does it; tested (batch-99). From LLR-154.2 (decision 10). |
 | R-LOG-001.1 | When | When the load of an S19 file ends, the system shall write the INFO log line `S19 load summary: path=<path> records=<n> errors=<e> validation_errors=<v> parse_errors=<p>`. | Does it; tested. `<e>` counts diagnostics and integrity notices together (Q-G). |
 | R-LOG-001.2 | When | When the load of an Intel HEX file ends, the system shall write the INFO log line `HEX load summary: path=<path> records=<n> addresses=<a> errors=<e>`. | Does it; tested. Same as the row above (Q-G). |
 
@@ -144,15 +144,15 @@ CTX-S19  Motorola S-record (S19)
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-PARSE-001 | If | If an S19 line has defect S-1, then the system shall record the diagnostic `Invalid S-record format: <line>`. | Does it; tested. |
-| R-PARSE-001b | If | If an S19 line has defect S-2, then the system shall record the diagnostic `Unsupported S-record type: <type>`. | Does it; tested. |
+| R-PARSE.1 | If | If an S19 line has defect S-1, then the system shall record the diagnostic `Invalid S-record format: <line>`. | Does it; tested. |
+| R-PARSE.7 | If | If an S19 line has defect S-2, then the system shall record the diagnostic `Unsupported S-record type: <type>`. | Does it; tested. |
 | R-PARSE-002 | If | If an S19 line has defect S-3, then the system shall record the diagnostic `Invalid byte count hex: <count>`. | Partly: a sign, a space, `0x`, `_` pass today (decision 1). |
-| R-PARSE-002a | If | If an S19 line has defect S-4, then the system shall record the diagnostic `Length mismatch: expected <n> chars, found <m>`. | Does it; tested. |
-| R-PARSE-003a | If | If an S19 line has defect S-5, then the system shall record the diagnostic `Line too short for address field`. | Does it (read from the code); untested. |
-| R-PARSE-003 | If | If an S19 line has defect S-6, then the system shall record the diagnostic `Invalid address hex: <address>`. | Partly, as R-PARSE-002 (decision 1). |
-| R-PARSE-004 | If | If an S19 line has defect S-7, then the system shall record the diagnostic `Invalid data byte hex: <xx>` for the first such byte. | Partly, as R-PARSE-002 (decision 1). |
-| R-PARSE-005 | If | If an S19 line has defect S-8, then the system shall record the diagnostic `Invalid checksum hex: <xx>`. | Partly, as R-PARSE-002 (decision 1). |
-| R-PARSE-006 | U | The system shall read the hexadecimal digits a–f as the same values as A–F. | Does it (decision 1). |
+| R-PARSE.8 | If | If an S19 line has defect S-4, then the system shall record the diagnostic `Length mismatch: expected <n> chars, found <m>`. | Does it; tested. |
+| R-PARSE.9 | If | If an S19 line has defect S-5, then the system shall record the diagnostic `Line too short for address field`. | Does it (read from the code); untested. |
+| R-PARSE.3 | If | If an S19 line has defect S-6, then the system shall record the diagnostic `Invalid address hex: <address>`. | Partly, as R-PARSE-002 (decision 1). |
+| R-PARSE.4 | If | If an S19 line has defect S-7, then the system shall record the diagnostic `Invalid data byte hex: <xx>` for the first such byte. | Partly, as R-PARSE-002 (decision 1). |
+| R-PARSE.5 | If | If an S19 line has defect S-8, then the system shall record the diagnostic `Invalid checksum hex: <xx>`. | Partly, as R-PARSE-002 (decision 1). |
+| R-PARSE.6 | U | The system shall read the hexadecimal digits a–f as the same values as A–F. | Does it (decision 1). |
 | R-VAL-001.1 | If | If an S19 record does not follow the checksum rule, then the system shall mark the record invalid. | Does it; tested. |
 | R-VAL-001.2 | If | If an S19 record does not follow the checksum rule, then the system shall record the diagnostic `Checksum mismatch: expected <XX>, found <YY>`. | Does it; tested. |
 
@@ -188,22 +188,22 @@ CTX-HEX  Intel HEX
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-HEX-004 | If | If an Intel HEX line has defect H-1, then the system shall record the diagnostic `Missing ':' prefix`. | Does it; tested. |
+| R-HEX.4 | If | If an Intel HEX line has defect H-1, then the system shall record the diagnostic `Missing ':' prefix`. | Does it; tested. |
 | R-HEX-005.1 | If | If an Intel HEX line has defect H-2, then the system shall record the diagnostic `Line too short: <n> chars`. | No: Python's raw text (Q-C). |
 | R-HEX-005.2 | If | If an Intel HEX line has defect H-3, then the system shall record the diagnostic `Invalid byte count hex: <xx>`. | No: Python's raw text (Q-C, decision 1). |
-| R-HEX-006 | If | If an Intel HEX line has defect H-4, then the system shall record the diagnostic `Length mismatch: expected <n>, found <m>`. | Partly: only when every field parses; a short line gives Python's text (Q-C). |
+| R-HEX.6 | If | If an Intel HEX line has defect H-4, then the system shall record the diagnostic `Length mismatch: expected <n>, found <m>`. | Partly: only when every field parses; a short line gives Python's text (Q-C). |
 | R-HEX-005.3 | If | If an Intel HEX line has defect H-5, then the system shall record the diagnostic `Invalid address hex: <xxxx>`. | No: Python's raw text (Q-C, decision 1). |
 | R-HEX-005.4 | If | If an Intel HEX line has defect H-6, then the system shall record the diagnostic `Invalid record type hex: <xx>`. | No: Python's raw text (Q-C, decision 1). |
 | R-HEX-005.5 | If | If an Intel HEX line has defect H-8, then the system shall record the diagnostic `Invalid data byte hex: <xx>` for the first such byte. | No: Python's raw text (Q-C, decision 1). |
 | R-HEX-005.6 | If | If an Intel HEX line has defect H-9, then the system shall record the diagnostic `Invalid checksum hex: <xx>`. | No: Python's raw text (Q-C, decision 1). |
 | R-HEX-007.1 | If | If an Intel HEX record does not follow the checksum rule, then the system shall mark the record invalid. | Does it; tested. |
 | R-HEX-007.2 | If | If an Intel HEX record does not follow the checksum rule, then the system shall record the diagnostic `Checksum mismatch`. | Does it; tested. |
-| R-HEX-008 | If | If an Intel HEX line has defect H-7, then the system shall record the diagnostic `Unsupported record type: <XX>`. | Message: does it; tested. Rejection: no, the record is kept today (Q-D). |
-| R-HEX-009 | While | While no address-base record has been applied, the system shall place each data byte at the record offset + the byte index. | Does it; tested. |
-| R-HEX-001 | While | While the most recently applied address-base record is type 04, the system shall place each data byte at the linear base + the record offset + the byte index. | Does it; tested. |
+| R-HEX.8 | If | If an Intel HEX line has defect H-7, then the system shall record the diagnostic `Unsupported record type: <XX>`. | Message: does it; tested. Rejection: no, the record is kept today (Q-D). |
+| R-HEX.9 | While | While no address-base record has been applied, the system shall place each data byte at the record offset + the byte index. | Does it; tested. |
+| R-HEX.1 | While | While the most recently applied address-base record is type 04, the system shall place each data byte at the linear base + the record offset + the byte index. | Does it; tested. |
 | R-HEX-001a.1 | If | If a type-04 record does not hold exactly 2 data bytes, then the system shall keep the current address base. | Does it; tested. |
 | R-HEX-001a.2 | If | If a type-04 record does not hold exactly 2 data bytes, then the system shall record the diagnostic `Invalid extended linear address record length`. | Does it; tested. |
-| R-HEX-002 | While | While the most recently applied address-base record is type 02, the system shall place each data byte at the segment base + ((the record offset + the byte index) mod 0x10000). | Partly: no wrap at 64 KiB (decision 4). |
+| R-HEX.2 | While | While the most recently applied address-base record is type 02, the system shall place each data byte at the segment base + ((the record offset + the byte index) mod 0x10000). | Partly: no wrap at 64 KiB (decision 4). |
 | R-HEX-002a.1 | If | If a type-02 record does not hold exactly 2 data bytes, then the system shall keep the current address base. | Does it; tested. |
 | R-HEX-002a.2 | If | If a type-02 record does not hold exactly 2 data bytes, then the system shall record the diagnostic `Invalid extended segment address record length`. | Does it; tested. |
 | R-HEX-003.1 | When | When the system reads a type-03 or type-05 record, the system shall add no byte to the image. | Does it; tested. |
@@ -226,19 +226,19 @@ CTX-IMAGE  The memory image
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-IMG-006 | U | The system shall place in the image only bytes of data records. | Does it; tested (batch-99). From HLR-153 (decision 10). |
-| R-IMG-001 | If | If more than one data record writes an address, then the system shall keep in the image the byte of the data record that comes last in the file. | Does it; no S1 test pins it. |
+| R-IMG.6 | U | The system shall place in the image only bytes of data records. | Does it; tested (batch-99). From HLR-153 (decision 10). |
+| R-IMG.1 | If | If more than one data record writes an address, then the system shall keep in the image the byte of the data record that comes last in the file. | Does it; no S1 test pins it. |
 | R-IMG-002.1 | If | If a file has overlap addresses, then the system shall include each one in the load result. | S19: does it; tested. HEX: no, code changes (Q-E). |
 | R-IMG-002.2 | If | If a file has overlap addresses, then the system shall list them in ascending order. | S19: does it; tested. HEX: as above. |
-| R-IMG-003 | If | If an S19 file has an out-of-order record, then the system shall include in the load result its line number, its start address and the start address of the data record before it. | Partly: the "line number" is the record position today; code changes (D-5). S19 only (Q-E). |
+| R-IMG.3 | If | If an S19 file has an out-of-order record, then the system shall include in the load result its line number, its start address and the start address of the data record before it. | Partly: the "line number" is the record position today; code changes (D-5). S19 only (Q-E). |
 | R-IMG-004.1 | When | When a load ends, the system shall include the ranges of the image in the load result. | Does it; tested. |
 | R-IMG-004.2 | When | When a load ends, the system shall list the ranges in ascending order of start address. | Does it; tested. |
 | R-IMG-005.1 | When | When a caller asks whether a span that one range holds whole lies in the image, the system shall answer yes. | Does it; tested. |
 | R-IMG-005.2 | When | When a caller asks whether a span that no single range holds whole lies in the image, the system shall answer no. | Does it; tested. |
 | R-IMG-005.3 | If | If a caller asks whether a span of length 0 or less lies in the image, then the system shall answer no. | Does it; tested. |
-| R-VAL-001a | If | If a data record is invalid, then the system shall place its data bytes in the image. | Does it (decision 2). |
-| R-VAL-001b | If | If a data record is invalid, then the system shall mark as invalid each range that holds its bytes. | Does it; computed in the display code (decisions 2, 9). |
-| R-HEX-007a | If | If an Intel HEX address-base record is invalid, then the system shall apply its address base. | Does it (decision 2). |
+| R-VAL.57 | If | If a data record is invalid, then the system shall place its data bytes in the image. | Does it (decision 2). |
+| R-VAL.58 | If | If a data record is invalid, then the system shall mark as invalid each range that holds its bytes. | Does it; computed in the display code (decisions 2, 9). |
+| R-HEX.10 | If | If an Intel HEX address-base record is invalid, then the system shall apply its address base. | Does it (decision 2). |
 
 ### S1.5 · Text from a file, on screen
 
@@ -288,7 +288,7 @@ CTX-TEXT  Text from a file, on screen
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-VER-001 | When | When the system reports its version, the system shall report the version declared in the package metadata. | Partly: the version is written in two files; code changes to one source (D-14). |
+| R-VER.1 | When | When the system reports its version, the system shall report the version declared in the package metadata. | Partly: the version is written in two files; code changes to one source (D-14). |
 
 The command-line tool (`python -m s19_app.cli`) is removed (D-11): its 59 strict rows, CTX-CLI, D-12, D-13 and Q-F go with it. The rows stay in revision 1 of this file (`review/archive/S1-ears-strict.rev1.md`) if the decision is reversed.
 
@@ -308,7 +308,7 @@ Every open point now carries a recommendation, and the rows above already follow
 | D-7 | The safe-display rule binds one function; ~150 places call it; nobody knows whether a screen shows file text without it. | **The named views now, plus a backlog item to sweep the other screens** (the sweep is S4's review). The S2 review added the A2L Explorer and the MAC View, which already meet the rule. | Backlog item only. |
 | D-8 | Two checks can never fire (data length vs count; the count re-check): earlier checks always catch the case first. | **Remove them from the requirements and from the code.** Rule use/defer/delete: code that never runs is deleted. | ~10 lines removed, no behaviour change. |
 | D-9 | "A range holding a bad-checksum record is shown invalid" is S1 behaviour computed by S4 display code. | **A row lives with the behaviour (S1), with a pointer in S4.** Requirements are grouped by what the system does, not by which file does it; the same rule holds for every later group. | Pointer in S4. |
-| D-10 | S1 rules (image holds only data records; end-record notices) sat in S0's table. | **Moved into S1** (R-IMG-006, R-READ-005 … 008), pointers left in S0. HLR-153's second sentence (how an image is *written*) goes to the S8/S17 review. | Done in the rows. |
+| D-10 | S1 rules (image holds only data records; end-record notices) sat in S0's table. | **Moved into S1** (R-IMG.6, R-READ.5 … R-READ.8), pointers left in S0. HLR-153's second sentence (how an image is *written*) goes to the S8/S17 review. | Done in the rows. |
 | D-11 | The command-line tool: runnable only as `python -m s19_app.cli`, 6 known defects, 2 of 15 behaviours tested. The README already says "the surface is going away … not being fixed". | **Remove it.** It would cost 59 rows and 6 fixes for a surface the project already dropped. D-12, D-13 and Q-F disappear with it. | One removal item (cli.py, its tests, the README section). |
 | D-14 | The version is written twice (pyproject.toml and s19_app/version.py), both 0.1.0, nothing checks they agree. Reports print it. | **One source:** `version.py` keeps it; pyproject reads it (`dynamic = ["version"]`). | Two-line change in pyproject.toml. |
 | D-15 | Three helper functions nothing uses; source comments carry batch history and requirement ids. | **Remove the helpers. Keep the requirement ids in comments** (code → requirement trace is mandatory); drop batch narrative only when a file is touched anyway. | Backlog item. |

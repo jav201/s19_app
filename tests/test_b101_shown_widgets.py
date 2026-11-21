@@ -2,7 +2,7 @@
 state, and the Addendum tab does what the removed hidden button mirrored.
 
 Design under test: ``.dev-flow/2026-11-01-batch-101/inc-12/01-requirements.md``
-row R-CHKED-058 (D-3, E3A-03), the cited canon row R-CHKED-021 and the
+row R-CHKED.58 (D-3, E3A-03), the cited canon row R-CHKED.21 and the
 acceptance case AT-I12-3 (Check Editor half), one node per case of
 ``inc-12/02-test-cases.md``.
 
@@ -88,12 +88,12 @@ def _shown_panes(panel) -> list:
 
 
 # --------------------------------------------------------------------------- #
-# R-CHKED-058 - the Check Editor walk
+# R-CHKED.58 - the Check Editor walk
 # --------------------------------------------------------------------------- #
 
 
 def test_r_chked_058_1_every_check_editor_widget_is_shown_in_a_state(tmp_path: Path) -> None:
-    """R-CHKED-058 (case /1): walk the window ``#screen_check_editor`` over
+    """R-CHKED.58 (case /1): walk the window ``#screen_check_editor`` over
     [opened with the demo A2L; ``#check_tab_fields``, ``#check_tab_json``,
     ``#check_tab_addendum`` pressed in turn] -> 0 widgets with an id never
     shown, at least 45 in the population, and the Addendum state shows
@@ -135,7 +135,7 @@ def test_r_chked_058_1_every_check_editor_widget_is_shown_in_a_state(tmp_path: P
 
 
 def test_at_i12_3_addendum_tab_by_keys(tmp_path: Path) -> None:
-    """AT-I12-3 (US-I12-2; R-CHKED-058 with the cited R-CHKED-021): the demo
+    """AT-I12-3 (US-I12-2; R-CHKED.58 with the cited R-CHKED.21): the demo
     A2L loaded; rail key ``=`` shows the Check Editor; ``tab`` until
     ``#check_tab_addendum`` has the focus (bounded); ``enter``. The Addendum
     pane is the one shown and ``#check_addendum_preview`` paints the addendum

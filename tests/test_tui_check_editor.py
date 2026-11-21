@@ -84,7 +84,7 @@ def _write_calls() -> tuple[list, object]:
     original = app_module.deps.write_change_document
 
     # batch-101 Inc 6: the spy takes the writer's whole signature; the Check
-    # Editor Write now passes ``dest_dir`` (the check home, R-CHKED-031).
+    # Editor Write now passes ``dest_dir`` (the check home, R-CHKED.31).
     def _spy(document, base_dir, file_name, copy_fn=None, dest_dir=None):
         calls.append((document, file_name))
         return original(document, base_dir, file_name, copy_fn, dest_dir=dest_dir)
@@ -100,7 +100,7 @@ def _write_calls() -> tuple[list, object]:
 
 def test_tc_b94_06_composition_census(tmp_path: Path) -> None:
     """The Check Editor composes a collector, a memory table, write+validate,
-    and exactly ZERO apply actions; composes at 80x24 (R-CHKED-022).
+    and exactly ZERO apply actions; composes at 80x24 (R-CHKED.22).
 
     Intent: TC-B94-06 — the ce_a two-column form: >=1 parameter collector,
     >=1 memory-location table, exactly 1 write action, exactly 1 validate
@@ -305,7 +305,7 @@ def test_tc_b94_07b_help_panel_lists_check_editor_binding(
 def test_at_b94_01_rail_selects_check_editor_mounts_twin(tmp_path: Path) -> None:
     """AT-B94-01 — rail selection mounts the Check Editor; Patch mounts Patch.
 
-    Intent (R-TUI-021.4, R-TUI-021.6, R-CHKED-022): selecting "Check Editor" mounts exactly one Check
+    Intent (R-TUI-021.4, R-TUI-021.6, R-CHKED.22): selecting "Check Editor" mounts exactly one Check
     Editor panel exposing write/validate actions and 0 apply actions;
     selecting "Patch Editor" mounts the Patch Editor instead. The base-state
     probe recorded 0 ``checkeditor`` hits (P0 RC-1(b)) — the negative control

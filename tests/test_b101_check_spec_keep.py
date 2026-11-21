@@ -9,20 +9,20 @@ implementation was read to decide what to assert.
 
 Covers the Check Editor cases of the increment (one node per case, the case id
 is in each docstring; the node name starts with the id in test spelling):
-  - R-CHKED-010/1..3   picks survive a plain return, the same A2L loaded
+  - R-CHKED.10/1..3   picks survive a plain return, the same A2L loaded
                        again and the image loaded again.
-  - R-CHKED-055/1      a parameter the new A2L no longer lists is dropped.
-  - R-CHKED-054/1      Write keeps the field set (F-26 guard).
+  - R-CHKED.55/1      a parameter the new A2L no longer lists is dropped.
+  - R-CHKED.54/1      Write keeps the field set (F-26 guard).
   - R-CHKED-041.1/1    a spec pick replaces the whole field set.
   - R-CHKED-041.2/1,3  a spec pick names and includes the parameters (F-27);
                        /2 is ``test_b101_symbol_reads.py::
                        test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols``.
   - R-CHKED-041.3/1..6 the entries with no named parameter become unlabelled
                        memory rows (/5 and /6 through the panel seam).
-  - R-CHKED-025/1..3   fields included in this session read the image.
+  - R-CHKED.25/1..3   fields included in this session read the image.
   - R-CHKED-026/1..4   fields loaded from a spec keep the spec's bytes (D9-11).
   - R-CHKED-027/1,2    fields outside the image are left out; spec fields stay.
-  - R-CHKED-056/1..3   a parameter a new A2L moves, renames or resizes becomes
+  - R-CHKED.56/1..3   a parameter a new A2L moves, renames or resizes becomes
                        an unlabelled memory row keeping its spec entry.
 
 Oracles are observable: the status log (every ``set_status`` message), the
@@ -561,12 +561,12 @@ BLANK_SERIAL_ROW = lambda f: (f"0x{f.serial:08X}", EM, "u32")  # noqa: E731
 
 
 # ---------------------------------------------------------------------------
-# US-CHK-KEEP-1 - R-CHKED-010, -054, -055
+# US-CHK-KEEP-1 - R-CHKED.10, R-CHKED.54, R-CHKED.55
 # ---------------------------------------------------------------------------
 
 
 def test_r_chked_010_1_plain_return_keeps_picks(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-010/1: case 08 and its A2L loaded, ``VALUE_0001`` and
+    """Case R-CHKED.10/1: case 08 and its A2L loaded, ``VALUE_0001`` and
     ``VALUE_0002`` included by ``space``, the memory row ``SERIAL`` added; key
     ``1`` then key ``=`` -> included exactly ``[VALUE_0001, VALUE_0002]``, both
     ledger rows show ``✓``, head line ``3 fields: 2 params · 1 memory row``.
@@ -589,7 +589,7 @@ def test_r_chked_010_1_plain_return_keeps_picks(tmp_path: Path, facts: Facts) ->
 
 
 def test_r_chked_010_2_same_a2l_reloaded_keeps_picks(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-010/2: as /1; key ``1``, ``firmware.a2l`` loaded again
+    """Case R-CHKED.10/2: as /1; key ``1``, ``firmware.a2l`` loaded again
     through the Load dialog, key ``=`` -> included exactly ``[VALUE_0001,
     VALUE_0002]`` in that order, both ``✓``, head line ``3 fields: 2 params · 1
     memory row``.
@@ -613,7 +613,7 @@ def test_r_chked_010_2_same_a2l_reloaded_keeps_picks(tmp_path: Path, facts: Fact
 
 
 def test_r_chked_010_3_image_reloaded_keeps_picks(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-010/3: as /1; key ``1``, ``firmware.s19`` loaded again
+    """Case R-CHKED.10/3: as /1; key ``1``, ``firmware.s19`` loaded again
     through the Load dialog, key ``=`` -> as /2.
 
     Negative control: the included parameters cleared on a ledger
@@ -636,7 +636,7 @@ def test_r_chked_010_3_image_reloaded_keeps_picks(tmp_path: Path, facts: Facts) 
 
 
 def test_r_chked_055_1_unlisted_parameter_dropped(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-055/1: as R-CHKED-010/1; key ``1``, a planted A2L listing
+    """Case R-CHKED.55/1: as R-CHKED.10/1; key ``1``, a planted A2L listing
     only ``VALUE_0002`` (same address and size) loaded through the Load dialog,
     key ``=`` -> included exactly ``[VALUE_0002]``; head line ``2 fields: 1
     param · 1 memory row``; no Fields line reads ``unresolved``; Write as
@@ -669,7 +669,7 @@ def test_r_chked_055_1_unlisted_parameter_dropped(tmp_path: Path, facts: Facts) 
 
 
 def test_r_chked_054_1_write_keeps_the_field_set(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-054/1 (F-26): as R-CHKED-010/1; Write as
+    """Case R-CHKED.54/1 (F-26): as R-CHKED.10/1; Write as
     ``pilot_fields.chk.json`` -> status ``Check Editor: wrote
     pilot_fields.chk.json (3 fields, kind=check).``; afterwards the included
     parameters are exactly ``[VALUE_0001, VALUE_0002]``, the memory table holds
@@ -677,7 +677,7 @@ def test_r_chked_054_1_write_keeps_the_field_set(tmp_path: Path, facts: Facts) -
     Write.
 
     Standing guard: holds on the base (batch-102's picker; F-26 is not
-    reproduced on ``c2cba35``, E1 D-2); it keeps the R-CHKED-010 fix from
+    reproduced on ``c2cba35``, E1 D-2); it keeps the R-CHKED.10 fix from
     bringing F-26 back. Negative control: the post-Write refresh repopulating
     the ledger with no signature -> ``1 field: 0 params · 1 memory row`` ->
     RED."""
@@ -956,12 +956,12 @@ def test_r_chked_041_3_6_symbol_range_mismatch_memory_row(tmp_path: Path, facts:
 
 
 # ---------------------------------------------------------------------------
-# US-CHK-SPEC-1 - R-CHKED-025, -026, -027
+# US-CHK-SPEC-1 - R-CHKED.25, R-CHKED-026, R-CHKED-027
 # ---------------------------------------------------------------------------
 
 
 def test_r_chked_025_1_session_field_reads_the_image(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-025/1: case 08 and its A2L loaded, the pilot spec picked;
+    """Case R-CHKED.25/1: case 08 and its A2L loaded, the pilot spec picked;
     ``VALUE_0003`` included by ``space``; Write as ``plus.chk.json`` -> the
     entry at ``VALUE_0003``'s address holds the image bytes of its range.
 
@@ -984,7 +984,7 @@ def test_r_chked_025_1_session_field_reads_the_image(tmp_path: Path, facts: Fact
 
 
 def test_r_chked_025_2_exclude_include_rebaselines(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-025/2: case 08 and its A2L loaded; a Patch Editor apply set
+    """Case R-CHKED.25/2: case 08 and its A2L loaded; a Patch Editor apply set
     the image byte at ``0x0`` to ``93``; the pilot spec picked; ``space`` on
     ``VALUE_0001`` (excluded), the toggle awaited, ``space`` again (included);
     Write as ``rebased.chk.json`` -> included ``[VALUE_0002, VALUE_0001]``, the
@@ -1017,7 +1017,7 @@ def test_r_chked_025_2_exclude_include_rebaselines(tmp_path: Path, facts: Facts)
 def test_r_chked_025_3_reincluded_after_move_reads_the_image(
     tmp_path: Path, facts: Facts
 ) -> None:
-    """Case R-CHKED-025/3 (E3 A-1, SEC5-1): as R-CHKED-056/1 after the return
+    """Case R-CHKED.25/3 (E3 A-1, SEC5-1): as R-CHKED.56/1 after the return
     (included ``[VALUE_0002]``, memory rows ``0x00C00FFC``, ``0x00000000``);
     ``space`` on ``VALUE_0001``'s ledger row (now at *A*); Write as
     ``moved_plus.chk.json`` -> 4 entries in this order: ``0x14`` ``A0 BE``, *A*
@@ -1192,7 +1192,7 @@ def test_r_chked_027_2_loaded_fields_kept_without_image(tmp_path: Path, facts: F
 
 
 # ---------------------------------------------------------------------------
-# US-CHK-SPEC-1 - R-CHKED-056 (E3 SEC5-1 = A-1)
+# US-CHK-SPEC-1 - R-CHKED.56 (E3 SEC5-1 = A-1)
 # ---------------------------------------------------------------------------
 
 
@@ -1230,7 +1230,7 @@ def assert_declared_entry_kept(f: Facts, state, lines, entries) -> None:
 def test_r_chked_056_1_moved_parameter_keeps_the_declared_entry(
     tmp_path: Path, facts: Facts
 ) -> None:
-    """Case R-CHKED-056/1: case 08 and its A2L loaded, the pilot spec picked;
+    """Case R-CHKED.56/1: case 08 and its A2L loaded, the pilot spec picked;
     the planted moved A2L (``VALUE_0001`` at *A*, 1 byte) loaded through the
     Load dialog; key ``=``; Write as ``kept.chk.json`` -> included exactly
     ``[VALUE_0002]``; memory rows ``0x00C00FFC`` ``—`` ``u32``, then
@@ -1254,11 +1254,11 @@ def test_r_chked_056_1_moved_parameter_keeps_the_declared_entry(
 def test_r_chked_056_2_renamed_parameter_keeps_the_declared_entry(
     tmp_path: Path, facts: Facts
 ) -> None:
-    """Case R-CHKED-056/2: as /1 with the planted renamed A2L (``VALUE_0001_R``
+    """Case R-CHKED.56/2: as /1 with the planted renamed A2L (``VALUE_0001_R``
     at ``0x00000000``, 1 byte) -> included exactly ``[VALUE_0002]`` (``VALUE_0001_R``
     not included); the memory rows, head line, status and entries of /1.
 
-    Negative control: R-CHKED-055's drop applied to a field loaded from a spec
+    Negative control: R-CHKED.55's drop applied to a field loaded from a spec
     -> 2 entries, none at ``0x0`` -> RED."""
     planted = planted_renamed(facts, tmp_path)
 
@@ -1273,7 +1273,7 @@ def test_r_chked_056_2_renamed_parameter_keeps_the_declared_entry(
 def test_r_chked_056_3_resized_parameter_keeps_the_declared_entry(
     tmp_path: Path, facts: Facts
 ) -> None:
-    """Case R-CHKED-056/3: as /1 with the planted resized A2L (``VALUE_0001`` at
+    """Case R-CHKED.56/3: as /1 with the planted resized A2L (``VALUE_0001`` at
     ``0x00000000``, 2 bytes) -> as /1; the entry at ``0x0`` is the 1 byte
     ``6C`` and no 2-byte entry is written at ``0x0``.
 
@@ -1485,7 +1485,7 @@ def test_r_chked_041_2_4_entry_order_is_kept(tmp_path: Path, facts: Facts) -> No
 
 
 def test_r_chked_010_4_session_field_moved_stays_included(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-010/4 (E5 C-6, *still lists* for a field included in this
+    """Case R-CHKED.10/4 (E5 C-6, *still lists* for a field included in this
     session): as /1; key ``1``, the planted moved A2L (``VALUE_0001`` at *A*)
     loaded through the Load dialog, key ``=`` -> included exactly
     ``[VALUE_0001, VALUE_0002]``, the Fields line ``◆ <A> VALUE_0001``, head
@@ -1493,7 +1493,7 @@ def test_r_chked_010_4_session_field_moved_stays_included(tmp_path: Path, facts:
     byte at *A*.
 
     Why: only the name counts for a field included in this session; the
-    spec-field demotion (R-CHKED-056) must not reach it. Base: the
+    spec-field demotion (R-CHKED.56) must not reach it. Base: the
     repopulation clears the picks -> ``[]`` -> RED. Negative control: a
     session field put in a memory row when it moves -> ``[VALUE_0002]`` -> RED."""
     moved = planted_moved(facts, tmp_path)
@@ -1569,7 +1569,7 @@ def test_r_chked_057_1_apply_clears_the_validation_results(tmp_path: Path, facts
 
 
 def test_at_i5_1_picks_survive_write_and_return_by_keys(tmp_path: Path, facts: Facts) -> None:
-    """AT-I5-1 (US-CHK-KEEP-1; drives R-CHKED-054/1 and R-CHKED-010/2 black
+    """AT-I5-1 (US-CHK-KEEP-1; drives R-CHKED.54/1 and R-CHKED.10/2 black
     box): key ``=``; ``VALUE_0001`` and ``VALUE_0002`` included by a click on
     the ledger, arrows and ``space``; address, label and size typed and Add
     clicked; the name typed and Write clicked -> ``Check Editor: wrote
@@ -1643,7 +1643,7 @@ def test_at_i5_2_spec_comes_back_and_validate_reports_the_drift(
 def test_at_i5_3_moved_parameter_keeps_the_declared_entry_by_keys(
     tmp_path: Path, facts: Facts
 ) -> None:
-    """AT-I5-3 (SEC5-1; drives R-CHKED-056/1 black box): as AT-I5-2 to the
+    """AT-I5-3 (SEC5-1; drives R-CHKED.56/1 black box): as AT-I5-2 to the
     pick; key ``1``; the planted moved A2L through the Load dialog; key ``=``
     -> painted memory table and head line; the name typed and Write clicked ->
     ``0x14`` ``A0 BE``, ``0xC00FFC`` ``FF FF FF FF``, ``0x0`` ``6C`` with the

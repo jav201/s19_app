@@ -29,7 +29,7 @@ def test_enrich_tags_and_render_merges_check_flags(monkeypatch):
 
 
 def test_build_validation_report_uses_overlap_addresses():
-    """Traces: R-VAL-041."""
+    """Traces: R-VAL.41."""
     loaded = LoadedFile(
         path=Path("firmware.s19"),
         file_type="s19",
@@ -58,7 +58,7 @@ def test_build_validation_report_uses_overlap_addresses():
 
 
 def test_build_validation_report_keeps_explicit_empty_enriched_tags(monkeypatch):
-    """Traces: R-VAL-055."""
+    """Traces: R-VAL.55."""
     loaded = LoadedFile(
         path=Path("firmware.s19"),
         file_type="s19",
@@ -102,7 +102,7 @@ def test_build_validation_report_keeps_explicit_empty_enriched_tags(monkeypatch)
 
 
 def test_build_validation_report_falls_back_to_raw_tags_when_enriched_is_none(monkeypatch):
-    """Traces: R-VAL-056."""
+    """Traces: R-VAL.56."""
     loaded = LoadedFile(
         path=Path("firmware.s19"),
         file_type="s19",
@@ -146,7 +146,7 @@ def test_build_validation_report_falls_back_to_raw_tags_when_enriched_is_none(mo
 
 
 def test_build_validation_report_mac_only_emits_duplicate_classification_issue():
-    """Traces: R-VAL-023."""
+    """Traces: R-VAL.23."""
     records = [
         {"parse_ok": True, "line_number": 1, "name": "RPM", "address": 0x1000},
         {"parse_ok": True, "line_number": 2, "name": "TORQUE", "address": 0x1000},

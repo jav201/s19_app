@@ -444,7 +444,7 @@ The check run and its display are S9 (S9.1, S9.2); running a scope is S11.
 - S10.1 (S2: `encode_physical_to_raw_bytes`) → covered by D10-13, D10-42 (block above).
 - S10.2 (S7: the unsaved-changes guard and the two JSON editors) → covered by R-PE-012 … 019, R-TUI-053.1 … .8, R-TUI-058.1 … .8.
 - S10.3 (S8: symbol input, declaration-fault list, Width round, R-CHG-001.1, conflict on R-PE-084 / 085) → D10-44 deletes R-PE-084 and R-PE-085 (R-HEX-VERIFY-002.3 stays S8's). The rest is covered: D10-13, D10-42; R-PE-005, and S1's CTX-TEXT already lists the Patch Editor; D10-43; R-PATCH-PASTE-001.4.
-- S10.4 (S9: Run checks help and button; ledger glyphs) → covered by R-PATCH-CHECKS-CLARITY-001.1, .2; the glyphs are S9 R-CHK-PE-013 on the ledger of CTX-PE-LEDGER.
+- S10.4 (S9: Run checks help and button; ledger glyphs) → covered by R-PATCH-CHECKS-CLARITY-001.1, .2; the glyphs are S9 R-CHK-PE.13 on the ledger of CTX-PE-LEDGER.
 - S10.5 (S11: Execute over variants controls) → covered by R-PE-100 … 102.
 - S10.6 (S14: the check-spec folder) → covered by D10-25 (same decision as S9 D9-15 and S14 D14-17).
 - S10.7 (S14: R-TUI-049 and its effect) → row R-TUI-049.2 now cites S14 R-BEFORE-AFTER-REPORT-001.2.

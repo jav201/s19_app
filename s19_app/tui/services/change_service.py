@@ -868,7 +868,7 @@ class ChangeService:
         #: The status message the most recent check run returned (the
         #: ``ChangeActionResult.message`` of :meth:`run_checks`), kept beside
         #: the provenance stamp so :meth:`check_status_line` can show it ONLY
-        #: while that run is still current (Inc 6, R-CHK-PE-010). Empty before
+        #: while that run is still current (Inc 6, R-CHK-PE.10). Empty before
         #: any run and whenever the run is no longer current.
         self._last_check_message: str = ""
         #: The change-set undo history (US-068a / LLR-068a.1): a bounded stack

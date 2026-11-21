@@ -279,7 +279,7 @@ Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC-054 … 
 | R-TUI-062.8 | When | When the system opens the main hex view from the Memory Map, the system shall switch to the Workspace and jump to the region's start (S4.5). | Partly: no status, the old marker stays (D4-6, D4-16). |
 | R-TUI-074.1 | If | If no region is selected, then the system shall show `Click a region to inspect it.` and `Double-click to open in hex.` in the inspector. | Yes; tested. |
 | R-TUI-074.2 | When | When the inspector shows a region, the system shall title it `Inspector — <start address>`. | Yes; tested. |
-| R-TUI-074.3 | When | When the inspector shows a region, the system shall show its Status: `VALID` or `INVALID` from the validity of its range (S1 R-VAL-001b). | Yes; tested. |
+| R-TUI-074.3 | When | When the inspector shows a region, the system shall show its Status: `VALID` or `INVALID` from the validity of its range (S1 R-VAL.58). | Yes; tested. |
 | R-TUI-074.4 | When | When the inspector shows a region, the system shall show its first and last address. | Yes; tested. |
 | R-TUI-074.10 | When | When the inspector shows a region, the system shall show its size, human-readable. | Yes; tested. |
 | R-TUI-074.11 | When | When the inspector shows a region, the system shall show its band glyph and name. | Yes; tested. |

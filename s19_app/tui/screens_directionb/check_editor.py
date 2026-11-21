@@ -212,8 +212,8 @@ class CheckEditorPanel(ScrollableContainer):
         touching the layout or the previews. On a real (re)population it
         re-includes every earlier pick the new ledger lists, demotes a pick
         loaded from a spec that the new ledger no longer lists at its spec
-        entry's range into a memory row (R-CHKED-056) and drops the rest
-        (R-CHKED-055), then re-derives the widths (the cached longest
+        entry's range into a memory row (R-CHKED.56) and drops the rest
+        (R-CHKED.55), then re-derives the widths (the cached longest
         ``Fmt · Unit`` text is an input of :func:`check_layout`). A headless
         panel or an app without parsed A2L data supplies ``None``.
         """
@@ -366,7 +366,7 @@ class CheckEditorPanel(ScrollableContainer):
 
     def _demote_moved_spec_params(self, kept: list) -> list:
         """Demote spec-loaded picks the new ledger no longer lists at their
-        spec entry's range into unlabelled memory rows (R-CHKED-056).
+        spec entry's range into unlabelled memory rows (R-CHKED.56).
 
         Runs after ``set_parameters`` replaced the ledger. A pick whose name
         now resolves to another address, another byte count, or not at all
@@ -662,7 +662,7 @@ class CheckEditorPanel(ScrollableContainer):
         Every row below the two columns is one terminal row; the ledger is
         the panel's growing region (design §3, Check Editor tree). The shipped
         ids are kept (LLR-145.1), except the hidden addendum toggle, which
-        batch-101 Inc 12 removed (R-CHKED-058).
+        batch-101 Inc 12 removed (R-CHKED.58).
         """
         with Horizontal(id="check_columns"):
             with Vertical(id="check_left_column") as left:

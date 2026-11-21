@@ -22,18 +22,18 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 
 | Id | Change | Rows | Status |
 |---|---|---|---|
-| D-3 | S19 reader: decode as UTF-8; an undecodable line is rejected and the load continues | R-READ-003, R-VAL-002.4 | open |
-| D-4 | Intel HEX type 02: wrap at 64 KiB; the sample file becomes the test | R-HEX-002 | open |
-| D-5 | Out-of-order findings carry the physical line number | R-IMG-003 | open |
+| D-3 | S19 reader: decode as UTF-8; an undecodable line is rejected and the load continues | R-READ.3, R-VAL-002.4 | open |
+| D-4 | Intel HEX type 02: wrap at 64 KiB; the sample file becomes the test | R-HEX.2 | open |
+| D-5 | Out-of-order findings carry the physical line number | R-IMG.3 | open |
 | D-6 | Safe text: a run of tab / line breaks shows as one space | R-TUI-103.1 | open |
 | D-7 | Sweep the screens not yet on the safe-text list (with S4) | R-TUI-103 | open |
 | D-7+ | Apply the safe-text function to the views added from S6–S14 (CTX-TEXT list) | R-TUI-103, 103.1, 103a, 103b | open |
 | D-8 | Remove the two checks that can never fire | — | open |
 | D-11 | Remove the command-line tool (cli.py, its tests, README section) | — | open |
-| D-14 | Version in one place (pyproject reads version.py) | R-VER-001 | open |
+| D-14 | Version in one place (pyproject reads version.py) | R-VER.1 | open |
 | D-15 | Remove three unused helpers | — | open |
-| Q-C | HEX reader: per-field messages; length check before field checks | R-HEX-005.x, R-HEX-006 | open |
-| Q-D | HEX reader: reject an unknown record type | R-HEX-008 | open |
+| Q-C | HEX reader: per-field messages; length check before field checks | R-HEX-005.x, R-HEX.6 | open |
+| Q-D | HEX reader: reject an unknown record type | R-HEX.8 | open |
 | Q-E | HEX reader: report overlap addresses | R-IMG-002.x | open |
 
 ## S2 — A2L & MAC
@@ -42,7 +42,7 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 |---|---|---|---|
 | D2-1 | Remove `get_raw_value` / `get_physical_value` / `validate_characteristic` and tests | — | open |
 | D2-2 | Remove the dead "existing tag endian" step | R-A2L-024 … 027 | open |
-| D2-3 | Raise `A2L_UNKNOWN_BYTE_ORDER` | R-A2L-028, R-VAL-037 | open |
+| D2-3 | Raise `A2L_UNKNOWN_BYTE_ORDER` | R-A2L-028, R-VAL.37 | open |
 | D2-5 | TAB_VERB shows the COMPU_VTAB text | R-A2L-059 | open |
 | D2-6 | One unit rule (UNIT/PHYS_UNIT whole text, then conversion unit); conversion line on /begin | R-A2L-030 … 033 | open |
 | D2-7 | CURVE/MAP length = whole record | R-A2L-018 | open |
@@ -72,27 +72,27 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 | Id | Change | Rows | Status |
 |---|---|---|---|
 | D3-4 | Remove unreachable codes and the xfail `CROSS_S19_HEX_OVERLAP` test | — | open |
-| D3-5 | Remove `alias_policy`; bit-field sharing is INFO | R-VAL-022 … 024 | open |
+| D3-5 | Remove `alias_policy`; bit-field sharing is INFO | R-VAL.22 … R-VAL.24 | open |
 | D3-7 | Remove the dead jump-to-source code and `_format_validation_issue_line` | — | done (batch-101 Inc 12) |
 | D3-8 | Remove the unused issue page-size setting and capped branch | — | open |
-| D3-9 | "Only in A2L / MAC" warnings only when the other file is loaded | R-VAL-045, 046 | open |
-| D3-10 | A2L structure checks in every session with an A2L | R-VAL-030 … 033 | open |
+| D3-9 | "Only in A2L / MAC" warnings only when the other file is loaded | R-VAL.45, R-VAL.46 | open |
+| D3-10 | A2L structure checks in every session with an A2L | R-VAL.30 … R-VAL-033 | open |
 | D3-11 | Run the A2L structure rules once | — | open |
 | D3-12 | Standard block names recognised; remove the display triage | R-VAL-032 | open |
 | D3-13 | Broken references: check child REF/DEF/IN/OUT blocks | R-VAL-033 | open |
-| D3-14 | Line diagnostics and MAC read failure become issues; integrity notices deduped | R-VAL-013, 017, 018 | open |
-| D3-15 | Overlap issues from the loaded image, both formats, whole tag span | R-VAL-041, 043 | open |
-| D3-16 | Tag with no length: not checked, no issue | R-VAL-042, 053 | open |
-| D3-17 | Names as written; triple issue carries the A2L address | R-VAL-047, 048 | open |
-| D3-18 | One palette on every surface; MAC warnings pale yellow | R-LEGEND-010, R-MAC-032 | open |
-| D3-19 | Legend rows rewritten from the screens' rules | R-LEGEND-011 | open |
+| D3-14 | Line diagnostics and MAC read failure become issues; integrity notices deduped | R-VAL.13, R-VAL.17, R-VAL.18 | open |
+| D3-15 | Overlap issues from the loaded image, both formats, whole tag span | R-VAL.41, R-VAL.43 | open |
+| D3-16 | Tag with no length: not checked, no issue | R-VAL.42, R-VAL.53 | open |
+| D3-17 | Names as written; triple issue carries the A2L address | R-VAL.47, R-VAL.48 | open |
+| D3-18 | One palette on every surface; MAC warnings pale yellow | R-LEGEND.10, R-MAC-032 | open |
+| D3-19 | Legend rows rewritten from the screens' rules | R-LEGEND.11 | open |
 | D3-20 | Hex legend rows in colour; Workspace shows the Hex block | R-LEGEND-MODAL-001.7, .9 | open |
 | D3-21 | Issues card text matches the real rows | R-LEGEND-MODAL-001.10 | open |
 | D3-22 | Active filter button; `No issue matches the filter.` | R-TUI-025.7, .15 | open |
 | D3-23 | Up/Down move between issue rows | R-TUI-025.16, .17 | open |
 | D3-24 | Clear the hex peek on load | R-ISSUES-HEXPANE-001.3 | open |
 | D3-25 | One definition of the overlay styles; fix the stale colour test | — | open |
-| D3-26 | Map patch teal, paste-gauge magenta, JSON hues and check-outcome colours onto the one palette; legend blocks for them | R-LEGEND-010, R-LEGEND-011 | needs prototype |
+| D3-26 | Map patch teal, paste-gauge magenta, JSON hues and check-outcome colours onto the one palette; legend blocks for them | R-LEGEND.10, R-LEGEND.11 | needs prototype |
 
 ## S4 — hex view & Memory Map
 
@@ -221,15 +221,15 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 |---|---|---|---|
 | D9-7 | Remove `run_checks_for_project` and its test-only caller (the headless project-run test) | — | done (batch-101 Inc 4) |
 | D9-8 | Remove the hidden `#check_preview_toggle_button` and its handler | — | done (batch-101 Inc 12) |
-| D9-10 | One "current run" rule: the Checks tab (rows, status, strip, subtitle) and the Checks screen show the no-run state when the document or the image differs from the run's (the stamp the ledger glyphs already use); a 0-entry run shows `0 checked` | R-CHK-PE-008 … 012, R-CHKS-001, R-CHKS-004, R-CHKS-009 | open |
-| D9-11 | Check Editor: a field loaded from a spec keeps the spec's expected bytes; only new fields take the image's bytes (Write and Validate) | R-CHKED-025, R-CHKED-026 | open |
-| D9-12 | Check Editor: keep the included parameters the new A2L list still holds on screen entry and after Write | R-CHKED-010 | open |
-| D9-13 | Check Editor JSON tab shows the document Write would write (S8 serialiser) | R-CHKED-019 | open |
-| D9-14 | Check Editor Write: append `.chk.json` when the name lacks it | R-CHKED-030 | open |
-| D9-15 | One check home for Write, the Spec dropdown and the chip (`<project>/checks/` with a project, else `workarea/patches/`); with S10 D10-25 | R-CHKED-031, R-CHKED-040 | open |
-| D9-16 | Check Editor: refuse a non-numeric Size with `Check Editor: bad size '<text>'.` | R-CHKED-014 | open |
-| D9-17 | Check Editor memory Address: `0x` + hex digits, or decimal digits only; with S10 D10-27 | R-CHKED-012 | open |
-| D9-20 | One aggregate strip form for the Patch Editor Checks tab and the Checks screen | R-CHK-PE-005, R-CHKS-008 | needs prototype |
+| D9-10 | One "current run" rule: the Checks tab (rows, status, strip, subtitle) and the Checks screen show the no-run state when the document or the image differs from the run's (the stamp the ledger glyphs already use); a 0-entry run shows `0 checked` | R-CHK-PE-008 … R-CHK-PE.12, R-CHKS.1, R-CHKS.4, R-CHKS-009 | open |
+| D9-11 | Check Editor: a field loaded from a spec keeps the spec's expected bytes; only new fields take the image's bytes (Write and Validate) | R-CHKED.25, R-CHKED-026 | open |
+| D9-12 | Check Editor: keep the included parameters the new A2L list still holds on screen entry and after Write | R-CHKED.10 | open |
+| D9-13 | Check Editor JSON tab shows the document Write would write (S8 serialiser) | R-CHKED.19 | open |
+| D9-14 | Check Editor Write: append `.chk.json` when the name lacks it | R-CHKED.30 | open |
+| D9-15 | One check home for Write, the Spec dropdown and the chip (`<project>/checks/` with a project, else `workarea/patches/`); with S10 D10-25 | R-CHKED.31, R-CHKED.40 | open |
+| D9-16 | Check Editor: refuse a non-numeric Size with `Check Editor: bad size '<text>'.` | R-CHKED.14 | open |
+| D9-17 | Check Editor memory Address: `0x` + hex digits, or decimal digits only; with S10 D10-27 | R-CHKED.12 | open |
+| D9-20 | One aggregate strip form for the Patch Editor Checks tab and the Checks screen | R-CHK-PE.5, R-CHKS.8 | needs prototype |
 
 ## S10 — Patch Editor
 

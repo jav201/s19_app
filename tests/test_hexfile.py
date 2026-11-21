@@ -16,7 +16,7 @@ def _build_record(byte_count: int, address: int, record_type: int, data: list[in
 
 
 def test_hex_extended_linear_address(tmp_path):
-    """Traces: R-HEX-001."""
+    """Traces: R-HEX.1."""
     lines = [
         _build_record(2, 0x0000, 0x04, [0x00, 0x01]),
         _build_record(1, 0x0010, 0x00, [0xAA]),
@@ -32,7 +32,7 @@ def test_hex_extended_linear_address(tmp_path):
 
 
 def test_hex_extended_segment_address(tmp_path):
-    """Traces: R-HEX-002."""
+    """Traces: R-HEX.2."""
     lines = [
         _build_record(2, 0x0000, 0x02, [0x12, 0x34]),
         _build_record(1, 0x0020, 0x00, [0xBB]),
@@ -63,7 +63,7 @@ def test_hex_start_address_records_are_ignored(tmp_path):
 
 
 def test_hex_data_record_without_extended_address(tmp_path):
-    """Traces: R-HEX-009."""
+    """Traces: R-HEX.9."""
     lines = [
         _build_record(2, 0x0010, 0x00, [0xAA, 0xBB]),
         _build_record(0, 0x0000, 0x01, []),
@@ -78,7 +78,7 @@ def test_hex_data_record_without_extended_address(tmp_path):
 
 
 def test_hex_missing_prefix_is_reported(tmp_path):
-    """Traces: R-HEX-004."""
+    """Traces: R-HEX.4."""
     hex_path = tmp_path / "bad.hex"
     hex_path.write_text("10010000214601360121470136007EFE09D2190140\n", encoding="utf-8")
 
@@ -99,7 +99,7 @@ def test_hex_parse_error_is_reported(tmp_path):
 
 
 def test_hex_length_mismatch_is_reported(tmp_path):
-    """Traces: R-HEX-006."""
+    """Traces: R-HEX.6."""
     line = _build_record(1, 0x0010, 0x00, [0xAA])
     hex_path = tmp_path / "length.hex"
     hex_path.write_text(line[:-1] + "\n", encoding="utf-8")
@@ -111,7 +111,7 @@ def test_hex_length_mismatch_is_reported(tmp_path):
 
 
 def test_hex_checksum_mismatch_is_reported(tmp_path):
-    """Traces: R-HEX-007.1, R-HEX-007.2, R-VAL-001a."""
+    """Traces: R-HEX-007.1, R-HEX-007.2, R-VAL.57."""
     line = _build_record(1, 0x0010, 0x00, [0xAA])
     hex_path = tmp_path / "checksum.hex"
     hex_path.write_text(line[:-2] + "00\n", encoding="utf-8")
@@ -124,7 +124,7 @@ def test_hex_checksum_mismatch_is_reported(tmp_path):
 
 
 def test_hex_unsupported_record_type_is_reported(tmp_path):
-    """Traces: R-HEX-008."""
+    """Traces: R-HEX.8."""
     lines = [
         _build_record(0, 0x0000, 0x06, []),
         _build_record(0, 0x0000, 0x01, []),
