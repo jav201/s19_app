@@ -270,8 +270,10 @@ removed file    A file the tree holds no longer (it stays in git history):
                  (the parse_canon rule of tests/test_requirements_canon.py).
   pointer table  A table of S0.2 (CTX-RETIRED) in REQUIREMENTS.md headed exactly `| Id | Where it lives now | Note |`;
                  the ids it names are already resolved by S0.2 and never enter the map.
-  highest number For a family FAM: the highest n among canon rows R-<FAM>.<n>, map new ids R-<FAM>.<n> and ids
-                 R-<FAM>.<n> planned in this run (0 when there is none).
+  highest number For a family FAM: the highest n among canon rows R-<FAM>.<n>, canon rows whose id is
+                 R-<FAM>-<n> followed by an optional letter (either case) and optional `.<k>` parts (old-form,
+                 letter-suffix and dotted rows of the family, deferred ones included), map new ids R-<FAM>.<n>
+                 and ids R-<FAM>.<n> planned in this run (0 when there is none).
   free number    A number n with no canon row R-<FAM>.<n>, no entry whose new id is R-<FAM>.<n> and no id
                  R-<FAM>.<n> planned in this run.
   id token       An occurrence of an R-form old id in text not preceded by a letter, digit, `.` or `-`, and not
@@ -279,7 +281,9 @@ removed file    A file the tree holds no longer (it stays in git history):
                  inside R-ZZT-001.1, and R-ZZQ-7 never inside R-ZZQ-70).
   shorthand citation  An R-form old id followed by shorthand: optional spaces, one of `/`, `..`, `…`, `–`, `,`,
                  optional spaces and a three-digit number with an optional letter (R-ZZT-010/011, R-ZZT-001 .. 007,
-                 R-ZZT-003, 006, R-ZZT-103 … 103b); or `-<lower-case letter>` lists (R-ZZT-043-g/h); or `*`.
+                 R-ZZT-003, 006, R-ZZT-103 … 103b); or optional spaces, `,` or `/`, optional spaces, `-` and a
+                 three-digit number with an optional letter (R-ZZT-010, -011; R-ZZT-031 / -034); or
+                 `-<lower-case letter>` lists (R-ZZT-043-g/h); or `*`.
                  `/` with a 1- or 2-digit number is a test-case suffix (R-ZZT-005/5) and leaves a plain id token.
   citation       An id token or a shorthand citation.
   live file      A file tracked in git, other than the map the run reads, docs/requirements/id-map.tsv, files under docs/requirements/history/,

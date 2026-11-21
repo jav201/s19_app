@@ -480,6 +480,37 @@ def test_plan_new_ids_letter_suffix_with_free_number_still_takes_highest_plus_on
     assert got == {"R-ZZP-005a": "R-ZZP.3"}
 
 
+def test_plan_new_ids_highest_counts_deferred_old_form_rows():
+    """A deferred old row still holds its number; reusing it would alias two requirements. R-DOC-IDMAP.10/c"""
+    rename = _load("tools.id_rename")
+    rows = ["R-ZZT-001", "R-ZZT-103", "R-ZZT-103a", "R-ZZT-103.1"]
+    assert rename.plan_new_ids(["R-ZZT-103a"], rows, []) == {"R-ZZT-103a": "R-ZZT.104"}
+
+
+def test_plan_new_ids_highest_counts_dotted_stems():
+    """A dotted old row R-FAM-049.1 holds 49; a letter id must land after it. R-DOC-IDMAP.10/d"""
+    rename = _load("tools.id_rename")
+    rows = ["R-ZZT-010", "R-ZZT-049.1", "R-ZZT-020a"]
+    got = rename.plan_new_ids(["R-ZZT-010", "R-ZZT-020a"], rows, [])
+    assert got == {"R-ZZT-010": "R-ZZT.10", "R-ZZT-020a": "R-ZZT.50"}
+
+
+def test_plan_new_ids_map_numbers_count_and_plain_ids_keep_their_own():
+    """Counting old stems must not push plain ids off their own free number (R-DOC-IDMAP.9). R-DOC-IDMAP.10/e"""
+    rename = _load("tools.id_rename")
+    entries = _entries("R-ZZT-099\tR-ZZT.120\trename\tREQUIREMENTS.md:10@ef5ab17c")
+    got = rename.plan_new_ids(
+        ["R-ZZT-005", "R-ZZT-006a"], ["R-ZZT-005", "R-ZZT-006a"], entries)
+    assert got == {"R-ZZT-005": "R-ZZT.5", "R-ZZT-006a": "R-ZZT.121"}
+
+
+def test_plan_new_ids_highest_accepts_upper_case_letter_stem():
+    """A stem letter in either case is still the same family number; ignoring it reuses numbers. R-DOC-IDMAP.10/f"""
+    rename = _load("tools.id_rename")
+    rows = ["R-ZZT-103B.4", "R-ZZT-001a"]
+    assert rename.plan_new_ids(["R-ZZT-001a"], rows, []) == {"R-ZZT-001a": "R-ZZT.104"}
+
+
 # -------------------------------------------------------------- scan_ids
 def test_scan_ids_boundaries_keep_only_the_true_token():
     """Dotted, prefixed, hyphen-suffixed and longer ids are other ids; only the plain token is a citation. R-DOC-IDMAP.8/2"""
@@ -674,6 +705,28 @@ def test_rewrite_file_test_case_suffix_head_is_replaced():
     """A one-digit suffix names a test case; its head is a plain token to rename. R-DOC-IDMAP.18/R2"""
     new, hits, skips = _rw("t.md", b"R-ZZT-011/5\n", M_OK)
     assert (new, len(hits), skips) == (b"R-ZZT.11/5\n", 1, [])
+
+
+_L10 = "R-ZZT-010\tR-ZZT.10\trename\tREQUIREMENTS.md:10@ef5ab17c"
+_L31 = "R-ZZT-031\tR-ZZT.31\trename\tREQUIREMENTS.md:11@ef5ab17c"
+
+
+def test_rewrite_file_dash_tail_lists_are_shorthand_and_unchanged():
+    """Renaming only the head of `R-X-010, -011` strands the tail on a dead id. R-DOC-IDMAP.18/4"""
+    text = b"R-ZZT-010, -011\nR-ZZT-031 / -034 / -040\n"
+    new, hits, skips = _rw("t.md", text, (_L10, _L31))
+    assert (new, hits, len(skips)) == (text, [], 2)
+    assert _skip_has(skips, "t.md", 1, "shorthand", "R-ZZT-010")
+    assert _skip_has(skips, "t.md", 2, "shorthand", "R-ZZT-031")
+
+
+def test_rewrite_file_dash_tail_needs_a_separator():
+    """A bare ` -011` is prose, not a list; over-matching would leave real ids unrenamed. R-DOC-IDMAP.18/5"""
+    text = b"R-ZZT-010-g/h\nR-ZZT-010 -011\n"
+    new, hits, skips = _rw("t.md", text, (_L10,))
+    assert new == b"R-ZZT-010-g/h\nR-ZZT.10 -011\n"
+    assert len(hits) == 1
+    assert len(skips) == 1 and _skip_has(skips, "t.md", 1, "shorthand", "R-ZZT-010")
 
 
 def test_rewrite_file_non_utf8_is_binary_skip():
@@ -1136,6 +1189,14 @@ def test_real_tree_cites_no_old_id_of_the_map():
     """Live files must hold no R-form old id once the map names it. R-DOC-IDMAP.8/6"""
     id_map = _load("tools.id_map")
     assert id_map.live_citation_offenders(ROOT, id_map.read_map(REAL_MAP)) == []
+
+
+def test_real_tree_dry_run_finds_no_replacement_and_no_shorthand():
+    """The shorthand forms in the tree were fixed by hand; the tool must find no stranded citation left. R-DOC-IDMAP.18/R3"""
+    rename = _load("tools.id_rename")
+    report, skips = rename.run(ROOT, REAL_MAP, exclude=None, apply=False)
+    assert report == []
+    assert [s for s in skips if "\tshorthand\t" in s] == []
 
 
 def test_real_gitattributes_pins_map_to_lf():

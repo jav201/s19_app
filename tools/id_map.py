@@ -31,7 +31,8 @@ _DECISION_RE = re.compile(r"(?<![A-Za-z0-9])[A-Z]+-?\d+(?![A-Za-z0-9])")
 _CTRL_RE = re.compile(r"[\x00-\x08\x0a-\x1f\x7f]")
 _ID_RE = re.compile(rf"(?<![A-Za-z0-9.-])R-{_FAM}-\d+[a-z]?(?![A-Za-z0-9]|\.\d)")
 _SHORT_RE = re.compile(
-    r"\s*(?:/|\.\.|…|–|,)\s*\d{3}[a-z]?(?![0-9A-Za-z])" r"|-[a-z](?:/[a-z])*(?![A-Za-z0-9])" r"|\*")
+    r"\s*(?:/|\.\.|…|–|,)\s*\d{3}[a-z]?(?![0-9A-Za-z])"
+    r"|\s*[,/]\s*-\d{3}[a-z]?(?![0-9A-Za-z])" r"|-[a-z](?:/[a-z])*(?![A-Za-z0-9])" r"|\*")
 _CANON_HEADER = "| Id | Form | Requirement |"
 _POINTER_HEADER = "| Id | Where it lives now | Note |"
 _SEPARATOR_RE = re.compile(r"^\|[\s:|-]+$")

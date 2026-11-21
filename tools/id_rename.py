@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from tools.id_map import (
+    _FAM,
     FILE_CAP,
     MAP_CAP,
     MAP_RELPATH,
@@ -43,6 +44,7 @@ Hit = str
 
 _OLD_PARTS = re.compile(r"R-(.+)-(\d+)([a-z]?)")
 _NEW_PARTS = re.compile(r"R-(.+)\.(\d+)")
+_STEM_PARTS = re.compile(rf"R-({_FAM})-(\d+)[A-Za-z]?(?:\.\d+)*")
 _MODULE_RE = re.compile(r"^## (S\d+) · ")
 
 
@@ -64,11 +66,23 @@ def _used_numbers(ids: Sequence[str]) -> Dict[str, Set[int]]:
     return used
 
 
+def _stem_numbers(ids: Sequence[str]) -> Dict[str, int]:
+    """Highest stem per family among old-form, letter-suffix and dotted row ids."""
+    top: Dict[str, int] = {}
+    for row_id in ids:
+        match = _STEM_PARTS.fullmatch(row_id)
+        if match:
+            family, digits = match.groups()
+            top[family] = max(top.get(family, 0), int(digits))
+    return top
+
+
 def plan_new_ids(
     old_ids: List[str], row_ids: List[str], entries: List[MapEntry]
 ) -> Dict[str, str]:
     """Plan ``R-FAM.n`` for each old id: its own number when free, else highest + 1."""
     used = _used_numbers(row_ids + [e.new_id for e in entries])
+    stems = _stem_numbers(row_ids)
     parsed = [(o, _OLD_PARTS.fullmatch(o)) for o in old_ids if OLD_R_RE.fullmatch(o)]
     planned: Dict[str, str] = {}
     rest: List[Tuple[str, str]] = []
@@ -81,7 +95,7 @@ def plan_new_ids(
         else:
             rest.append((old, family))
     for old, family in rest:
-        number = max(used.get(family, set()), default=0) + 1
+        number = max(max(used.get(family, set()), default=0), stems.get(family, 0)) + 1
         used.setdefault(family, set()).add(number)
         planned[old] = f"R-{family}.{number}"
     return {o: planned[o] for o, _ in parsed if o in planned}
