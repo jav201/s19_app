@@ -229,6 +229,7 @@ class CheckEditorPanel(ScrollableContainer):
         # mapping on the UI thread before the existing route describe.
         a2l_data = None
         prepared_definitions = None
+        describe_context = None
         if self.is_mounted:
             a2l_data = getattr(self.app, "current_a2l_data", None)
             snapshots = getattr(
@@ -238,6 +239,7 @@ class CheckEditorPanel(ScrollableContainer):
             if entry is not None:
                 if entry.signature == signature and entry.a2l_source is a2l_data:
                     prepared_definitions = entry.definitions
+                    describe_context = getattr(entry, "describe_context", None)
                 else:
                     self.app._accepted_a2l_picker_snapshots = MappingProxyType({})
         if prepared_definitions is not None:
@@ -246,6 +248,7 @@ class CheckEditorPanel(ScrollableContainer):
                 signature,
                 a2l_data=a2l_data,
                 prepared_definitions=prepared_definitions,
+                describe_context=describe_context,
             )
         else:
             repopulated = self._picker.set_parameters(

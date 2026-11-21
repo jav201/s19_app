@@ -31,6 +31,7 @@ remaining non-ledger painters.
 
 from __future__ import annotations
 
+import logging
 from math import ceil
 from dataclasses import dataclass
 from types import MappingProxyType
@@ -45,9 +46,16 @@ from textual.coordinate import Coordinate
 from textual.message import Message
 from textual.widgets import Button, DataTable, Input, Label, Static
 
-from .a2l_definition import Definition, describe_definitions
+from .a2l_definition import (
+    DescribeContext,
+    Definition,
+    describe_definitions,
+    describe_in_context,
+)
 from .insight_style import CYAN, DGRAY, GREEN, VALUE
 from .os_clipboard_input import OsClipboardInput
+
+logger = logging.getLogger("s19tui")
 
 if TYPE_CHECKING:
     from textual.timer import Timer
@@ -496,6 +504,8 @@ class A2LParameterPicker(Vertical):
         self._filter_timer: Optional[Timer] = None
         self._definitions: Mapping[str, Definition] = MappingProxyType({})
         self._definitions_source: Optional[dict] = None
+        self._describe_context: Optional[DescribeContext] = None
+        self._page_memo: Optional[tuple] = None
 
     # ------------------------------------------------------------------
     # State read by the host (compatibility surface)
@@ -511,6 +521,34 @@ class A2LParameterPicker(Vertical):
     def definitions_source(self) -> Optional[dict]:
         """The ``a2l_data`` that describe used (E3A-13); ``None`` without it."""
         return self._definitions_source
+
+    @property
+    def describe_context(self) -> Optional[DescribeContext]:
+        """The describe context of the last real population, or ``None``."""
+        return self._describe_context
+
+    def page_definitions(self) -> Mapping[str, Definition]:
+        """The definitions of the shown page.
+
+        With a describe context they are described through it, memoized for
+        the last page only. A raise inside the context describe falls back to
+        the non-context describe and logs one fixed line (no exception text,
+        no name). Without a context: the population definitions.
+        """
+        context = self._describe_context
+        if context is None:
+            return self._definitions
+        names = tuple(self._visible_params)
+        key = (id(context), names)
+        if self._page_memo is not None and self._page_memo[0] == key:
+            return self._page_memo[1]
+        try:
+            page = describe_in_context(names, context)
+        except Exception:
+            logger.warning("A2L describe context failed: full describe used.")
+            page = describe_definitions(names, context.source)
+        self._page_memo = (key, page)
+        return page
 
     @property
     def param_rows(self) -> dict:
@@ -594,6 +632,7 @@ class A2LParameterPicker(Vertical):
         *,
         a2l_data: Optional[dict] = None,
         prepared_definitions: Optional[Mapping[str, Definition]] = None,
+        describe_context: Optional[DescribeContext] = None,
     ) -> bool:
         """Populate the ledger (R-B102-SEL-001, R-B102-SEL-004, R-B102-SEL-006).
 
@@ -608,6 +647,11 @@ class A2LParameterPicker(Vertical):
         installed as the read-only definitions without a describe. An omitted
         input retains the existing single direct describe. ``definitions``
         and ``definitions_source`` still describe the last real population.
+
+        A supplied ``describe_context`` wins over ``prepared_definitions``:
+        every format cell comes from the context's format fields, the
+        definitions stay empty and ``definitions_source`` is the context's
+        source (the shown page is described by :meth:`page_definitions`).
 
         When ``signature`` is non-``None`` and equals the stored signature,
         returns ``False`` before describing definitions or touching filter,
@@ -636,14 +680,22 @@ class A2LParameterPicker(Vertical):
         self._param_rows = {}
         self._picked_params = []
         names = [str(row.get("name") or "?") for row in rows]
-        if prepared_definitions is not None:
-            definitions: Mapping[str, Definition] = prepared_definitions
+        formats: Mapping = {}
+        if describe_context is not None:
+            definitions: Mapping[str, Definition] = {}
+            formats = describe_context.formats
+        elif prepared_definitions is not None:
+            definitions = prepared_definitions
         else:
             definitions = (
                 describe_definitions(names, a2l_data) if a2l_data is not None else {}
             )
         self._definitions = MappingProxyType(definitions)
-        self._definitions_source = a2l_data
+        self._definitions_source = (
+            describe_context.source if describe_context is not None else a2l_data
+        )
+        self._describe_context = describe_context
+        self._page_memo = None
         for row, name in zip(rows, names):
             address = row.get("address")
             address = (
@@ -657,7 +709,8 @@ class A2LParameterPicker(Vertical):
                 if isinstance(length, int) and not isinstance(length, bool) and length > 0
                 else None
             )
-            fmt_unit = _format_parameter(definitions.get(name), row)
+            source = formats if describe_context is not None else definitions
+            fmt_unit = _format_parameter(source.get(name), row)
             self._param_rows[name] = (address, size, fmt_unit)
         self._fmt_longest = max(
             (

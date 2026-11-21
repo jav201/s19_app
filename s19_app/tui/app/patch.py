@@ -7,7 +7,12 @@ from typing import TYPE_CHECKING, Callable, List, Mapping, Optional
 from textual import work
 from textual.widgets import DataTable, Select, Static, TextArea
 from ...compare import DIFF_KIND_DOMAIN
-from ..a2l_definition import Refusal, describe_definition
+from ..a2l_definition import (
+    Definition,
+    Refusal,
+    describe_definition,
+    describe_in_context,
+)
 from ..definition_sheet import name_echo
 from ..changes import STATUS_VERIFIED, VerifyResult
 from ..changes.io import (
@@ -387,7 +392,7 @@ class PatchMixin:
         if not a2l_data:
             self.set_status("Patch Editor: no A2L is loaded — nothing staged.")
             return
-        definition = describe_definition(event.name, a2l_data)
+        definition = self._describe_for_stage(event.name, a2l_data)
         result = self._change_service.stage_definition(
             definition,
             a2l_data,
@@ -452,7 +457,7 @@ class PatchMixin:
                 f"{name_echo(event.name)} was encoding — stage it again."
             )
             return False
-        if describe_definition(event.name, a2l_data) != event.definition:
+        if self._describe_for_stage(event.name, a2l_data) != event.definition:
             self.set_status(
                 f"Patch Editor: {name_echo(event.name)} changed in the A2L — "
                 "select it again to reload its values."
@@ -1818,6 +1823,31 @@ class PatchMixin:
 
         self.push_screen(LoadGuardScreen(), _answer)
 
+    def _describe_for_stage(self, name: str, a2l_data: dict) -> Definition:
+        """Describe one staged name: through the Patch picker's context when
+        it belongs to ``a2l_data``, else the full single-name describe (with
+        a fixed log line for a stale, missing or failing context)."""
+        try:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+            context = panel._a2l_picker.describe_context
+        except Exception:
+            context = None
+        if context is None:
+            if getattr(self, "_a2l_describe_path", "eager") == "lazy":
+                self.logger.info(
+                    "A2L describe context missing: full describe used."
+                )
+        elif context.source is not a2l_data:
+            self.logger.info("A2L describe context stale: full describe used.")
+        else:
+            try:
+                return describe_in_context([name], context)[name]
+            except Exception:
+                self.logger.warning(
+                    "A2L describe context failed: full describe used."
+                )
+        return describe_definition(name, a2l_data)
+
     def _prefill_patch_editor(self) -> None:
         """Populate the Patch Editor's A2L picker on screen entry
         (batch-102 Inc 5, R-B102-PE-001, R-B102-PE-005; C-7, I-ALP-2.3).
@@ -1861,6 +1891,7 @@ class PatchMixin:
                 key,
                 a2l_data=self.current_a2l_data,
                 prepared_definitions=entry.definitions,
+                describe_context=entry.describe_context,
             )
         elif entry is not None:
             self._accepted_a2l_picker_snapshots = MappingProxyType({})

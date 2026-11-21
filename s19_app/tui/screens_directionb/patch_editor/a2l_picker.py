@@ -28,6 +28,7 @@ class A2lPickerMixin:
         *,
         a2l_data=None,
         prepared_definitions=None,
+        describe_context=None,
     ) -> None:
         """Populate the A2L picker (R-B102-PE-001, R-B102-PE-005; C-7, I-ALP-2.3).
 
@@ -49,6 +50,13 @@ class A2lPickerMixin:
         if not self.is_mounted:
             repopulated = self._a2l_picker.set_parameters(
                 rows, signature, a2l_data=None
+            )
+        elif describe_context is not None:
+            repopulated = self._a2l_picker.set_parameters(
+                rows,
+                signature,
+                a2l_data=a2l_data,
+                describe_context=describe_context,
             )
         elif prepared_definitions is not None:
             repopulated = self._a2l_picker.set_parameters(
@@ -233,7 +241,7 @@ class A2lPickerMixin:
         picker = self._a2l_picker
         self._sheet.show_page(
             picker.visible_params,
-            picker.definitions,
+            picker.page_definitions(),
             picker.definitions_source,
             self._mem_map,
         )

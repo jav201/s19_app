@@ -620,6 +620,44 @@ def _read_limits(lower_word: object, upper_word: object) -> Limits:
     )
 
 
+class FormatFields(NamedTuple):
+    """The three Definition fields the picker format column reads."""
+
+    datatype: Optional[str]
+    kind: str
+    unit: str
+
+
+@dataclass(frozen=True, eq=False)
+class DescribeContext:
+    """One per parsed A2L: the source payload, the format fields of every
+    measurable name and the private read-only state ``describe_in_context``
+    answers from (maps, final span table, occupancy index with tuple arrays).
+    Never written after it is built; identity is the binding."""
+
+    source: dict = field(repr=False)
+    formats: Mapping[str, FormatFields] = field(repr=False)
+    _maps: Mapping = field(repr=False)
+    _span_table: Mapping[int, tuple] = field(repr=False)
+    _index: _OccupancyIndex = field(repr=False)
+
+
+@dataclass
+class _DescribeMaps:
+    """The section walk's maps; the span entries are in walk order."""
+
+    tags_by_name: dict = field(default_factory=dict)
+    object_sections_by_name: dict = field(default_factory=dict)
+    compu_methods_by_name: dict = field(default_factory=dict)
+    compu_tables_by_name: dict = field(default_factory=dict)
+    axis_pts_by_name: dict = field(default_factory=dict)
+    mod_common_of: dict = field(default_factory=dict)
+    span_entries: list = field(default_factory=list)
+    tag_consumed: dict = field(default_factory=dict)
+    order: int = 0
+    ds_index: int = 0
+
+
 def describe_definition(name: str, a2l_data: dict) -> Definition:
     """Build the definition of one name; ``describe_definitions([name],
     a2l_data)[name]`` — one code path, every rule lives in
@@ -660,121 +698,16 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
     Raises:
         None.
     """
-    tags_by_name: dict[str, list[dict]] = {}
-    for tag in a2l_data.get("tags") or []:
-        tags_by_name.setdefault(tag.get("name"), []).append(tag)
-
-    object_sections_by_name: dict[str, list[dict]] = {}
-    compu_methods_by_name: dict[str, dict] = {}
-    compu_tables_by_name: dict[str, dict] = {}
-    axis_pts_by_name: dict[str, tuple[dict, tuple[str, ...], Optional[dict]]] = {}
-    mod_common_of: dict[int, Optional[dict]] = {}
-    record_layouts = a2l_data.get("record_layouts_by_name") or {}
-    declared_spans = a2l_data.get("declared_spans") or []
-    order = [0]
-    ds_index = [0]
-    tag_consumed: dict[str, int] = {}
-    span_entries: list[tuple] = []
-
-    def walk(nodes: Iterable[dict], mod_common: Optional[dict]) -> None:
-        for node in nodes:
-            order[0] += 1
-            position = order[0]
-            node_name = node.get("name")
-            if node_name == "MODULE":
-                child_common = next(
-                    (
-                        child
-                        for child in node.get("children") or []
-                        if child.get("name") == "MOD_COMMON"
-                    ),
-                    None,
-                )
-                walk(node.get("children") or [], child_common)
-                continue
-            parsed = parse_begin_meta(node.get("meta", "") or "")
-            if node_name in ("MEASUREMENT", "CHARACTERISTIC"):
-                object_sections_by_name.setdefault(parsed[0], []).append(node)
-                mod_common_of[id(node)] = mod_common
-                if node.get("end_line") is not None:
-                    idx = tag_consumed.get(parsed[0], 0)
-                    tags = tags_by_name.get(parsed[0]) or []
-                    if idx < len(tags):
-                        tag = tags[idx]
-                        tag_consumed[parsed[0]] = idx + 1
-                        address = tag.get("address")
-                        if address is not None:
-                            span_entries.append(
-                                (
-                                    position,
-                                    parsed[0],
-                                    node_name,
-                                    address,
-                                    tag.get("length"),
-                                    tag.get("effective_byte_order") or "little",
-                                )
-                            )
-            elif node_name == "COMPU_METHOD":
-                compu_methods_by_name.setdefault(parsed[0], node)
-            elif node_name in ("COMPU_VTAB", "COMPU_VTAB_RANGE"):
-                compu_tables_by_name.setdefault(parsed[0], node)
-            elif node_name in ("BLOB", "INSTANCE"):
-                if ds_index[0] < len(declared_spans):
-                    span = declared_spans[ds_index[0]]
-                    ds_index[0] += 1
-                    address = span.get("address")
-                    if address is not None:
-                        span_entries.append(
-                            (
-                                position,
-                                span.get("name"),
-                                node_name,
-                                address,
-                                span.get("length"),
-                                "little",
-                            )
-                        )
-            elif node_name == "AXIS_PTS":
-                tokens = _flatten_body_tokens(
-                    [node.get("meta", "") or ""] + (node.get("lines") or [])
-                )
-                header = tuple(tokens[:10])
-                ref = header[0] if header else None
-                layout_name = header[4] if len(header) > 4 else None
-                layout_section = record_layouts.get(layout_name) if layout_name else None
-                if ref is not None:
-                    axis_pts_by_name.setdefault(ref, (node, header, layout_section))
-                    address = _read_address_word(
-                        header[2] if len(header) > 2 else None
-                    )
-                    if address is not None:
-                        span_entries.append(
-                            (
-                                position,
-                                ref,
-                                "AXIS_PTS",
-                                address,
-                                None,
-                                "little",
-                                node,
-                                header,
-                                layout_section,
-                            )
-                        )
-                mod_common_of[id(node)] = mod_common
-            walk(node.get("children") or [], mod_common)
-
-    walk(a2l_data.get("sections") or [], None)
-    walk = None  # break the closure self-cycle: no cyclic garbage (R-A2L-REFRESH.053, DX-F3)
+    walked = _walk_describe_maps(a2l_data)
+    tags_by_name = walked.tags_by_name
+    object_sections_by_name = walked.object_sections_by_name
+    axis_pts_by_name = walked.axis_pts_by_name
+    mod_common_of = walked.mod_common_of
+    tag_consumed = walked.tag_consumed
+    span_entries = walked.span_entries
 
     reads: dict[object, object] = {}
-    maps = {
-        "axis_pts_by_name": axis_pts_by_name,
-        "mod_common_of": mod_common_of,
-        "reads": reads,
-        "compu_methods_by_name": compu_methods_by_name,
-        "compu_tables_by_name": compu_tables_by_name,
-    }
+    maps = _helper_maps(walked, reads)
     definitions: dict[str, Definition] = {}
     axis_records: dict[int, tuple[Optional[int], str]] = {}
 
@@ -784,22 +717,13 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
                 name,
                 tags_by_name,
                 object_sections_by_name,
-                compu_methods_by_name,
-                compu_tables_by_name,
+                walked.compu_methods_by_name,
+                walked.compu_tables_by_name,
                 a2l_data,
                 maps,
             )
             definitions[name] = definition
-            for axis in definition.axes:
-                record = axis.axis_object_record
-                if record is None:
-                    continue
-                found = axis_pts_by_name.get(record.name)
-                if found is not None:
-                    axis_records[id(found[0])] = (
-                        record.byte_length,
-                        record.byte_order,
-                    )
+            _note_axis_records(definition, axis_pts_by_name, axis_records)
         return definitions[name]
 
     requested: list[str] = []
@@ -811,57 +735,8 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
             requested.append(name)
             requested_set.add(name)
 
-    def axis_span(entry: tuple) -> tuple[Optional[int], str]:
-        node, header, layout_section = entry[6:9]
-        key = id(node)
-        if key in axis_records:
-            return axis_records[key]
-        byte_order = _axis_byte_order(node, layout_section, maps)
-        byte_length: Optional[int] = None
-        layout_name = header[4] if len(header) > 4 else None
-        layout = _read_record_layout(
-            layout_name,
-            a2l_data,
-            _echo(entry[1]),
-            maps,
-            layout_section,
-        )
-        point_count = _read_count(header[7] if len(header) > 7 else None)
-        if (
-            layout is not None
-            and not isinstance(layout, Refusal)
-            and _find_component(layout, "AXIS_PTS_X") is not None
-            and point_count is not None
-            and 1 <= point_count <= _MAX_AXIS_POINTS
-        ):
-            fixed_count = layout["fixed"].get("X")
-            if fixed_count is None or fixed_count == point_count:
-                placed = _place_components(layout, (point_count,))
-                if placed is not None:
-                    end = placed[1]
-                    address = entry[3]
-                    if address >= 0 and address + end - 1 <= 0xFFFFFFFF:
-                        byte_length = end
-        axis_records[key] = (byte_length, byte_order)
-        return axis_records[key]
-
     def is_array_entry(entry: tuple) -> bool:
-        tags = tags_by_name.get(entry[1]) or []
-        sections = object_sections_by_name.get(entry[1]) or []
-        if len(tags) != 1 or len(sections) != 1:
-            return True
-        tag = tags[0]
-        if tag.get("section") == "CHARACTERISTIC":
-            if tag.get("char_type") == "VALUE":
-                matrix = _read_matrix_dim(sections[0])
-                return matrix is not None and _is_multi_value_matrix(matrix[0])
-            return tag.get("char_type") in ("VAL_BLK", "CURVE", "MAP")
-        if tag.get("section") == "MEASUREMENT":
-            matrix = _read_matrix_dim(sections[0])
-            return matrix is not None and (
-                matrix[1] is None or _is_multi_value_matrix(matrix[0])
-            )
-        return False
+        return _is_array_entry(entry, walked)
 
     entry_cache: dict[int, tuple] = {}
 
@@ -878,7 +753,7 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
             byte_length = entry[4]
             byte_order = entry[5]
         elif kind == "AXIS_PTS":
-            byte_length, byte_order = axis_span(entry)
+            byte_length, byte_order = _axis_span(entry, a2l_data, maps, axis_records)
         else:
             byte_length = entry[4]
             byte_order = entry[5]
@@ -886,17 +761,7 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
         return entry_cache[key]
 
     def mask_of(other_name: str) -> Optional[int]:
-        other = describe_name(other_name)
-        if (
-            other is None
-            or other.section not in ("MEASUREMENT", "CHARACTERISTIC")
-            or other.kind not in ("number", "enum")
-            or other.refusal is not None
-            or other.byte_length is None
-            or other.byte_length < 1
-        ):
-            return None
-        return other.bit_mask
+        return _clean_mask(describe_name(other_name))
 
     definitions_by_position: dict[int, Definition] = {}
     for entry in span_entries:
@@ -938,6 +803,454 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
         tag_consumed,
         *(f for f in index if isinstance(f, (list, dict))),
     )  # private containers only; R-A2L-REFRESH.050
+    return result
+
+
+def _helper_maps(walked: _DescribeMaps, reads: dict) -> dict:
+    """The ``maps`` dict the describe helpers read, over a given ``reads``."""
+    return {
+        "axis_pts_by_name": walked.axis_pts_by_name,
+        "mod_common_of": walked.mod_common_of,
+        "reads": reads,
+        "compu_methods_by_name": walked.compu_methods_by_name,
+        "compu_tables_by_name": walked.compu_tables_by_name,
+    }
+
+
+def _walk_describe_maps(a2l_data: dict) -> _DescribeMaps:
+    """Walk the sections once: tags and sections by name, compu methods and
+    tables, AXIS_PTS by name, MOD_COMMON per node, span entries in walk order."""
+    walked = _DescribeMaps()
+    for tag in a2l_data.get("tags") or []:
+        walked.tags_by_name.setdefault(tag.get("name"), []).append(tag)
+    _walk_nodes(a2l_data.get("sections") or [], None, walked, a2l_data)
+    return walked
+
+
+def _walk_nodes(
+    nodes: Iterable[dict], mod_common: Optional[dict], walked: _DescribeMaps, a2l_data: dict
+) -> None:
+    for node in nodes:
+        walked.order += 1
+        position = walked.order
+        node_name = node.get("name")
+        if node_name == "MODULE":
+            child_common = next(
+                (
+                    child
+                    for child in node.get("children") or []
+                    if child.get("name") == "MOD_COMMON"
+                ),
+                None,
+            )
+            _walk_nodes(node.get("children") or [], child_common, walked, a2l_data)
+            continue
+        parsed = parse_begin_meta(node.get("meta", "") or "")
+        if node_name in ("MEASUREMENT", "CHARACTERISTIC"):
+            _walk_object_node(node, node_name, parsed, position, mod_common, walked)
+        elif node_name == "COMPU_METHOD":
+            walked.compu_methods_by_name.setdefault(parsed[0], node)
+        elif node_name in ("COMPU_VTAB", "COMPU_VTAB_RANGE"):
+            walked.compu_tables_by_name.setdefault(parsed[0], node)
+        elif node_name in ("BLOB", "INSTANCE"):
+            _walk_declared_span(node_name, position, walked, a2l_data)
+        elif node_name == "AXIS_PTS":
+            _walk_axis_pts_node(node, position, mod_common, walked, a2l_data)
+        _walk_nodes(node.get("children") or [], mod_common, walked, a2l_data)
+
+
+def _walk_object_node(
+    node: dict,
+    node_name: str,
+    parsed: tuple,
+    position: int,
+    mod_common: Optional[dict],
+    walked: _DescribeMaps,
+) -> None:
+    walked.object_sections_by_name.setdefault(parsed[0], []).append(node)
+    walked.mod_common_of[id(node)] = mod_common
+    if node.get("end_line") is None:
+        return
+    idx = walked.tag_consumed.get(parsed[0], 0)
+    tags = walked.tags_by_name.get(parsed[0]) or []
+    if idx >= len(tags):
+        return
+    tag = tags[idx]
+    walked.tag_consumed[parsed[0]] = idx + 1
+    address = tag.get("address")
+    if address is not None:
+        walked.span_entries.append(
+            (
+                position,
+                parsed[0],
+                node_name,
+                address,
+                tag.get("length"),
+                tag.get("effective_byte_order") or "little",
+            )
+        )
+
+
+def _walk_declared_span(
+    node_name: str, position: int, walked: _DescribeMaps, a2l_data: dict
+) -> None:
+    declared_spans = a2l_data.get("declared_spans") or []
+    if walked.ds_index >= len(declared_spans):
+        return
+    span = declared_spans[walked.ds_index]
+    walked.ds_index += 1
+    address = span.get("address")
+    if address is not None:
+        walked.span_entries.append(
+            (position, span.get("name"), node_name, address, span.get("length"), "little")
+        )
+
+
+def _walk_axis_pts_node(
+    node: dict,
+    position: int,
+    mod_common: Optional[dict],
+    walked: _DescribeMaps,
+    a2l_data: dict,
+) -> None:
+    tokens = _flatten_body_tokens([node.get("meta", "") or ""] + (node.get("lines") or []))
+    header = tuple(tokens[:10])
+    ref = header[0] if header else None
+    layout_name = header[4] if len(header) > 4 else None
+    record_layouts = a2l_data.get("record_layouts_by_name") or {}
+    layout_section = record_layouts.get(layout_name) if layout_name else None
+    if ref is not None:
+        walked.axis_pts_by_name.setdefault(ref, (node, header, layout_section))
+        address = _read_address_word(header[2] if len(header) > 2 else None)
+        if address is not None:
+            walked.span_entries.append(
+                (position, ref, "AXIS_PTS", address, None, "little", node, header, layout_section)
+            )
+    walked.mod_common_of[id(node)] = mod_common
+
+
+def _note_axis_records(
+    definition: Definition, axis_pts_by_name: Mapping, axis_records: dict
+) -> None:
+    """Record the axis span each described axis object of ``definition`` gives."""
+    for axis in definition.axes:
+        record = axis.axis_object_record
+        if record is None:
+            continue
+        found = axis_pts_by_name.get(record.name)
+        if found is not None:
+            axis_records[id(found[0])] = (record.byte_length, record.byte_order)
+
+
+def _clean_mask(other: Optional[Definition]) -> Optional[int]:
+    """The clean bit mask of a described candidate, else ``None``."""
+    if (
+        other is None
+        or other.section not in ("MEASUREMENT", "CHARACTERISTIC")
+        or other.kind not in ("number", "enum")
+        or other.refusal is not None
+        or other.byte_length is None
+        or other.byte_length < 1
+    ):
+        return None
+    return other.bit_mask
+
+
+def _is_array_entry(entry: tuple, walked: _DescribeMaps) -> bool:
+    """Whether an entry's final length can still change: a homonym or an
+    array-like object (VAL_BLK, CURVE, MAP, MATRIX_DIM)."""
+    tags = walked.tags_by_name.get(entry[1]) or []
+    sections = walked.object_sections_by_name.get(entry[1]) or []
+    if len(tags) != 1 or len(sections) != 1:
+        return True
+    tag = tags[0]
+    if tag.get("section") == "CHARACTERISTIC":
+        if tag.get("char_type") == "VALUE":
+            matrix = _read_matrix_dim(sections[0])
+            return matrix is not None and _is_multi_value_matrix(matrix[0])
+        return tag.get("char_type") in ("VAL_BLK", "CURVE", "MAP")
+    if tag.get("section") == "MEASUREMENT":
+        matrix = _read_matrix_dim(sections[0])
+        return matrix is not None and (
+            matrix[1] is None or _is_multi_value_matrix(matrix[0])
+        )
+    return False
+
+
+def _axis_span(
+    entry: tuple, a2l_data: dict, maps: dict, axis_records: dict
+) -> tuple[Optional[int], str]:
+    """The span of an AXIS_PTS entry: the one a described curve recorded, else
+    the span placed from the record layout (recorded in ``axis_records``)."""
+    node, header, layout_section = entry[6:9]
+    key = id(node)
+    if key in axis_records:
+        return axis_records[key]
+    byte_order = _axis_byte_order(node, layout_section, maps)
+    byte_length: Optional[int] = None
+    layout_name = header[4] if len(header) > 4 else None
+    layout = _read_record_layout(
+        layout_name, a2l_data, _echo(entry[1]), maps, layout_section
+    )
+    point_count = _read_count(header[7] if len(header) > 7 else None)
+    if (
+        layout is not None
+        and not isinstance(layout, Refusal)
+        and _find_component(layout, "AXIS_PTS_X") is not None
+        and point_count is not None
+        and 1 <= point_count <= _MAX_AXIS_POINTS
+    ):
+        fixed_count = layout["fixed"].get("X")
+        if fixed_count is None or fixed_count == point_count:
+            placed = _place_components(layout, (point_count,))
+            if placed is not None:
+                end = placed[1]
+                address = entry[3]
+                if address >= 0 and address + end - 1 <= 0xFFFFFFFF:
+                    byte_length = end
+    axis_records[key] = (byte_length, byte_order)
+    return axis_records[key]
+
+
+def _format_fields(
+    name: str, walked: _DescribeMaps, a2l_data: dict, reads: dict
+) -> FormatFields:
+    """The datatype, kind and unit of ``name`` without reading occupancy."""
+    found = _find_tag(name, walked.tags_by_name, walked.object_sections_by_name)
+    if found is None or isinstance(found, Refusal):
+        return FormatFields(None, "", "")
+    tag, section = found
+    matrix = _read_matrix_dim(section)
+    fields, _ = _conversion_fields(
+        _echo(name),
+        tag.get("conversion"),
+        walked.compu_methods_by_name,
+        walked.compu_tables_by_name,
+        a2l_data.get("compu_tabs_by_name") or {},
+        reads,
+    )
+    kind, _ = _object_kind(
+        tag, fields["conversion_type"], matrix[0] if matrix is not None else None
+    )
+    if kind in ("array", "curve", "map"):
+        full = _describe_one(
+            name,
+            walked.tags_by_name,
+            walked.object_sections_by_name,
+            walked.compu_methods_by_name,
+            walked.compu_tables_by_name,
+            a2l_data,
+            _helper_maps(walked, reads),
+        )
+        return FormatFields(full.datatype, full.kind, full.unit)
+    unit = _read_object_lines(section).get("unit")
+    if unit is None:
+        unit = fields["record_unit"] or ""
+    return FormatFields(_resolve_datatype(tag, a2l_data, reads), kind or "", unit or "")
+
+
+def _span_of_described(
+    name: str,
+    a2l_data: dict,
+    walked: _DescribeMaps,
+    helper: dict,
+    memo: dict,
+    axis_records: dict,
+) -> None:
+    if name in memo:
+        return
+    definition = _describe_one(
+        name,
+        walked.tags_by_name,
+        walked.object_sections_by_name,
+        walked.compu_methods_by_name,
+        walked.compu_tables_by_name,
+        a2l_data,
+        helper,
+    )
+    memo[name] = (definition.byte_length, definition.byte_order)
+    _note_axis_records(definition, walked.axis_pts_by_name, axis_records)
+
+
+def _build_span_table(
+    a2l_data: dict, names: Sequence[str], walked: _DescribeMaps, helper: dict
+) -> dict[int, tuple]:
+    """Every entry's final ``materialize`` value, keyed by walk position.
+
+    Array-kind and homonym objects are described in ``names`` order first, then
+    the rest in walk order, so every curve has recorded its axis span before
+    any AXIS_PTS span is taken."""
+    entries = walked.span_entries
+    kinds = ("MEASUREMENT", "CHARACTERISTIC")
+    flags = {e[0]: e[2] in kinds and _is_array_entry(e, walked) for e in entries}
+    array_names = {e[1] for e in entries if flags[e[0]]}
+    memo: dict[str, tuple] = {}
+    axis_records: dict[int, tuple] = {}
+    order = [n for n in names if n in array_names]
+    order += [e[1] for e in entries if flags[e[0]]]
+    for name in order:
+        _span_of_described(name, a2l_data, walked, helper, memo, axis_records)
+    table: dict[int, tuple] = {}
+    for entry in entries:
+        if flags[entry[0]]:
+            length, byte_order = memo[entry[1]]
+        elif entry[2] == "AXIS_PTS":
+            length, byte_order = _axis_span(entry, a2l_data, helper, axis_records)
+        else:
+            length, byte_order = entry[4], entry[5]
+        table[entry[0]] = entry[:4] + (length, byte_order)
+    release_in_slices(memo, axis_records, flags)
+    return table
+
+
+def _freeze_index(index: _OccupancyIndex) -> _OccupancyIndex:
+    """The index with tuple arrays and a read-only object map; the builder's
+    lists are released in slices."""
+    frozen = _OccupancyIndex(
+        tuple(index.records),
+        index.leaf_offset,
+        tuple(index.min_first),
+        tuple(index.max_last),
+        tuple(index.min_pos),
+        tuple(index.leaf_records),
+        MappingProxyType(index.position_by_object),
+    )
+    release_in_slices(
+        index.records, index.min_first, index.max_last, index.min_pos, index.leaf_records
+    )
+    return frozen
+
+
+class _GroupedByName(Mapping):
+    """A read-only ``name -> tuple`` map held as one flat tuple plus a map of
+    ``(start, stop)`` bounds, so a name costs no garbage-collector-tracked
+    container of its own (a per-name tuple would; the bounds are untracked)."""
+
+    def __init__(self, grouped: Mapping[str, list]) -> None:
+        flat: list = []
+        bounds: dict = {}
+        for key, items in grouped.items():
+            bounds[key] = (len(flat), len(flat) + len(items))
+            flat.extend(items)
+        self._flat = tuple(flat)
+        self._bounds = MappingProxyType(bounds)
+
+    def __getitem__(self, key: str) -> tuple:
+        start, stop = self._bounds[key]
+        return self._flat[start:stop]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._bounds)
+
+    def __len__(self) -> int:
+        return len(self._bounds)
+
+
+def _freeze_maps(walked: _DescribeMaps) -> Mapping:
+    """The maps ``describe_in_context`` reads, as read-only maps over tuples."""
+    return MappingProxyType(
+        {
+            "tags_by_name": _GroupedByName(walked.tags_by_name),
+            "object_sections_by_name": _GroupedByName(walked.object_sections_by_name),
+            "compu_methods_by_name": MappingProxyType(walked.compu_methods_by_name),
+            "compu_tables_by_name": MappingProxyType(walked.compu_tables_by_name),
+            "axis_pts_by_name": MappingProxyType(walked.axis_pts_by_name),
+            "mod_common_of": MappingProxyType(walked.mod_common_of),
+        }
+    )
+
+
+def build_describe_context(a2l_data: dict, names: Sequence[str]) -> DescribeContext:
+    """Build the read-only context ``describe_in_context`` answers from: one
+    section walk, the final span table of every entry, the occupancy index
+    built once from that table, and the format fields of every name.
+
+    Args:
+        a2l_data (dict): The parse payload (as :func:`describe_definition`).
+        names (Sequence[str]): The measurable names in enrichment order.
+
+    Returns:
+        DescribeContext: Never written after it is returned.
+
+    Raises:
+        None expected; a helper's raise propagates to the caller.
+    """
+    walked = _walk_describe_maps(a2l_data)
+    reads: dict[object, object] = {}
+    table = _build_span_table(a2l_data, names, walked, _helper_maps(walked, reads))
+    entries = [entry[:6] for entry in walked.span_entries]
+    index = _freeze_index(_build_occupancy_index(entries, lambda entry: False, {}, table))
+    shared: dict[FormatFields, FormatFields] = {}
+    formats: dict[str, FormatFields] = {}
+    for name in names:
+        fields = _format_fields(name, walked, a2l_data, reads)
+        formats[name] = shared.setdefault(fields, fields)
+    context = DescribeContext(
+        source=a2l_data,
+        formats=MappingProxyType(formats),
+        _maps=_freeze_maps(walked),
+        _span_table=MappingProxyType(table),
+        _index=index,
+    )
+    release_in_slices(entries, walked.span_entries, walked.tag_consumed, reads)
+    return context
+
+
+def _described_in_context(
+    name: str, described: dict, context: DescribeContext, maps: dict
+) -> Definition:
+    if name not in described:
+        described[name] = _describe_one(
+            name,
+            maps["tags_by_name"],
+            maps["object_sections_by_name"],
+            maps["compu_methods_by_name"],
+            maps["compu_tables_by_name"],
+            context.source,
+            maps,
+        )
+    return described[name]
+
+
+def describe_in_context(
+    names: Iterable[str], context: DescribeContext
+) -> dict[str, Definition]:
+    """The definitions of ``names`` from a built context: each equals
+    ``describe_definitions(<all measurable names>, context.source)[name]``.
+
+    Walks no section and writes nothing in the context; the memo is fresh.
+
+    Args:
+        names (Iterable[str]): The names to describe.
+        context (DescribeContext): The context built for the loaded A2L.
+
+    Returns:
+        dict[str, Definition]: One definition per requested name, in request
+        order.
+
+    Raises:
+        None expected; a helper's raise propagates to the caller.
+    """
+    maps = {**context._maps, "reads": {}}
+    described: dict[str, Definition] = {}
+    index = context._index
+    table = context._span_table
+
+    def mask_of(other_name: str) -> Optional[int]:
+        return _clean_mask(_described_in_context(other_name, described, context, maps))
+
+    result: dict[str, Definition] = {}
+    for name in names:
+        if name in result:
+            continue
+        definition = _described_in_context(name, described, context, maps)
+        if definition.address is not None:
+            own_position = index.position_by_object.get((definition.name, definition.section))
+            shared = _shared_with(
+                definition, index, own_position, mask_of, lambda entry: table[entry[0]]
+            )
+            definition = replace(definition, shared_with=shared)
+        result[name] = definition
     return result
 
 

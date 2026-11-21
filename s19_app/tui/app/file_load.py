@@ -14,7 +14,12 @@ from textual.widgets import ListItem, ListView
 from ...range_index import address_in_sorted_ranges
 from ...render.hexview import build_row_bases
 from ...utils import safe_text
-from ..a2l_definition import Definition, describe_definitions
+from ..a2l_definition import (
+    DescribeContext,
+    Definition,
+    build_describe_context,
+    describe_definitions,
+)
 from ..mac import parse_mac_file
 from ..models import LoadedFile
 from ..screens import ConfirmQuestionScreen, LoadChoice, LoadDialog
@@ -117,6 +122,23 @@ class A2LPickerSnapshot:
     signature: Tuple[int, int, int]
     a2l_source: dict
     definitions: Mapping[str, Definition]
+    describe_context: Optional[DescribeContext] = None
+
+
+def _selected_describe_path(logger: Any) -> str:
+    """``lazy`` only for the exact value of ``S19_A2L_DESCRIBE``; read at
+    each call. Any other set value logs one fixed line (never the value)
+    and selects ``eager``."""
+    value = deps.os.environ.get("S19_A2L_DESCRIBE")
+    if value is None or value == "eager":
+        return "eager"
+    if value == "lazy":
+        return "lazy"
+    logger.info(
+        "A2L describe path: unrecognised S19_A2L_DESCRIBE value ignored; "
+        "eager used."
+    )
+    return "eager"
 
 
 @dataclass(frozen=True)
@@ -1101,8 +1123,16 @@ class FileLoadMixin:
             for tag in enriched
             if isinstance(tag.get("address"), int)
         ]
-        definitions = describe_definitions(names, a2l_data)
-        picker_definitions = MappingProxyType(definitions)
+        context: Optional[DescribeContext] = None
+        selected = _selected_describe_path(self.logger)
+        self._a2l_describe_path = selected
+        if selected == "lazy":
+            context = build_describe_context(a2l_data, names)
+            picker_definitions: Mapping[str, Definition] = MappingProxyType({})
+        else:
+            picker_definitions = MappingProxyType(
+                describe_definitions(names, a2l_data)
+            )
         self.logger.info(
             "A2L attach snapshot prepared: path=%s a2l_generation=%d "
             "image_generation=%d mem_size=%d names=%d",
@@ -1125,12 +1155,14 @@ class FileLoadMixin:
                         signature=enrichment_key,
                         a2l_source=a2l_data,
                         definitions=picker_definitions,
+                        describe_context=context,
                     ),
                     "patch": A2LPickerSnapshot(
                         picker="patch",
                         signature=enrichment_key,
                         a2l_source=a2l_data,
                         definitions=picker_definitions,
+                        describe_context=context,
                     ),
                 }
             ),
