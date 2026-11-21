@@ -1,6 +1,6 @@
 # Handoff — after batch-87: D-II discharged, surface #3 declared, and the 4 BLOCKs left on `main` are batch-88's opening move
 
-> **Written 2026-08-24 (evening, local -06:00), session "batch-87 landing + batch-88 scoping" (background job, operator Javier).**
+> **Written 2026-08-24 (evening, local -06:00), session "batch-87 landing + batch-88 scoping" (background job, operator <operator>).**
 > **Supersedes** [[HANDOFF-devflow-session-2026-08-24]] — that document's §1, §4, §5 and §6 were
 > written before batch-87 and are now FALSE in named ways (D-II is ruled AND discharged; surface #3
 > shipped; the flaky diagnosis it records was refuted by measurement). It is kept, not edited.

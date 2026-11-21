@@ -53,7 +53,7 @@ Five follow-up batches are scoped and ready, derived from the open-findings regi
 | B-2B — Workspace hardening | F-7.7-02, -03, -04, -05, -06 | software-dev | 2–3 increments | high |
 | B-2C — Service-layer symmetry | F-9.04-01, -02, -03 | software-dev | 1–2 increments | medium |
 | B-2D — REQUIREMENTS.md numbering | F-9.01-01, F-9.02-01..03 | docs-writer | 1 increment | medium |
-| B-2E — Demo evidence + drift | TC-032 packs, TC-047 Windows stdout, 5 R-* `promote`, 2 `drift` | docs-writer + Javier | ~1 hour manual | medium |
+| B-2E — Demo evidence + drift | TC-032 packs, TC-047 Windows stdout, 5 R-* `promote`, 2 `drift` | docs-writer + <operator> | ~1 hour manual | medium |
 
 Detail: `.dev-flow/05-postmortem.md` §3.
 

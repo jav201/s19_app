@@ -10,7 +10,7 @@
 - Artifacts editor-invisible (worktree-not-editor-root): pasted inline at each gate.
 
 ### ✅ COLLISION RESOLVED (2026-07-21)
-A parallel session `local_b3ec8612` was also set up to build batch-58. I paused after Phase 2 and escalated; **Javier adjudicated live: THIS session owns batch-58 from Phase 3.** Stand-down message delivered to the parallel session; it stays parked (primary checkout intentionally NOT on `main`). Mutual backstop: RC-1 already-shipped grep catches a merged `#screen_crc_designer`.
+A parallel session `local_b3ec8612` was also set up to build batch-58. I paused after Phase 2 and escalated; **<operator> adjudicated live: THIS session owns batch-58 from Phase 3.** Stand-down message delivered to the parallel session; it stays parked (primary checkout intentionally NOT on `main`). Mutual backstop: RC-1 already-shipped grep catches a merged `#screen_crc_designer`.
 
 ### Phase-3 increment cut (engine-first, ≤5 files each)
 | Inc | Scope | LLR | AT | Notes |

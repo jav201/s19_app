@@ -90,7 +90,7 @@ Four candidate batches, each derivable from existing Findings — no new require
 
 **Batch B-2C — Service-layer symmetry.** Closes F-9.04-01, F-9.04-02, F-9.04-03. Add `tui/services/mac_service.py`, fold `S19File.get_overlap_addresses()` into `validation_service.build_validation_report`, add `a2l_service.parse_and_cache` to consume the third `app.py` direct-call bypass. Mechanical refactor; security-reviewer optional. 1–2 increments.
 
-**Batch B-2D — REQUIREMENTS.md numbering and demo evidence.** Closes F-9.01-01, F-9.02-01, F-9.02-02, F-9.02-03, F-9.09-01 (overlap with B-2A acceptable), plus the TC-032 9-pack demo evidence and TC-047 Windows stdout (Q-N01) gap from `04-validation.md` §5. Doc-only batch + a manual demo capture session. Owner: docs-writer + Javier. 1 increment.
+**Batch B-2D — REQUIREMENTS.md numbering and demo evidence.** Closes F-9.01-01, F-9.02-01, F-9.02-02, F-9.02-03, F-9.09-01 (overlap with B-2A acceptable), plus the TC-032 9-pack demo evidence and TC-047 Windows stdout (Q-N01) gap from `04-validation.md` §5. Doc-only batch + a manual demo capture session. Owner: docs-writer + <operator>. 1 increment.
 
 **Suggested execution order:** B-2A first (clears all `xfail` rows and the largest open-Findings cluster), then B-2B in parallel with B-2C, then B-2D as the closing doc sweep before the next /dev-flow-sync.
 
@@ -201,7 +201,7 @@ The architect and qa-reviewer recommendations overlap cleanly. Merged with no co
 | **B-2B — Workspace hardening** | F-7.7-02, F-7.7-03, F-7.7-04, F-7.7-05, F-7.7-06 | software-dev | 2–3 | high (closes 5 Findings; self-flip tests already in place) |
 | **B-2C — Service-layer symmetry** | F-9.04-01, F-9.04-02, F-9.04-03 | software-dev | 1–2 | medium (refactor; no new product behaviour) |
 | **B-2D — REQUIREMENTS.md numbering** | F-9.01-01, F-9.02-01..03, F-9.09-01 (overlap with B-2A acceptable) | docs-writer | 1 | medium (doc-only) |
-| **B-2E — Demo evidence + test promotions + drift remediation** | TC-032 (9 packs), TC-047 Windows stdout (Q-N01), 5 R-* `promote`, 2 R-* `drift` | docs-writer + Javier | 1 | medium (closes Phase 4 gaps; ~1 hour manual + doc edit) |
+| **B-2E — Demo evidence + test promotions + drift remediation** | TC-032 (9 packs), TC-047 Windows stdout (Q-N01), 5 R-* `promote`, 2 R-* `drift` | docs-writer + <operator> | 1 | medium (closes Phase 4 gaps; ~1 hour manual + doc edit) |
 
 **Suggested execution order:** B-2A first (clears xfails + largest cluster) → B-2B + B-2C in parallel → B-2D + B-2E as the closing doc/evidence sweep before the next batch sync to Obsidian.
 

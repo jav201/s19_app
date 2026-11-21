@@ -8,7 +8,7 @@
 > P4 (three fail in isolation at N=10; the `n = 1` reading is recorded as vacuous, C-53). It is kept
 > unedited as the record of that session — read the successor for current ground.
 
-> **Written 2026-08-24, session "dev-flow updates" (background job, operator Javier).**
+> **Written 2026-08-24, session "dev-flow updates" (background job, operator <operator>).**
 > **Re-derive every figure below; if a command disagrees, the command is right** — this
 > project has now retired that lesson into four separate controls and this document still
 > assumes it is wrong somewhere.

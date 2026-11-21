@@ -347,7 +347,7 @@ unencoded.**
 
 ## 3 · PART C — open operator decisions
 
-**These are Javier's and none has been ruled.** Each is stated so it can be answered, not re-derived.
+**These are <operator>'s and none has been ruled.** Each is stated so it can be answered, not re-derived.
 
 | # | decision | the shape of the answer |
 |---|---|---|

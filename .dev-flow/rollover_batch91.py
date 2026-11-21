@@ -86,7 +86,7 @@ doc["mode_history"].append({
               "rev60's packet template, is long satisfied; it resumes as its own step); mode "
               "core declared by the commission" % (batch, OUTGOING)})
 doc["standing_authorization"]["operator_words"] = (
-    "Operator (Javier), 2026-10-08: 'revisa la funcionalidad de la app y cierra los gaps de "
+    "Operator (<operator>), 2026-10-08: 'revisa la funcionalidad de la app y cierra los gaps de "
     "user stories, requerimientos y test cases que falten... usa /dev-flow' + 'despliegues "
     "agentes kimi 2.8 o 2.7 segun convenga'. Read with the established chain: Gates -- "
     "autonomous with the two exceptions; Git -- the COORDINATOR commits and pushes at each "

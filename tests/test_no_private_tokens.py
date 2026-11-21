@@ -26,7 +26,8 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 # sha256(token) -> token length. Accounts, LAN addresses and host names of the
-# operator's machines (redacted 2026-11-13).
+# operator's machines (redacted 2026-11-13), and the operator's first name
+# (redacted 2026-11-20).
 FORBIDDEN_DIGESTS: dict[str, int] = {
     "1cdf92120cc9fd75e8fd07d7459b21227030acc96c19c8777dce130ad859ce71": 8,
     "c4bae0a25aacc7b82c55e64d64c816cd8e31a24a671cc1b1caf38f499835f3ad": 7,
@@ -35,6 +36,7 @@ FORBIDDEN_DIGESTS: dict[str, int] = {
     "4a41fa5f84749be160db00f6a73370cfbcc4da931fa0053ed46b5d757cd46867": 14,
     "fbc3db768e89dbab8da11350faa84d0061545b7c653858f3fa6595302934c8df": 11,
     "037e406699771565d701ea9f793e936cc900e5c9620e1dcf6da0b7832ec5a07e": 11,
+    "0e1e847b6d1dfa0382c082a9850febd05bebad869f61e8c39e12992f9b87c0ff": 6,
 }
 
 _WORD = re.compile(rb"[A-Za-z0-9_.-]+")

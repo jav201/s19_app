@@ -113,7 +113,7 @@ How the 6 phases flowed in this batch, including the iter 2 → iter 3 rollback 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant User as User<br/>(Javier)
+    participant User as User<br/>(<operator>)
     participant P1 as Phase 1<br/>Requirements
     participant P2 as Phase 2<br/>Review
     participant P3 as Phase 3<br/>Implementation

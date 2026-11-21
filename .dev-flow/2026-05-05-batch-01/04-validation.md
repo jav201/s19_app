@@ -221,7 +221,7 @@ For each of `R-TUI-003`, `R-TUI-008`, `R-TUI-009`, `R-TUI-010`, `R-A2L-003`, `R-
    - **R-TUI-016** — project labels updated in the active session.
 4. Place a one-paragraph transcript (`transcript.md`) next to the screenshot describing steps + observed pass/fail, signed by the demo runner.
 
-**Owner:** Javier (jav201). **Effort:** ~1 hour total for all 9 packs against fixtures already in the repo.
+**Owner:** <operator> (jav201). **Effort:** ~1 hour total for all 9 packs against fixtures already in the repo.
 
 ### 5.2 Gap B — TC-047 NTFS junction probe canonical Windows stdout
 
@@ -235,7 +235,7 @@ pytest -v tests/test_tui_workspace.py::TestCopyIntoWorkareaContainment::test_jun
 
 then paste stdout (verbatim, including PASS line and exit code) into `increment-001.md` §6 under the Q-N01 closure note. Linux CI will continue to report the test as `SKIPPED`; that is by design.
 
-**Owner:** Javier. **Effort:** <5 minutes.
+**Owner:** <operator>. **Effort:** <5 minutes.
 
 ### 5.3 Gap C — Linux CI confirmation for TC-044/045/046
 
@@ -243,7 +243,7 @@ then paste stdout (verbatim, including PASS line and exit code) into `increment-
 
 **Closure step:** Wait for the next push to `main-tui` (or trigger a workflow_dispatch) and append the relevant test-output lines to `increment-001.md` §6. TC-044/045/046 are platform-agnostic so the Linux pass is structurally guaranteed; the gap is documentary only.
 
-**Owner:** Javier. **Effort:** None — happens automatically on next CI run.
+**Owner:** <operator>. **Effort:** None — happens automatically on next CI run.
 
 ---
 

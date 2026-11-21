@@ -226,7 +226,7 @@ Findings raised but closed inline during Phase 3 (e.g. S-005 message scrubbing, 
 | **B-2B — Workspace hardening** | F-7.7-02, F-7.7-03, F-7.7-04, F-7.7-05, F-7.7-06 | software-dev | 2–3 | high (closes 5 Findings; self-flip tests already in place) |
 | **B-2C — Service-layer symmetry** | F-9.04-01, F-9.04-02, F-9.04-03 | software-dev | 1–2 | medium (refactor; no new product behaviour) |
 | **B-2D — REQUIREMENTS.md numbering** | F-9.01-01, F-9.02-01..03, F-9.09-01 (overlap with B-2A acceptable) | docs-writer | 1 | medium (doc-only) |
-| **B-2E — Demo evidence + test promotions + drift remediation** | TC-032 (9 packs), TC-047 Windows stdout (Q-N01), 5 R-* `promote`, 2 R-* `drift` | docs-writer + Javier | 1 | medium (closes Phase 4 gaps; ~1 hour manual + doc edit) |
+| **B-2E — Demo evidence + test promotions + drift remediation** | TC-032 (9 packs), TC-047 Windows stdout (Q-N01), 5 R-* `promote`, 2 R-* `drift` | docs-writer + <operator> | 1 | medium (closes Phase 4 gaps; ~1 hour manual + doc edit) |
 
 **Concrete first steps for B-2A** (highest-priority closure):
 

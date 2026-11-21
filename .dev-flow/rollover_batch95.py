@@ -86,7 +86,7 @@ doc["mode_history"].append({
               "rev60's packet template, is long satisfied; it resumes as its own step); mode "
               "core declared by the commission" % (batch, OUTGOING)})
 doc["standing_authorization"]["operator_words"] = (
-    "Operator (Javier), 2026-10-13: the prototype round for the cambios of 2026-10-12 "
+    "Operator (<operator>), 2026-10-13: the prototype round for the cambios of 2026-10-12 "
     "CLOSED -- all four changes + the six rulings accepted, the join preview visor added, "
     "the TUI-native pass shipped the graft as the final screen, a color, both verdicts "
     "accepted (veredicto-ronda1 / veredicto-tui-pass / veredicto-final in the round's "

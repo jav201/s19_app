@@ -83,7 +83,7 @@ doc["mode_history"].append({
               "rev60's packet template, is long satisfied; it resumes as its own step); mode "
               "core declared by the commission" % (batch, OUTGOING)})
 doc["standing_authorization"]["operator_words"] = (
-    "Operator (Javier), 2026-10-13, from live testing: 'Veo esto en la leyenda [Keys: "
+    "Operator (<operator>), 2026-10-13, from live testing: 'Veo esto en la leyenda [Keys: "
     "j k select...] pero k precisamente abre la leyenda, no es para desplazarse o "
     "seleccionar, es esto un error?' Read with the established chain: Gates -- autonomous "
     "with the two exceptions; Git -- the COORDINATOR commits and pushes at each close; "

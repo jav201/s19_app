@@ -243,7 +243,7 @@ The findings split cleanly into one must-fix-now item, a single cheap requiremen
 
 ### Must fix before Phase 3 — A-03
 
-**A-03 must be closed before any Phase 3 layout increment begins.** It is the only finding that, if left open, makes implementation impossible — the Workspace pane layout has no satisfiable specification until one of the three resolutions (proportional panes below a breakpoint / raised minimum width / fixed widths only ≥120 cols + defined 80×24 collapse) is chosen and baked into LLR-007.1 / 008.1 / 009.1 / 010.1. This is a product-owner decision (it changes the supported-size contract or the layout behavior), so it needs Javier's sign-off, not just an editorial pass. **Q-07 couples to A-03** — the 80×24 leg of the pane-width TCs only becomes well-defined once A-03 is resolved, so fix them together.
+**A-03 must be closed before any Phase 3 layout increment begins.** It is the only finding that, if left open, makes implementation impossible — the Workspace pane layout has no satisfiable specification until one of the three resolutions (proportional panes below a breakpoint / raised minimum width / fixed widths only ≥120 cols + defined 80×24 collapse) is chosen and baked into LLR-007.1 / 008.1 / 009.1 / 010.1. This is a product-owner decision (it changes the supported-size contract or the layout behavior), so it needs <operator>'s sign-off, not just an editorial pass. **Q-07 couples to A-03** — the 80×24 leg of the pane-width TCs only becomes well-defined once A-03 is resolved, so fix them together.
 
 ### Fix in one Phase-1 iteration — the remaining 10 majors + most minors
 
