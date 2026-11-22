@@ -2419,17 +2419,23 @@ def test_r038_preparation_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
     _run(base, body)
 
 
+@pytest.mark.parametrize("size", ["small", "large"])
 def test_r038_install_exception_reenables_gc(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, size: str
 ) -> None:
     """R-A2L-REFRESH.051 (E4R) — attach install-exception arm (reviewer
     MAJOR E5-INC2-F3): an injected exception in the last attach-install step
     ends through the failure route AND leaves the cycle collector enabled,
     which the attach producer deliberately disabled for the worker window.
-    Every observation is recorded inside the route and asserted after
-    Textual's exception re-raise, so the assertion cannot be masked by the
-    re-raised install exception."""
+    I1f (R-A2L-REFRESH.071/.073, E4-1): the producer holds it for every
+    size, so both the small and the large (exactly 1 MiB) arm see it
+    disabled at the injected exception and both end enabled. Every
+    observation is recorded inside the route and asserted after Textual's
+    exception re-raise, so the assertion cannot be masked by the re-raised
+    install exception."""
     import gc
+
+    from tests.test_p279_i1f_gc import MIB, write_a2l_of_size
 
     _guard_attach_snapshot_seams()
 
@@ -2437,7 +2443,10 @@ def test_r038_install_exception_reenables_gc(
     src = tmp_path / "src"
     src.mkdir(parents=True)
     old = _old_a2l(src / "old.a2l")
-    new = _new_a2l(src / "new.a2l")
+    if size == "large":
+        new = write_a2l_of_size(src / "new.a2l", MIB)
+    else:
+        new = _new_a2l(src / "new.a2l")
     img = _write_image(src / "img1.s19", dict(IMG1))
 
     armed: dict = {"on": False}
@@ -2485,7 +2494,7 @@ def test_r038_install_exception_reenables_gc(
     assert raised, "the install exception never fired"
     assert gc_at_boom == [False], (
         "the producer left the cycle collector disabled for the install "
-        f"window: {gc_at_boom}"
+        f"window ({size} load): {gc_at_boom}"
     )
     assert gc_at_end == [True], (
         "R-A2L-REFRESH.051: the cycle collector stayed disabled after the "
@@ -2606,23 +2615,31 @@ def test_r_a2l_refresh_051_attach_outcomes_gc_enabled(
         assert outcomes and outcomes[-1][1].startswith("A2L loaded"), outcomes
 
 
+@pytest.mark.parametrize("size", ["small", "large"])
 def test_r_a2l_refresh_052_install_runs_no_full_collection(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, size: str
 ) -> None:
     """R-A2L-REFRESH.052/.054 (E4R, operator D-GC = A) — attach install
-    arm: a generated mid-size A2L attach install runs at most one full
-    gc.collect() from a product module, and that single collection is
-    logged by the ``s19tui`` logger with the ``attach`` route and its
-    duration in seconds."""
+    arm: an attach install runs at most one full gc.collect() from a product
+    module and every collection is logged one-to-one. I1f: the small arm (a
+    generated ~0.2 MB A2L) runs none (R-A2L-REFRESH.072); the large arm (a
+    generated A2L of exactly 1 MiB) makes that single collection, and the
+    ``s19tui`` logger logs it with the ``attach`` route and its duration in
+    seconds (.054 logs only a completed collection)."""
     import gc
     import sys
+
+    from tests.test_p279_i1f_gc import MIB, write_a2l_of_size
 
     _guard_attach_snapshot_seams()
 
     base = tmp_path / "app"
     src = tmp_path / "src"
     src.mkdir(parents=True)
-    a2l = _mid_a2l(src, count=2000)
+    if size == "large":
+        a2l = write_a2l_of_size(src / "large.a2l", MIB)
+    else:
+        a2l = _mid_a2l(src, count=2000)
 
     real_collect = gc.collect
     product_collects: list = []
@@ -2678,27 +2695,39 @@ def test_r_a2l_refresh_052_install_runs_no_full_collection(
         "not one-to-one with the logged GC lines: "
         f"collects={product_collects} logs={gc_log_lines}"
     )
-    assert gc_log_lines and all(args and args[0] == "attach" for _msg, args in gc_log_lines), (
-        "R-A2L-REFRESH.054: the attach install's GC log line does not carry "
-        f"the attach route: {gc_log_lines}"
-    )
+    if size == "large":
+        assert len(gc_log_lines) == 1 and all(
+            args and args[0] == "attach" for _msg, args in gc_log_lines
+        ), (
+            "R-A2L-REFRESH.054: the attach install's GC log line does not carry "
+            f"the attach route: {gc_log_lines}"
+        )
 
 
+@pytest.mark.parametrize("size", ["small", "large"])
 def test_r_a2l_refresh_053_reloads_do_not_accumulate_objects(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, size: str
 ) -> None:
-    """R-A2L-REFRESH.053 (E4R): attach the same generated mid-size A2L five
-    times through the product route; after each outcome run gc.collect() and
+    """R-A2L-REFRESH.053 (E4R): attach the same generated A2L five times
+    through the product route; after each outcome run gc.collect() and
     record len(gc.get_objects()) + gc.get_freeze_count(); loads 3-5 keep at
-    most 1.10 x load 2."""
+    most 1.10 x load 2. I1f: the small arm (mid-size, held during
+    preparation and no install collection, R-A2L-REFRESH.072) and the large
+    arm (exactly 1 MiB, D-13 hold and collection) keep the same bound."""
+
     import gc
+
+    from tests.test_p279_i1f_gc import MIB, write_a2l_of_size
 
     _guard_attach_snapshot_seams()
 
     base = tmp_path / "app"
     src = tmp_path / "src"
     src.mkdir(parents=True)
-    a2l = _mid_a2l(src, count=2000)
+    if size == "large":
+        a2l = write_a2l_of_size(src / "large.a2l", MIB)
+    else:
+        a2l = _mid_a2l(src, count=2000)
     counts: list = []
 
     async def body(app, pilot):

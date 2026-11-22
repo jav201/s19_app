@@ -1,7 +1,7 @@
 """s19_app.tui.app.file_load — S19TuiApp mixin: file_load (moved verbatim from s19_app/tui/app.py at 4f721985)."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 import gc
 import os
 from pathlib import Path, PurePath
@@ -47,6 +47,32 @@ from .shared import (
 )
 
 
+A2L_COLLECTOR_HOLD_BYTES = 1_048_576
+
+
+def a2l_holds_collector(incoming: Optional[Path], installed: Optional[Path]) -> bool:
+    """Decide on the UI thread whether a load keeps the full D-13 policy.
+
+    Every load holds the collector during preparation; a held load (True)
+    also runs the one full collection at install, a small load (False)
+    only re-enables the collector there.
+
+
+    True when either A2L file is at least ``A2L_COLLECTOR_HOLD_BYTES`` or its
+    size cannot be read; False otherwise. Logs nothing and raises nothing.
+    """
+    for candidate in (incoming, installed):
+        if candidate is None:
+            continue
+        try:
+            if deps.os.lstat(candidate).st_size >= A2L_COLLECTOR_HOLD_BYTES:
+
+                return True
+        except (OSError, ValueError):
+            return True
+    return False
+
+
 @dataclass(frozen=True)
 class A2LAttachRequest:
     """Inc 12b (S-b): the A2L attach worker's immutable request.
@@ -68,6 +94,7 @@ class A2LAttachRequest:
     expected_a2l_generation: Optional[int] = None
     expected_image_generation: Optional[int] = None
     image_mem_map: Optional[Mapping[int, int]] = None
+    collector_hold: bool = True
 
 
 @dataclass(frozen=True)
@@ -108,6 +135,7 @@ class A2LAttachSnapshot:
     enriched_tags: Tuple[dict, ...]
     summary_lines: Tuple[str, ...]
     picker_snapshots: Mapping[str, "A2LPickerSnapshot"]
+    collector_hold: bool = field(default=True, compare=False)
 
 
 @dataclass(frozen=True)
@@ -163,6 +191,7 @@ class FileLoadRequest:
     gen: int
     a2l_files: Optional[Tuple[Path, ...]] = None
     sync_project: bool = True
+    collector_hold: bool = True
 
 
 class FileLoadMixin:
@@ -650,6 +679,7 @@ class FileLoadMixin:
                 gen=gen,
                 a2l_files=None,
                 sync_project=True,
+                collector_hold=a2l_holds_collector(None, self.current_a2l_path),
             )
             self._start_load_worker(copied, gen=gen, context=context)
 
@@ -930,6 +960,9 @@ class FileLoadMixin:
                 expected_a2l_generation=expected_a2l_generation,
                 expected_image_generation=expected_image_generation,
                 image_mem_map=image_mem_map,
+                collector_hold=a2l_holds_collector(
+                    normalized, self.current_a2l_path
+                ),
             )
             if not copy:
                 self.step_busy("a2l_load", gen, 2)
@@ -983,6 +1016,7 @@ class FileLoadMixin:
                     image_mem_map=request.image_mem_map,
                     expected_a2l_generation=request.expected_a2l_generation,
                     expected_image_generation=request.expected_image_generation,
+                    collector_hold=request.collector_hold,
                 )
                 result = A2LAttachResult(
                     request,
@@ -1013,6 +1047,7 @@ class FileLoadMixin:
         image_mem_map: Mapping[int, int] | None,
         expected_a2l_generation: int,
         expected_image_generation: int,
+        collector_hold: bool = True,
     ) -> A2LAttachSnapshot:
         """Build one generation-bound attach snapshot off the UI thread.
 
@@ -1088,16 +1123,19 @@ class FileLoadMixin:
         # AFTER the preserved common refresh (HLR-176 territory, D-12), so
         # no big collection pause can land inside the commissioned window.
         # On failure the collector is re-enabled here. Consumers of the
-        # snapshot must re-enable after their preserved refresh.
+        # snapshot must re-enable after their preserved refresh. The
+        # snapshot carries ``collector_hold`` so that the install of a small
+        # load re-enables the collector without the full collection.
         gc.disable()
         try:
-            return self._prepare_a2l_attach_snapshot_inner(
+            snapshot = self._prepare_a2l_attach_snapshot_inner(
                 a2l_path=a2l_path,
                 a2l_data=a2l_data,
                 image_mem_map=image_mem_map,
                 expected_a2l_generation=expected_a2l_generation,
                 expected_image_generation=expected_image_generation,
             )
+            return replace(snapshot, collector_hold=collector_hold)
         except BaseException:
             gc.enable()
             raise
@@ -1257,6 +1295,9 @@ class FileLoadMixin:
             # garbage, after the preserved refresh, timed and logged
             # (R-A2L-REFRESH.052/.054). gc.freeze() was rejected: it keeps
             # Textual UI cycles alive (GC-REDESIGN, R-A2L-REFRESH.053).
+            # A small load only re-enables the collector.
+            if not gc.isenabled() and not req.collector_hold:
+                gc.enable()
             if not gc.isenabled():
                 gc_started = time.perf_counter()
                 unreachable = gc.collect()
@@ -1264,6 +1305,7 @@ class FileLoadMixin:
                 self.logger.info(
                     "A2L load GC: route=%s unreachable=%d seconds=%.3f",
                     "attach",
+
                     unreachable,
                     time.perf_counter() - gc_started,
                 )
@@ -1431,6 +1473,9 @@ class FileLoadMixin:
                         gen=gen,
                         a2l_files=None,
                         sync_project=False,
+                        collector_hold=a2l_holds_collector(
+                            None, self.current_a2l_path
+                        ),
                     )
                     self._start_load_worker(
                         candidate, gen=gen, sync_project=False, context=context
@@ -1713,6 +1758,7 @@ class FileLoadMixin:
         image_generation: Optional[int] = None,
         *,
         prepare_a2l: bool = True,
+        collector_hold: bool = True,
     ) -> PreparedLoad:
         """
         Summary:
@@ -1814,6 +1860,7 @@ class FileLoadMixin:
                 image_mem_map=loaded.mem_map,
                 expected_a2l_generation=a2l_view_generation,
                 expected_image_generation=image_generation,
+                collector_hold=collector_hold,
             )
             a2l_preparation = preparation
             a2l_enriched_tags = list(preparation.enriched_tags)
@@ -1990,6 +2037,7 @@ class FileLoadMixin:
                         loaded,
                         a2l_view_generation=context.expected_a2l_generation,
                         image_generation=context.expected_image_generation,
+                        collector_hold=context.collector_hold,
                     )
                 except Exception as exc:
                     if not gc.isenabled():

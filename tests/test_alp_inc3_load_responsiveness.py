@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import asyncio
 import gc
+import hashlib
 import importlib
 import json
 import os
@@ -731,6 +732,68 @@ def test_r_a2l_refresh_050_small_routes_same_oracle(tmp_path: Path, monkeypatch:
             first=first,
             last=last,
         )
+    _assert_small_oracle(label, run)
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_refresh_050_near_1mib_real_content_tick_arm(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """R-A2L-REFRESH.050 (I1f E3-3): the tick window holds on a real-content
+    A2L just below the 1 MiB gate (generated into ``tmp_path`` by the I1f E3-3
+    generator, 1,048,451 bytes, 6,818 characteristics), loaded on the image
+    route: every due 50 ms tick at most 100 ms late (same oracle as the small
+    routes). After I1f E4-1 (P-346) the collector is held during preparation
+    for every size, so the arm also asserts that it was disabled inside the
+    preparation: the tick oracle is measured under the shipped policy."""
+    _guard_perf_seams()
+    gen = importlib.import_module("tests.test_p279_i1f_gc")
+    data, _count = gen.gen_a2l_bytes(gen.NEAR_LIMIT)
+    a2l_path = tmp_path / "near_1mib.a2l"
+    a2l_path.write_bytes(data)
+    assert a2l_path.stat().st_size == gen.NEAR_RECORD["bytes"] < 1 << 20
+    assert hashlib.sha256(data).hexdigest() == gen.NEAR_RECORD["sha256"]
+    parsed = parse_a2l_file(a2l_path)
+    assert (parsed.get("errors") or []) == [], parsed.get("errors")
+    tags = parsed["tags"]
+    image_path = _small_image(tmp_path)
+    main = threading.get_ident()
+    disabled_in_preparation: list = []
+    real_inner = S19TuiApp._prepare_a2l_attach_snapshot_inner
+
+    def inner_probe(self_, *args, **kwargs):
+        if threading.get_ident() != main:
+            disabled_in_preparation.append(not gc.isenabled())
+        return real_inner(self_, *args, **kwargs)
+
+    monkeypatch.setattr(S19TuiApp, "_prepare_a2l_attach_snapshot_inner", inner_probe)
+    label = "R-A2L-REFRESH.050 near-1-MiB image"
+    run = _one_image_run(
+        tmp_path / "run",
+        monkeypatch,
+        label,
+        a2l=a2l_path,
+        image=image_path,
+        tag_count=len(tags),
+        first=tags[0]["name"],
+        last=tags[-1]["name"],
+    )
+    assert len(disabled_in_preparation) >= 2 and all(disabled_in_preparation), (
+        "the collector was enabled inside a near-1-MiB preparation: "
+        f"{disabled_in_preparation}"
+    )
+
+    window_start, window_end = run["window"]
+    late = [
+        round(lateness, 3)
+        for due, _fired, lateness in run["tick_observations"]
+        if window_start <= due <= window_end and lateness > timing_bound(TICK_BOUND_S)
+    ]
+    print(
+        f"[{label}] window_s={window_end - window_start:.3f} "
+        f"window_worst_s={run['window_worst']:.3f} "
+        f"tick_failures={run['tick_failures']} late_in_window_s={late}"
+    )
     _assert_small_oracle(label, run)
 
 

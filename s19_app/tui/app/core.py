@@ -546,6 +546,7 @@ class S19TuiApp(ComposeScreensMixin, FlowMixin, SaveCommitMixin, ReportsMixin, P
         # batch-94: the rail carries the 12-entry B94 order (Check Editor
         # after Patch Editor, Flow Execution after Flow Builder) — see
         # `RAIL_ENTRIES_B94`.
+        narrow_class = "width-narrow" if self.size.width < 120 else ""
         yield Horizontal(
             Container(Rail(entries=RAIL_ENTRIES_B94, active="workspace"), id="rail_slot"),
             Container(
@@ -563,8 +564,10 @@ class S19TuiApp(ComposeScreensMixin, FlowMixin, SaveCommitMixin, ReportsMixin, P
                 self._compose_screen_crc_designer(),
                 self._compose_screen_split_join(),
                 id="workspace_body",
+                classes=f"{narrow_class} density-comfortable".strip(),
             ),
             id="workspace_shell",
+            classes=narrow_class,
         )
         # Persistent status bar — the re-homed status text, progress bar and
         # log-tail labels that the old Workspace Status tile carried. Kept
@@ -709,8 +712,6 @@ class S19TuiApp(ComposeScreensMixin, FlowMixin, SaveCommitMixin, ReportsMixin, P
 
     def on_mount(self) -> None:
         self._setup_datatable_columns()
-        # LLR-006.2: Comfortable is the default startup density.
-        self.query_one("#workspace_body").add_class("density-comfortable")
         self.refresh_files()
         self._update_a2l_filter_menu()
         self._update_settings_menu()

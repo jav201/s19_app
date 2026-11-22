@@ -51,7 +51,7 @@ from ..workspace import (
     recent_kind,
 )
 from . import deps
-from .file_load import A2LAttachSnapshot
+from .file_load import A2LAttachSnapshot, a2l_holds_collector
 from .shared import (
     _TYPED_REFUSAL_TOKENS,
     A2LCacheEntry,
@@ -103,6 +103,7 @@ class ProjectLoadRequest:
     routed: bool
     captured_a2l_generation: Optional[int] = None
     captured_image_generation: Optional[int] = None
+    collector_hold: bool = True
 
 
 @dataclass(frozen=True)
@@ -1410,6 +1411,9 @@ class ProjectLoadMixin:
                 # values and never reads a live counter.
                 captured_a2l_generation=self._a2l_view_generation,
                 captured_image_generation=self._image_generation,
+                collector_hold=a2l_holds_collector(
+                    a2l_files[0] if a2l_files else None, self.current_a2l_path
+                ),
             )
             self._project_load_worker(request)
         except BaseException:
@@ -1598,6 +1602,7 @@ class ProjectLoadMixin:
                     a2l_view_generation=captured_a + 1 + (1 if has_a2l else 0),
                     image_generation=captured_i + 1,
                     prepare_a2l=has_a2l and mac is None,
+                    collector_hold=request.collector_hold,
                 )
             if mac is not None:
                 mac_bundle = self._prepare_load_payload(
@@ -1610,6 +1615,7 @@ class ProjectLoadMixin:
                     ),
                     image_generation=captured_i + 1 + (1 if image_stage else 0),
                     prepare_a2l=has_a2l,
+                    collector_hold=request.collector_hold,
                 )
             elif image is None and has_a2l and a2l_path is not None:
                 # A2L-only project (P-ONLY): the same Inc 2 producer with
@@ -1621,6 +1627,7 @@ class ProjectLoadMixin:
                     image_mem_map=None,
                     expected_a2l_generation=captured_a + 2,
                     expected_image_generation=captured_i,
+                    collector_hold=request.collector_hold,
                 )
         if image_bundle is not None:
             image = image_bundle
@@ -1831,8 +1838,12 @@ class ProjectLoadMixin:
             # garbage, after the preserved final refresh, timed and logged
             # (R-A2L-REFRESH.052/.054). gc.freeze() was rejected: it keeps
             # Textual UI cycles alive (GC-REDESIGN, R-A2L-REFRESH.053).
+            # A small load only re-enables the collector.
+            if not gc.isenabled() and not request.collector_hold:
+                gc.enable()
             if not gc.isenabled():
                 gc_started = time.perf_counter()
+
                 unreachable = gc.collect()
                 gc.enable()
                 self.logger.info(

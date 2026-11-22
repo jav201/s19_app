@@ -47,6 +47,7 @@ BENCH_KINDS = ("curve", "map", "array")
 BENCH_LARGE = 4096
 BUSY_GRACE_S = 0.2
 BUSY_TICK_S = 0.1
+BENCH_PAINT_INTERVAL_S = 0.25
 
 
 def busy_job(name, state, stage_name):
@@ -115,6 +116,8 @@ class ArrayBenchSheet(StagingSheet):
         self._busy_timer = None
         self._busy_frame: int = 0
         self._busy_idle_title = None
+        self._painted_at: float = 0.0
+        self._window_timer = None
 
     def on_mount(self) -> None:
         self._busy_timer = self.set_interval(BUSY_TICK_S, self._busy_tick, pause=True)
@@ -124,6 +127,33 @@ class ArrayBenchSheet(StagingSheet):
         if row is not None:
             self._state_for(row.name)
         super()._paint()
+        self._painted_at = time.monotonic()
+        if self._window_timer is not None:
+            self._window_timer.stop()
+            self._window_timer = None
+
+    def _page_decodes_pending(self) -> bool:
+        active = self._active_job
+        return bool(self._page) or (active is not None and active[0] in ("summary", "staged"))
+
+    def _paint_after_page_result(self) -> bool:
+        """Paint a page result when the batch has drained or a paint window has passed; else arm one deferred paint."""
+        elapsed = time.monotonic() - self._painted_at
+        if not self._page_decodes_pending() or elapsed >= BENCH_PAINT_INTERVAL_S:
+            self._paint()
+            return True
+        if self._window_timer is None:
+            self._window_timer = self.set_timer(BENCH_PAINT_INTERVAL_S - elapsed, self._paint_window_end)
+        return False
+
+    def _paint_window_end(self) -> None:
+        self._window_timer = None
+        self._paint()
+
+    def on_unmount(self) -> None:
+        if self._window_timer is not None:
+            self._window_timer.stop()
+            self._window_timer = None
 
     def _status(self, text: str) -> None:
         if self.is_attached:
@@ -274,6 +304,10 @@ class ArrayBenchSheet(StagingSheet):
             return
         state = self._state_for(name)
         self.states[name] = self._assign_result(kind, state, result, derived)
+        if kind in ("summary", "staged"):
+            self._start_next()
+            self._paint_after_page_result()
+            return
         self._paint()
         self._start_next()
 

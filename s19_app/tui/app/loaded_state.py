@@ -888,8 +888,17 @@ class LoadedStateMixin:
             # (R-A2L-REFRESH.052/.054). gc.freeze() was rejected: it keeps
             # Textual UI cycles alive (GC-REDESIGN, R-A2L-REFRESH.053).
             # Project bundle stages pass ``publish_a2l=False`` — P5
-            # re-enables after its own final refresh.
+            # re-enables after its own final refresh. A small load only
+            # re-enables the collector.
+            preparation = prepared.a2l_preparation
+            if (
+                not gc.isenabled()
+                and preparation is not None
+                and not preparation.collector_hold
+            ):
+                gc.enable()
             if not gc.isenabled():
+
                 gc_started = time.perf_counter()
                 unreachable = gc.collect()
                 gc.enable()

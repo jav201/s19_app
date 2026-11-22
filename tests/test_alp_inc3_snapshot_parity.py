@@ -716,23 +716,31 @@ def test_r043_preparation_failure_has_no_ui_fallback(tmp_path: Path, monkeypatch
     _run(base, body)
 
 
+@pytest.mark.parametrize("size", ["small", "large"])
 def test_r043_install_exception_reenables_gc(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, size: str
 ) -> None:
     """R-A2L-REFRESH.051 (E4R) — loose image install-exception arm (reviewer
     MAJOR E5-INC3-F4): an injected exception in the loose prepared-load
     install body (_store_a2l_cache) propagates, but must RE-ENABLE the cycle
-    collector that the prepared-load producer left disabled. Every
-    observation is recorded inside the route and asserted after Textual's
-    exception re-raise."""
+    collector that the prepared-load producer left disabled. I1f
+    (R-A2L-REFRESH.071/.073, E4-1): the producer holds it for every size, so
+    both the small and the large (installed A2L of exactly 1 MiB) arm see it
+    disabled at the injected exception. Every observation is recorded inside
+    the route and asserted after Textual's exception re-raise."""
     import gc
+
+    from tests.test_p279_i1f_gc import MIB, write_a2l_of_size
 
     _guard_inc3_interface()
 
     base = tmp_path / "app"
     src = tmp_path / "src"
     src.mkdir(parents=True)
-    old = _old_a2l(src / "old.a2l")
+    if size == "large":
+        old = write_a2l_of_size(src / "old.a2l", MIB)
+    else:
+        old = _old_a2l(src / "old.a2l")
     img1 = _write_image(src / "img1.s19", dict(IMG1))
     img2 = _write_image(src / "img2.s19", dict(IMG2))
 
@@ -775,7 +783,7 @@ def test_r043_install_exception_reenables_gc(
     assert raised, "the install exception never fired"
     assert gc_at_boom == [False], (
         "the producer left the cycle collector disabled for the install "
-        f"window: {gc_at_boom}"
+        f"window ({size} load): {gc_at_boom}"
     )
     assert gc_at_end == [True], (
         "R-A2L-REFRESH.051: the cycle collector stayed disabled after the "
@@ -822,20 +830,26 @@ def test_r_a2l_refresh_051_project_success_gc_enabled(
     )
 
 
+@pytest.mark.parametrize("size", ["small", "large"])
 @pytest.mark.parametrize(
     "arm",
     ["image", "project"],
     ids=[f"R-A2L-REFRESH.052/{i}" for i in range(1, 3)],
 )
 def test_r_a2l_refresh_052_install_runs_no_full_collection(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str, size: str
 ) -> None:
     """R-A2L-REFRESH.052/.054 (E4R, operator D-GC = A) — image and
     project install arms: each install runs at most one full gc.collect()
-    from a product module, and that single collection is logged by the
-    ``s19tui`` logger with the arm's route and its duration in seconds."""
+    from a product module and every collection is logged one-to-one. I1f:
+    the small arm (a generated ~0.2 MB A2L) runs none (R-A2L-REFRESH.072);
+    the large arm (a generated A2L of exactly 1 MiB) makes that single
+    collection, logged by the ``s19tui`` logger with the arm's route and its
+    duration in seconds (.054 logs only a completed collection)."""
     import gc
     import sys
+
+    from tests.test_p279_i1f_gc import MIB, write_a2l_of_size
 
     if arm == "image":
         _guard_image_route()
@@ -847,7 +861,10 @@ def test_r_a2l_refresh_052_install_runs_no_full_collection(
     src.mkdir(parents=True)
     old = _old_a2l(src / "old.a2l")
     img = _write_image(src / "img1.s19", dict(IMG1))
-    a2l = _mid_a2l(src, count=2000)
+    if size == "large":
+        a2l = write_a2l_of_size(src / "large.a2l", MIB)
+    else:
+        a2l = _mid_a2l(src, count=2000)
 
     real_collect = gc.collect
     product_collects: list = []
@@ -914,10 +931,13 @@ def test_r_a2l_refresh_052_install_runs_no_full_collection(
         "not one-to-one with the logged GC lines: "
         f"collects={product_collects} logs={gc_log_lines}"
     )
-    assert gc_log_lines and all(args and args[0] == arm for _msg, args in gc_log_lines), (
-        f"R-A2L-REFRESH.054: the {arm} install's GC log line does not carry "
-        f"the {arm} route: {gc_log_lines}"
-    )
+    if size == "large":
+        assert len(gc_log_lines) == 1 and all(
+            args and args[0] == arm for _msg, args in gc_log_lines
+        ), (
+            f"R-A2L-REFRESH.054: the {arm} install's GC log line does not carry "
+            f"the {arm} route: {gc_log_lines}"
+        )
 
 
 # ===========================================================================
@@ -1688,6 +1708,7 @@ def test_r_a2l_refresh_050_project_worker_runs_no_collection(
     src = tmp_path / "src"
     src.mkdir(parents=True)
     a2l = _mid_a2l(src, count=2000)
+
     img1 = _write_image(src / "img1.s19", dict(IMG1))
 
     collection_threads: list = []

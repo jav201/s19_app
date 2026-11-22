@@ -1140,12 +1140,14 @@ class NavigationMixin:
                 - ``on_resize``
         """
         narrow = width < 120
-        for widget_id in ("#workspace_shell", "#workspace_body"):
-            widget = self.query_one(widget_id)
-            if narrow:
-                widget.add_class("width-narrow")
-            else:
-                widget.remove_class("width-narrow")
+        shell = self.query_one("#workspace_shell")
+        changed = False
+        for widget in (shell, self.query_one("#workspace_body")):
+            if widget.has_class("width-narrow") != narrow:
+                widget.set_class(narrow, "width-narrow", update=False)
+                changed = True
+        if changed:
+            self.update_styles(shell)
 
     def on_resize(self, event: events.Resize) -> None:
         """Update the width/diff regimes AND recompose the context line.
