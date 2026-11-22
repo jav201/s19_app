@@ -57,7 +57,6 @@ def a2l_holds_collector(incoming: Optional[Path], installed: Optional[Path]) -> 
     also runs the one full collection at install, a small load (False)
     only re-enables the collector there.
 
-
     True when either A2L file is at least ``A2L_COLLECTOR_HOLD_BYTES`` or its
     size cannot be read; False otherwise. Logs nothing and raises nothing.
     """
@@ -66,7 +65,6 @@ def a2l_holds_collector(incoming: Optional[Path], installed: Optional[Path]) -> 
             continue
         try:
             if deps.os.lstat(candidate).st_size >= A2L_COLLECTOR_HOLD_BYTES:
-
                 return True
         except (OSError, ValueError):
             return True
@@ -1305,7 +1303,6 @@ class FileLoadMixin:
                 self.logger.info(
                     "A2L load GC: route=%s unreachable=%d seconds=%.3f",
                     "attach",
-
                     unreachable,
                     time.perf_counter() - gc_started,
                 )

@@ -725,7 +725,7 @@ def test_r_a2l_refresh_051_overlap_large_held_while_small_completes(
 
     obs = _run(tmp_path / "app", body)
     assert gc_at_gate == [False], f"the large worker did not hold the collector: {gc_at_gate}"
-    assert marks["small_collects"] <= 1, obs.collects
+    assert marks["small_collects"] == 0, obs.collects
     assert len(obs.collects) - marks["small_collects"] <= 1, obs.collects
     assert len(obs.gc_lines()) == len(obs.collects), (obs.gc_lines(), obs.collects)
     assert obs.final_enabled is True

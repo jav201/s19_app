@@ -1843,7 +1843,6 @@ class ProjectLoadMixin:
                 gc.enable()
             if not gc.isenabled():
                 gc_started = time.perf_counter()
-
                 unreachable = gc.collect()
                 gc.enable()
                 self.logger.info(
