@@ -1339,6 +1339,88 @@ MAC View columns, in order: Tag, Address, InA2L, InMem, Status, SourceLine,
 coverage strip  The line above the MAC table: MAC→S19 coverage and A2L↔MAC matches.
 ```
 
+#### CTX-A2L-CACHE · The A2L parse cache (S2.10; batch 2026-11-20-p279 I3)
+
+```text
+load                 An A2L load on one of the four routes that reach the parse seam: direct A2L attach,
+                     image+A2L load, project image+A2L load, project A2L-only load.
+in-memory entry      The (resolved path, modification time, size) key and payload the app keeps from the last
+                     load (A2LCacheEntry, base); a match means the same key.
+parse cache          The per-user store of stored parses described below.
+cache setting        The environment variable S19_A2L_CACHE, read at each load. Its word: the value with
+                     surrounding blanks (space, tab, CR, LF) removed, ASCII letters compared ignoring case.
+                     on: unset, or the word is empty or "on". off: the word is "off". Not recognised: any other
+                     value (a non-ASCII value included).
+size setting         The environment variable S19_A2L_CACHE_MAX_MB, read at each store. Valid: 1 to 7 ASCII
+                     digits, nothing else, whose number is 1 to 1,048,576.
+size cap             The valid size setting's number × 1,048,576 bytes; else 2,147,483,648 bytes (2 GiB).
+cache base           Windows: LOCALAPPDATA when usable (S5 CTX-RECENT "usable LOCALAPPDATA").
+                     Linux: XDG_CACHE_HOME when it starts with "/" and names a folder that exists; when
+                     XDG_CACHE_HOME is unset, empty or does not start with "/", <HOME>/.cache when HOME starts
+                     with "/" and <HOME>/.cache is a folder that exists. No cache base otherwise (an absolute
+                     XDG_CACHE_HOME naming no folder included: the system never falls back from it).
+cache folder         Windows: <cache base>\s19_app\cache\a2l.   Linux: <cache base>/s19_app/a2l.
+app cache folders    The folders from the cache base (exclusive) to the cache folder (inclusive).
+real path            A path with every link and junction on it resolved.
+repository marker    A file or folder named .git, pyproject.toml or project.toml.
+usable cache folder  There is a cache base; no app cache folder that exists is a link or a junction; no folder of
+                     the cache folder's real path, the cache folder included, is named .s19tool or holds a
+                     repository marker; on Linux, every app cache folder that exists is owned by the user, the
+                     cache folder grants no permission to group or others, every other app cache folder grants
+                     no write permission to group or others, and the cache base grants no write permission to
+                     group or others unless its sticky bit is set (E3 F-3); the parser source can be read.
+folder chain         Linux: the descriptor of the cache base (opened with O_DIRECTORY) and the descriptor of each
+                     app cache folder in turn, each opened with O_DIRECTORY | O_NOFOLLOW relative to the
+                     descriptor before it and checked by fstat, when opened, against the owner and mode rules
+                     of usable cache folder (E3 F-3; example: E3-review.md P4, "dir_fd read: refused").
+parser source        The bytes of the file s19_app/tui/a2l.py that the running system imported.
+format version       1.
+parser fingerprint   SHA-256 of the ASCII text s19-a2l-cache/<format version>/<SHA-256 hex of the parser source>/
+                     <Python major>.<minor> (example: examples.json "fingerprint_text_example").
+content digest       SHA-256 of the bytes of the A2L file.
+entry name           The 64 lowercase hex digits of SHA-256(content digest + parser fingerprint), both as 32 bytes.
+entry                A file of the cache folder whose name is an entry name.
+temporary file       A file of the cache folder named <entry name>.tmp-<16 lowercase hex digits>.
+stale temporary file A temporary file whose modification time is more than 3,600 s before now.
+foreign file         Any other file or folder in the cache folder.
+stored parse         The parser's payload for the A2L without its "path", "record_layouts_by_name",
+                     "compu_methods_by_name" and "compu_tabs_by_name" keys, key order kept (E3 F-1: each map
+                     entry shares its section's "lines" list, a2l.py:1571/1577, :1705/1725, :1759/1781, so the
+                     maps are rebuilt on a hit, never stored).
+hit payload          {"path": <the load's path as str>}, then the stored parse's keys in order, then
+                     "record_layouts_by_name", "compu_methods_by_name" and "compu_tabs_by_name" built from its
+                     "sections" by the parser's own extract_record_layouts, extract_compu_methods and
+                     extract_compu_tables: the key order of the parser's payload (a2l.py:4085–4094; example:
+                     examples.json "hit_payload_key_order"; E3 F-1, F-5).
+section              A dict of the parse's section tree: an item of "sections" or of a section's "children".
+branch section       A section whose "children" list holds more than 16 sections, or holds a section whose own
+                     "children" list is not empty (E3 F-8).
+entry format         Header, 88 bytes: "S19A2LC\n" (8), format version (4, big-endian), content digest (32),
+                     parser fingerprint (32), chunk count (4, big-endian), body length (8, big-endian).
+                     Body: chunk count chunks, each a data length (4, big-endian), the SHA-256 of the data (32)
+                     and the data: one marshal record of the stored parse.
+chunk bound          2,097,152 bytes of data per chunk, except a chunk whose record holds one text or byte
+                     string and nothing else (planned; E4 starts at 2 MiB and host arm H-4 confirms or raises
+                     it to meet R-A2L-CACHE.050/.051; E3 F-15: 15.2 ms/MiB measured with the collector held).
+damaged entry        An entry that is empty or shorter than 88 bytes; whose header does not start with the 8
+                     magic bytes, holds another format version, or holds a content digest or parser fingerprint
+                     other than those its name was computed from; whose length differs from 88 + body length;
+                     whose chunk count is larger than body length / 36 (checked before any chunk is read); whose
+                     chunks do not end exactly at the end of the file; with a chunk whose length runs past the
+                     end of the file, whose data SHA-256 differs from the chunk digest, whose decode raises any
+                     exception (MemoryError and RecursionError included), or whose record does not fit the
+                     records before it; or whose decoded stored parse is not a dict whose "sections", "errors",
+                     "tags" and "declared_spans" values are lists (E3 F-7).
+usable entry         A regular file, not a link or junction, that is an entry and not a damaged entry.
+stored-parse hit     A load given the stored parse of a usable entry.
+recency              An entry's modification time; most recently used = newest.
+committed A2L set    Every tracked *.a2l file of the repository except examples/case_06_large_nested_a2l/
+                     firmware.a2l (34 files at 436f49dc2).
+reference host       The I0 host: 8 cores, Linux, Python 3.11.18, Textual 8.2.8 (as I2).
+log line             A line of the app log (.s19tool/logs/s19tui.log, S5 R-TUI-015.1), level info.
+<s>                  Seconds with 3 decimals.
+```
+
 ---
 
 ### Requirements
@@ -1451,6 +1533,8 @@ R-A2L-004.5 was retired at the batch-103 fold: R-A2L-REFRESH.020 replaces its te
 | R-A2L-READ.70 | If | If an A2L file ends before a BLOB, INSTANCE or typedef section used to construct a declared span is closed, then the system shall give every affected declared span no address and no length. |
 | R-A2L-READ.71 | When | When the system has built the sections of an A2L file, the system shall write the INFO log line `A2L section tree built: path=<path> lines=<n> root_sections=<s> errors=<e>`. |
 | R-A2L-READ.72 | When | When the system has parsed an A2L file, the system shall write the INFO log line `A2L parse stages: path=<path> total_seconds=<t> tag_extract_seconds=<x> tags=<n> measurement=<m> characteristic=<c> errors=<e>`. |
+| R-A2L-READ.73 | When | When the system removes the comments of a text that holds neither `/*` nor `//`, the system shall return the text unchanged in at most 10 % of the time the base character scan takes for that text. |
+| R-A2L-READ.74 | When | When the system removes the comments of a text, the system shall return the same text as the base character scan. |
 
 #### S2.2 · What a tag declares (CTX-A2L-TAG)
 
@@ -1950,6 +2034,12 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-DEF.166 | When | When the system indexes an unresolved array-like occupancy record, the system shall give that record an unbounded upper end. |
 | R-A2L-DEF.167 | When | When the system evaluates 8,000 pairwise-disjoint definitions declared in address order, in shuffled address order or with 1,000 AXIS_PTS declared first, the system shall visit on average at most 4·log2(8,000) + 16 (67.9) index nodes per definition. |
 | R-A2L-DEF.168 | When | When the system evaluates 8,000 pairwise-disjoint definitions with 1,000 AXIS_PTS declared first, the system shall perform at most 200,000 candidate-overlap checks in total. |
+| R-A2L-DEF.169 | When | When the system describes names through a describe context, the system shall return for each name a definition equal, field by field and `shared_with` included, to that name's definition in the bulk describe of the same A2L. |
+| R-A2L-DEF.170 | If | If a name asked of a describe context is not declared exactly once in its A2L, then the system shall return the refusal definition that the bulk describe returns for that name. |
+| R-A2L-DEF.171 | U | The system shall leave a describe context unchanged by every describe through it. |
+| R-A2L-DEF.172 | When | When the system describes names through a describe context, the system shall walk none of the A2L's sections. |
+| R-A2L-DEF.173 | When | When the system describes a page of 200 names of case_06 through its describe context, the system shall finish within 50 ms on the reference host. |
+| R-A2L-DEF.174 | When | When the system builds a describe context, the system shall give each measurable name a datatype, kind and unit equal to those of that name's definition in the bulk describe of the same A2L. |
 
 #### S2.8 · A2L label matching (batch-103 Inc 4)
 
@@ -2032,7 +2122,7 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-REFRESH.026 | When | When A2L copy, parse or precompute work runs on a worker, the system shall confine that worker to data preparation and perform every common-refresh view mutation on the UI thread. |
 | R-A2L-REFRESH.027 | When | When a direct A2L attach or A2L-only project install completes without installing a primary image, the system shall publish a new A2L view generation while keeping the current image generation unchanged. |
 | R-A2L-REFRESH.028 | If | If a worker-prepared A2L enrichment snapshot's expected post-install A2L or image generation differs from its recorded generation, then the system shall discard the whole prepared load before installing any file, A2L, enrichment, MAC or Issues state. |
-| R-A2L-REFRESH.029 | When | When a direct A2L attach has parsed its admitted source, the system shall build one immutable attach snapshot containing its enriched tags, summary lines and per-picker bulk definitions on the existing attach worker before dispatching installation. |
+| R-A2L-REFRESH.029 | When | When a direct A2L attach has parsed its admitted source, the system shall build one immutable attach snapshot containing its enriched tags, summary lines and one describe context with the format fields of every measurable name on the existing attach worker before dispatching installation. |
 | R-A2L-REFRESH.030 | While | While the direct A2L attach worker performs post-parse work, the system shall confine its inputs to the immutable request and parsed payload, including the expected pair and read-only image mapping, without reading widgets or mutable application state. |
 | R-A2L-REFRESH.031 | When | When a direct attach result's recorded pair matches the live expected post-install pair, the system shall install its parsed A2L and attach snapshot coherently before starting the common refresh. |
 | R-A2L-REFRESH.032 | If | If a direct attach result's recorded A2L or image generation differs from its live expected post-install generation, then the system shall discard the whole result before any recent, cache, session, view or project-sync mutation and end with `Load superseded — current state kept.` |
@@ -2040,9 +2130,9 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-REFRESH.034 | While | While a direct A2L attach captures its request snapshot or performs post-parse work, the system shall update its existing busy progress line at least once per 1.0 second. |
 | R-A2L-REFRESH.035 | When | When an accepted direct attach snapshot completes installation, the system shall run exactly one common refresh on the UI thread after all snapshot state is installed and before the successful load outcome. |
 | R-A2L-REFRESH.036 | When | When the common refresh consumes an accepted direct attach snapshot, the system shall reuse its installed enriched tags and summary lines without recomputing either on the UI thread. |
-| R-A2L-REFRESH.037 | When | When a picker handles an accepted direct-attach generation or a later population request, the system shall make the generation's single worker-built bulk definition snapshot, shared read-only by the Check and Patch pickers, available exclusively to a matching mounted request while preserving the legacy `a2l_data=None` call and the accepted snapshot for an unmounted panel. |
-| R-A2L-REFRESH.038 | If | If enrichment, summary construction or picker definition preparation raises an exception during a direct attach, then the system shall keep the current image and all previous A2L-dependent state/views, retain the existing Workarea Files refresh and its possible new-copy listing, run no common refresh or project sync and end with `File NOT loaded: '<file>' could not be read — check that the file can be opened, then load again.` |
-| R-A2L-REFRESH.039 | U | The system shall prepare A2L enrichment, summary and definition data for direct A2L attach, image+A2L load, project image+A2L load and project A2L-only load through one immutable generation-bound prepared-snapshot interface. |
+| R-A2L-REFRESH.037 | When | When a picker handles an accepted direct-attach generation or a later population request, the system shall make the generation's single worker-built describe context, shared read-only by the Check and Patch pickers, available exclusively to a matching mounted request while preserving the legacy `a2l_data=None` call and the accepted snapshot for an unmounted panel. |
+| R-A2L-REFRESH.038 | If | If enrichment, summary construction or describe-context construction raises an exception during a direct attach, then the system shall keep the current image and all previous A2L-dependent state/views, retain the existing Workarea Files refresh and its possible new-copy listing, run no common refresh, project sync or A2L preparation on the UI thread and end with `File NOT loaded: '<file>' could not be read — check that the file can be opened, then load again.` |
+| R-A2L-REFRESH.039 | U | The system shall prepare A2L enrichment, summary and describe context for direct A2L attach, image+A2L load, project image+A2L load and project A2L-only load through one immutable generation-bound prepared-snapshot interface. |
 | R-A2L-REFRESH.040 | When | When the system loads a primary image with case_06 A2L attached, the system shall complete the image+A2L load with a median total duration of at most 54 s over 3 runs and no individual run of 68 s or more on the reference host. |
 | R-A2L-REFRESH.041 | When | When the system loads a project containing a primary image and case_06 A2L, the system shall complete the project load with a median total duration of at most 60 s over 3 runs and no individual run of 75 s or more on the reference host. |
 | R-A2L-REFRESH.042 | When | When the system loads an A2L-only project containing case_06, the system shall complete the project load with a median total duration of at most 52 s over 3 runs and no individual run of 65 s or more on the reference host. |
@@ -2058,6 +2148,24 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-REFRESH.052 | When | When a direct A2L attach, image load or project load installs its result, the system shall run at most one full cyclic garbage collection. |
 | R-A2L-REFRESH.053 | When | When the system loads the same A2L five times in a row, the system shall retain at most 10 % more garbage-collector-tracked objects after the fifth load than after the second. |
 | R-A2L-REFRESH.054 | When | When the system completes an install's full cyclic garbage collection, the system shall log the collection's duration in seconds. |
+| R-A2L-REFRESH.058 | When | When the system prepares an A2L load on any route, the system shall build exactly one describe context on the load worker. |
+| R-A2L-REFRESH.059 | When | When the system prepares an A2L load, the system shall resolve no overlap between definitions. |
+| R-A2L-REFRESH.060 | When | When the system populates the Check or Patch picker from an accepted snapshot entry, the system shall take every row's format cell and the longest format cell from the generation's format fields. |
+| R-A2L-REFRESH.062 | When | When the operator stages a value or a bench record while the Patch picker's describe context belongs to the loaded A2L, the system shall describe the staged name without walking the A2L's sections. |
+| R-A2L-REFRESH.063 | When | When the operator stages a value for a name of case_06 while the Patch picker's describe context belongs to the loaded A2L, the system shall finish describing that name within 50 ms on the reference host. |
+| R-A2L-REFRESH.064 | If | If the operator stages a value or a bench record while the Patch picker holds a stale context, then the system shall describe the staged name with the full single-name describe of the loaded A2L and log `A2L describe context stale: full describe used.` |
+| R-A2L-REFRESH.066 | While | While the system builds a describe context on any load route, the system shall fire each due 50 ms UI timer tick no more than 100 ms late. |
+| R-A2L-REFRESH.067 | When | When a new A2L generation replaces the previous one with both pickers repopulated, the system shall release the previous generation's describe context. |
+| R-A2L-REFRESH.068.1 | When | When the system builds a describe context, the system shall hold in it no more garbage-collector-tracked objects than the bulk describe of the same names holds. |
+| R-A2L-REFRESH.068.2 | When | When an A2L load settles, the system shall retain no Definition object that the definitions of the names on the Patch picker's shown page do not reach. |
+| R-A2L-REFRESH.069 | If | If the operator stages a value or a bench record while the Patch picker holds no describe context, then the system shall describe the staged name with the full single-name describe of the loaded A2L and log `A2L describe context missing: full describe used.` |
+| R-A2L-REFRESH.070 | If | If describing names through a describe context raises on a page change or a stage, then the system shall describe those names with the non-context describe of the loaded A2L and log `A2L describe context failed: full describe used.` |
+| R-A2L-REFRESH.071 | While | While the system prepares a small A2L load, the system shall keep the cyclic garbage collector disabled. |
+| R-A2L-REFRESH.072 | When | When the system installs a small A2L load that was prepared while no other load's worker held the cyclic garbage collector disabled, the system shall re-enable the cyclic garbage collector without a full cyclic garbage collection. |
+| R-A2L-REFRESH.073 | While | While the system prepares a large A2L load, the system shall keep the cyclic garbage collector disabled. |
+| R-A2L-REFRESH.074 | If | If the size of the incoming or the installed A2L file cannot be read when the system builds the load request, then the system shall prepare that load as a large A2L load. |
+| R-A2L-REFRESH.077 | If | If the environment variable `S19_A2L_DESCRIBE` holds any value, then the system shall prepare each A2L load exactly as it does with the variable unset. |
+| R-A2L-REFRESH.078 | When | When the system populates a picker's rows, the system shall measure the cell width of each distinct format text at most once. |
 ##### List of labels (CTX-A2L-LIST; batch-103 Inc 7)
 
 | Id | Form | Requirement |
@@ -2149,6 +2257,73 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-LIST.091 | While | While the A2L Explorer body is 9 to 14 rows high and the viewer is in text mode, the system shall show at least one tag table row. |
 | R-A2L-LIST.092 | While | While the A2L Explorer body is 9 to 14 rows high and the viewer is in list mode, the system shall show at least one tag table row. |
 | R-A2L-LIST.093 | While | While the viewer is in list mode and the A2L Explorer body is less than 10 rows high, the system shall hide the summary under the table. |
+
+#### S2.10 · A2L parse cache (CTX-A2L-CACHE; batch 2026-11-20-p279 I3)
+
+| Id | Form | Requirement |
+|---|---|---|
+| R-A2L-CACHE.001 | When | When a load's in-memory entry matches the A2L file, the system shall reuse that entry without reading the cache setting, reading the A2L file or opening the cache folder. |
+| R-A2L-CACHE.002 | When | When a load's in-memory entry does not match and the cache folder holds a usable entry of the load's entry name, the system shall give the load that entry's stored parse without parsing the A2L file. |
+| R-A2L-CACHE.003 | When | When the system gives a load a stored parse, the system shall give it a payload equal to the parser's payload for the same A2L file at the load's path. |
+| R-A2L-CACHE.004 | When | When the system parses an A2L file for a load while the cache setting is on and the cache folder is usable, the system shall store the stored parse as one entry of the load's entry name. |
+| R-A2L-CACHE.005 | When | When two A2L files hold the same bytes, the system shall serve the load of each from one entry. |
+| R-A2L-CACHE.006 | When | When the content digest or the parser fingerprint of a load differs from those of every entry, the system shall parse the A2L file. |
+| R-A2L-CACHE.007 | When | When the system gives a load no stored parse, the system shall complete the load with the parser's payload exactly as with the cache setting off. |
+| R-A2L-CACHE.008 | When | When the system stores an entry, the system shall make the complete entry appear under its entry name in one step. |
+| R-A2L-CACHE.009 | U | The system shall name each file it writes in the cache folder only with an entry name, or with an entry name followed by `.tmp-` and 16 lowercase hex digits. |
+| R-A2L-CACHE.010 | U | The system shall store in an entry no path and no name of any file or folder. |
+| R-A2L-CACHE.011 | When | When the system stores an entry while the entries and temporary files of the cache folder hold more than the size cap in all, the system shall delete the least recently used entries other than the one just stored, oldest first, until the entries and temporary files hold at most the size cap or no such entry is left. |
+| R-A2L-CACHE.012 | When | When the system evicts entries, the system shall delete every stale temporary file of the cache folder. |
+| R-A2L-CACHE.013 | When | When the system gives a load a stored parse, the system shall make that entry the most recently used. |
+| R-A2L-CACHE.014 | U | The system shall neither read, count nor delete a foreign file of the cache folder. |
+| R-A2L-CACHE.015 | Where | Where the size setting is valid, the system shall use its number of mebibytes as the size cap. |
+| R-A2L-CACHE.016 | If | If the size setting is unset or is not valid, then the system shall use a size cap of 2,147,483,648 bytes. |
+| R-A2L-CACHE.017 | If | If the size setting is set, non-empty and not valid, then the system shall log `A2L parse cache size setting not recognised: 2048 MiB used.` at each store. |
+| R-A2L-CACHE.018 | Where | Where the system runs on Windows, the system shall keep the parse cache in `<LOCALAPPDATA>\s19_app\cache\a2l`. |
+| R-A2L-CACHE.019 | Where | Where the system runs on Linux, the system shall keep the parse cache in `<cache base>/s19_app/a2l`. |
+| R-A2L-CACHE.020 | If | If the system runs on Linux and XDG_CACHE_HOME is unset, empty or does not start with `/`, then the system shall take `<HOME>/.cache` as the cache base. |
+| R-A2L-CACHE.021 | If | If the cache setting is off or not recognised, or the cache folder is not a usable cache folder, then the system shall open, create and write nothing under the cache base for that load. |
+| R-A2L-CACHE.022 | If | If the system uses no parse cache for a load because of a condition of R-A2L-CACHE.021, then the system shall log `A2L parse cache off: <reason>.` with the reason `setting`, `setting not recognised`, `no cache folder`, `cache folder is a link`, `cache folder inside a repository or work area`, `cache folder not private` or `parser source unreadable`. |
+| R-A2L-CACHE.023 | Where | Where the system runs on Linux, the system shall create the app cache folders with permission bits 0700 and each entry and temporary file with permission bits 0600. |
+| R-A2L-CACHE.024 | U | The system shall write no file of the parse cache outside the cache folder. |
+| R-A2L-CACHE.025 | U | The system shall write in a parse-cache log line no path, no file name, no entry name, no digest and no A2L text. |
+| R-A2L-CACHE.026 | When | When the system is started with `--clear-a2l-cache`, the system shall delete every entry and every temporary file of the cache folder. |
+| R-A2L-CACHE.027 | When | When the system has deleted every entry and temporary file for `--clear-a2l-cache`, the system shall print `A2L cache cleared: <n> files, <bytes> bytes.` and exit with status 0. |
+| R-A2L-CACHE.028 | When | When the system is started with `--clear-a2l-cache`, the system shall start no TUI and create no file or folder outside the cache folder. |
+| R-A2L-CACHE.029 | If | If a file cannot be deleted for `--clear-a2l-cache`, then the system shall print `A2L cache cleared: <n> files, <bytes> bytes; <k> could not be removed.` and exit with status 1. |
+| R-A2L-CACHE.030 | If | If the cache folder is not a usable cache folder when the system is started with `--clear-a2l-cache`, then the system shall end with `A2L cache not cleared: <reason>.` and exit status 1 without deleting any file. |
+| R-A2L-CACHE.031 | If | If the system is started with both `--clear-a2l-cache` and `--load`, then the system shall end with argparse's message `argument <second option>: not allowed with argument <first option>` and exit status 2 without deleting any file. |
+| R-A2L-CACHE.032 | U | The system shall describe `--clear-a2l-cache` in its command-line help as `delete every stored A2L parse of this user, then exit`. |
+| R-A2L-CACHE.033 | When | When the system gives a load a stored parse, the system shall log `A2L parse cache hit: entry_bytes=<n> read_seconds=<s>`. |
+| R-A2L-CACHE.034 | When | When a load's in-memory entry does not match and no usable entry holds the load's entry name, the system shall log `A2L parse cache miss: file_bytes=<n> hash_seconds=<s>`. |
+| R-A2L-CACHE.035 | When | When the system has stored an entry, the system shall log `A2L parse cache stored: entry_bytes=<n> write_seconds=<s>`. |
+| R-A2L-CACHE.036 | When | When eviction deletes at least one file, the system shall log `A2L parse cache evicted: files=<k> bytes=<n>`. |
+| R-A2L-CACHE.037 | If | If the entry of a load's entry name is a damaged entry, then the system shall delete that entry before parsing the A2L file. |
+| R-A2L-CACHE.038 | If | If the file of a load's entry name is a link, a junction or not a regular file, then the system shall leave that file unchanged. |
+| R-A2L-CACHE.039 | If | If the system finds a damaged entry or a file of a load's entry name that is not a usable entry, then the system shall log `A2L parse cache entry unusable: <reason>.` with the reason `damaged` or `not a regular file`. |
+| R-A2L-CACHE.040 | U | The system shall execute no code read from a file of the cache folder. |
+| R-A2L-CACHE.041 | If | If listing the cache folder or opening or reading a file of it raises an `OSError` during a load, then the system shall leave the cache folder unchanged for that load. |
+| R-A2L-CACHE.042 | If | If writing, renaming or closing the temporary file of a store fails, or the stored parse cannot be marshalled, then the system shall leave the cache folder as it was before the store. |
+| R-A2L-CACHE.043 | If | If a read or a store of the parse cache fails as in R-A2L-CACHE.041 or R-A2L-CACHE.042, then the system shall log `A2L parse cache read failed: <exception class>.` or `A2L parse cache write failed: <exception class>.` respectively. |
+| R-A2L-CACHE.044 | If | If the stored parse is larger than the size cap, or the A2L file's size or modification time after the parse differs from those before its content digest, or the A2L file's content digest after the parse differs from the one before it, then the system shall store no entry for that parse. |
+| R-A2L-CACHE.045 | If | If the system stores no entry for a reason of R-A2L-CACHE.044, then the system shall log `A2L parse cache not stored: <reason>.` with the reason `entry larger than the size cap` or `file changed during the parse`. |
+| R-A2L-CACHE.046 | If | If any other exception than those of R-A2L-CACHE.041 and R-A2L-CACHE.042 escapes the parse-cache work of a load, then the system shall complete the load as with the cache setting off. |
+| R-A2L-CACHE.047 | If | If two app instances store the entry of one entry name at the same time, then the system shall leave exactly one usable entry of that name. |
+| R-A2L-CACHE.048 | When | When the system hashes an A2L file, reads an entry, stores an entry or evicts entries for a load, the system shall do it on that load's worker thread. |
+| R-A2L-CACHE.049 | While | While the system reads an entry for a load, the system shall move the progress bar within the parse step in proportion to the entry bytes read so far. |
+| R-A2L-CACHE.050 | When | When the system stores an entry, the system shall write each chunk at most a chunk bound long, except a chunk holding one text or byte string. |
+| R-A2L-CACHE.051 | While | While the system hashes an A2L file, reads an entry or stores an entry, the system shall fire each due 50 ms UI timer tick no more than 100 ms late. |
+| R-A2L-CACHE.052 | When | When the system loads case_06 with a usable entry and no in-memory entry, the system shall finish the parse step within 3.0 s. |
+| R-A2L-CACHE.053 | When | When the system parses case_06 with the cache setting on and no entry, the system shall finish the parse step at most 1.5 s later than with the cache setting off. |
+| R-A2L-CACHE.054 | U | The system shall state in the user guide's load chapter the cache folder of each platform, that `S19_A2L_CACHE=off` turns the cache off and keeps the stored parses, that `S19_A2L_CACHE_MAX_MB` sets the size cap, that `s19tui --clear-a2l-cache` removes the stored parses, and that the cache folder must be private to the user and on Windows inherits the `%LOCALAPPDATA%` permissions. |
+| R-A2L-CACHE.055 | If | If the system completes a load as with the cache setting off because of R-A2L-CACHE.046, then the system shall log `A2L parse cache failed: <exception class>.` |
+| R-A2L-CACHE.056 | While | While the system reads or stores an entry for a load, the system shall keep the cyclic garbage collector disabled. |
+| R-A2L-CACHE.057 | When | When the system has read or stored an entry for a load, the system shall return the cyclic garbage collector to the state it had before that read or store. |
+| R-A2L-CACHE.058 | Where | Where the system runs on Linux, the system shall reach every file of the cache folder only through the folder chain. |
+| R-A2L-CACHE.059 | If | If an app cache folder is replaced by a link or a junction after the system has checked the cache folder for a load or a clear, then the system shall read, write and delete no file through that link. |
+| R-A2L-CACHE.060 | When | When the system on Linux has made an app cache folder for a store, the system shall check that folder's owner and permission bits through its descriptor before it creates a file in it. |
+| R-A2L-CACHE.061 | Where | Where the system runs on Windows, the system shall check the app cache folders and the file for a link or a junction immediately before each open, rename, delete and time update of a file of the cache folder. |
+| R-A2L-CACHE.062 | When | When the system stores an entry, the system shall marshal each branch section without its child sections. |
 
 <a id="s3"></a>
 
@@ -3346,7 +3521,8 @@ progress line   <glyph> <label>  ·  step <n>/<m> <step name>  ·  <mm>:<ss>
   <mm>:<ss>     Whole minutes and seconds since the action began, two digits each;
                 the minutes go past 59 (4503 s is 75:03).
 amount          What a step reports of its work: done of total.
-                  A2L parse     bytes read of the A2L file's size.
+                  A2L parse     bytes read of the A2L file's size; for a stored-parse
+                                hit, bytes read of the entry's size.
                   Place the files (Save project)   files placed of files planned.
 bar value       Step n of m with no amount: floor(100 × (n − 1) / m) %.
                 Step n of m with an amount: floor(100 × (n − 1 + f) / m) %, where
@@ -3531,6 +3707,13 @@ The look (one row in the accent colour, the glyph, the step, the elapsed time, n
 | R-TUI-023.5 | When | When the operator presses Ctrl+D, the system shall switch between the comfortable and the compact density. |
 | R-TUI-023.6 | When | When the density changes, the system shall show the status `Density: compact` or `Density: comfortable`. |
 | R-TUI-023.7 | While | While the density is compact, the system shall draw the Workspace panes without top and bottom padding. |
+| R-TUI-023.8 | When | When the system starts, the system shall show the workspace in the width layout of its start width without a workspace restyle for the width layout. |
+| R-TUI-023.9 | When | When the terminal is resized across 120 columns, the system shall make exactly one workspace restyle for the width layout. |
+| R-TUI-023.10 | When | When the terminal is resized without crossing 120 columns, the system shall make no workspace restyle for the width layout. |
+| R-TUI-023.11 | When | When the system starts, the system shall show the comfortable density without a workspace restyle for the density. |
+| R-TUI-023.12 | U | The system shall lay out every window at a terminal size identically whether the system started at that size or was resized to it. |
+| R-TUI-023.13 | If | If the start width seen at compose and the width of the first resize lie on different sides of 120 columns, then the system shall make exactly one workspace restyle and show the width layout of the first resize. |
+| R-TUI-023.14 | When | When the system starts headless at 118×54 on the reference laptop, the system shall reach its first idle within a median of 2.2 s. |
 | R-TUI-024.1 | U | The system shall draw every window in the dark theme of CTX-THEME. |
 | R-TUI-024.2 | U | The system shall use one accent colour, `#91abec`. |
 | R-TUI-024.3 | U | The system shall offer no light theme. |
@@ -5736,7 +5919,8 @@ The check run and its display are S9 (S9.1, S9.2); running a scope is S11.
 | R-PE-DEF.4 | While | While the staging sheet holds the focus, the system shall paint its border in the accent colour. |
 | R-PE-DEF.5 | U | The system shall show the staging sheet's header line of CTX-PE-DEF. |
 | R-PE-DEF.10 | When | When the picker's shown page changes, the system shall show one sheet row per parameter of that page, in page order. |
-| R-PE-DEF.11 | When | When the picker's shown page changes, the system shall build the page's rows from the definitions and the page A2L that the picker last populated from. |
+| R-PE-DEF.11.1 | When | When the picker's shown page changes, the system shall build each row of the page from a definition equal to that name's definition in the bulk describe of the page A2L that the picker last populated from. |
+| R-PE-DEF.11.2 | When | When the picker's shown page changes, the system shall build the page's rows without walking the sections of any A2L. |
 | R-PE-DEF.12 | When | When the picker's shown page changes, the system shall paint the sheet within 0.5 s for a page of 200 parameters. |
 | R-PE-DEF.13 | If | If the shown page has no parameter, then the system shall show the sheet line `No parameters on this page: type a filter above.` |
 | R-PE-DEF.14 | If | If no A2L is loaded, then the system shall show the sheet line `Load an A2L file to edit parameters by definition.` |
@@ -5937,6 +6121,10 @@ The check run and its display are S9 (S9.1, S9.2); running a scope is S11.
 | R-PE-BENCH.106 | If | If the change document or the image changes while a record stage's write and refresh run, then the system shall show that latest document in the ledger, the JSON view and the staging sheet when the refresh ends. |
 | R-PE-BENCH.107 | U | The system shall draw each cell of a summary strip with a block no taller than seven eighths of the cell. |
 | R-PE-BENCH.108 | U | The system shall paint each summary strip in the dim style of CTX-PE-DEF with no ground of its own. |
+| R-PE-BENCH.109 | When | When the last pending page decode of the shown page ends, the system shall repaint the staging sheet. |
+| R-PE-BENCH.110 | While | While page decodes of the shown page are pending, the system shall repaint the staging sheet once per paint window in which a page decode result arrived, no later than that window's end. |
+| R-PE-BENCH.111 | If | If a page decode result arrives for a page that is no longer shown, then the system shall discard it without repainting the staging sheet. |
+| R-PE-BENCH.113 | When | When a decode, preview or record-stage job of the selected bench row ends, the system shall repaint the staging sheet before the next job starts. |
 
 #### S10.12 · Apply visibly and export (CTX-SAVEBACK; batch-103 Inc 10)
 
