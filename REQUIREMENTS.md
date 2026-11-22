@@ -320,10 +320,10 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-002 · LLR-002.1 … .3 | **retired** | Code placement (range-index re-exports removed). |
 | HLR-003 · LLR-003.1 … .3 | **retired** | Code placement (`safe_text` moved to `s19_app/utils.py`). The safe-text behaviour is S1: R-TUI-103 … 103b. |
 | HLR-004 · LLR-004.1 … .3 | **retired** | Code placement (palette constants moved to `s19_app/render/format.py`). Colours are S3 CTX-LEGEND and S6 CTX-THEME. |
-| HLR-005 · LLR-005.1, .2 | **absorbed** · S10: R-PE-012 … R-PE-019 | Unsaved-changes popup; a dropdown pick is guarded since batch-100 Inc 10 (R-PE-016, S10 D10-45; D10-20 done). |
+| HLR-005 · LLR-005.1, .2 | **absorbed** · S10: R-PE.12 … R-PE.19 | Unsaved-changes popup; a dropdown pick is guarded since batch-100 Inc 10 (R-PE.16, S10 D10-45; D10-20 done). |
 | HLR-006 · LLR-006.1, .2 | **retired** | Deleted behaviour: the variant dropdown and variant help were removed in batch-94 (S10 D10-4). |
-| HLR-007 · LLR-007.1, .2 | **absorbed** · S10: R-PE-080, R-PE-081 | The apply itself is S8.5. |
-| HLR-008 · LLR-008.1, .2 | **absorbed** · S10: R-PE-010, R-PE-011, R-TUI-052.1 … .3 | Refresh rescans the folder (D10-5). |
+| HLR-007 · LLR-007.1, .2 | **absorbed** · S10: R-PE.80, R-PE.81 | The apply itself is S8.5. |
+| HLR-008 · LLR-008.1, .2 | **absorbed** · S10: R-PE.10, R-PE.11, R-TUI-052.1 … .3 | Refresh rescans the folder (D10-5). |
 | HLR-009 · LLR-009.1 … .3 | **absorbed** · S9: R-CHKED-001 … R-CHKED.53 | The Check Editor, S9.4 (D9-3). |
 | HLR-010 · LLR-010.1, .2 | **absorbed** · S14: R-DIFF-CHK.1 … R-DIFF-CHK.11 | Check-spec addendum of the diff report, S14.6 (D14-6). |
 | HLR-011 · LLR-011.1, .2 | **absorbed** · S9: R-CHKED.48 | Plain text on the Check Editor (S1 CTX-TEXT). |
@@ -363,7 +363,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-145 · LLR-145.1 … .10 | **absorbed** · S9: R-CHKED-001 … R-CHKED.53 | The Check Editor, S9.4. |
 | HLR-146 · LLR-146.1 … .14 | **absorbed** · S16: R-TUI-059.20 … R-FB-PIPE.5 | The Flow Builder, S16.1 … S16.3. |
 | HLR-147 · LLR-147.1 … .13 | **absorbed** · S16: R-FX-SCR.1 … R-FX-WAIT.13 | Flow Execution, S16.7 … S16.9. |
-| HLR-148 · LLR-148.1 … .10 | **absorbed** · S5: R-CHIP-001.1 … .11; S7: R-WHELP.1 … .15; S9: R-CHKED-002, R-CHKED.17; S10: R-PE-060, R-PE-073; S16: R-FB-RUN.1 | Chips, help entries, empty-state lines. Glyph vocabularies (LLR-148.7) are design. |
+| HLR-148 · LLR-148.1 … .10 | **absorbed** · S5: R-CHIP-001.1 … .11; S7: R-WHELP.1 … .15; S9: R-CHKED-002, R-CHKED.17; S10: R-PE.60, R-PE.73; S16: R-FB-RUN.1 | Chips, help entries, empty-state lines. Glyph vocabularies (LLR-148.7) are design. |
 | HLR-149 · LLR-149.1 … .6 | **absorbed** · S10: R-TUI-064.1 … .3; S9: R-CHKED.49, R-CHKED.50; S16: R-FB-RIB.5, R-FB-RIB.6, R-FX-SIZE.1, R-FX-SIZE.2 | The four editor windows at 118 × 54 or more and below it. |
 | HLR-150 · LLR-150.1 … .7 | **absorbed** · S7: R-KEYBAR.1 … R-KEYBAR.15 | The key bar, S7.5. |
 | HLR-151 · LLR-151.1 | **absorbed** · S7: R-LOADDLG.1, R-LOADDLG.54, R-LOADDLG.60, R-LOADDLG.70 | LLR-151.1 (the Load project dialog) is superseded by batch-100 HLR-173 (Inc 9b): the one Load dialog, S7.2. S11 R-TUI-013.4 is retired (S11 D11-55). |
@@ -376,7 +376,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-158 · LLR-158.1 … .3 | **absorbed** · S2: R-A2L-024, R-A2L-025, R-A2L-026, R-A2L-027, R-A2L-056, R-A2L-057, R-A2L-058.1, R-A2L-058.2, R-A2L-058.3, R-A2L-006.7 | Decoding. Encoding is deferred with the symbol input (S10 D10-13, D10-42). |
 | HLR-159 · LLR-159.1, .2 | **absorbed** · S13: R-CRC-CHECK-002.1 … .4; S15: R-FLOW-CRC.1 … .8 | Empty and partly covered CRC targets. |
 | HLR-160 · LLR-160.1 … .5 | **absorbed** · S17: R-SEG-NAME.1 … R-SEG-PLACE.18 | Export names and placement, S17.7 (D17-12). |
-| HLR-161 · LLR-161.1, .2 | **absorbed** · S10: R-PE-031 | The help-window note is S7's (passed by S10). |
+| HLR-161 · LLR-161.1, .2 | **absorbed** · S10: R-PE.31 | The help-window note is S7's (passed by S10). |
 | HLR-162 · LLR-162.1 … .3 | **absorbed** · S11: R-TUI-013.2; S7: R-LOADDLG.1, R-LOADDLG.24, R-LOADDLG.60; S5: R-WS-FILES.1, R-WS-FILES.3 | Pick by name; list the folder loads write into. The Load project dialog rows (S11 R-TUI-013.1, .3, .4) are retired into the Load dialog (S11 D11-55). |
 
 **Batch-100 ids** (CTX-RETIRED "batch-100 id"; D0-13). One pointer line per HLR of batch-100 (HLR-163 … HLR-178 with every lettered sub-HLR, 42 ids), in the same classes. Rows cited are those of the 570b4b5 reconciliation.
@@ -387,7 +387,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-164 · LLR-164.1 … .4 | **absorbed** · S11: R-TUI-012.5 … .15, .20, .21, R-TUI-013.2, R-PROJ-MERGE.1 … .3, R-PROJ-ROLLBACK.1 … .6, .12 | Name guards, merge, a failed save leaves nothing. The AST census of LLR-164.4 is mechanism (S11 D11-50, D11-51). |
 | HLR-165 · LLR-165.1 … .4 | **absorbed** · S11: R-PROJ-RESET.1, .3, .4; S2: R-A2L-004.13; S5: R-WS-LOADED.6, .10 | Reset after the read, before the first install; `_session_snapshot` is a test seam (S11 D11-63). LLR-165.4 (an unload drops the parsed A2L) was in the code at 093a7c0 (S2 D2-32); S5's unload rows cite it. |
 | HLR-166 · LLR-166.1, .2 | **absorbed** · S6: R-SHELL-FOCUS.3, .4, .5, .7, R-FOCUS-LOAD.1 | Focus after a load completes or is cancelled, and after the Load-result panel closes; the panel's own first focus is S11's (R-LOADRES.8). |
-| HLR-167 · LLR-167.1 … .8, .6a … .6g | **absorbed** · S11: R-PROJ-IMAGE.1 … .14, R-PROJ-001.1 … .12, R-TUI-012.16, .17, .28, .29, R-SAVEDLG.16, R-SAVEDLG.24, R-PROJ-DOC.15 … .17; S10: R-PE-038, R-PE-039.1 … .4 | Emit on data (S11 D11-52, LED .14 over LED .13); the LLR-167.7 split is mechanism. LLR-167.8 (the Patch Editor's unsaved mark after Save project) is S10's (D10-46). |
+| HLR-167 · LLR-167.1 … .8, .6a … .6g | **absorbed** · S11: R-PROJ-IMAGE.1 … .14, R-PROJ-001.1 … .12, R-TUI-012.16, .17, .28, .29, R-SAVEDLG.16, R-SAVEDLG.24, R-PROJ-DOC.15 … .17; S10: R-PE.38, R-PE-039.1 … .4 | Emit on data (S11 D11-52, LED .14 over LED .13); the LLR-167.7 split is mechanism. LLR-167.8 (the Patch Editor's unsaved mark after Save project) is S10's (D10-46). |
 | HLR-168 · LLR-168.1 … .4 | **absorbed** · S11: R-PROJ-SAVEBACK.1 … .3, R-PROJ-002.4, .10, .11, R-PROJ-WRITER.1 … .4, R-VAR-001.1, R-VAR-002.19, R-PROJ-IMAGE.13; S8: R-CHG-003.8, .19, .20 | Every in-project writer rewrites project.json (S11 D11-59). The save-back itself is unchanged; S8 cites the S11 rows (D8-37). |
 | HLR-169 · LLR-169.1 … .9 | **absorbed** · S11: R-PROJCHK.1 … R-PROJCHK.18, R-PROJ-OPEN.1, .2, R-VAR-002.2, .14, R-MANIFEST-READ.3 … .11, .17, R-MANIFEST-WRITE.2, .3, R-MAN-WRITE-001.4, R-MAN-VERIFY-001.2, R-MANIFEST-KEEP.1 … .5 | Read cap 1 MiB (S11 D11-57); private staging is mechanism. |
 | HLR-170 · LLR-170.1 … .3 | **absorbed** · S11: R-PROJ-DOC.1 … .22, R-MANIFEST-READ.15, R-MANIFEST-WRITE.5, .6 | The active change document is saved and reopened. |
@@ -403,7 +403,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-173c · LLR-173.1a … .1c, .2f, .2g | **absorbed** · S7: R-LOADDLG.54 … .63, R-TUI-043.2, R-TUI-043.15 | Enter, Alt+L and Load load the load source. |
 | HLR-173d · LLR-173.2h, .2i, .5, .5a … .5e | **absorbed** · S7: R-LOADDLG.69 … .80 | An empty or refused load request is explained in the reason line. |
 | HLR-173e · LLR-173.2k, .2l | **absorbed** · S7: R-DLG.2, R-DLG.9, R-TUI-043.3 | Escape and Cancel close the dialog and change nothing. |
-| HLR-174 · LLR-174.1, .1b, .1c, .2, .2a, .2g, .2h, .2j, .2r, .2s, .2t, .3b, .4 … .4c | **absorbed** · S5: R-LOADQ-001.1, .4, .6, R-LOADQ-002.1 … .3, R-LOADQ-004.6 … .8, R-LOADQ-005.4, R-LOADQ-006.1 … .4; S6: R-BUSY-REFUSE.6; S10: R-PE-015, R-PE-016, R-PE-019, R-PE-019a | LLR-174.1c, .2a, .3b and the census of .4 are design (S5 D5-46). LLR-174.2j, .2t are the Patch Editor's own popup (S10 D10-45; D10-20 settled). |
+| HLR-174 · LLR-174.1, .1b, .1c, .2, .2a, .2g, .2h, .2j, .2r, .2s, .2t, .3b, .4 … .4c | **absorbed** · S5: R-LOADQ-001.1, .4, .6, R-LOADQ-002.1 … .3, R-LOADQ-004.6 … .8, R-LOADQ-005.4, R-LOADQ-006.1 … .4; S6: R-BUSY-REFUSE.6; S10: R-PE.15, R-PE.16, R-PE.19, R-PE.112 | LLR-174.1c, .2a, .3b and the census of .4 are design (S5 D5-46). LLR-174.2j, .2t are the Patch Editor's own popup (S10 D10-45; D10-20 settled). |
 | HLR-174a · LLR-174.1, .1a, .1b, .4b, .4c | **absorbed** · S5: R-LOADQ-001.2, .3, .5, R-LOADQ-002.1 … .3 | The cells that load without asking. |
 | HLR-174b · LLR-174.2c, .2e, .2f, .2p, .3, .3c | **absorbed** · S5: R-LOADQ-003.1, .5, R-LOADQ-004.2, .4, .5, R-LOADQ-005.4 | LLR-174.3's order (reset after the answer) is design; its observable part is R-LOADQ-003.2. |
 | HLR-174c · LLR-174.2b, .2d, .2e, .2f, .2p, .3a, .3c, .3d | **absorbed** · S5: R-LOADQ-003.2 … .5, R-LOADQ-004.1, .3, .4, .5; S6: R-SHELL-FOCUS.4 | The focus after the close is S6's (LLR-166.1). |
@@ -421,7 +421,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-176c · LLR-176.1i … .1m, .1o, .1s, .2c, .2d | **absorbed** · S6: R-PROGRESS-END.1 … .5, R-PROGRESS-SHOWN.2, .4, R-PROGRESS-BAR.1, .5, R-PROGRESS-LINE.7; S12: R-RPT-LOG.1 … .4; S14: R-CMP-005.13 … .15, R-BEFORE-AFTER-REPORT-001.31 | Each action's own outcome text stays in its chapter (S5 R-TUI-012L.12, S2 R-A2L-004.1, S11, S12, S14); the report's end follows S6 R-PROGRESS-END.3 (S12 D12-30). |
 | HLR-176d · LLR-176.1h, .1j | **absorbed** · S6: R-PROGRESS-LINE.2, R-PROGRESS-END.2 | One owner of the status text while an action runs. |
 | HLR-177 · LLR-177.1 … .1k, .2 … .2c, .5, .5a, LLR-176.3 | **absorbed** · S6: R-PROGRESS-LINE.3, .5, R-PROGRESS-BAR.3, R-BUSY-RUN.1; S2: R-A2L-004.3, .6 … .12; S5: R-TUI-012L.5; S11: R-PROJ-RESET.1, R-LOADRES.2, R-PROJ-ROLLBACK.17, .18, R-TUI-013.17 | Worker threads, frozen requests and main-thread writes (.1, .1a, .1b, .1d, .1e, .1i) are implementation (S6 D6-33, S2 D2-33). The results and failures of each action (.1f … .1h, .1j, .1k, .2 … .2c) are in its chapter (S6 D6-42). The copy on the screen's thread is a held step (S6 D6-35, S5 D5-50). |
-| HLR-177a · LLR-177.3 … .3i | **absorbed** · S6: R-BUSY-REFUSE.1 … .8; S10: R-PE-110, R-PE-111; S12: R-RPT-002.28 | The busy line and the refused list are S6 CTX-BUSY; reports are never refused (R-BUSY-REFUSE.7). |
+| HLR-177a · LLR-177.3 … .3i | **absorbed** · S6: R-BUSY-REFUSE.1 … .8; S10: R-PE-110, R-PE.111; S12: R-RPT-002.28 | The busy line and the refused list are S6 CTX-BUSY; reports are never refused (R-BUSY-REFUSE.7). |
 | HLR-177b · LLR-177.4, .4a, .4b, .4d | **absorbed** · S6: R-SHELL-START.5, R-QUIT.1 … .6 | Supersedes S6 D6-9 for the "session action running" state (S6 D6-36). |
 | HLR-177c · LLR-177.4c, .4e | **absorbed** · S6: R-QUIT.7 … .12 | Quit waits for the end; withdrawn on a failure or unsaved work. |
 | HLR-178 · LLR-178.1 … .3 | **absorbed** · S11: R-TUI-013.12, .13, R-LOADRES.1 … R-LOADRES.18; S7: R-LOADDLG.83; S3: R-LEGEND.10 | Problem rows bounded at 102 (S11 D11-54); the panel's colours are the S3 palette. The open project's preview of the last load result (LLR-178.3, last sentence) is not built at 570b4b5: S7 R-LOADDLG.83 reads No (S7 D7-35). |
@@ -454,16 +454,26 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 
 | Id | Where it lives now | Note |
 |---|---|---|
+| HLR-056 · LLR-056.3 | **absorbed** · S12: R-RPT-FILTER-001.4, R-RPT-FILTER-001.5, R-RPT-FILTER-001.13, R-RPT-FILTER-001.16, R-RPT-FILTER-001.17; S14: R-BEFORE-AFTER-REPORT-001.23 | Batch 2026-07-10-batch-35. One filter selection feeds the project report and the before/after report and is cleared when the loaded set changes; the field that holds it is design. HLR-056 and its other LLRs are other increments' rows. |
 | HLR-059 · LLR-059.3 | **absorbed** · S3: R-TUI.47 | Batch 2026-07-11-batch-36. Hex-block colour names derived from the hex view's styles; the scoped severity-orphan guard of the same LLR is a test method (I1-D1). |
+| HLR-061 · LLR-061.2 | **absorbed** · S10: R-TUI-049.2; S14: R-BEFORE-AFTER-REPORT-001.2, R-BEFORE-AFTER-REPORT-001.14, R-BEFORE-AFTER-REPORT-001.15 | Batch 2026-07-11-batch-37. Write before/after report writes what `b` writes; a refusal writes nothing and shows its reason. HLR-061 and its other LLRs are other increments' rows. |
+| HLR-068a · LLR-068a.2, .4 | **absorbed** · S10: R-TUI-057.4, R-TUI-057.5, R-TUI-057.6 | Batch 2026-07-12-batch-38. .2: undo and redo restore the latest step; no step, no change. .4 (Undo and Redo disabled for a file-backed document) was superseded by S10 D10-23: both stay enabled for every document (R-TUI-057.8); retired (I4-D5). LLR-068a.3 waits for P-279 (I4-D7). HLR-068a and its other LLRs are other increments' rows. |
 | HLR-072 · LLR-072.3 | **absorbed** · S4: R-TUI-072.1, R-TUI-072.2 | Batch 2026-07-15-batch-47, as amended by 2026-08-01-batch-77 (Amendment B); the 5-tick text it replaced was superseded there (I1-D2). |
 | HLR-073 · LLR-073.2 | **absorbed** · S4: R-TUI-073.1, R-TUI-062.2 | Batch 2026-07-15-batch-47. The ↵ glyph closes each region row (CTX-MAP); what Enter does is S4 D4-21. |
 | HLR-074 · LLR-074.2 | **absorbed** · S4: R-TUI-074.6, R-TUI-074.7 | Batch 2026-07-15-batch-47. The 3-row peek was superseded by HLR-126 and HLR-128 (peek rows). |
+| HLR-075 · LLR-075.1, .3, .4, .6 | **absorbed** · S10: R-TUI-063.6, R-PE-041, R-TUI-063.8, R-PE.101, R-PE.5; S9: R-CHK-PE-008, R-CHK-PE-009 | Batch 2026-07-16-batch-48. The three titled windows became the landing pane and its subtitles (S10 D10-3). .3: the variant half of the line went with batch-94 HLR-006 (S10 D10-4); the scope line stays. .4: no variant text reaches the line any more; its test guards the line as a test method. .6: every ledger cell is plain text. .2 entered the canon as fold R-PE-LEDGER.1 (I4-D3). LLR-075.5 is another increment's row. |
+| HLR-077 · LLR-077.1 … .6 | **absorbed** · S9: R-CHK-PE-001, R-CHK-PE.13, R-CHK-PE.14, R-CHK-PE.15, R-CHK-PE.16; S10: R-PE.40 | Batch 2026-07-16-batch-48. The check glyph leads each ledger row's Kind cell, by document order, with no column added (CTX-PE-LEDGER); it shows only for the current run (CTX-CHECK-TEXT). The fallback ◐ for an unknown result token (.3) and the census of the refresh sites (.5) are design. HLR-077 itself is another increment's row. |
+| HLR-078 · LLR-078.1, .2, .3 | **absorbed** · S9: R-CHK-PE.5, R-CHK-PE.11 | Batch 2026-07-16-batch-48. The patch strip of CTX-CHECK-TEXT sits above the result rows; undo and redo end the current run, so the strip clears (.3). .2 is design. LLR-078.4, .5 are other increments' rows. |
+| HLR-079 · LLR-079.1, .3, .4 | **absorbed** · S10: R-PATCH-PASTE-001.7, R-PATCH-PASTE-001.8, R-PATCH-PASTE-001.9, R-PE.5 | Batch 2026-07-16-batch-48. The paste buffer's JSON in the JSON hues, in place, as literal text; the paste gauge is now `<used>K / 64.0K` (CTX-PE-JSON). The highlight mechanism and its fallback (.1) are design. LLR-079.2, .5 are other increments' rows. |
+| HLR-080 · LLR-080.1 … .4, .6, .7 | **absorbed** · S10: R-PE.50, R-PE.51, R-PE.52, R-PE.56, R-PE.57, R-PE.58, R-PE.59, R-PE.60, R-TUI-064.3 | Batch 2026-07-16-batch-48. The before/after card is today's before → after strip of the Inspector tab (CTX-PE-STRIP); it shows only addresses, column offsets and bytes (.7). .1, .2 are design. .5 entered the canon as fold R-PE-STRIP.1 (I4-D4). |
+| HLR-081 · LLR-081.1 … .4 | **absorbed** · S10: R-TUI-057.9, R-TUI-057.8 | Batch 2026-07-16-batch-48. The history strip of CTX-PE-DOC follows every history change. .1, .2 are design; .4 is process (batch-48 added no shared key binding). |
 | HLR-082 · LLR-082.2 | **absorbed** · S3: R-TUI-025.2 | Batch 2026-07-18-batch-49. The severity strip above the issue list (CTX-ISSUES-SCREEN). .4 and .5 entered the canon as folds R-ISSUES.1 and R-ISSUES.2 (I2-D6, I2-D7); HLR-082 and its other LLRs are other increments' rows. |
-| HLR-083 · LLR-083.1, .3, .5 | **absorbed** · S6: R-TUI-021.1, R-TUI-021.3, R-TUI-021.7, R-TUI-022.2; S9: R-CHKS.1, R-CHKS.8, R-CHKS.13; S5: R-TUI-029.4 | Batch 2026-07-18-batch-49. Checks is the rail item ☑ on key 9 (CTX-SHELL; the 9th place of batch-49 moved as later items came); the screen's parts are CTX-CHECKS-SCREEN. LLR-083.6 waits for P-279 (I2-D9). |
-| HLR-084 · LLR-084.1, .3, .4, .5, .6, .8 | **absorbed** · S9: R-CHKS.1 … R-CHKS.14; S5: R-TUI-029.4 | Batch 2026-07-18-batch-49: the Checks screen is S9.3 (S9 D9-3). .1 → R-CHKS.5 … .7, .10; .3 → R-CHKS.1 … R-CHKS.5, R-CHKS.8; .4 → R-CHKS.8, R-CHKS-009; .5 → R-CHKS.13; .6 → R-TUI-029.4, R-CHKS.4; .8 → R-CHKS.14 (I1-D3). |
-| HLR-119 · LLR-119.2, .4 | **absorbed** · S6: R-TUI-033.2, R-TUI-033.3 | Batch 2026-08-06-batch-78. .2: one status notice where the window has no box. .4 is a test method (each focus test clears the focus and asserts it first). HLR-119 and its other LLRs are other increments' rows. |
-| HLR-120 · LLR-120.1, .2, .5 | **absorbed** · S6: R-TUI-036.1, R-TUI-016.1 … R-TUI-016.4, R-TUI-036.4, R-TUI-023.3; S5: R-WS-LOADED.1, R-WS-LOADED.17 | Batch 2026-08-06-batch-78, built in 2026-08-07-batch-79. The names moved from the command bar to the context line and the loaded panel's PROJ row, both in the forms of CTX-SHELL (S6 D6-3); one update entry point for both (.1) is design. |
+| HLR-083 · LLR-083.1, .3, .5 | **absorbed** · S6: R-TUI-021.1, R-TUI-021.2, R-TUI-021.3, R-TUI-021.6, R-TUI-021.7, R-TUI-022.2, R-TUI-022.6; S9: R-CHKS.1, R-CHKS.8, R-CHKS.13; S5: R-TUI-029.4 | Batch 2026-07-18-batch-49. Checks is the rail item ☑ on key 9 (CTX-SHELL; the 9th place of batch-49 moved as later items came); the screen's parts are CTX-CHECKS-SCREEN. HLR-083 itself: key 9 or the palette shows the Checks screen, hides the others and moves the one active mark (R-TUI-021.2, R-TUI-021.6, R-TUI-022.6; I4-D2). LLR-083.6 waits for P-279 (I2-D9). |
+| HLR-084 · LLR-084.1 … .8 | **absorbed** · S9: R-CHKS.1 … R-CHKS.14; S5: R-TUI-029.4 | Batch 2026-07-18-batch-49: the Checks screen is S9.3 (S9 D9-3). .1 → R-CHKS.5 … .7, .10; .2 → R-CHKS.5 … .7, R-CHKS.12, the row accessor is design (I4-D2); .3 → R-CHKS.1 … R-CHKS.5, R-CHKS.8; .4 → R-CHKS.8, R-CHKS-009; .5 → R-CHKS.13; .6 → R-TUI-029.4, R-CHKS.4; .7 → R-CHKS.2, R-CHKS.3 (I4-D2); .8 → R-CHKS.14 (I1-D3). |
+| HLR-119 · LLR-119.1, .2, .4 | **absorbed** · S6: R-TUI-033.1, R-TUI-033.2, R-TUI-033.3 | Batch 2026-08-06-batch-78. .1: `/` and `g` act on the shown window's own box; resolving it by a map, not by the boxes present, is design (I4-D2). .2: one status notice where the window has no box. .4 is a test method (each focus test clears the focus and asserts it first). HLR-119 and its other LLRs are other increments' rows. |
+| HLR-120 · LLR-120.1 … .5 | **absorbed** · S6: R-TUI-036.1, R-TUI-016.1 … R-TUI-016.4, R-TUI-036.4, R-TUI-023.3; S5: R-WS-LOADED.1, R-WS-LOADED.17 | Batch 2026-08-06-batch-78, built in 2026-08-07-batch-79. The names moved from the command bar to the context line and the loaded panel's PROJ row, both in the forms of CTX-SHELL (S6 D6-3); one update entry point for both (.1) is design. .3: the context line sits in the status line and adds no row (R-TUI-036.1). .4: both surfaces show the names without control characters or markup (R-TUI-036.4, R-WS-LOADED.17) (I4-D2). |
 | HLR-121 · LLR-121.2, .4 | **absorbed** · S6: R-SHELL-START.1, R-TUI-033.1, R-TUI-016.1; S4: R-TUI-040.1; S5: R-WS-LOADED.1 | Batch 2026-08-06-batch-78, built in 2026-08-07-batch-79. The command bar's find and go-to boxes are gone: the frame of CTX-SHELL has none, `/` and `g` use the window's own boxes (S6 D6-3). .2: the search and go-to rows of S4.3 and S4.4 hold unchanged; the frozen-payload check is a test method. .4: process (increment order); its test helpers read the loaded panel and the context line. Not retired (I2-D5). |
+| HLR-N8-1 · LLR-N8-1.2 | **retired** | Batch 2026-07-23-batch-n8. Superseded by S3 D3-20: the legend window on the Workspace shows the Hex block (S3: R-LEGEND-MODAL-001.7). The example-only Workspace legend is today's code, the defect D3-20 records (I4-D5). HLR-N8-1 and its other LLRs are other increments' rows. |
 | HLR-N8-3 · LLR-N8-3.2 | **absorbed** · S3: R-LEGEND-MAP.2, R-LEGEND-MAP.3 | Batch 2026-07-23-batch-n8. Band rows derived from S4 CTX-ENTROPY (CTX-LEGEND "map sheet"). |
 | HLR-V1 | **absorbed** · S13: R-CRC-PRESET-001.1 … R-CRC-PRESET-001.8 | Batch 2026-07-20-batch-58. The form is CTX-DESIGNER column 1 and Store placement; a preset pick fills it and leaves the preset unchanged. LLR-V1.1, .2 are other increments' rows. |
 | HLR-111 · LLR-111.1, .2, .3, .4 | **absorbed** · S4: R-TUI-103B.4, R-TUI-103B.3, R-TUI-062.9, R-TUI-103B.5, R-TUI-103B.1, R-TUI-103B.2 | Batch 2026-08-01-batch-77. Widths by mapped bytes; one ╱ column per gap. .3: no segment outside the bar (R-TUI-103B.5). .4: a gapless bar at a fixed width shares its columns by largest remainder (R-TUI-103B.1, R-TUI-103B.2, R-TUI-103B.4); the golden that checks it is a test method (I3-D2). |
@@ -3046,7 +3056,7 @@ CTX-LOADQ  The load question
   unsaved image      The loaded image holds a byte other than the byte last loaded,
                      saved by Save project (S11) or saved back (S8).
   unsaved entries    The Patch Editor's dirty flag is set (S10 CTX-PE-DOC; when Save
-                     project clears it: S10 R-PE-038, R-PE-039.1 … .4).
+                     project clears it: S10 R-PE.38, R-PE-039.1 … .4).
   unsaved flow       The Flow Builder holds edits not yet saved (S16).
   unsaved work       For an image replacement: an unsaved image. For a project load:
                      an unsaved image, unsaved entries or an unsaved flow. For an
@@ -3504,7 +3514,7 @@ Shared with S2 R-TUI-019.3 (A2L and MAC page sizes) and S4 (the main hex view's 
 
 #### S6.8 · Session actions: the busy refusal and the quit question (CTX-BUSY; batch-100)
 
-What each session action does, refuses on its own and reports on failure stays in its chapter (S5, S2, S11; D6-42). This section holds what happens around it. Rows that live with their surface: the Patch Editor's refused controls and its read-only paste buffer during a project load (S10 R-PE-110, R-PE-111); Generate new report keeps the session's regions during a session action (S12 R-RPT-002.28).
+What each session action does, refuses on its own and reports on failure stays in its chapter (S5, S2, S11; D6-42). This section holds what happens around it. Rows that live with their surface: the Patch Editor's refused controls and its read-only paste buffer during a project load (S10 R-PE-110, R-PE.111); Generate new report keeps the session's regions during a session action (S12 R-RPT-002.28).
 
 #### S6.8a · Keys and refusals while a session action runs (from batch-100 HLR-177, HLR-177a)
 
@@ -5085,6 +5095,9 @@ ledger row      Kind: the check glyph (S9.2), then string or bytes ·
                 Status: inside, partial, outside or unvalidated-no-image (S8), then
                 " / fault" when an ERROR finding names the entry's address ·
                 Linkage: from the last apply (S8), "-" before one.
+role colours    Kind: purple #b565f3, the check glyph in its own colour (S9) ·
+                Address: cyan #7dd3fc (S3 CTX-LEGEND) · Value / bytes: the text
+                colour #e9e9e9 (S6 CTX-THEME) · Status and Linkage: no role colour.
 ledger subtitle <n> entry or <n> entries, then " ●" while the dirty flag is set.
 tally           DOCUMENT; a 12-cell bar (one cell per entry in its status colour while
                 the entries fit, else proportional); "<n> entries · <i> inside ·
@@ -5487,11 +5500,11 @@ refresh         (R-PE-BENCH.70 … .83) and the refresh of the ledger, the JSON 
 | R-TUI-064.3 | While | While the Patch Editor is shown below 118 × 54, the system shall keep every control reachable by scrolling. |
 | R-TUI-064.4 | U | The system shall show every Patch Editor button as a one-row chip. |
 | R-TUI-064.5 | U | The system shall give Save the only filled style of the Patch Editor. |
-| R-PE-001 | U | The system shall show the Patch Editor legend of CTX-PE under the document row. |
-| R-PE-002 | While | While the document is file-backed, the system shall show `<file name> · <kind>` in the identity ribbon. |
-| R-PE-003 | While | While the document is a draft, the system shall show `draft · <kind>` in the identity ribbon. |
-| R-PE-004 | If | If the file name is wider than the ribbon, then the system shall show one `…` and the end of the name that fits. |
-| R-PE-005 | U | The system shall show file names, entry values, findings, the JSON view and the paste buffer in the Patch Editor as plain text, never as markup. |
+| R-PE.1 | U | The system shall show the Patch Editor legend of CTX-PE under the document row. |
+| R-PE.2 | While | While the document is file-backed, the system shall show `<file name> · <kind>` in the identity ribbon. |
+| R-PE.3 | While | While the document is a draft, the system shall show `draft · <kind>` in the identity ribbon. |
+| R-PE.4 | If | If the file name is wider than the ribbon, then the system shall show one `…` and the end of the name that fits. |
+| R-PE.5 | U | The system shall show file names, entry values, findings, the JSON view and the paste buffer in the Patch Editor as plain text, never as markup. |
 
 #### S10.2 · Choosing and loading a document (CTX-PE-DOC)
 
@@ -5504,49 +5517,49 @@ Reading the file, the load status and the finding lines are S8's (R-CHG-001.19 �
 | R-PATCH-DOC-DROPDOWN-001.3 | When | When the operator picks a file in the dropdown, the system shall load it as the document. |
 | R-PATCH-DOC-DROPDOWN-001.4 | If | If the picked file is a link, lies under a linked folder, or lies outside its folder, then the system shall refuse it with the status `Patch Editor: change file '<name>' is outside the patches folder — not loaded.` |
 | R-TUI-054.1 | U | The system shall show the path input placeholder `or type a path to the same change-set JSON (alternative to the patches/ dropdown)`. |
-| R-PE-010 | When | When the operator presses Load, the system shall load the file the path input names as the document (S8 reader). |
-| R-PE-011 | If | If the path input is empty when Load acts, then the system shall show the status `Patch Editor: enter a change-file path to load.` |
+| R-PE.10 | When | When the operator presses Load, the system shall load the file the path input names as the document (S8 reader). |
+| R-PE.11 | If | If the path input is empty when Load acts, then the system shall show the status `Patch Editor: enter a change-file path to load.` |
 | R-TUI-052.1 | When | When the operator presses Refresh, the system shall fill the File dropdown with the change list. |
 | R-TUI-052.2 | When | When the operator presses Refresh, the system shall keep the document as it is. |
 | R-TUI-052.3 | When | When the operator presses Refresh, the system shall show the status `Patch Editor: file list refreshed.` |
-| R-PE-015 | If | If the operator presses Load while the dirty flag is set, then the system shall ask with the unsaved-changes popup before it loads. |
-| R-PE-012 | When | When the system shows the unsaved-changes popup, the system shall title it `Unsaved changes will be lost`. |
-| R-PE-013 | When | When the system shows the unsaved-changes popup, the system shall show the text `The change editor and the text editor carry unsaved changes. Loading a new document replaces them.` |
-| R-PE-014 | When | When the system shows the unsaved-changes popup, the system shall offer the buttons `Accept loss and load` and `Cancel` (focus and Esc: S7.1). |
-| R-PE-016 | If | If the operator picks a file in the dropdown while the dirty flag is set, then the system shall ask with the unsaved-changes popup before it loads. |
-| R-PE-017 | When | When the operator accepts the loss in the unsaved-changes popup, the system shall load the file the operator asked for. |
-| R-PE-018 | When | When the operator cancels the unsaved-changes popup, the system shall keep the document and the dirty flag. |
-| R-PE-019 | When | When the operator cancels the unsaved-changes popup, the system shall show the status `Patch Editor: load cancelled — changes kept.` |
-| R-PE-019a | When | When the operator cancels the unsaved-changes popup that a dropdown pick opened, the system shall clear the dropdown's choice. |
+| R-PE.15 | If | If the operator presses Load while the dirty flag is set, then the system shall ask with the unsaved-changes popup before it loads. |
+| R-PE.12 | When | When the system shows the unsaved-changes popup, the system shall title it `Unsaved changes will be lost`. |
+| R-PE.13 | When | When the system shows the unsaved-changes popup, the system shall show the text `The change editor and the text editor carry unsaved changes. Loading a new document replaces them.` |
+| R-PE.14 | When | When the system shows the unsaved-changes popup, the system shall offer the buttons `Accept loss and load` and `Cancel` (focus and Esc: S7.1). |
+| R-PE.16 | If | If the operator picks a file in the dropdown while the dirty flag is set, then the system shall ask with the unsaved-changes popup before it loads. |
+| R-PE.17 | When | When the operator accepts the loss in the unsaved-changes popup, the system shall load the file the operator asked for. |
+| R-PE.18 | When | When the operator cancels the unsaved-changes popup, the system shall keep the document and the dirty flag. |
+| R-PE.19 | When | When the operator cancels the unsaved-changes popup, the system shall show the status `Patch Editor: load cancelled — changes kept.` |
+| R-PE.112 | When | When the operator cancels the unsaved-changes popup that a dropdown pick opened, the system shall clear the dropdown's choice. |
 
 #### S10.3 · Entries (CTX-PE-INPUT)
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-PE-020 | U | The system shall show the placeholders of CTX-PE-INPUT in the Address, String and Bytes fields. |
-| R-PE-021 | When | When the operator presses Add, the system shall append the built entry at the Address field's address to the document. |
-| R-PE-022 | When | When an Add succeeds, the system shall show the status `Patch Editor: entry added.` |
-| R-PE-023 | If | If an entry already declares the Address field's address, then the system shall refuse the Add with the status `Patch Editor: an entry at address 0x<X> already exists - use Edit`. |
-| R-PE-024 | When | When the operator presses Edit, the system shall replace the first entry declared at the Address field's address with the built entry. |
-| R-PE-025 | When | When an Edit succeeds, the system shall show the status `Patch Editor: entry updated.` |
-| R-PE-026 | When | When the operator presses Remove, the system shall remove the first entry declared at the Address field's address. |
-| R-PE-027 | When | When a Remove succeeds, the system shall show the status `Patch Editor: entry removed.` |
-| R-PE-028 | If | If no entry declares the Address field's address, then the system shall refuse the Edit or Remove with the status `Patch Editor: no change entry at address 0x<X>`. |
-| R-PE-029 | If | If the Address field is empty, then the system shall refuse the action with the status `Patch Editor: memory address must not be empty`. |
-| R-PE-030 | If | If the Address field is not empty and does not follow CTX-PE-INPUT, then the system shall refuse the action with the status `Patch Editor: bad address '<text>' - use 0x and hex digits, or decimal digits`. |
-| R-PE-031 | If | If a Bytes token is not 1–2 hex digits with an optional `0x`, then the system shall refuse the action with the status `Patch Editor: invalid byte token '<token>' - every token is 1-2 hex digits with an optional 0x prefix; decimals are not accepted`. |
-| R-PE-032 | If | If the String and Bytes fields are both empty, then the system shall refuse the Add or Edit with the status `Patch Editor: enter a string value or a run of new bytes`. |
-| R-PE-033 | If | If the String text does not encode in the document's encoding, then the system shall refuse the Add or Edit with the status `Patch Editor: string value does not encode under '<encoding>': <reason>`. |
-| R-PE-034 | When | When the document changes through Add, Edit, Remove, Parse pasted, a stage, undo, redo or a per-entry JSON edit, the system shall set the dirty flag. |
-| R-PE-035 | If | If an Add, Edit, Remove or stage is refused, then the system shall keep the dirty flag as it was. |
-| R-PE-036 | When | When the operator types in the paste buffer, the system shall set the dirty flag. |
-| R-PE-037 | When | When a Save or a load succeeds, the system shall clear the dirty flag. |
+| R-PE.20 | U | The system shall show the placeholders of CTX-PE-INPUT in the Address, String and Bytes fields. |
+| R-PE.21 | When | When the operator presses Add, the system shall append the built entry at the Address field's address to the document. |
+| R-PE.22 | When | When an Add succeeds, the system shall show the status `Patch Editor: entry added.` |
+| R-PE.23 | If | If an entry already declares the Address field's address, then the system shall refuse the Add with the status `Patch Editor: an entry at address 0x<X> already exists - use Edit`. |
+| R-PE.24 | When | When the operator presses Edit, the system shall replace the first entry declared at the Address field's address with the built entry. |
+| R-PE.25 | When | When an Edit succeeds, the system shall show the status `Patch Editor: entry updated.` |
+| R-PE.26 | When | When the operator presses Remove, the system shall remove the first entry declared at the Address field's address. |
+| R-PE.27 | When | When a Remove succeeds, the system shall show the status `Patch Editor: entry removed.` |
+| R-PE.28 | If | If no entry declares the Address field's address, then the system shall refuse the Edit or Remove with the status `Patch Editor: no change entry at address 0x<X>`. |
+| R-PE.29 | If | If the Address field is empty, then the system shall refuse the action with the status `Patch Editor: memory address must not be empty`. |
+| R-PE.30 | If | If the Address field is not empty and does not follow CTX-PE-INPUT, then the system shall refuse the action with the status `Patch Editor: bad address '<text>' - use 0x and hex digits, or decimal digits`. |
+| R-PE.31 | If | If a Bytes token is not 1–2 hex digits with an optional `0x`, then the system shall refuse the action with the status `Patch Editor: invalid byte token '<token>' - every token is 1-2 hex digits with an optional 0x prefix; decimals are not accepted`. |
+| R-PE.32 | If | If the String and Bytes fields are both empty, then the system shall refuse the Add or Edit with the status `Patch Editor: enter a string value or a run of new bytes`. |
+| R-PE.33 | If | If the String text does not encode in the document's encoding, then the system shall refuse the Add or Edit with the status `Patch Editor: string value does not encode under '<encoding>': <reason>`. |
+| R-PE.34 | When | When the document changes through Add, Edit, Remove, Parse pasted, a stage, undo, redo or a per-entry JSON edit, the system shall set the dirty flag. |
+| R-PE.35 | If | If an Add, Edit, Remove or stage is refused, then the system shall keep the dirty flag as it was. |
+| R-PE.36 | When | When the operator types in the paste buffer, the system shall set the dirty flag. |
+| R-PE.37 | When | When a Save or a load succeeds, the system shall clear the dirty flag. |
 
 **(from batch-100 HLR-167: LLR-167.8, LED .72, LED .73)** Save project and its outcome are S11's; these rows state only what it does to the dirty flag.
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-PE-038 | When | When a Save project places the Patch Editor's draft document in the project and the paste buffer holds no unparsed paste text, the system shall clear the dirty flag. |
+| R-PE.38 | When | When a Save project places the Patch Editor's draft document in the project and the paste buffer holds no unparsed paste text, the system shall clear the dirty flag. |
 | R-PE-039.1 | If | If a Save project is refused or rolled back, then the system shall keep the dirty flag as it was. |
 | R-PE-039.2 | If | If a Save project cannot write the Patch Editor's draft document, then the system shall keep the dirty flag as it was. |
 | R-PE-039.3 | If | If the Patch Editor's document is file-backed when a Save project ends, then the system shall keep the dirty flag as it was. |
@@ -5557,43 +5570,45 @@ Reading the file, the load status and the finding lines are S8's (R-CHG-001.19 �
 | Id | Form | Requirement |
 |---|---|---|
 | R-CHG-004.1 | U | The system shall edit one change document at a time in the Patch Editor. |
-| R-PE-040 | U | The system shall show one ledger row per entry, in document order. |
+| R-PE.40 | U | The system shall show one ledger row per entry, in document order. |
+| R-PE-LEDGER.1 | U | The system shall show the Kind, Address and Value / bytes cells of each ledger row in the role colours of CTX-PE-LEDGER. |
 | R-PE-041 | While | While the Patch script or Inspector tab is shown, the system shall show the ledger subtitle of CTX-PE-LEDGER as the landing pane's border subtitle. |
-| R-PE-042 | U | The system shall show every ledger address in full. |
-| R-PE-043 | If | If a Value / bytes, Status or Linkage cell is wider than its column, then the system shall show its start and one `…`. |
-| R-PE-044 | If | If the document has no entry and no finding, then the system shall show the ledger line `No entries yet: Add one, paste a change-set or Load a file.` |
-| R-PE-045 | If | If the document has no entry and has findings, then the system shall show the ledger line `Refused: <first finding line>`. |
+| R-PE.42 | U | The system shall show every ledger address in full. |
+| R-PE.43 | If | If a Value / bytes, Status or Linkage cell is wider than its column, then the system shall show its start and one `…`. |
+| R-PE.44 | If | If the document has no entry and no finding, then the system shall show the ledger line `No entries yet: Add one, paste a change-set or Load a file.` |
+| R-PE.45 | If | If the document has no entry and has findings, then the system shall show the ledger line `Refused: <first finding line>`. |
 | R-CHG-004.2 | When | When a Patch Editor action ends, the system shall show the document's findings list on the Checks tab. |
 | R-CHG-004.3 | While | While the document has no finding, the system shall show no findings count and no findings line. |
 | R-CHG-004.4 | U | The system shall mark the Status of an entry with ` / fault` while an ERROR finding names its address. |
-| R-PE-046 | U | The system shall show the tally of CTX-PE-LEDGER at the foot of the Inspector tab. |
+| R-PE.46 | U | The system shall show the tally of CTX-PE-LEDGER at the foot of the Inspector tab. |
 
 #### S10.5 · The before → after strip (CTX-PE-STRIP)
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-PE-050 | When | When the operator highlights a ledger row, the system shall show the strip rows of that entry. |
-| R-PE-051 | U | The system shall show on the `was` lines the image bytes as they were before any apply (S8). |
-| R-PE-052 | U | The system shall show on the `now` lines the bytes the entry writes, and the image byte at every place outside the entry. |
-| R-PE-053 | U | The system shall build strip rows of the row width. |
-| R-PE-054 | If | If an entry needs more than 8 strip rows, then the system shall show the first 8 rows and the line `showing <n> of <m> bytes`. |
-| R-PE-055 | U | The system shall close the strip with its summary line. |
-| R-PE-056 | U | The system shall show each changed byte on the `now` line, and a non-zero changed count, in bold patch teal. |
-| R-PE-057 | If | If an address of a strip row has no image byte, then the system shall show `--` for it. |
-| R-PE-058 | If | If the document has no entry, then the system shall show the strip line `No entry yet: Add one or Load a file.` |
-| R-PE-059 | If | If no ledger row is highlighted, then the system shall show the strip line `Select a ledger row to see its bytes.` |
-| R-PE-060 | If | If no image is loaded, then the system shall show the strip line `No image loaded: ^l loads one.` |
+| R-PE.50 | When | When the operator highlights a ledger row, the system shall show the strip rows of that entry. |
+| R-PE-STRIP.1 | When | When the operator highlights a ledger row, the system shall keep the image, the document and every file as they are. |
+| R-PE.51 | U | The system shall show on the `was` lines the image bytes as they were before any apply (S8). |
+| R-PE.52 | U | The system shall show on the `now` lines the bytes the entry writes, and the image byte at every place outside the entry. |
+| R-PE.53 | U | The system shall build strip rows of the row width. |
+| R-PE.54 | If | If an entry needs more than 8 strip rows, then the system shall show the first 8 rows and the line `showing <n> of <m> bytes`. |
+| R-PE.55 | U | The system shall close the strip with its summary line. |
+| R-PE.56 | U | The system shall show each changed byte on the `now` line, and a non-zero changed count, in bold patch teal. |
+| R-PE.57 | If | If an address of a strip row has no image byte, then the system shall show `--` for it. |
+| R-PE.58 | If | If the document has no entry, then the system shall show the strip line `No entry yet: Add one or Load a file.` |
+| R-PE.59 | If | If no ledger row is highlighted, then the system shall show the strip line `Select a ledger row to see its bytes.` |
+| R-PE.60 | If | If no image is loaded, then the system shall show the strip line `No image loaded: ^l loads one.` |
 
 #### S10.6 · The JSON tab: view, paste buffer, Edit JSON (CTX-PE-JSON)
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-PE-070 | When | When the document changes, the system shall show its JSON (S8 wire form) in the read-only view of the JSON tab. |
-| R-PE-071 | If | If the document's JSON equals the JSON shown, then the system shall keep the view's text, cursor, scroll and stamp. |
-| R-PE-072 | If | If the document's JSON is longer than 5000 lines, then the system shall show its first 5000 lines and the line `showing 5000 of <N> lines`. |
-| R-PE-073 | While | While no document has been shown, the system shall show `No document yet: Load, paste or Add.` in the JSON view. |
-| R-PE-074 | When | When the JSON view or the dirty flag changes, the system shall show the JSON stamp above the view. |
-| R-PE-075 | U | The system shall show the heading `LOADED DOCUMENT · read-only` above the JSON view. |
+| R-PE.70 | When | When the document changes, the system shall show its JSON (S8 wire form) in the read-only view of the JSON tab. |
+| R-PE.71 | If | If the document's JSON equals the JSON shown, then the system shall keep the view's text, cursor, scroll and stamp. |
+| R-PE.72 | If | If the document's JSON is longer than 5000 lines, then the system shall show its first 5000 lines and the line `showing 5000 of <N> lines`. |
+| R-PE.73 | While | While no document has been shown, the system shall show `No document yet: Load, paste or Add.` in the JSON view. |
+| R-PE.74 | When | When the JSON view or the dirty flag changes, the system shall show the JSON stamp above the view. |
+| R-PE.75 | U | The system shall show the heading `LOADED DOCUMENT · read-only` above the JSON view. |
 | R-PATCH-PASTE-001.1 | When | When the Patch Editor opens, the system shall fill the paste buffer with the example. |
 | R-PATCH-PASTE-001.2 | While | While the paste buffer equals the example, the system shall show the paste heading `PASTE BUFFER · example`. |
 | R-PATCH-PASTE-001.3 | While | While the paste buffer differs from the example, the system shall show the paste heading `PASTE BUFFER · editable`. |
@@ -5605,7 +5620,7 @@ Reading the file, the load status and the finding lines are S8's (R-CHG-001.19 �
 | R-PATCH-PASTE-001.10 | While | While the paste buffer holds 75 % to under 100 % of its cap, the system shall show the gauge's used figure in magenta. |
 | R-PATCH-PASTE-001.11 | While | While the paste buffer holds 100 % of its cap or more, the system shall show the gauge's used figure in bold magenta. |
 | R-TUI-046.1 | When | When the operator opens the JSON tab, the system shall show the first line of the paste buffer without scrolling. |
-| R-PATCH-WRITE-REUSE-001 | U | The system shall apply, save back and name the save-back of a pasted document exactly as for the same document loaded from a file. |
+| R-PATCH-WRITE-REUSE.1 | U | The system shall apply, save back and name the save-back of a pasted document exactly as for the same document loaded from a file. |
 | R-TUI-053.1 | When | When the operator presses Edit JSON under the paste buffer, the system shall open the change-set JSON popup (S7) with the paste buffer text. |
 | R-TUI-053.2 | When | When the operator confirms valid text in the change-set JSON popup, the system shall put the text in the paste buffer and act as Parse pasted. |
 | R-TUI-053.3 | If | If the confirmed popup text carries an ERROR finding, then the system shall keep the document and show the status `Edit JSON refused: <kind> text carries <n> error(s) — the document is unchanged.` |
@@ -5644,9 +5659,9 @@ S8 owns what these controls do: Validate (R-CHG-VAL.1 … .4), the apply and its
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-PE-080 | U | The system shall label the apply button `Apply loaded changes`. |
-| R-PE-081 | When | When the operator presses Apply loaded changes, the system shall apply the document to the loaded image (S8). |
-| R-PE-093 | When | When a Save succeeds, the system shall make the written file the document's source. |
+| R-PE.80 | U | The system shall label the apply button `Apply loaded changes`. |
+| R-PE.81 | When | When the operator presses Apply loaded changes, the system shall apply the document to the loaded image (S8). |
+| R-PE.93 | When | When a Save succeeds, the system shall make the written file the document's source. |
 | R-TUI-049.1 | When | When a save-back succeeds, the system shall show the before/after control as a shown widget whichever inspector tab is shown. |
 | R-TUI-049.2 | When | When the operator presses Write before/after report, the system shall write the before/after report as the `b` key does (S14 R-BEFORE-AFTER-REPORT-001.2). |
 | R-TUI-049.3.1 | When | When the document is replaced by a load, a project load, a paste, undo or redo, or an image load completes, the system shall hide the before/after control. |
@@ -5657,7 +5672,7 @@ S8 owns what these controls do: Validate (R-CHG-VAL.1 … .4), the apply and its
 | Id | Form | Requirement |
 |---|---|---|
 | R-PE-110 | While | While a session action runs, the system shall refuse Add, Edit, Remove, Load, a dropdown pick, Refresh, Parse pasted, Validate, Apply loaded changes, Save, Run checks, Execute scope, Undo and Redo (buttons, Ctrl+Z and Ctrl+Y), Write file, a stage, both Edit JSON popups and their results, and the accept of the unsaved-changes popup. |
-| R-PE-111 | While | While a project load runs, the system shall make the paste buffer read-only. |
+| R-PE.111 | While | While a project load runs, the system shall make the paste buffer read-only. |
 
 #### S10.9 · Checks and the execution scope (CTX-PE)
 
@@ -5667,9 +5682,9 @@ The check run and its display are S9 (S9.1, S9.2); running a scope is S11.
 |---|---|---|
 | R-PATCH-CHECKS-CLARITY-001.1 | When | When the operator presses Run checks, the system shall run the document as a check document against the loaded image (S9.1). |
 | R-PATCH-CHECKS-CLARITY-001.2 | U | The system shall show under Run checks the help text `Checks: runs the loaded change document's checks against the loaded image. Needs kind 'check' (a change-set cannot be checked). Uncheckable rows name their reason (declaration fault, partial/outside range, or no image); healthy entries are still checked.` |
-| R-PE-100 | When | When the operator presses the scope button, the system shall move to the next scope label in cycle order and label the button `Scope: <label>`. |
-| R-PE-101 | When | When the scope changes, the system shall show the scope line `Scope <label>`. |
-| R-PE-102 | When | When the operator presses Execute scope, the system shall run the document over the variants of the shown scope (S11.13). |
+| R-PE.100 | When | When the operator presses the scope button, the system shall move to the next scope label in cycle order and label the button `Scope: <label>`. |
+| R-PE.101 | When | When the scope changes, the system shall show the scope line `Scope <label>`. |
+| R-PE.102 | When | When the operator presses Execute scope, the system shall run the document over the variants of the shown scope (S11.13). |
 
 
 

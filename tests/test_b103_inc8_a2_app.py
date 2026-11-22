@@ -1,6 +1,6 @@
 """Batch-103 Inc 8, group A: the app-level stage handler and its panel effects (E4, tester ``test-a``).
 
-Design under test: ``inc-8/01-requirements.md`` rows R-PE-DEF.50 ... .64, .73, R-PE-034, R-PE-035, R-PE-110 and the
+Design under test: ``inc-8/01-requirements.md`` rows R-PE-DEF.50 ... .64, .73, R-PE.34, R-PE.35, R-PE-110 and the
 nodes ``PatchMixin.on_staging_sheet_stage_requested`` (A3/A3'), ``PatchEditorPanel.note_staged`` and the sheet's
 staged mark of ``codewire/graph-inc8.md``. Cases: ``inc-8/02-test-cases-A.md``.
 
@@ -144,7 +144,7 @@ def refusal(defc, name, text):
     return result
 
 
-# ------------------------------------------------------------------ R-PE-DEF.50 / .58 / .61 / R-PE-034 end to end
+# ------------------------------------------------------------------ R-PE-DEF.50 / .58 / .61 / R-PE.34 end to end
 
 
 def test_r_pe_def_50_1_app_display_25_5_through_the_sheet_message(tmp_path, defc):
@@ -217,7 +217,7 @@ def test_r_pe_def_51_3_app_handler_encodes_over_the_source_view(tmp_path, defc):
     assert run(tmp_path, defc, body) == [(MASK_WORD, bytes([0x1A, 0xE6]))]
 
 
-# ------------------------------------------------------------------ R-PE-DEF.57 / .56 / R-PE-035: a refusal
+# ------------------------------------------------------------------ R-PE-DEF.57 / .56 / R-PE.35: a refusal
 
 
 def _refused_status(tmp_path, defc, name, text):

@@ -5,7 +5,7 @@ window, AT-B103-I8-6, which lives in ``test_b103_inc8_at_help.py``). Requirement
 Requirement ids verified end to end here (one name per row of the cases file):
 R-PE-DEF.10, R-PE-DEF.13, R-PE-DEF.14, R-PE-DEF.22, R-PE-DEF.23, R-PE-DEF.27, R-PE-DEF.40, R-PE-DEF.42, R-PE-DEF.45,
 R-PE-DEF.46, R-PE-DEF.47, R-PE-DEF.48, R-PE-DEF.50, R-PE-DEF.51, R-PE-DEF.52, R-PE-DEF.53, R-PE-DEF.54,
-R-PE-DEF.56, R-PE-DEF.57, R-PE-DEF.58, R-PE-DEF.60, R-PE-DEF.63, R-PE-DEF.82, R-PE-034, R-PE-035, R-PE-041.
+R-PE-DEF.56, R-PE-DEF.57, R-PE-DEF.58, R-PE-DEF.60, R-PE-DEF.63, R-PE-DEF.82, R-PE.34, R-PE.35, R-PE-041.
 
 Black-box. The real app (``S19TuiApp`` under Textual's pilot) loads the synthetic definitions case (DEFC, seed
 20260001: ``definitions.a2l`` + ``definitions.s19``) through its own loaders; the operator route is driven by keys
@@ -341,7 +341,7 @@ async def stage_by_keys(pilot, app, panel, names, target: str, text: str) -> Non
 
 def test_at_b103_i8_1_filter_page_row_formula_stage_advances_and_marks_dirty(tmp_path: Path, defc, monkeypatch) -> None:
     """AT-B103-I8-1 (US-103-05; R-PE-DEF.10/2, .22, .23/1, .40/1, .45, .46, .50/1, .53/1, .58/1, .60/1, .82/2,
-    R-PE-034/1, R-PE-041/2 and /4).
+    R-PE.34/1, R-PE-041/2 and /4).
 
     Filter `_0001` -> the page's rows -> Tab to the sheet -> down to DISPLAY_0001 -> Enter -> type `25.5` -> the tail
     reads in-limits -> Enter stages: the ledger holds the model's entry, the status line names it, the selection
@@ -414,7 +414,7 @@ def test_at_b103_i8_1_filter_page_row_formula_stage_advances_and_marks_dirty(tmp
     assert "25.5" in after["display_line"], after["display_line"]
     # R-PE-DEF.82/2: the pending text is cleared
     assert after["input"] == "" and reselected_input == "", (after["input"], reselected_input)
-    # R-PE-041/2, /4 and R-PE-034/1: the ledger subtitle with the dirty mark
+    # R-PE-041/2, /4 and R-PE.34/1: the ledger subtitle with the dirty mark
     assert "1 entry ●" in after["subtitles"], after["subtitles"]
 
 
@@ -626,7 +626,7 @@ def test_at_b103_i8_5b_a2l_unloaded_before_enter_stages_nothing(tmp_path: Path, 
 
 
 def test_at_b103_i8_7_refused_formula_stages_nothing(tmp_path: Path, defc, monkeypatch) -> None:
-    """AT-B103-I8-7 (R-PE-DEF.56/1-3, .57/1-3, .27/1, R-PE-035/1-2) — negative control of AT-1's readers.
+    """AT-B103-I8-7 (R-PE-DEF.56/1-3, .57/1-3, .27/1, R-PE.35/1-2) — negative control of AT-1's readers.
 
     `abc` and `250` on DISPLAY_0001, `WALK` on ENUM_0001: Enter stages nothing (ledger, document, `●` mark, subtitle
     unchanged and not dirty), the status line is `Patch Editor: <I-2 message>`, the message taken from the model; after
@@ -652,7 +652,7 @@ def test_at_b103_i8_7_refused_formula_stages_nothing(tmp_path: Path, defc, monke
             }
             await pilot.press("escape")
             await settle(pilot, 3)
-        # one good stage sets dirty; the next refusal keeps it set (R-PE-035/2)
+        # one good stage sets dirty; the next refusal keeps it set (R-PE.35/2)
         await stage_by_keys(pilot, app, panel, names, "DISPLAY_0001", "25.5")
         dirty_after_good = any("●" in s for s in subtitles(app))
         await stage_by_keys(pilot, app, panel, names, "DISPLAY_0001", "abc")

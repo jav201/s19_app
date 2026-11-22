@@ -62,7 +62,7 @@ def _service_with_image() -> tuple[ChangeService, dict[int, int], list[tuple[int
 def test_add_edit_remove_string_entry() -> None:
     """String entries mutate through the evolved both-kind methods.
 
-    Intent: R-PE-021, R-PE-024, R-PE-026 — the service handles the v2 ``"string"`` kind
+    Intent: R-PE.21, R-PE.24, R-PE.26 — the service handles the v2 ``"string"`` kind
     natively: the declared value is encoded with the document encoding, an
     edit replaces the entry at its address, and a remove empties the list.
     """
@@ -88,7 +88,7 @@ def test_add_edit_remove_string_entry() -> None:
 def test_add_edit_remove_bytes_entry() -> None:
     """Bytes entries mutate through the evolved both-kind methods.
 
-    Intent: R-PE-021, R-PE-024, R-PE-026 — the permissive TUI-input grammar (bare hex, commas,
+    Intent: R-PE.21, R-PE.24, R-PE.26 — the permissive TUI-input grammar (bare hex, commas,
     ``0x`` prefixes) feeds the ``"bytes"`` kind; edit replaces in place and
     remove deletes by address.
     """
@@ -111,7 +111,7 @@ def test_add_duplicate_address_is_rejected() -> None:
     the interactive add treats one as an operator mistake — Edit is the
     update path, so the table never silently grows a colliding twin.
 
-    Traces: R-PE-023.
+    Traces: R-PE.23.
     """
     service = ChangeService()
     service.add_entry("0x100", "", "AA")
@@ -122,7 +122,7 @@ def test_add_duplicate_address_is_rejected() -> None:
 def test_edit_or_remove_missing_address_raises_key_error() -> None:
     """Edit / remove of an unknown address is a KeyError the app reports.
 
-    Traces: R-PE-028.
+    Traces: R-PE.28.
     """
     service = ChangeService()
     with pytest.raises(KeyError):
@@ -556,7 +556,7 @@ def test_rows_render_kind_address_status_and_fault_marker() -> None:
     Intent: LLR-003.1 columns + the LLR-002.8 per-entry status arm — a row
     whose address carries an ERROR finding is suffixed `` / fault``.
 
-    Traces: R-CHG-004.4, R-PE-040.
+    Traces: R-CHG-004.4, R-PE.40.
     """
     service, _mem_map, ranges = _service_with_image()
     service.add_entry("0x100", "", "01 02 03 04")

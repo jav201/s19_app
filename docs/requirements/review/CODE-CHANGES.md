@@ -237,18 +237,18 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 |---|---|---|---|
 | D10-13 | Defer: keep `add_symbol_entry`, `resolve_symbol_entry`, `list_a2l_symbol_names` and the encoder until the symbol-input round (D10-42) | — | open |
 | D10-14 | Remove the never-displayed census widgets `#patch_checks_section_label`, `#patch_script_section_label`, `#patch_win_json_dock_spacer` and their census entries | — | open |
-| D10-20 | Dropdown pick asks with the unsaved-changes popup while the dirty flag is set | R-PE-016 | done (batch-100 Inc 10, 5dd2249) |
-| D10-21 | Dirty flag follows real document changes: not set by a refused Add/Edit/Remove; set by undo, redo and a per-entry JSON edit | R-PE-034, R-PE-035 | open (re-verified at 570b4b5) |
+| D10-20 | Dropdown pick asks with the unsaved-changes popup while the dirty flag is set | R-PE.16 | done (batch-100 Inc 10, 5dd2249) |
+| D10-21 | Dirty flag follows real document changes: not set by a refused Add/Edit/Remove; set by undo, redo and a per-entry JSON edit | R-PE.34, R-PE.35 | open (re-verified at 570b4b5) |
 | D10-22 | Parse pasted refuses text with an ERROR finding and keeps the document (as Edit JSON does) | R-PATCH-PASTE-001.5 | open (re-verified at 570b4b5) |
 | D10-23 | Undo, Redo, ctrl+z / ctrl+y and per-entry Edit JSON for every document; whole-set Edit JSON stays draft-only; drop the `history off` strip state | R-TUI-057.8, R-TUI-058.6, R-TUI-053.5 | open (re-verified at 570b4b5) |
-| D10-24 | After a successful Save the written file becomes the document's source (ribbon names it) | R-PE-093 | open (re-verified at 570b4b5) |
+| D10-24 | After a successful Save the written file becomes the document's source (ribbon names it) | R-PE.93 | open (re-verified at 570b4b5) |
 | D10-25 | The File dropdown lists the change home (project patches/ and checks/ with a project); with S9 D9-15 | R-PATCH-DOC-DROPDOWN-001.1 | open (re-verified at 570b4b5) |
-| D10-27 | Address field: `0x` + hex digits, or decimal digits; message `Patch Editor: bad address '<text>' - use 0x and hex digits, or decimal digits`; with S9 D9-17 | R-PE-030 | open |
-| D10-28 | Edit/Remove on a missing address: status without the KeyError quotes | R-PE-028 | open |
+| D10-27 | Address field: `0x` + hex digits, or decimal digits; message `Patch Editor: bad address '<text>' - use 0x and hex digits, or decimal digits`; with S9 D9-17 | R-PE.30 | open |
+| D10-28 | Edit/Remove on a missing address: status without the KeyError quotes | R-PE.28 | open |
 | D10-29 | Per-entry edit status names the address (`entry at 0x<X> updated.`), not a zero-based index | R-TUI-058.4 | open (re-verified at 570b4b5) |
 | D10-30 | Hide the before/after control and the save-back prompt whenever the document is replaced (dropdown, guarded load, undo, redo too) | R-TUI-049.3 | open (re-verified at 570b4b5) |
 | D10-40 | Where the save-back prompt, the before/after control, Undo/Redo and Execute appear (today inside the JSON tab, out of sight after Apply) | R-HEX-VERIFY-002.3 (S8), R-TUI-049.1 | needs prototype |
-| D10-41 | One target rule for Edit/Remove (typed address) and the strip / per-entry Edit JSON (highlighted row) | R-PE-024, R-PE-026, R-TUI-058.1 | needs prototype |
+| D10-41 | One target rule for Edit/Remove (typed address) and the strip / per-entry Edit JSON (highlighted row) | R-PE.24, R-PE.26, R-TUI-058.1 | needs prototype |
 | D10-42 | Symbol input with A2L picker and a Symbol ledger column (HLR-141 / LLR-141.2); write the encoder rows S2 passed | — | needs prototype |
 | D10-43 | Width control on the save-back prompt for an Intel HEX image (S8 D8-40) | — | needs prototype |
 

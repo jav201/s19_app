@@ -106,6 +106,7 @@ import json
 from pathlib import Path
 
 import pytest
+from rich.style import Style
 from rich.text import Text
 from textual.content import Content
 from textual.coordinate import Coordinate
@@ -438,6 +439,8 @@ def test_at075b_role_colours(tmp_path: Path) -> None:
     on the live table. Both a ``string``- and a ``bytes``-kind row are covered
     because they take different ``value_text`` branches in
     ``ChangeService.rows``.
+
+    Traces: R-PE-LEDGER.1.
     """
     doc_path = _write_v2_document(
         tmp_path / "kinds.json",
@@ -476,6 +479,58 @@ def test_at075b_role_colours(tmp_path: Path) -> None:
         assert all(style for style in role_styles), (
             f"every role cell must carry a NON-EMPTY style; got {role_styles!r}"
         )
+
+
+def test_r_pe_ledger_1_each_role_cell_has_its_own_colour(tmp_path: Path) -> None:
+    """Each ledger role cell carries ITS OWN colour, not just a distinct one.
+
+    Traces: R-PE-LEDGER.1. ``test_at075b_role_colours`` only asks for >=3
+    distinct, non-empty styles over the three role cells, so swapping two role
+    colours (Kind cyan, Address purple) or recolouring a cell stays green. This
+    pins the CTX-PE-LEDGER "role colours": Kind purple #b565f3, Address cyan
+    #7dd3fc, Value / bytes #e9e9e9 (hex literals from the definition, not the
+    code's constants), and no colour on Status or Linkage.
+    """
+    doc_path = _write_v2_document(
+        tmp_path / "role_colours.json",
+        [
+            {"type": "string", "address": "0x100", "value": "sensor"},
+            {"type": "bytes", "address": "0x110", "bytes": "AA BB CC"},
+        ],
+    )
+
+    async def _drive() -> list[list[object]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            _load_document(app, doc_path)
+            await pilot.pause()
+            return [_row_cells(app, row) for row in range(2)]
+
+    rows = asyncio.run(_drive())
+    assert len(rows) == 2, f"both entry kinds must render a row; got {rows!r}"
+
+    def _colour(cell: Text):
+        return Style.parse(str(cell.style)).color
+
+    expected = {
+        0: ("Kind", Style.parse("#b565f3").color),
+        1: ("Address", Style.parse("#7dd3fc").color),
+        2: ("Value / bytes", Style.parse("#e9e9e9").color),
+    }
+    for kind, cells in zip(("string", "bytes"), rows):
+        for column, (role, want) in expected.items():
+            assert _colour(cells[column]) == want, (
+                f"{kind} row {role} cell must be {want!r}; got "
+                f"{_colour(cells[column])!r} (style {str(cells[column].style)!r})"
+            )
+        for column, role in ((3, "Status"), (4, "Linkage")):
+            assert _colour(cells[column]) is None, (
+                f"{kind} row {role} cell must carry no role colour; got "
+                f"{str(cells[column].style)!r}"
+            )
 
 
 # ===========================================================================

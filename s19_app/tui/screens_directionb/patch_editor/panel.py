@@ -524,7 +524,7 @@ class PatchEditorPanel(
         #: edit) · w2 ``on_text_area_changed`` (paste typing) · w3
         #: ``mark_saved`` · w4 ``mark_loaded`` · w5 ``mark_pasted`` (Parse
         #: pasted, batch-97 Inc-4) · w6 ``note_staged`` (a stage, batch-103
-        #: Inc 8, R-PE-034).
+        #: Inc 8, R-PE.34).
         self._dirty: bool = False
         #: The loaded image's sparse memory map, RETAINED from
         #: ``refresh_entries``' parameter for the before/after strip
@@ -734,7 +734,7 @@ class PatchEditorPanel(
         return [(row.address, tuple(row.encoded_bytes)) for row in rows]
 
     def note_staged(self, name: str, advance: bool = True) -> None:
-        """A stage wrote the document (R-PE-034, R-PE-DEF.60; I-8.4).
+        """A stage wrote the document (R-PE.34, R-PE-DEF.60; I-8.4).
 
         Dirty writer w6: sets the flag and repaints its indicator. With
         ``advance`` the sheet selects the row after ``name`` (a formula-bar

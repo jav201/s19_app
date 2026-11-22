@@ -576,7 +576,7 @@ Where the help window's focus starts and how it closes: R-DLG.8, R-DLG.2, R-DLG.
 - S7.2 (S5: the load dialog) → covered by R-TUI-043.1 … .3 (S7.2).
 - S7.3 (S6: key bar, window help, keys behind a dialog) → covered by S7.5, S7.4 and R-DLG.1 (D7-23); S6 R-TUI-031.2 now leaves dialogs to R-DLG.1.
 - S7.4 (S9: the Check Editor's help entry) → covered by R-WHELP.1 (CTX-HELP lists the Check Editor section).
-- S7.5 (S10: unsaved-changes popup, the two JSON popups, the Patch Editor help) → row R-WHELP.16 (the Bytes hex note of LLR-161.2); the popups are in CTX-DIALOG and follow S7.1, their paste limit is R-TUI-044.2, their content is S10's (R-PE-012 … 019, R-TUI-053.x, R-TUI-058.x).
+- S7.5 (S10: unsaved-changes popup, the two JSON popups, the Patch Editor help) → row R-WHELP.16 (the Bytes hex note of LLR-161.2); the popups are in CTX-DIALOG and follow S7.1, their paste limit is R-TUI-044.2, their content is S10's (R-PE.12 … R-PE.19, R-TUI-053.x, R-TUI-058.x).
 - S7.6 (S11: Save, Load project and Select variant widgets and layout) → covered by D7-3 (content stays S11's; its layout round is S11 D11-40) and R-DLG.1 … .13.
 - S7.7 (S12: the Reports dialog's common behaviour) → covered by R-DLG.2 (D7-20), R-DLG.7, R-DLG.11, .12 (D7-31). R-RPT-002.13 adds a status for a bad context-bytes value; R-DLG.10 is about an empty required box: no conflict.
 - S7.8 (S13: Operations dialog, CRC write confirmation, HYGIENE error rule) → covered by R-DLG.2, R-DLG.6 (D7-22), D7-2; content is S13 R-OPS-003.x, R-OPS-003.11, .12, R-CRC-RECWIDTH-001.1 … .3.

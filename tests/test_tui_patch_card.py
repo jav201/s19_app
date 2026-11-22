@@ -210,6 +210,8 @@ def test_at080b_read_only(tmp_path: Path) -> None:
     memory map is byte-identical (and the SAME object), the change document is
     unchanged, and no file appeared. This is the safety property: a card that
     quietly wrote would be worse than no card.
+
+    Traces: R-PE-STRIP.1.
     """
 
     async def _run() -> dict:
@@ -257,6 +259,8 @@ def test_tc080_5_no_apply_path_reachable() -> None:
     drive; this proves the code cannot write at all, over the card's whole call
     graph. AST-walked (never a source grep matching my own prose — the oracle
     class this batch has repeatedly caught).
+
+    Traces: R-PE-STRIP.1.
     """
     forbidden = {"apply", "save_patched", "write_text", "write_bytes", "open"}
     for func in (

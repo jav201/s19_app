@@ -108,10 +108,10 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-002 · LLR-002.1 … .3 | **retired** | Code placement (range-index re-exports removed). |
 | HLR-003 · LLR-003.1 … .3 | **retired** | Code placement (`safe_text` moved to `s19_app/utils.py`). The safe-text behaviour is S1: R-TUI-103 … 103b. |
 | HLR-004 · LLR-004.1 … .3 | **retired** | Code placement (palette constants moved to `s19_app/render/format.py`). Colours are S3 CTX-LEGEND and S6 CTX-THEME. |
-| HLR-005 · LLR-005.1, .2 | **absorbed** · S10: R-PE-012 … R-PE-019 | Unsaved-changes popup; a dropdown pick is guarded since batch-100 Inc 10 (R-PE-016, S10 D10-45; D10-20 done). |
+| HLR-005 · LLR-005.1, .2 | **absorbed** · S10: R-PE.12 … R-PE.19 | Unsaved-changes popup; a dropdown pick is guarded since batch-100 Inc 10 (R-PE.16, S10 D10-45; D10-20 done). |
 | HLR-006 · LLR-006.1, .2 | **retired** | Deleted behaviour: the variant dropdown and variant help were removed in batch-94 (S10 D10-4). |
-| HLR-007 · LLR-007.1, .2 | **absorbed** · S10: R-PE-080, R-PE-081 | The apply itself is S8.5. |
-| HLR-008 · LLR-008.1, .2 | **absorbed** · S10: R-PE-010, R-PE-011, R-TUI-052.1 … .3 | Refresh rescans the folder (D10-5). |
+| HLR-007 · LLR-007.1, .2 | **absorbed** · S10: R-PE.80, R-PE.81 | The apply itself is S8.5. |
+| HLR-008 · LLR-008.1, .2 | **absorbed** · S10: R-PE.10, R-PE.11, R-TUI-052.1 … .3 | Refresh rescans the folder (D10-5). |
 | HLR-009 · LLR-009.1 … .3 | **absorbed** · S9: R-CHKED-001 … R-CHKED.53 | The Check Editor, S9.4 (D9-3). |
 | HLR-010 · LLR-010.1, .2 | **absorbed** · S14: R-DIFF-CHK.1 … R-DIFF-CHK.11 | Check-spec addendum of the diff report, S14.6 (D14-6). |
 | HLR-011 · LLR-011.1, .2 | **absorbed** · S9: R-CHKED.48 | Plain text on the Check Editor (S1 CTX-TEXT). |
@@ -151,7 +151,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-145 · LLR-145.1 … .10 | **absorbed** · S9: R-CHKED-001 … R-CHKED.53 | The Check Editor, S9.4. |
 | HLR-146 · LLR-146.1 … .14 | **absorbed** · S16: R-TUI-059.20 … R-FB-PIPE.5 | The Flow Builder, S16.1 … S16.3. |
 | HLR-147 · LLR-147.1 … .13 | **absorbed** · S16: R-FX-SCR.1 … R-FX-WAIT.13 | Flow Execution, S16.7 … S16.9. |
-| HLR-148 · LLR-148.1 … .10 | **absorbed** · S5: R-CHIP-001.1 … .11; S7: R-WHELP.1 … .15; S9: R-CHKED-002, R-CHKED.17; S10: R-PE-060, R-PE-073; S16: R-FB-RUN.1 | Chips, help entries, empty-state lines. Glyph vocabularies (LLR-148.7) are design. |
+| HLR-148 · LLR-148.1 … .10 | **absorbed** · S5: R-CHIP-001.1 … .11; S7: R-WHELP.1 … .15; S9: R-CHKED-002, R-CHKED.17; S10: R-PE.60, R-PE.73; S16: R-FB-RUN.1 | Chips, help entries, empty-state lines. Glyph vocabularies (LLR-148.7) are design. |
 | HLR-149 · LLR-149.1 … .6 | **absorbed** · S10: R-TUI-064.1 … .3; S9: R-CHKED.49, R-CHKED.50; S16: R-FB-RIB.5, R-FB-RIB.6, R-FX-SIZE.1, R-FX-SIZE.2 | The four editor windows at 118 × 54 or more and below it. |
 | HLR-150 · LLR-150.1 … .7 | **absorbed** · S7: R-KEYBAR.1 … R-KEYBAR.15 | The key bar, S7.5. |
 | HLR-151 · LLR-151.1 | **absorbed** · S7: R-LOADDLG.1, R-LOADDLG.54, R-LOADDLG.60, R-LOADDLG.70 | LLR-151.1 (the Load project dialog) is superseded by batch-100 HLR-173 (Inc 9b): the one Load dialog, S7.2. S11 R-TUI-013.4 is retired (S11 D11-55). |
@@ -164,7 +164,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-158 · LLR-158.1 … .3 | **absorbed** · S2: R-A2L-024, R-A2L-025, R-A2L-026, R-A2L-027, R-A2L-056, R-A2L-057, R-A2L-058.1, R-A2L-058.2, R-A2L-058.3, R-A2L-006.7 | Decoding. Encoding is deferred with the symbol input (S10 D10-13, D10-42). |
 | HLR-159 · LLR-159.1, .2 | **absorbed** · S13: R-CRC-CHECK-002.1 … .4; S15: R-FLOW-CRC.1 … .8 | Empty and partly covered CRC targets. |
 | HLR-160 · LLR-160.1 … .5 | **absorbed** · S17: R-SEG-NAME.1 … R-SEG-PLACE.18 | Export names and placement, S17.7 (D17-12). |
-| HLR-161 · LLR-161.1, .2 | **absorbed** · S10: R-PE-031 | The help-window note is S7's (passed by S10). |
+| HLR-161 · LLR-161.1, .2 | **absorbed** · S10: R-PE.31 | The help-window note is S7's (passed by S10). |
 | HLR-162 · LLR-162.1 … .3 | **absorbed** · S11: R-TUI-013.2; S7: R-LOADDLG.1, R-LOADDLG.24, R-LOADDLG.60; S5: R-WS-FILES.1, R-WS-FILES.3 | Pick by name; list the folder loads write into. The Load project dialog rows (S11 R-TUI-013.1, .3, .4) are retired into the Load dialog (S11 D11-55). |
 
 **Batch-100 ids** (CTX-RETIRED "batch-100 id"; D0-13). One pointer line per HLR of batch-100 (HLR-163 … HLR-178 with every lettered sub-HLR, 42 ids), in the same classes. Rows cited are those of the 570b4b5 reconciliation.
@@ -175,7 +175,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-164 · LLR-164.1 … .4 | **absorbed** · S11: R-TUI-012.5 … .15, .20, .21, R-TUI-013.2, R-PROJ-MERGE.1 … .3, R-PROJ-ROLLBACK.1 … .6, .12 | Name guards, merge, a failed save leaves nothing. The AST census of LLR-164.4 is mechanism (S11 D11-50, D11-51). |
 | HLR-165 · LLR-165.1 … .4 | **absorbed** · S11: R-PROJ-RESET.1, .3, .4; S2: R-A2L-004.13; S5: R-WS-LOADED.6, .10 | Reset after the read, before the first install; `_session_snapshot` is a test seam (S11 D11-63). LLR-165.4 (an unload drops the parsed A2L) was in the code at 093a7c0 (S2 D2-32); S5's unload rows cite it. |
 | HLR-166 · LLR-166.1, .2 | **absorbed** · S6: R-SHELL-FOCUS.3, .4, .5, .7, R-FOCUS-LOAD.1 | Focus after a load completes or is cancelled, and after the Load-result panel closes; the panel's own first focus is S11's (R-LOADRES.8). |
-| HLR-167 · LLR-167.1 … .8, .6a … .6g | **absorbed** · S11: R-PROJ-IMAGE.1 … .14, R-PROJ-001.1 … .12, R-TUI-012.16, .17, .28, .29, R-SAVEDLG.16, R-SAVEDLG.24, R-PROJ-DOC.15 … .17; S10: R-PE-038, R-PE-039.1 … .4 | Emit on data (S11 D11-52, LED .14 over LED .13); the LLR-167.7 split is mechanism. LLR-167.8 (the Patch Editor's unsaved mark after Save project) is S10's (D10-46). |
+| HLR-167 · LLR-167.1 … .8, .6a … .6g | **absorbed** · S11: R-PROJ-IMAGE.1 … .14, R-PROJ-001.1 … .12, R-TUI-012.16, .17, .28, .29, R-SAVEDLG.16, R-SAVEDLG.24, R-PROJ-DOC.15 … .17; S10: R-PE.38, R-PE-039.1 … .4 | Emit on data (S11 D11-52, LED .14 over LED .13); the LLR-167.7 split is mechanism. LLR-167.8 (the Patch Editor's unsaved mark after Save project) is S10's (D10-46). |
 | HLR-168 · LLR-168.1 … .4 | **absorbed** · S11: R-PROJ-SAVEBACK.1 … .3, R-PROJ-002.4, .10, .11, R-PROJ-WRITER.1 … .4, R-VAR-001.1, R-VAR-002.19, R-PROJ-IMAGE.13; S8: R-CHG-003.8, .19, .20 | Every in-project writer rewrites project.json (S11 D11-59). The save-back itself is unchanged; S8 cites the S11 rows (D8-37). |
 | HLR-169 · LLR-169.1 … .9 | **absorbed** · S11: R-PROJCHK.1 … R-PROJCHK.18, R-PROJ-OPEN.1, .2, R-VAR-002.2, .14, R-MANIFEST-READ.3 … .11, .17, R-MANIFEST-WRITE.2, .3, R-MAN-WRITE-001.4, R-MAN-VERIFY-001.2, R-MANIFEST-KEEP.1 … .5 | Read cap 1 MiB (S11 D11-57); private staging is mechanism. |
 | HLR-170 · LLR-170.1 … .3 | **absorbed** · S11: R-PROJ-DOC.1 … .22, R-MANIFEST-READ.15, R-MANIFEST-WRITE.5, .6 | The active change document is saved and reopened. |
@@ -191,7 +191,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-173c · LLR-173.1a … .1c, .2f, .2g | **absorbed** · S7: R-LOADDLG.54 … .63, R-TUI-043.2, R-TUI-043.15 | Enter, Alt+L and Load load the load source. |
 | HLR-173d · LLR-173.2h, .2i, .5, .5a … .5e | **absorbed** · S7: R-LOADDLG.69 … .80 | An empty or refused load request is explained in the reason line. |
 | HLR-173e · LLR-173.2k, .2l | **absorbed** · S7: R-DLG.2, R-DLG.9, R-TUI-043.3 | Escape and Cancel close the dialog and change nothing. |
-| HLR-174 · LLR-174.1, .1b, .1c, .2, .2a, .2g, .2h, .2j, .2r, .2s, .2t, .3b, .4 … .4c | **absorbed** · S5: R-LOADQ-001.1, .4, .6, R-LOADQ-002.1 … .3, R-LOADQ-004.6 … .8, R-LOADQ-005.4, R-LOADQ-006.1 … .4; S6: R-BUSY-REFUSE.6; S10: R-PE-015, R-PE-016, R-PE-019, R-PE-019a | LLR-174.1c, .2a, .3b and the census of .4 are design (S5 D5-46). LLR-174.2j, .2t are the Patch Editor's own popup (S10 D10-45; D10-20 settled). |
+| HLR-174 · LLR-174.1, .1b, .1c, .2, .2a, .2g, .2h, .2j, .2r, .2s, .2t, .3b, .4 … .4c | **absorbed** · S5: R-LOADQ-001.1, .4, .6, R-LOADQ-002.1 … .3, R-LOADQ-004.6 … .8, R-LOADQ-005.4, R-LOADQ-006.1 … .4; S6: R-BUSY-REFUSE.6; S10: R-PE.15, R-PE.16, R-PE.19, R-PE.112 | LLR-174.1c, .2a, .3b and the census of .4 are design (S5 D5-46). LLR-174.2j, .2t are the Patch Editor's own popup (S10 D10-45; D10-20 settled). |
 | HLR-174a · LLR-174.1, .1a, .1b, .4b, .4c | **absorbed** · S5: R-LOADQ-001.2, .3, .5, R-LOADQ-002.1 … .3 | The cells that load without asking. |
 | HLR-174b · LLR-174.2c, .2e, .2f, .2p, .3, .3c | **absorbed** · S5: R-LOADQ-003.1, .5, R-LOADQ-004.2, .4, .5, R-LOADQ-005.4 | LLR-174.3's order (reset after the answer) is design; its observable part is R-LOADQ-003.2. |
 | HLR-174c · LLR-174.2b, .2d, .2e, .2f, .2p, .3a, .3c, .3d | **absorbed** · S5: R-LOADQ-003.2 … .5, R-LOADQ-004.1, .3, .4, .5; S6: R-SHELL-FOCUS.4 | The focus after the close is S6's (LLR-166.1). |
@@ -209,7 +209,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-176c · LLR-176.1i … .1m, .1o, .1s, .2c, .2d | **absorbed** · S6: R-PROGRESS-END.1 … .5, R-PROGRESS-SHOWN.2, .4, R-PROGRESS-BAR.1, .5, R-PROGRESS-LINE.7; S12: R-RPT-LOG.1 … .4; S14: R-CMP-005.13 … .15, R-BEFORE-AFTER-REPORT-001.31 | Each action's own outcome text stays in its chapter (S5 R-TUI-012L.12, S2 R-A2L-004.1, S11, S12, S14); the report's end follows S6 R-PROGRESS-END.3 (S12 D12-30). |
 | HLR-176d · LLR-176.1h, .1j | **absorbed** · S6: R-PROGRESS-LINE.2, R-PROGRESS-END.2 | One owner of the status text while an action runs. |
 | HLR-177 · LLR-177.1 … .1k, .2 … .2c, .5, .5a, LLR-176.3 | **absorbed** · S6: R-PROGRESS-LINE.3, .5, R-PROGRESS-BAR.3, R-BUSY-RUN.1; S2: R-A2L-004.3, .6 … .12; S5: R-TUI-012L.5; S11: R-PROJ-RESET.1, R-LOADRES.2, R-PROJ-ROLLBACK.17, .18, R-TUI-013.17 | Worker threads, frozen requests and main-thread writes (.1, .1a, .1b, .1d, .1e, .1i) are implementation (S6 D6-33, S2 D2-33). The results and failures of each action (.1f … .1h, .1j, .1k, .2 … .2c) are in its chapter (S6 D6-42). The copy on the screen's thread is a held step (S6 D6-35, S5 D5-50). |
-| HLR-177a · LLR-177.3 … .3i | **absorbed** · S6: R-BUSY-REFUSE.1 … .8; S10: R-PE-110, R-PE-111; S12: R-RPT-002.28 | The busy line and the refused list are S6 CTX-BUSY; reports are never refused (R-BUSY-REFUSE.7). |
+| HLR-177a · LLR-177.3 … .3i | **absorbed** · S6: R-BUSY-REFUSE.1 … .8; S10: R-PE-110, R-PE.111; S12: R-RPT-002.28 | The busy line and the refused list are S6 CTX-BUSY; reports are never refused (R-BUSY-REFUSE.7). |
 | HLR-177b · LLR-177.4, .4a, .4b, .4d | **absorbed** · S6: R-SHELL-START.5, R-QUIT.1 … .6 | Supersedes S6 D6-9 for the "session action running" state (S6 D6-36). |
 | HLR-177c · LLR-177.4c, .4e | **absorbed** · S6: R-QUIT.7 … .12 | Quit waits for the end; withdrawn on a failure or unsaved work. |
 | HLR-178 · LLR-178.1 … .3 | **absorbed** · S11: R-TUI-013.12, .13, R-LOADRES.1 … R-LOADRES.18; S7: R-LOADDLG.83; S3: R-LEGEND.10 | Problem rows bounded at 102 (S11 D11-54); the panel's colours are the S3 palette. The open project's preview of the last load result (LLR-178.3, last sentence) is not built at 570b4b5: S7 R-LOADDLG.83 reads No (S7 D7-35). |

@@ -1,5 +1,5 @@
 """Batch-103 Inc 8 E4, group P - the landing pane's border subtitle (R-PE-041) and the dirty
-writer w6 reached through ``PatchEditorPanel.note_staged`` (R-PE-034, R-PE-DEF.60 selection).
+writer w6 reached through ``PatchEditorPanel.note_staged`` (R-PE.34, R-PE-DEF.60 selection).
 
 Cases: ``02-test-cases-P.md``.  Entries are added through the shipped service and the app's own
 refresh site (``_refresh_patch_history_view``) for the count rows, and through the panel's own
@@ -97,7 +97,7 @@ def test_r_pe_041_the_json_tab_shows_the_schema_token_and_checks_its_run_state(t
 
 
 # --------------------------------------------------------------------------- #
-# R-PE-034 (writer w6) and R-PE-DEF.60 - note_staged
+# R-PE.34 (writer w6) and R-PE-DEF.60 - note_staged
 # --------------------------------------------------------------------------- #
 
 

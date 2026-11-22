@@ -407,7 +407,7 @@ Shared with S2 R-TUI-019.3 (A2L and MAC page sizes) and S4 (the main hex view's 
 
 ### S6.8 · Session actions: the busy refusal and the quit question (CTX-BUSY; batch-100)
 
-What each session action does, refuses on its own and reports on failure stays in its chapter (S5, S2, S11; D6-42). This section holds what happens around it. Rows that live with their surface: the Patch Editor's refused controls and its read-only paste buffer during a project load (S10 R-PE-110, R-PE-111); Generate new report keeps the session's regions during a session action (S12 R-RPT-002.28).
+What each session action does, refuses on its own and reports on failure stays in its chapter (S5, S2, S11; D6-42). This section holds what happens around it. Rows that live with their surface: the Patch Editor's refused controls and its read-only paste buffer during a project load (S10 R-PE-110, R-PE.111); Generate new report keeps the session's regions during a session action (S12 R-RPT-002.28).
 
 #### S6.8a · Keys and refusals while a session action runs (from batch-100 HLR-177, HLR-177a)
 
@@ -478,7 +478,7 @@ What each session action does, refuses on its own and reports on failure stays i
 | D6-42 | LLR-177.1f … .1k and LLR-177.2 … .2c state what a load or Save project installs, refuses and reports when its work fails (`could not be read`, `could not save`, the A2L attach's early refusals). That is each action's own behaviour. | Rule D-9: they move to S11 (project load, Save project), S5 (file load, Workarea Files pick, A2L attach failure) and S2 (A2L attach refusals); passed. S6 keeps the progress, busy and quit behaviour. |
 | D6-43 | A Patch Editor JSON edit dialog whose result arrives during a session action loses the typed JSON; the busy line says why (LLR-177.3e continuations, ruling P2-5). The change-file dropdown arm is not driven by a test (tester note in `test_tc_b100_53_patch_editor_continuations_are_refused_while_busy`). | Keep (batch ruling); the refused list names the dialog results. |
 | D6-44 | R-SHELL-STATUS.6 said "When a load reports progress, show it in the progress bar"; at 093a7c0 a load set fixed values (10, 50, 100 %). At 570b4b5 every long action drives the bar by its steps and returns it to 0 % (`begin_busy` / `step_busy` / `end_busy`, `app.py:20213-20355`). | R-SHELL-STATUS.6 rewritten to the begin rule; the step and end rules are R-PROGRESS-BAR.1, .2 and R-PROGRESS-END.3. |
-| D6-45 | The batch-100 sweep wrote each long action's own progress rows with the action (rule D-9): S2 R-A2L-004.10 … .12 (the A2L load's responsiveness, its bytes-read bar, the in-place pick at Parse), S10 R-PE-110, R-PE-111 (the Patch Editor's busy refusals, the read-only paste buffer), S12 R-RPT-LOG.1 … .4, R-RPT-002.28 (the report's steps and bar; Generate keeps the regions during a session action), S14 R-CMP-005.13 … .15, R-BEFORE-AFTER-REPORT-001.31. S12 D12-29 and S14 D14-22 rely on S6 stating that reports are not session actions. | S6 keeps only the shared rules and cites those rows; the duplicate S6 rows for the A2L bytes-read bar, the Generate regions and the paste buffer were dropped before publication. CTX-BUSY defines the three reports as not session actions; R-BUSY-REFUSE.7, .8 state that a report is never refused and refuses nothing. |
+| D6-45 | The batch-100 sweep wrote each long action's own progress rows with the action (rule D-9): S2 R-A2L-004.10 … .12 (the A2L load's responsiveness, its bytes-read bar, the in-place pick at Parse), S10 R-PE-110, R-PE.111 (the Patch Editor's busy refusals, the read-only paste buffer), S12 R-RPT-LOG.1 … .4, R-RPT-002.28 (the report's steps and bar; Generate keeps the regions during a session action), S14 R-CMP-005.13 … .15, R-BEFORE-AFTER-REPORT-001.31. S12 D12-29 and S14 D14-22 rely on S6 stating that reports are not session actions. | S6 keeps only the shared rules and cites those rows; the duplicate S6 rows for the A2L bytes-read bar, the Generate regions and the paste buffer were dropped before publication. CTX-BUSY defines the three reports as not session actions; R-BUSY-REFUSE.7, .8 state that a report is never refused and refuses nothing. |
 
 **Remove (rule use/defer/delete)**
 
@@ -522,7 +522,7 @@ What each session action does, refuses on its own and reports on failure stays i
   - **S1**: names in the progress line, the busy line and the quit question follow a stricter scrub than R-TUI-103a (format characters removed, cut at 120; D6-41); the message lines now drop control characters (D6-28 done).
   - **S2**, **S5**, **S11**: the load and save results and failures of LLR-177.1f … .1k and LLR-177.2 … .2c (D6-42); S5's CTX-FILES "progress line" and R-TUI-012L.6 are replaced by S6.5b; S5 R-TUI-012L.5 and D5-15 are settled by Inc 12b.
   - **S7**: R-DLG.1 / D7-23 partly settled (D6-40); the quit question is a dialog whose text and answers are here (CTX-BUSY, S6.8b); the `Load` / `Projects` labels (D6-38).
-  - **S10**: R-PE-110, R-PE-111 (written by the batch-100 sweep) are cited, not repeated, by S6.8a.
+  - **S10**: R-PE-110, R-PE.111 (written by the batch-100 sweep) are cited, not repeated, by S6.8a.
   - **S12**, **S14**: R-RPT-LOG.1 … .4, R-RPT-002.28, R-CMP-005.13 … .15, R-BEFORE-AFTER-REPORT-001.31 (written by the sweep) are cited by S6.5b and S6.8a; reports are not session actions (R-BUSY-REFUSE.7, .8).
 
 ---
