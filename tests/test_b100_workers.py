@@ -655,6 +655,9 @@ def test_tc_b100_53_every_a2l_attach_route_parses_on_a_worker(
     temp = W(base) / WORKAREA_TEMP
     temp.mkdir(parents=True)
     shutil.copyfile(CASE01 / "firmware.a2l", temp / "c.a2l")
+    # I3 re-target (R-I3-12): this arm counts the parser's thread on each route; with the parse cache on, the
+    # second and third routes read the stored parse of the same content and the parser never runs there.
+    monkeypatch.setenv("S19_A2L_CACHE", "off")
     parses = Spy(monkeypatch, app_module.deps, "parse_a2l_file")
     copies = Spy(monkeypatch, app_module.deps, "copy_into_workarea")
 
@@ -698,6 +701,77 @@ def test_tc_b100_53_every_a2l_attach_route_parses_on_a_worker(
     assert typed_copy_threads and main1 not in typed_copy_threads, typed_copy_threads
     assert startup_copy_threads and main2 not in startup_copy_threads, startup_copy_threads
     assert pick_copy_count == 0, pick_copy_count
+    assert last == "A2L loaded: c.a2l", last
+
+
+def test_r_a2l_cache_048_every_a2l_attach_route_hashes_and_reads_the_cache_on_a_worker(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """R-A2L-CACHE.048 + R-A2L-CACHE.002 (I3 E4-5, the cache-on twin of
+    ``test_tc_b100_53_every_a2l_attach_route_parses_on_a_worker``): with the
+    parse cache on, the typed attach of ``cal.a2l`` parses and stores; the
+    Workarea Files pick of ``c.a2l`` and the start-up ``load_path`` of
+    ``cal3.a2l`` (the same bytes) are served from the stored entry with 0
+    parser calls; on each of the 3 routes the content hash and the entry
+    read run off the main thread, and so does the one store."""
+    import importlib
+
+    a2l_cache = importlib.import_module("s19_app.tui.a2l_cache")
+    base = tmp_path / "app"
+    src = tmp_path / "src"
+    src.mkdir()
+    for name in ("cal.a2l", "cal3.a2l"):
+        shutil.copyfile(CASE01 / "firmware.a2l", src / name)
+    temp = W(base) / WORKAREA_TEMP
+    temp.mkdir(parents=True)
+    shutil.copyfile(CASE01 / "firmware.a2l", temp / "c.a2l")
+    parses = Spy(monkeypatch, app_module.deps, "parse_a2l_file")
+    digests = Spy(monkeypatch, a2l_cache, "content_digest")
+    reads = Spy(monkeypatch, a2l_cache, "read_entry")
+    stores = Spy(monkeypatch, a2l_cache, "store_entry")
+
+    def by_name(spy, name):
+        return [c.thread for c in spy.calls if c.args and Path(c.args[0]).name == name]
+
+    async def typed_and_pick(app, pilot, log):
+        main = _main_ident()
+        await ld.load_path_through_dialog(
+            pilot, app, src / "cal.a2l",
+            until=lambda: app.current_a2l_path is not None and Path(app.current_a2l_path).name == "cal.a2l",
+            what="the typed attach of cal.a2l",
+        )
+        await settle_workers(pilot)
+        typed_reads = len(reads.calls)
+        app._load_workarea_file("c.a2l")
+        await settle_workers(pilot)
+        await wait(pilot, lambda: Path(app.current_a2l_path or "").name == "c.a2l", "the pick of c.a2l")
+        return main, typed_reads, log_tail(app)[0]
+
+    main1, typed_reads, last = run(base, typed_and_pick)
+    reads_before = len(reads.calls)
+
+    async def startup(app, pilot, log):
+        main = _main_ident()
+        await wait(pilot, lambda: Path(app.current_a2l_path or "").name == "cal3.a2l", "the start-up attach")
+        await settle_workers(pilot)
+        return main
+
+    main2 = run(tmp_path / "app2", startup, load_path=src / "cal3.a2l")
+    assert [len(by_name(parses, n)) for n in ("cal.a2l", "c.a2l", "cal3.a2l")] == [1, 0, 0], parses.calls
+    routes = {
+        "typed": (by_name(digests, "cal.a2l"), reads.calls[:typed_reads], main1),
+        "pick": (by_name(digests, "c.a2l"), reads.calls[typed_reads:reads_before], main1),
+        "startup": (by_name(digests, "cal3.a2l"), reads.calls[reads_before:], main2),
+    }
+    assert all(hashed and read for hashed, read, _ in routes.values()), {
+        k: (len(v[0]), len(v[1])) for k, v in routes.items()
+    }
+    on_main = sorted(
+        route for route, (hashed, read, main) in routes.items()
+        if main in hashed or main in {c.thread for c in read}
+    )
+    assert on_main == [], f"A2L cache work on the main thread on: {on_main}"
+    assert len(stores.calls) == 1 and main1 not in stores.threads(), stores.calls
     assert last == "A2L loaded: c.a2l", last
 
 
@@ -2026,6 +2100,9 @@ def test_tc_b100_53_refusals_stop_after_each_project_load_exit(
     trio(wa / "P2")
     trio(wa / "A2LONLY", names=("firmware.a2l",))
     trio(wa / "PF")
+    # I3 re-target (R-I3-12): the A2L-only project's parse must run (and fail); with the parse cache on, the
+    # content P2 already stored is read instead and the injected parser failure never happens.
+    monkeypatch.setenv("S19_A2L_CACHE", "off")
     real_manifest = app_module.deps.read_project_manifest
     real_parse = app_module.deps.parse_a2l_file
 
@@ -2897,6 +2974,8 @@ def test_tc_b100_54_a2l_worker_failure_keeps_the_session(
         await wait(pilot, lambda: app.current_a2l_path is not None, "the attach of p0.a2l")
         path, data = app.current_a2l_path, app.current_a2l_data
         if stage == "parse":
+            # I3 re-target (R-I3-12): p0.a2l has the same content, so the parse cache would serve it.
+            monkeypatch.setenv("S19_A2L_CACHE", "off")
             monkeypatch.setattr(app_module.deps, "parse_a2l_file", _parse_fail)
         elif stage == "copy":
             monkeypatch.setattr(app_module.deps, "copy_into_workarea", _copy_fail)

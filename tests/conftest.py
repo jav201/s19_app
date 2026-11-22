@@ -226,6 +226,39 @@ def _real_store_folder_names(localappdata: Optional[str]) -> Optional[frozenset]
         return None
 
 
+def _real_cache_folder(env) -> Optional[Path]:
+    """The real per-user A2L parse-cache folder for ``env`` (P-279 I3), or
+    None when no base can be named. Mirrors the product's folder rule with
+    nothing created: Windows ``LOCALAPPDATA``/s19_app/cache/a2l, else
+    ``XDG_CACHE_HOME`` (absolute) or ``HOME``/.cache, then s19_app/a2l."""
+    if os.name == "nt":
+        lad = env.get("LOCALAPPDATA")
+        return Path(lad) / "s19_app" / "cache" / "a2l" if lad else None
+    xdg = env.get("XDG_CACHE_HOME", "")
+    home = env.get("HOME", "")
+    if xdg.startswith("/"):
+        return Path(xdg) / "s19_app" / "a2l"
+    if home.startswith("/"):
+        return Path(home) / ".cache" / "s19_app" / "a2l"
+    return None
+
+
+def _real_cache_snapshot(folder: Optional[Path]) -> Optional[dict]:
+    """``{name: (size, sha256)}`` of the real cache folder's files, or None
+    when the folder (or the base) is absent. Reads only what is already
+    there; an unreadable entry is recorded by name."""
+    if folder is None or not folder.is_dir():
+        return None
+    snapshot: dict = {}
+    for item in sorted(folder.iterdir()):
+        try:
+            data = item.read_bytes() if item.is_file() else b""
+            snapshot[item.name] = (len(data), hashlib.sha256(data).hexdigest())
+        except OSError:
+            snapshot[item.name] = (-1, "")
+    return snapshot
+
+
 @pytest.fixture(scope="session", autouse=True)
 def _recent_store_session_guard(tmp_path_factory: pytest.TempPathFactory):
     """Record the real store's SHA-256 (or its absence) before any test runs,
@@ -236,10 +269,18 @@ def _recent_store_session_guard(tmp_path_factory: pytest.TempPathFactory):
     real = os.environ.get("LOCALAPPDATA")
     before = _real_store_digest(real)
     names_before = _real_store_folder_names(real)
+    cache_folder = _real_cache_folder(os.environ)
+    cache_before = _real_cache_snapshot(cache_folder)
     patch = pytest.MonkeyPatch()
     patch.setenv("LOCALAPPDATA", str(tmp_path_factory.mktemp("lad-session")))
+    patch.setenv("XDG_CACHE_HOME", str(tmp_path_factory.mktemp("xdg-session")))
     yield
     patch.undo()
+    assert _real_cache_snapshot(cache_folder) == cache_before, (
+        "the real per-user A2L parse-cache folder changed (names or bytes) "
+        "during the test run (P-279 I3, R-A2L-CACHE.021): a test or fixture "
+        "wrote or deleted a cache entry"
+    )
     after = _real_store_digest(real)
     assert after == before, (
         "the real per-user recent-sources store under LOCALAPPDATA changed during "
@@ -260,6 +301,27 @@ def _recent_store_isolated(tmp_path_factory: pytest.TempPathFactory, monkeypatch
     lad = tmp_path_factory.mktemp("lad")
     monkeypatch.setenv("LOCALAPPDATA", str(lad))
     return lad
+
+
+@pytest.fixture(autouse=True)
+def _a2l_cache_base_isolated(tmp_path_factory: pytest.TempPathFactory, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Every test gets its own existing ``XDG_CACHE_HOME`` folder (P-279 I3),
+    outside its ``tmp_path`` for the same reason as ``LOCALAPPDATA`` above, so
+    the A2L parse cache never reaches the real user cache. Its real path holds
+    no repository marker and no ``.s19tool`` folder (R-A2L-CACHE.021 would
+    refuse every cache test otherwise); an arm that needs a refusal makes the
+    marker itself. A test needing another value overrides it with
+    ``monkeypatch``."""
+    base = tmp_path_factory.mktemp("xdg")
+    real = base.resolve()
+    for folder in (real, *real.parents):
+        marked = [m for m in (".git", "pyproject.toml", "project.toml") if (folder / m).exists()]
+        assert not marked and folder.name != ".s19tool", (
+            f"the isolated cache base {real} sits inside a repository or work area ({folder}): "
+            "set --basetemp to a folder with no such marker"
+        )
+    monkeypatch.setenv("XDG_CACHE_HOME", str(base))
+    return base
 
 
 @pytest.fixture(autouse=True)

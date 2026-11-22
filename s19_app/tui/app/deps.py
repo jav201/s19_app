@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import gc
 import hashlib
 import json
 import os
 from pathlib import Path
 import stat
+import time
 from datetime import datetime
 from typing import Optional, Tuple
 from textual.widgets import Label, ListItem
@@ -34,6 +36,7 @@ from ..services.project_gather_service import (
     inventory_project_tree,
     plan_project_save,
 )
+from .. import a2l, a2l_cache
 from ..a2l import A2LProgress
 from ..services.variant_execution_service import (
     _KEY_ACTIVE_DOCUMENT,
@@ -67,21 +70,131 @@ from .shared import (
 )
 
 
+_PAYLOAD_DERIVED_KEYS = (
+    "path",
+    "record_layouts_by_name",
+    "compu_methods_by_name",
+    "compu_tabs_by_name",
+)
+
+
+def _held(work, *args):
+    """Run ``work(*args)`` with the cyclic collector off, then restore the
+    state the caller had."""
+    was_enabled = gc.isenabled()
+    gc.disable()
+    try:
+        return work(*args)
+    finally:
+        if was_enabled:
+            gc.enable()
+
+
+def _hit_payload(path: Path, stored: dict) -> dict:
+    """The parse payload of a stored parse: the parser's key order, with the
+    three name maps rebuilt by the parser's own extractors."""
+    sections = stored["sections"]
+    return {
+        "path": str(path),
+        **stored,
+        "record_layouts_by_name": a2l.extract_record_layouts(sections),
+        "compu_methods_by_name": a2l.extract_compu_methods(sections),
+        "compu_tabs_by_name": a2l.extract_compu_tables(sections),
+    }
+
+
+def _read_stage(path: Path, state, progress):
+    """Look the load up in the disk cache: ``(payload, None)`` for a hit,
+    ``(None, plan)`` when the parse may be stored afterwards, else
+    ``(None, None)``."""
+    started = time.perf_counter()
+    digest, size, mtime_ns = a2l_cache.content_digest(path)
+    hash_seconds = time.perf_counter() - started
+    name = a2l_cache.entry_name(digest, state.fingerprint)
+    try:
+        result = _held(a2l_cache.read_entry, state, name, digest, progress)
+    except OSError as exc:
+        _LOG.info("A2L parse cache read failed: %s.", type(exc).__name__)
+        return None, None
+    if result.outcome == "hit":
+        payload = _hit_payload(path, result.stored_parse)
+        _LOG.info(
+            "A2L parse cache hit: entry_bytes=%d read_seconds=%.3f",
+            result.entry_bytes,
+            result.seconds,
+        )
+        return payload, None
+    if result.outcome != "absent":
+        _LOG.info("A2L parse cache entry unusable: %s.", result.outcome)
+    _LOG.info(
+        "A2L parse cache miss: file_bytes=%d hash_seconds=%.3f", size, hash_seconds
+    )
+    if result.outcome == "not a regular file":
+        return None, None
+    return None, (state, name, digest, size, mtime_ns)
+
+
+def _lookup(path: Path, progress):
+    """``_read_stage`` behind the cache state check; a fault of the cache
+    work ends the lookup with no payload and no plan."""
+    try:
+        state = a2l_cache.cache_state()
+        if isinstance(state, a2l_cache.CacheOff):
+            _LOG.info("A2L parse cache off: %s.", state.reason)
+            return None, None
+        return _read_stage(path, state, progress)
+    except Exception as exc:
+        _LOG.info("A2L parse cache failed: %s.", type(exc).__name__)
+        return None, None
+
+
+def _store_stage(path: Path, data: dict, plan) -> None:
+    """Store the parse unless the A2L changed during it."""
+    state, name, digest, size, mtime_ns = plan
+    now = os.stat(path)
+    if (now.st_size, now.st_mtime_ns) != (size, mtime_ns) or (
+        a2l_cache.content_digest(path)[0] != digest
+    ):
+        _LOG.info("A2L parse cache not stored: file changed during the parse.")
+        return
+    stored = {k: v for k, v in data.items() if k not in _PAYLOAD_DERIVED_KEYS}
+    if not state.size_setting_valid:
+        _LOG.info("A2L parse cache size setting not recognised: 2048 MiB used.")
+    try:
+        result = _held(a2l_cache.store_entry, state, name, digest, stored)
+    except (OSError, ValueError) as exc:
+        _LOG.info("A2L parse cache write failed: %s.", type(exc).__name__)
+        return
+    if result.outcome != "stored":
+        _LOG.info("A2L parse cache not stored: %s.", result.outcome)
+        return
+    _LOG.info(
+        "A2L parse cache stored: entry_bytes=%d write_seconds=%.3f",
+        result.entry_bytes,
+        result.seconds,
+    )
+    if result.evicted_files:
+        _LOG.info(
+            "A2L parse cache evicted: files=%d bytes=%d",
+            result.evicted_files,
+            result.evicted_bytes,
+        )
+
+
 def parse_a2l_cached(
     path: Path,
     cached: Optional[A2LCacheEntry],
     progress: Optional[A2LProgress] = None,
 ) -> A2LCacheEntry:
-    """Parse an A2L once per unchanged file, else return the cached entry.
+    """Parse an A2L once per unchanged file, else return a stored entry.
 
     Summary:
-        The 12b cache seam (S-h, LLR-177.1d / .1e): stat the file, return
-        the given entry unchanged on a key match (a hit, no parse), else
-        parse with ``parse_a2l_file`` — with ``progress=`` only when a
-        callback is given (fixed Q-f2: the no-callback call is the real
-        main-thread / file-load path). Pure and module-level: it reads no
-        ``self`` and writes nothing; an exception from ``stat`` or the parse
-        propagates to the caller.
+        The 12b cache seam: stat the file, return the given entry unchanged
+        on a key match (no work), else look the content up in the per-user
+        disk parse cache and, on a miss, parse with ``parse_a2l_file`` (with
+        ``progress=`` only when a callback is given) and store the parse.
+        Reads no ``self``. A fault of the cache work never fails the load;
+        an exception from ``stat`` or the parse propagates.
 
     Args:
         path (Path): The A2L file.
@@ -94,11 +207,14 @@ def parse_a2l_cached(
     Data Flow:
         - ``key = (str(path.resolve()), st.st_mtime_ns, st.st_size)``.
         - A matching ``cached[0]`` returns ``cached`` itself (``is``).
-        - Else parse and return ``(key, parse_a2l_file(...))``.
+        - Else the disk cache is read; a hit returns the rebuilt payload.
+        - Else parse, then store when the file is unchanged.
 
     Dependencies:
         Uses:
             - parse_a2l_file (the app module's global; tests monkeypatch it)
+            - a2l_cache (cache_state, content_digest, entry_name, read_entry,
+              store_entry)
         Used by:
             - _prepare_project_load / _parse_loaded_file / _a2l_attach_worker
     """
@@ -108,11 +224,19 @@ def parse_a2l_cached(
         _LOG.info("A2L cache hit: path=%s size_bytes=%d", path, st.st_size)
         return cached
     _LOG.info("A2L cache miss: path=%s size_bytes=%d", path, st.st_size)
+    payload, plan = _lookup(path, progress)
+    if payload is not None:
+        return (key, payload)
     data = (
         parse_a2l_file(path, progress=progress)
         if progress is not None
         else parse_a2l_file(path)
     )
+    if plan is not None:
+        try:
+            _store_stage(path, data, plan)
+        except Exception as exc:
+            _LOG.info("A2L parse cache failed: %s.", type(exc).__name__)
     return (key, data)
 #: The full-path limit the Save project name check guards (LLR-164.3, the
 #: ``_MAX_FULL_PATH`` idiom): ``len(workarea) + 1 + len(name) + 53`` must

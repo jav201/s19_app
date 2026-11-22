@@ -1228,6 +1228,7 @@ def _strip_a2l_comments(text: str) -> str:
         None: Malformed/unterminated comment or quote syntax degrades gracefully.
 
     Data Flow:
+        - A text with neither ``/*`` nor ``//`` is returned as it is.
         - Scan char-by-char, tracking whether the cursor is inside a quoted span.
         - Outside quotes: drop ``/* … */`` (spanning newlines) and ``// … <\n>``.
         - Inside quotes: copy literally; a ``"`` closes only when not backslash
@@ -1237,12 +1238,15 @@ def _strip_a2l_comments(text: str) -> str:
         Uses:
             - ``_A2L_LINE_SENTINEL``
         Used by:
-            - ``_flatten_body_tokens``
+            - the describe build of ``a2l_definition.py``
+              (``describe_definitions`` / the context build)
 
     Example:
         >>> _strip_a2l_comments('CURVE /* c */ 0x1  // tail\\nRL')
         'CURVE  0x1  \\nRL'
     """
+    if "/*" not in text and "//" not in text:
+        return text
     out: list[str] = []
     i = 0
     n = len(text)

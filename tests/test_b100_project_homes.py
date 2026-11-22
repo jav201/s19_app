@@ -2318,26 +2318,58 @@ def test_tc_b100_31_open_project_folder_gone_saves_without_a_copy(
     assert _with(messages, "could not be read") == [], messages
 
 
-def test_tc_b100_32_unload_of_an_a2l_only_session_clears_the_a2l(tmp_path: Path) -> None:
+@pytest.mark.parametrize("cache", ["on", "off"])
+def test_tc_b100_32_unload_of_an_a2l_only_session_clears_the_a2l(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, cache: str
+) -> None:
     """F3 (I-2, probe P-3): an A2L-only project P open (3 tags, no image);
     the A2L slot's unload → ``current_a2l_path`` None, 0 tags, the status
     "Unloaded A2L.", 0 lines "Nothing to unload.".
 
     RED (pre snapshot): "Nothing to unload.", the A2L stays attached.
-    Mutant: no A2L-only branch → RED."""
+    Mutant: no A2L-only branch → RED.
+
+    I3 E4-4: "open" is the end of P's load (no session action running, as
+    the shipped unload entry points require), and the outcome is read once
+    it is painted (it is painted after a refresh). Both arms of the A2L
+    parse: ``on`` serves P's A2L from the parse cache (0 parser calls),
+    ``off`` parses it (1 call)."""
+    if cache == "off":
+        monkeypatch.setenv("S19_A2L_CACHE", "off")
     base = tmp_path / "app"
     _a2l_only_project(base)
+    parses: list = []
+    real_parse = app_module.deps.parse_a2l_file
+
+    def _counted(*args, **kwargs):
+        parses.append(1)
+        return real_parse(*args, **kwargs)
+
+    monkeypatch.setattr(app_module.deps, "parse_a2l_file", _counted)
+    outcomes = ("Unloaded A2L.", "Nothing to unload.")
 
     async def _scenario(app, pilot, log):
         app._handle_load_project("P")
-        await projects.wait_for(pilot, lambda: app.current_a2l_path is not None, "the A2L")
+        await projects.wait_for(
+            pilot,
+            lambda: app.current_a2l_path is not None
+            and app._running_session_action() is None,
+            "the end of the load of P",
+        )
         tags_before = _a2l_tags(app)
         mark = len(log.messages)
         app._apply_unload("a2l")
-        await pilot.pause()
+        await projects.wait_for(
+            pilot,
+            lambda: any(m in outcomes for m in log.since(mark)),
+            "the unload outcome",
+        )
+        for _ in range(3):
+            await pilot.pause()
         return tags_before, app.current_a2l_path, _a2l_tags(app), log.since(mark)
 
     tags_before, after, tags_after, lines = projects.run_app(base, _scenario)
+    assert len(parses) == (0 if cache == "on" else 1), parses
     assert tags_before == 3, tags_before
     assert after is None and tags_after == 0, (after, tags_after, lines)
     assert "Unloaded A2L." in lines and "Nothing to unload." not in lines, lines

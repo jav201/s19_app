@@ -97,6 +97,10 @@ and drops the unsaved work; **Cancel (n)** (default) keeps it.
 
 Below 100 columns the list and the preview stack vertically (capture at 99×54).
 
+## The A2L parse cache
+
+Loading an A2L you opened before is faster: the app keeps each parse in a cache folder of your own and reads it back when the file's content is unchanged. On Windows the folder is `%LOCALAPPDATA%\s19_app\cache\a2l`; elsewhere it is `$XDG_CACHE_HOME/s19_app/a2l` (else `~/.cache/s19_app/a2l`). Set `S19_A2L_CACHE_MAX_MB` to change the size cap (the default is 2048 MiB; the oldest entries are removed first). Set `S19_A2L_CACHE=off` to use no cache. S19_A2L_CACHE=off stops reading and writing but keeps the stored parses; s19tui --clear-a2l-cache removes them. The cache folder must be private to you; on Windows it inherits the %LOCALAPPDATA% permissions.
+
 ## Features of these windows
 
 | Feature | How | Capture |

@@ -246,8 +246,9 @@ from tools.id_registry import (
 # batch-2026-11-20-p279 I1 E4: +3 (tests/test_p279_i1_{definition_context,picker_context,
 # load_stage}.py); 374 -> 377.
 # batch-2026-11-20-p279 I1f E4: +3 (tests/test_p279_i1f_{nav,bench,gc}.py); 377 -> 380.
+# batch-2026-11-20-p279 I3 E4: +2 (tests/test_p279_i3_{parse_cache,cache_load}.py); 380 -> 382.
 
-EXPECTED_SCANNED_TEST_FILES = 380
+EXPECTED_SCANNED_TEST_FILES = 382
 
 """Test modules scanned, including this one.
 

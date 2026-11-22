@@ -1328,12 +1328,37 @@ class S19TuiApp(ComposeScreensMixin, FlowMixin, SaveCommitMixin, ReportsMixin, P
         )
 
 
+def _clear_a2l_cache_and_exit() -> None:
+    from .. import a2l_cache
+
+    result = a2l_cache.clear_cache()
+    if isinstance(result, a2l_cache.CacheOff):
+        print(f"A2L cache not cleared: {result.reason}.")
+        raise SystemExit(1)
+    text = f"A2L cache cleared: {result.files} files, {result.bytes} bytes"
+    if result.failed:
+        print(f"{text}; {result.failed} could not be removed.")
+        raise SystemExit(1)
+    print(f"{text}.")
+    raise SystemExit(0)
+
+
 def main() -> None:
     import argparse
 
+    from .. import a2l_cache
+
     parser = argparse.ArgumentParser(description="S19/HEX/MAC TUI Viewer")
-    parser.add_argument("--load", help="Optional path to load at startup")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--load", help="Optional path to load at startup")
+    group.add_argument(
+        "--clear-a2l-cache",
+        action="store_true",
+        help=a2l_cache.CLEAR_HELP,
+    )
     args = parser.parse_args()
+    if args.clear_a2l_cache:
+        _clear_a2l_cache_and_exit()
     load_path = Path(args.load) if args.load else None
     app = S19TuiApp(load_path=load_path)
     app.run()
