@@ -739,6 +739,44 @@ def test_r_a2l_cache_021_refusal_arms_with_a_folder_setup_write_nothing(arm, cen
 
 
 @POSIX_ONLY
+def test_r_a2l_cache_021_a_cache_base_that_is_a_link_into_a_repository_is_refused(cenv, tmp_path):
+    repo = tmp_path / "repo"
+    (repo / ".git").mkdir(parents=True)
+    (repo / "c").mkdir()
+    link = tmp_path / "xdg-link"
+    link.symlink_to(repo / "c")
+    before = _tree_snapshot(repo)
+    state = _store().cache_state({**cenv, "XDG_CACHE_HOME": str(link)}, "posix")
+    assert type(state).__name__ == "CacheOff", state
+    assert state.reason == "cache folder inside a repository or work area"
+    assert _tree_snapshot(repo) == before
+
+
+def test_r_a2l_cache_021_a_relative_localappdata_naming_an_existing_folder_is_refused(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "AppData").mkdir()
+    state = _store().cache_state({"LOCALAPPDATA": "AppData"}, "nt")
+    assert type(state).__name__ == "CacheOff" and state.reason == "no cache folder"
+    assert _names(tmp_path / "AppData") == []
+
+
+def test_r_a2l_cache_037_a_chunk_length_past_the_end_asks_for_no_chunk_data(cenv, monkeypatch):
+    mod = _store()
+    state = _state(cenv)
+    name, digest, _parse, data = _valid_entry(state)
+    bad = bytearray(data)
+    bad[HEADER_LEN:HEADER_LEN + 4] = struct.pack(">I", 0xFFFFFFFF)
+    (state.folder / name).write_bytes(bytes(bad))
+    asked = []
+    real = os.read
+    monkeypatch.setattr(os, "read", lambda fd, n: (asked.append(n), real(fd, n))[1])
+    result = mod.read_entry(state, name, digest)
+    monkeypatch.undo()
+    assert result.outcome == "damaged"
+    assert asked and max(asked) <= HEADER_LEN + PREFIX_LEN, asked
+
+
+@POSIX_ONLY
 def test_r_a2l_cache_021_parser_source_unreadable_refuses_the_cache(cenv, monkeypatch):
     mod = _store()
     monkeypatch.setattr(mod, "parser_fingerprint", lambda: None)
@@ -1672,6 +1710,33 @@ def test_r_a2l_cache_047_two_threads_storing_one_name_leave_one_usable_entry(cen
     assert len(outcomes) == 40 and set(outcomes) <= {"stored", "oserror"}, set(outcomes)
     assert outcomes.count("stored") >= 1
     _assert_one_usable_entry(state, cenv)
+
+
+@POSIX_ONLY
+def test_r_a2l_cache_047_a_store_finished_inside_another_leaves_one_usable_entry(cenv, monkeypatch):
+    mod = _store()
+    state = _state(cenv)
+    digest = hashlib.sha256(b"interleaved name").digest()
+    name = mod.entry_name(digest, state.fingerprint)
+    first, second = _blob_parse(1), _blob_parse(2, size=400_000)
+    real = mod._write_all
+    calls = []
+
+    def hook(fd, data):
+        real(fd, data)
+        calls.append(1)
+        if len(calls) == 1:
+            monkeypatch.setattr(mod, "_write_all", real)
+            mod.store_entry(state, name, digest, second)
+
+    monkeypatch.setattr(mod, "_write_all", hook)
+    try:
+        mod.store_entry(state, name, digest, first)
+    except OSError:
+        pass
+    monkeypatch.undo()
+    assert mod.read_entry(state, name, digest).outcome == "hit"
+    assert _names(state.folder) == [name]
 
 
 @POSIX_ONLY
