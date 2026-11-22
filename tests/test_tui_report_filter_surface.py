@@ -1060,6 +1060,8 @@ def test_at_054a_bkey_filtered_pair_keeps_match_omits_unmatched(
     writes an MD+HTML pair that keeps the MATCHING linkage row, omits the
     unmatched one (and its window heading), and carries the audit header
     naming the real filter file.
+
+    Traces: R-BA-FILTER.1.
     """
 
     async def _drive() -> dict:
@@ -1136,6 +1138,8 @@ def test_at_054c_bkey_zero_match_writes_pair_with_loud_notice(
     with the loud ``filter matched 0 of N items`` notice — and the notice
     wording is disjoint from the refusal wording (no shared prefix token,
     no ``refused`` anywhere in the flow).
+
+    Traces: R-BA-FILTER.3.
     """
 
     async def _drive() -> dict:

@@ -166,7 +166,7 @@ from .workspace import PROJECT_EXTERNAL_SUBDIR
 
 
 #: The five resolution sources a file-bearing card annotation paints
-#: (R-B102-FILE-001): ``project`` / ``temp`` / ``loaded`` / ``external``
+#: (R-B102-FILE.1): ``project`` / ``temp`` / ``loaded`` / ``external``
 #: / ``missing``.
 FLOW_REF_SOURCES = ("project", "temp", "loaded", "external", "missing")
 
@@ -235,7 +235,7 @@ def resolve_flow_ref_source(
     loaded_names: Sequence[str],
     project_names: Optional[Sequence[str]] = None,
 ) -> str:
-    """Classify one flow ref's resolution source (R-B102-FILE-001/007).
+    """Classify one flow ref's resolution source (R-B102-FILE.1, R-B102-FILE.7).
 
     Summary:
         The classifier (E3 ruling 5): normalized string comparison against
@@ -804,7 +804,7 @@ def _card_annotation(
     Resolved origins paint dim as ``↳ <source>: <ref>``; ``missing``
     paints bold and names the ref (``missing: <ref>``) so a bare ref can
     never read as resolved. Every file-derived string rides
-    ``safe_text`` — literal text, zero markup spans (R-B102-FILE-007).
+    ``safe_text`` — literal text, zero markup spans (R-B102-FILE.7).
     """
     pairs = _annotated_file_refs(block)
     if not pairs:
@@ -1863,7 +1863,7 @@ class FlowBuilderPanel(ScrollableContainer):
         return index, self._blocks[index]
 
     def _edit_block(self) -> None:
-        """Post :class:`EditRequested` for the picked block (R-B102-FB-001).
+        """Post :class:`EditRequested` for the picked block (R-B102-FB.1).
 
         The panel never pushes the modal itself (E3 ruling 3): the app
         coordinates :class:`FlowBlockEditScreen` and re-enters through the
@@ -1878,7 +1878,7 @@ class FlowBuilderPanel(ScrollableContainer):
         )
 
     def _remove_block(self) -> None:
-        """Post :class:`RemoveRequested` for the picked block (R-B102-FB-004)."""
+        """Post :class:`RemoveRequested` for the picked block (R-B102-FB.4)."""
         selected = self._selected_block()
         if selected is None:
             return
@@ -1886,7 +1886,7 @@ class FlowBuilderPanel(ScrollableContainer):
         self.post_message(self.RemoveRequested(index, block))
 
     def replace_block(self, index: int, replacement: FlowBlock) -> None:
-        """Apply a VALIDATED edit: swap exactly one block (R-B102-FB-002).
+        """Apply a VALIDATED edit: swap exactly one block (R-B102-FB.2).
 
         Called by the app's edit-modal save callback. Minimal mutation: only
         ``self._blocks[index]`` is touched — the funnel and the clipboard
@@ -1906,7 +1906,7 @@ class FlowBuilderPanel(ScrollableContainer):
         self._mark_dirty()
 
     def remove_block(self, index: int) -> None:
-        """Apply a confirmed remove: delete exactly one block (R-B102-FB-004).
+        """Apply a confirmed remove: delete exactly one block (R-B102-FB.4).
 
         Called by the app's remove-confirm callback. Minimal mutation: only
         the picked index is deleted — variables and the clipboard survive.
@@ -2015,7 +2015,7 @@ class FlowBuilderPanel(ScrollableContainer):
 
     def _browse_ref(self, input_id: str) -> None:
         """Post :class:`BrowseRequested` for a ref field's Browse chip
-        (R-B102-FILE-002).
+        (R-B102-FILE.2).
 
         The panel never pushes the chooser itself (E3 ruling 2): the app
         builds the candidates, pushes ``FileRefChooserScreen`` and writes
@@ -2024,12 +2024,12 @@ class FlowBuilderPanel(ScrollableContainer):
         self.post_message(BrowseRequested(input_id))
 
     def apply_browsed_ref(self, input_id: str, ref: str) -> None:
-        """Write a browsed ref into one add-form field (R-B102-FILE-003).
+        """Write a browsed ref into one add-form field (R-B102-FILE.3).
 
         Fills ONLY the field: picking a candidate never adds or edits a
         block (Add still owns that) and marks nothing dirty.  A stale or
         foreign selector is a silent no-op; the value rides ``safe_text``
-        so a hostile name lands literal (R-B102-FILE-007).
+        so a hostile name lands literal (R-B102-FILE.7).
         """
         try:
             widget = self.query_one(input_id, Input)

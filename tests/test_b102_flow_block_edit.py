@@ -8,26 +8,26 @@ plus the mandatory Inc-6 addenda of
 
 * TC-B102-FB-01 — Edit opens an initialized modal for each of the 8 block
   kinds; title names the ledger number + kind and the kind-specific fields
-  carry the block's current values verbatim (R-B102-FB-001).
+  carry the block's current values verbatim (R-B102-FB.1).
 * TC-B102-FB-02 — Save replaces ONLY the selected block on the three routes
   (SOURCE / A2B / External step); the other blocks stay dataclass-equal to
   their originals, pipeline/ribbon repaint and the dirty flag sets
-  (R-B102-FB-002). Funnel and clipboard survive the replacement.
+  (R-B102-FB.2). Funnel and clipboard survive the replacement.
 * TC-B102-FB-03 — an invalid edit (A2B binding pointing downstream, external
   step with an empty log) is refused INSIDE the modal: the original chain and
-  the dirty state are untouched by the failed save (R-B102-FB-003).
+  the dirty state are untouched by the failed save (R-B102-FB.3).
 * TC-B102-FB-04 — Remove, confirmed, deletes exactly the picked index (first,
   then middle, then last of a 3-block chain); variables and clipboard survive;
   dirty sets; Cancel starts focused and ``escape`` cancels without a trace
-  (R-B102-FB-004 + ruling 8).
+  (R-B102-FB.4 + ruling 8).
 * TC-B102-FB-05 — empty / non-numeric / out-of-range picks for BOTH actions
   paint the exact notice ``Edit/Remove needs a block # between 1 and <N>.``
-  and neither open a modal nor mutate the chain (R-B102-FB-005 + ruling 1:
+  and neither open a modal nor mutate the chain (R-B102-FB-005.1, R-B102-FB-005.2 + ruling 1:
   empty is invalid for Edit/Remove; Copy's empty=last arm keeps working —
   pinned green-on-base by the r1 regression test).
 * TC-B102-FB-06 — hostile block fields render as literal text in the edit
   modal and its refusal: zero markup spans, zero control bytes, and the
-  sentinel is never logged (R-B102-FB-006 + rulings 7/10).
+  sentinel is never logged (R-B102-FB.6 + rulings 7/10).
 
 E3-rulings addenda:
 
@@ -94,7 +94,7 @@ from tests.b97_probes import record_statuses, settle
 
 SIZE = (118, 54)
 
-#: The exact invalid-pick notice of R-B102-FB-005 / ruling 1, ``<N>`` = the
+#: The exact invalid-pick notice of R-B102-FB-005.1, R-B102-FB-005.2 / ruling 1, ``<N>`` = the
 #: chain length (TC-B102-FB-05 expects the exact ``1 and 2`` form for a
 #: 2-block flow). Asserted verbatim, never imported from the product.
 def _needs_block_notice(n: int) -> str:
@@ -115,7 +115,7 @@ ROW_IDS = ("flow_pick", "flow_copy", "flow_paste", "flow_edit", "flow_remove", "
 #: text (the batch-102 Inc-4 hostile oracle).
 MARKUP_SPAN_RE = re.compile(r"link|click|bold|^red$")
 
-#: C0/C1 control bytes that must never be painted (R-B102-FB-006).
+#: C0/C1 control bytes that must never be painted (R-B102-FB.6).
 CONTROL_CHARS_RE = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f]")
 
 #: A hostile instruction carrying every markup token family, no whitespace
@@ -248,7 +248,7 @@ def _notice(panel):
 
 
 def _assert_zero_markup_spans(modal) -> None:
-    """No Static/Label span may carry a Rich markup style (R-B102-FB-006)."""
+    """No Static/Label span may carry a Rich markup style (R-B102-FB.6)."""
     offenders = []
     for widget in modal.query("*"):
         if not isinstance(widget, (Static, Label)):
@@ -300,7 +300,7 @@ TC01_CASES = [
 
 @pytest.mark.parametrize("kind,ledger,expected_inputs,screen_bits", TC01_CASES, ids=[c[0] for c in TC01_CASES])
 def test_tc_b102_fb_01_edit_opens_initialized_modal(tmp_path: Path, kind, ledger, expected_inputs, screen_bits) -> None:
-    """TC-B102-FB-01 (R-B102-FB-001): pick the ledger number, press Edit, and
+    """TC-B102-FB-01 (R-B102-FB.1): pick the ledger number, press Edit, and
     the modal opens with the block's kind in the title and its CURRENT field
     values prefilled (the add-row grammar, kind fixed). Mutant control: an
     empty/default modal, or the wrong kind, or values re-typed by the modal.
@@ -362,7 +362,7 @@ def _route_blocks(route: str) -> list:
 
 @pytest.mark.parametrize("route", ["source", "a2b", "external_step"], ids=["source", "a2b", "external_step"])
 def test_tc_b102_fb_02_save_replaces_only_the_selected_block(tmp_path: Path, route: str) -> None:
-    """TC-B102-FB-02 (R-B102-FB-002): the three edit routes (SOURCE / A2B /
+    """TC-B102-FB-02 (R-B102-FB.2): the three edit routes (SOURCE / A2B /
     External step) replace exactly index 1 — the other block objects stay
     dataclass-equal to their originals, the pipeline repaints the new value
     and the dirty flag sets. Variables and the clipboard survive. Mutant
@@ -425,7 +425,7 @@ def test_tc_b102_fb_02_save_replaces_only_the_selected_block(tmp_path: Path, rou
 
 @pytest.mark.parametrize("case", ["a2b_downstream", "external_step_no_log"], ids=["a2b_downstream", "external_step_no_log"])
 def test_tc_b102_fb_03_invalid_edit_refused_and_original_remains(tmp_path: Path, case: str) -> None:
-    """TC-B102-FB-03 (R-B102-FB-003): a candidate that fails validation keeps
+    """TC-B102-FB-03 (R-B102-FB.3): a candidate that fails validation keeps
     the ORIGINAL block — the refusal paints in the modal (naming the binding /
     the missing log), the modal stays open, the chain and the dirty state are
     unchanged, and variables/clipboard survive. Mutant control: the invalid
@@ -496,7 +496,7 @@ def test_tc_b102_fb_03_invalid_edit_refused_and_original_remains(tmp_path: Path,
 
 
 def test_tc_b102_fb_04_remove_first_middle_last(tmp_path: Path) -> None:
-    """TC-B102-FB-04 (R-B102-FB-004): with variables, a seeded clipboard and a
+    """TC-B102-FB-04 (R-B102-FB.4): with variables, a seeded clipboard and a
     3-block chain, confirming the remove of #1 three times deletes the FIRST,
     then the MIDDLE, then the LAST of the original chain — one index each
     time, variables and clipboard untouched, dirty set. The confirm asks the
@@ -645,7 +645,7 @@ def test_tc_b102_fb_05_defensive_index_parsing(tmp_path: Path, action: str, raw:
 
 
 def test_tc_b102_fb_06_hostile_fields_render_literally(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """TC-B102-FB-06 (R-B102-FB-006) + rulings 7/10: a block whose instruction
+    """TC-B102-FB-06 (R-B102-FB.6) + rulings 7/10: a block whose instruction
     carries every Rich markup token paints LITERALLY in the edit modal — the
     field keeps the sentinel verbatim, the painted surface shows ``[red]`` /
     ``[link=e]`` / ``[@click=app.quit]`` as text with zero markup spans and

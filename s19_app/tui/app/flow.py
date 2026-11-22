@@ -206,7 +206,7 @@ class FlowMixin:
             candidate, applies it through the panel's PUBLIC
             ``replace_block`` — the panel is never touched through a
             private seam. A cancel dismisses with ``None`` and changes
-            nothing (R-B102-FB-003 keeps the original on a refused save —
+            nothing (R-B102-FB.3 keeps the original on a refused save —
             the modal itself never dismisses with a finding).
 
         Args:
@@ -244,7 +244,7 @@ class FlowMixin:
             the removal through the panel's PUBLIC ``remove_block``, which
             re-checks the range immediately before mutating. The index is
             captured here, when the screen opens; the funnel and the
-            clipboard survive (R-B102-FB-004).
+            clipboard survive (R-B102-FB.4).
 
         Args:
             event (FlowBuilderPanel.RemoveRequested): Carries the target
@@ -267,7 +267,7 @@ class FlowMixin:
         question.PRIMARY_BUTTON = "confirm_no"
         self.push_screen(question, _apply)
 
-    # -- flow file refs (batch-102 Inc 7, US-102-07; R-B102-FILE-001..007) -----
+    # -- flow file refs (batch-102 Inc 7, US-102-07; R-B102-FILE.1 … R-B102-FILE.7) -----
 
     def _flow_project_file_names(self, project_dir: Optional[Path]) -> Tuple[str, ...]:
         """The active project's direct-child FILE names (Inc 7 candidates
@@ -331,7 +331,7 @@ class FlowMixin:
     def _flow_ref_candidates(
         self, project_dir: Optional[Path]
     ) -> List[FileRefCandidate]:
-        """The chooser's candidates (R-B102-FILE-002): project files, then
+        """The chooser's candidates (R-B102-FILE.2): project files, then
         workarea temp files, then the loaded artifacts — each temp/loaded
         entry carrying its source path so a pick outside the project
         imports through the hardened safe path first (E3 ruling 1)."""
@@ -386,7 +386,7 @@ class FlowMixin:
 
     def on_browse_requested(self, event: BrowseRequested) -> None:
         """Open the file-ref chooser for a flow host's Browse chip
-        (batch-102 Inc 7, R-B102-FILE-002; E3 ruling 2 — the app
+        (batch-102 Inc 7, R-B102-FILE.2; E3 ruling 2 — the app
         coordinates the modal, never the host)."""
         self._open_file_ref_chooser(event.input_id)
 
@@ -407,7 +407,7 @@ class FlowMixin:
 
     def _apply_flow_ref_choice(self, input_id: str, choice: FileRefChoice) -> None:
         """Write the browsed ref into the host that owns the field
-        (R-B102-FILE-003; E3 ruling 2): the ``FlowBlockEditScreen`` when it
+        (R-B102-FILE.3; E3 ruling 2): the ``FlowBlockEditScreen`` when it
         sits under the chooser, else the Flow Builder's add form.  Only
         the field changes — no block is added or edited."""
         screen = self.screen

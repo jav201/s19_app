@@ -1595,7 +1595,7 @@ class LoadFlowScreen(ModalScreen[Optional[str]]):
 
 
 # ---------------------------------------------------------------------------
-# batch-102 Inc 7 (US-102-07) — the flow file-ref chooser (R-B102-FILE-002..007)
+# batch-102 Inc 7 (US-102-07) — the flow file-ref chooser (R-B102-FILE.2 … R-B102-FILE.7)
 # ---------------------------------------------------------------------------
 
 
@@ -1637,18 +1637,18 @@ class FileRefChooserScreen(ModalScreen[Optional[FileRefChoice]]):
         (E3 ruling 2 — the app coordinates the modal, never the host).
         Lists the three candidate sections — ``Project``, ``Temp /
         workarea`` and ``Loaded artifacts`` — plus an external-path input
-        with an Import action (R-B102-FILE-002).  Picking a candidate
+        with an Import action (R-B102-FILE.2).  Picking a candidate
         dismisses with its wire value and NEVER adds or edits a block
-        (R-B102-FILE-003); a temp or loaded pick whose file is not already
+        (R-B102-FILE.3); a temp or loaded pick whose file is not already
         inside the active project is first imported into
         ``<project>/external/`` through the hardened
         :func:`import_external_ref`, so every produced value is runnable
         by ``run_flow`` (E3 ruling 1).  Every refusal is painted in the
         modal with its exact pinned line, names at most the file NAME
         (never a path — E3 ruling 8), and leaves the host field untouched
-        (R-B102-FILE-005/006).  Every file-derived string renders through
+        (R-B102-FILE-005.1, R-B102-FILE-005.2, R-B102-FILE.6).  Every file-derived string renders through
         ``safe_text``/``Content`` — literal text, zero markup spans
-        (R-B102-FILE-007).
+        (R-B102-FILE.7).
 
     Args:
         candidates (Sequence[FileRefCandidate]): The app-built candidate
@@ -1660,7 +1660,7 @@ class FileRefChooserScreen(ModalScreen[Optional[FileRefChoice]]):
 
     BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
 
-    #: The section headers, in stack order (R-B102-FILE-002: 3/3 visible).
+    #: The section headers, in stack order (R-B102-FILE.2: 3/3 visible).
     _SECTION_TITLES: Tuple[Tuple[str, str], ...] = (
         ("project", "Project"),
         ("temp", "Temp / workarea"),
@@ -1747,7 +1747,7 @@ class FileRefChooserScreen(ModalScreen[Optional[FileRefChoice]]):
                 self._pick_candidate(candidate)
 
     def _pick_candidate(self, candidate: FileRefCandidate) -> None:
-        """Dismiss with the candidate's wire value (R-B102-FILE-003).
+        """Dismiss with the candidate's wire value (R-B102-FILE.3).
 
         A project candidate (or a loaded one already inside the project)
         dismisses directly; a temp/loaded pick imports first (E3 ruling 1)
@@ -1767,7 +1767,7 @@ class FileRefChooserScreen(ModalScreen[Optional[FileRefChoice]]):
         """The hardened import; ``None`` (refusal painted) on any refusal.
 
         The refusal messages are operator-facing and path-free (E3 ruling
-        8); nothing is copied on a refusal (R-B102-FILE-005/006).
+        8); nothing is copied on a refusal (R-B102-FILE-005.1, R-B102-FILE-005.2, R-B102-FILE.6).
         """
         try:
             imported = import_external_ref(source, self._project_root)
@@ -1809,7 +1809,7 @@ class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
 
     Summary:
         Opened by the app when the Flow Builder posts ``EditRequested``
-        (R-B102-FB-001). The dialog fixes the block kind — the title names
+        (R-B102-FB.1). The dialog fixes the block kind — the title names
         ``EDIT BLOCK #<n> — <kind>`` — and shows exactly the add-row's
         field vocabulary for that kind, prefilled with the block's current
         values (TC-B102-FB-01's 8/8 kinds). Save builds the candidate by
@@ -1821,7 +1821,7 @@ class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
         ``dict_to_flow`` loader — the same fail-closed gate Paste uses
         (finding F-B102-FB-2: a failed edit must never corrupt the chain).
         On findings the ORIGINAL block stays, the refusal is painted in the
-        modal (R-B102-FB-003) listing every finding, and the modal stays
+        modal (R-B102-FB.3) listing every finding, and the modal stays
         open; on success it dismisses with the replacement block and the
         app applies it through the panel's public ``replace_block``.
 
@@ -1839,7 +1839,7 @@ class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
         Without a containment base (E3 ruling 4) Save refuses IN the modal
         — a hostile ref is never stored to fail later. Every file-derived
         string (title, prefilled fields, refusal) renders literal:
-        ``safe_text`` + ``markup=False`` (R-B102-FB-006), and nothing
+        ``safe_text`` + ``markup=False`` (R-B102-FB.6), and nothing
         content-bearing is logged (E3 ruling 10).
 
     Args:
@@ -1985,7 +1985,7 @@ class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
     ) -> ComposeResult:
         """One label + prefilled input row (the add-row vocabulary).
 
-        The prefill rides through ``safe_text`` (R-B102-FB-006): the block's
+        The prefill rides through ``safe_text`` (R-B102-FB.6): the block's
         stored value is literal text — control bytes are scrubbed before it
         enters the field, markup characters stay inert.  ``browse=True``
         (the READ file-ref rows only, E3 ruling 6) adds the Browse chip that
@@ -2021,7 +2021,7 @@ class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
 
     def apply_browsed_ref(self, input_id: str, ref: str) -> None:
         """Write a browsed ref into one of the modal's fields
-        (R-B102-FILE-003): the field updates, the block changes only on a
+        (R-B102-FILE.3): the field updates, the block changes only on a
         validated Save.  A stale or foreign selector is a silent no-op.
         """
         try:
@@ -2074,7 +2074,7 @@ class FlowBlockEditScreen(ModalScreen[Optional[FlowBlock]]):
     def _save(self) -> None:
         """Validate the merged candidate against the chain; dismiss or refuse.
 
-        R-B102-FB-002 / R-B102-FB-003 / E3 rulings 2/4/6/7: without a base
+        R-B102-FB.2 / R-B102-FB.3 / E3 rulings 2/4/6/7: without a base
         the refusal is painted here (nothing hostile is kept); the candidate
         merges over the original wire (unexposed fields survive); the
         substituted envelope re-runs the hardened loader — any finding keeps

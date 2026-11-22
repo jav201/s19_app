@@ -96,7 +96,7 @@ class WorkareaPlacementError(WorkareaContainmentError):
 class ExternalImportRefusal(ValueError):
     """A flow external import was refused BEFORE any filesystem mutation.
 
-    batch-102 Inc 7 (R-B102-FILE-005/006): the ``message`` is
+    batch-102 Inc 7 (R-B102-FILE-005.1, R-B102-FILE-005.2, R-B102-FILE.6): the ``message`` is
     operator-facing and carries at most the file NAME — never a full
     path (E3 ruling 8, zero path logs/paints) — and is rendered verbatim
     by the chooser through ``safe_text`` + ``markup=False``.
@@ -1503,7 +1503,7 @@ def _imported_name_candidates(name: str) -> Iterator[str]:
     """The Inc-7 import landing-name walk: the requested name, then the
     lowest free ``-<N>`` (``calib-1.json``, ``calib-2.json``, …).
 
-    batch-102 Inc 7 (R-B102-FILE-004, E3 rulings 1/4): the workarea
+    batch-102 Inc 7 (R-B102-FILE.4, E3 rulings 1/4): the workarea
     placement walk uses ``_<N>``; the flow import uses ``-<N>`` because the
     increment's operator contract (``02-test-cases.md``,
     ``external/calib-1.json``) names the hyphen form.  Every yielded name
@@ -1526,13 +1526,13 @@ def import_external_ref(
     Summary:
         Import one external file for a flow block into the active
         project's ``external/`` folder (batch-102 Inc 7, US-102-07,
-        R-B102-FILE-004..006) and return the landed path plus the
+        R-B102-FILE.4 … R-B102-FILE.6) and return the landed path plus the
         workarea-relative ref (``external/<name>``) the flow field
         receives.  A byte-identical name is NEVER reused: any taken name
         (identical content or not) advances the claim to the next free
         ``-<N>`` suffix — reuse-by-content is disabled for this flow
         (E3 ruling 4), so a repeated import always lands a fresh file and
-        never overwrites (R-B102-FILE-004).
+        never overwrites (R-B102-FILE.4).
 
     Args:
         external_path (Path): The external/temp/loaded source file
@@ -1542,7 +1542,7 @@ def import_external_ref(
             app passes it UNRESOLVED, exactly like ``_active_project_dir``
             returns it, so the destination guard reads the workarea root
             off its textual path).  ``None`` refuses BEFORE any
-            filesystem touch (R-B102-FILE-005).
+            filesystem touch (R-B102-FILE-005.1, R-B102-FILE-005.2).
         max_size_bytes (int): Source size cap (the shared 256 MB default).
 
     Returns:

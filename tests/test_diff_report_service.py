@@ -1240,6 +1240,8 @@ def test_tc312_filter_restricts_linkage_and_run_sections_both_formats(
 
     Threshold (Q-2 scope): unmatched run → 0 linkage rows, 0 window
     headings; matched run → all present; stats row still counts BOTH runs.
+
+    Traces: R-BA-FILTER.1.
     """
     comparison, mem_a, mem_b, entries = _two_disjoint_run_fixture()
     matcher = _report_matcher(addresses=[(0x100, 0x110)])
@@ -1271,6 +1273,8 @@ def test_tc312_a9_merged_window_spans_excluded_run(tmp_path: Path) -> None:
     spans an excluded run merge into ONE window; the excluded run seeds no
     heading and no linkage row, but its bytes MAY appear inside the merged
     window (assert heading/linkage absence, NOT byte absence).
+
+    Traces: R-BA-FILTER.1.
     """
     runs = [
         DiffRun(0x1000, 0x1004, KIND_CHANGED),
@@ -1321,6 +1325,8 @@ def test_tc312_zero_match_notice_and_refusal_disjoint(tmp_path: Path) -> None:
     ``filter matched 0 of N items`` notice; the notice wording shares no
     prefix token with the refusal wording (LLR-053.5 = the read/parse
     diagnostics, report-kind-prefixed).
+
+    Traces: R-BA-FILTER.3, R-BA-FILTER.4.
     """
     comparison, mem_a, mem_b, entries = _two_disjoint_run_fixture()
     matcher = _report_matcher(addresses=[(0xF000, 0xF010)], name=None)
@@ -1356,11 +1362,87 @@ def test_tc312_zero_match_notice_and_refusal_disjoint(tmp_path: Path) -> None:
         )
 
 
+@pytest.mark.parametrize(
+    "case",
+    ["entries_match_no_run", "run_matches_no_entry"],
+)
+def test_r_ba_filter_3_4_each_section_zero_match_on_its_own(
+    tmp_path: Path, case: str
+) -> None:
+    """Partial zero-match: only ONE of the two filtered sections is empty.
+
+    Traces: R-BA-FILTER.3, R-BA-FILTER.4.
+
+    Why: ``test_tc312_zero_match_notice_and_refusal_disjoint`` covers only
+    the both-zero case, so a product that coupled the two decisions
+    (``zero_entries = zero_runs = both empty``) would still pass it. Here
+    the linkage set (3 entries) and the run set (2 runs) have different
+    sizes, so the ``<n>`` in each notice also proves which set it counts.
+    Expected: the notice sits only in the empty section (n = that
+    section's pre-filter count); the other section keeps its matching row.
+    """
+    runs = [
+        DiffRun(0x100, 0x104, KIND_CHANGED),
+        DiffRun(0x900, 0x904, KIND_CHANGED),
+    ]
+    comparison = _comparison(runs=runs, stats=_stats(2, 8))
+    mem_a = _mem(0x100, 0xAA, 4) | _mem(0x900, 0xAA, 4)
+    mem_b = _mem(0x100, 0xBB, 4) | _mem(0x900, 0xBB, 4)
+    if case == "entries_match_no_run":
+        # Window [0x500,0x510) holds one entry, no run.
+        entries = [
+            _entry(address_start=0x500, address_end=0x502, linkage_symbol="ENT_KEEP"),
+            _entry(address_start=0x600, address_end=0x602, linkage_symbol="ENT_DROP1"),
+            _entry(address_start=0x700, address_end=0x702, linkage_symbol="ENT_DROP2"),
+        ]
+        matcher = _report_matcher(addresses=[(0x500, 0x510)])
+    else:
+        # Window [0x100,0x110) holds one run, no entry.
+        entries = [
+            _entry(address_start=0x500, address_end=0x502, linkage_symbol="ENT_A"),
+            _entry(address_start=0x600, address_end=0x602, linkage_symbol="ENT_B"),
+            _entry(address_start=0x700, address_end=0x702, linkage_symbol="ENT_C"),
+        ]
+        matcher = _report_matcher(addresses=[(0x100, 0x110)])
+
+    md_text, html_text = _filtered_pair(
+        tmp_path, matcher, comparison, mem_a, mem_b, entries
+    )
+
+    entries_notice = "filter matched 0 of 3 items"
+    runs_notice = "filter matched 0 of 2 items"
+    if case == "entries_match_no_run":
+        # Runs + hex windows carry the notice (n = 2 runs); linkage keeps its row.
+        assert md_text.count(runs_notice) == 2
+        assert entries_notice not in md_text
+        assert r"ENT\_KEEP" in md_text
+        assert r"ENT\_DROP1" not in md_text and r"ENT\_DROP2" not in md_text
+        assert "| 0x00000100 | 0x00000104 | 4 | changed | - |" not in md_text
+        assert "Image A window" not in md_text
+        assert runs_notice in html_text and entries_notice not in html_text
+        assert "ENT_KEEP" in html_text and "ENT_DROP1" not in html_text
+    else:
+        # Linkage carries the notice (n = 3 entries); runs keep their row/window.
+        assert md_text.count(entries_notice) == 1
+        assert runs_notice not in md_text
+        assert r"ENT\_A" not in md_text and r"ENT\_B" not in md_text
+        assert "Disposition" not in md_text  # no linkage table header row
+        assert "| 0x00000100 | 0x00000104 | 4 | changed | - |" in md_text
+        assert "| 0x00000900 | 0x00000904 | 4 | changed | - |" not in md_text
+        assert "Image A window" in md_text
+        assert entries_notice in html_text and runs_notice not in html_text
+        assert "ENT_A" not in html_text
+        assert "Run 0x00000100-0x00000104 (changed)" in html_text
+
+
+
 def test_tc312_audit_header_first_block_fixed_format(tmp_path: Path) -> None:
     """TC-312 / LLR-054.3 (S-F6, F-07): the audit header is the FIRST block
     after the report title, with the fixed line format — filter file name,
     per-section shown/hidden counts (shown+hidden == pre-filter count), and
     the F-03 informative note — in BOTH formats.
+
+    Traces: R-BA-FILTER.2.
     """
     comparison, mem_a, mem_b, entries = _two_disjoint_run_fixture()
     matcher = _report_matcher(addresses=[(0x100, 0x110)])
@@ -1396,6 +1478,8 @@ def test_tc318_hostile_filter_name_sanitized_md_html(tmp_path: Path) -> None:
     """TC-318 (diff-module half) / LLR-055.4: a hostile filter display name
     (pipe, backtick, ``<b>``, control bytes) renders ctl-stripped on the
     non-cell MD audit line and html-escaped in the HTML — never raw.
+
+    Traces: R-BA-FILTER.2.
     """
     comparison, mem_a, mem_b, entries = _two_disjoint_run_fixture()
     hostile = "a|b`c<b>\x01\x0dd.json"

@@ -7,7 +7,7 @@ plus the mandatory Inc-7 addenda of
 ``.dev-flow/2026-11-03-batch-102/design/E3-rulings-inc7.md``:
 
 * TC-B102-FILE-01 — every file-bearing block card paints its ref's resolution
-  source (R-B102-FILE-001, 5/5 states). Painted-card arms cover
+  source (R-B102-FILE.1, 5/5 states). Painted-card arms cover
   ``project`` / ``temp`` / ``external`` / ``missing`` through the shipped
   pipeline; the ``loaded`` state plus the precedence
   (``external`` > ``project`` > ``temp`` > ``loaded``) and the textual
@@ -25,12 +25,12 @@ plus the mandatory Inc-7 addenda of
   2: the panel never pushes the modal) and the app tops
   ``FileRefChooserScreen`` listing ``Project`` / ``Temp / workarea`` /
   ``Loaded artifacts`` + the ``#flow_external_path_input`` row with
-  Import/Cancel (R-B102-FILE-002, 3/3 sources). A2B fields carry their own
+  Import/Cancel (R-B102-FILE.2, 3/3 sources). A2B fields carry their own
   ``#flow_ref_a_browse`` / ``#flow_ref_b_browse``. Addendum: links (a live
   symlink and a dangling one) planted in the project dir never appear in the
   chooser, while a regular project file does (ruling 4's link-safe listing).
 * TC-B102-FILE-03 — picking a candidate dismisses the chooser and writes ONLY
-  the host field; no block is added or replaced (R-B102-FILE-003). Addendum
+  the host field; no block is added or replaced (R-B102-FILE.3). Addendum
   (ruling 1): a temp candidate that does not resolve inside the project is
   imported through the safe path into ``<project>/external/`` and the field
   gets the executable ``external/<name>``; a loaded artifact already inside
@@ -42,7 +42,7 @@ plus the mandatory Inc-7 addenda of
   ``<project>/external/``, writes ``external/<name>`` into the field, keeps
   the original, reports ``imported as external/<name>`` and never
   overwrites: a same-named file with different content lands on
-  ``external/<name>-1`` (R-B102-FILE-004 + rulings 1/4). Service layer:
+  ``external/<name>-1`` (R-B102-FILE.4 + rulings 1/4). Service layer:
   ``workspace.import_external_ref`` returns ``(dest, ref)``; a repeated
   import of IDENTICAL bytes still suffixes (content reuse is disabled for
   this flow); refusals raise ``ValueError`` carrying the exact pinned
@@ -50,13 +50,13 @@ plus the mandatory Inc-7 addenda of
 * TC-B102-FILE-05 — with no active project the import refusal paints the
   exact ``Load or create a project before importing an external file.`` for
   both an external path and a temp-candidate pick; nothing is copied and the
-  field stays unchanged (R-B102-FILE-005 + ruling 1).
+  field stays unchanged (R-B102-FILE-005.1, R-B102-FILE-005.2 + ruling 1).
 * TC-B102-FILE-06 — an unreadable external path paints the exact
   ``External file not readable: <name>`` (the name, never the full path),
-  copies nothing and leaves the field unchanged (R-B102-FILE-006 + ruling 8).
+  copies nothing and leaves the field unchanged (R-B102-FILE.6 + ruling 8).
 * TC-B102-FILE-07 — hostile candidate names render as literal text in the
   chooser and the card annotations: the safe_text payload paints, zero
-  markup spans, zero control bytes (R-B102-FILE-007). Addendum (ruling 8
+  markup spans, zero control bytes (R-B102-FILE.7). Addendum (ruling 8
   logs arm): across the root logger and the app logger during
   Browse/annotate/import, no record carries the full external path or the
   file name.
@@ -130,12 +130,12 @@ SECTIONS = ("Project", "Temp / workarea", "Loaded artifacts")
 #: The chooser's external-path input (codewire example, TC-B102-FILE-02).
 EXTERNAL_INPUT = "#flow_external_path_input"
 
-#: The exact no-project refusal of R-B102-FILE-005 / ruling 1.
+#: The exact no-project refusal of R-B102-FILE-005.1, R-B102-FILE-005.2 / ruling 1.
 NO_PROJECT_REFUSAL = "Load or create a project before importing an external file."
 
 
 def _unreadable(name: str) -> str:
-    """The exact unreadable-external refusal of R-B102-FILE-006."""
+    """The exact unreadable-external refusal of R-B102-FILE.6."""
     return f"External file not readable: {name}"
 
 
@@ -143,7 +143,7 @@ def _unreadable(name: str) -> str:
 #: text (the batch-102 Inc-4 hostile oracle, reused by Inc 6).
 MARKUP_SPAN_RE = re.compile(r"link|click|bold|^red$")
 
-#: C0/C1 control bytes that must never be painted (R-B102-FILE-007).
+#: C0/C1 control bytes that must never be painted (R-B102-FILE.7).
 CONTROL_CHARS_RE = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f]")
 
 
@@ -325,7 +325,7 @@ def _import_service():
 
 
 # --------------------------------------------------------------------------- #
-# TC-B102-FILE-01 — card origin annotations (R-B102-FILE-001, 5/5 states)
+# TC-B102-FILE-01 — card origin annotations (R-B102-FILE.1, 5/5 states)
 # --------------------------------------------------------------------------- #
 
 STATE_ARMS = [
@@ -339,7 +339,7 @@ STATE_ARMS = [
 
 @pytest.mark.parametrize("arm,ref,plant,expected", STATE_ARMS, ids=[a[0] for a in STATE_ARMS])
 def test_tc_b102_file_01_card_origin_annotation(tmp_path: Path, arm, ref, plant, expected) -> None:
-    """TC-B102-FILE-01 (R-B102-FILE-001): a file-bearing card paints the
+    """TC-B102-FILE-01 (R-B102-FILE.1): a file-bearing card paints the
     prototype's annotation grammar — ``↳ <source>: <ref>`` for a resolved
     source, ``missing: <ref>`` for an unresolved one — with the ref verbatim.
 
@@ -421,7 +421,7 @@ CLASSIFIER_ARMS = [
 def test_tc_b102_file_01_classifier_states_and_precedence(
     tmp_path: Path, ref, project_files, temp_files, loaded_names, root_mode, expected
 ) -> None:
-    """TC-B102-FILE-01 (R-B102-FILE-001, full 5/5 + rulings 5/6):
+    """TC-B102-FILE-01 (R-B102-FILE.1, full 5/5 + rulings 5/6):
     ``resolve_flow_ref_source`` classifies a ref as ``project`` / ``temp`` /
     ``loaded`` / ``external`` / ``missing`` with precedence
     ``external`` > ``project`` > ``temp`` > ``loaded``; a ``None`` project
@@ -536,12 +536,12 @@ def test_tc_b102_file_01_annotation_matrix_by_kind(tmp_path: Path, arm, factory,
 
 
 # --------------------------------------------------------------------------- #
-# TC-B102-FILE-02 — Browse lists all sources (R-B102-FILE-002, 3/3)
+# TC-B102-FILE-02 — Browse lists all sources (R-B102-FILE.2, 3/3)
 # --------------------------------------------------------------------------- #
 
 
 def test_tc_b102_file_02_browse_posts_request_and_chooser_lists_all_sources(tmp_path: Path) -> None:
-    """TC-B102-FILE-02 (R-B102-FILE-002 + ruling 2): pressing ``#flow_browse``
+    """TC-B102-FILE-02 (R-B102-FILE.2 + ruling 2): pressing ``#flow_browse``
     beside ``#flow_ref`` posts exactly one ``BrowseRequested('#flow_ref')``
     (the panel never pushes the modal itself) and the app tops
     ``FileRefChooserScreen`` painting the ``Project`` / ``Temp / workarea`` /
@@ -596,7 +596,7 @@ def test_tc_b102_file_02_browse_posts_request_and_chooser_lists_all_sources(tmp_
 
 
 def test_tc_b102_file_02_browse_beside_every_ref_field(tmp_path: Path) -> None:
-    """TC-B102-FILE-02 (R-B102-FILE-002, every ref field): the add form
+    """TC-B102-FILE-02 (R-B102-FILE.2, every ref field): the add form
     carries ``#flow_browse`` beside ``#flow_ref`` for the single-ref kinds
     and ``#flow_ref_a_browse`` / ``#flow_ref_b_browse`` beside the A2B
     bindings; Browse on an A2B binding routes through the same chooser and a
@@ -671,12 +671,12 @@ def test_tc_b102_file_02_project_links_omitted_from_chooser(tmp_path: Path) -> N
 
 
 # --------------------------------------------------------------------------- #
-# TC-B102-FILE-03 — picking fills the field only (R-B102-FILE-003)
+# TC-B102-FILE-03 — picking fills the field only (R-B102-FILE.3)
 # --------------------------------------------------------------------------- #
 
 
 def test_tc_b102_file_03_project_pick_fills_field_only(tmp_path: Path) -> None:
-    """TC-B102-FILE-03 (R-B102-FILE-003, project source): picking the project
+    """TC-B102-FILE-03 (R-B102-FILE.3, project source): picking the project
     candidate ``prg.s19`` dismisses the chooser, writes ``prg.s19`` into
     ``#flow_ref`` and adds/replaces nothing; no import happens for a
     project-resident pick (ruling 1).
@@ -797,12 +797,12 @@ def test_tc_b102_file_03_edit_modal_browse_routes_back_to_the_host(tmp_path: Pat
 
 
 # --------------------------------------------------------------------------- #
-# TC-B102-FILE-04 — external import (R-B102-FILE-004 + ruling 4)
+# TC-B102-FILE-04 — external import (R-B102-FILE.4 + ruling 4)
 # --------------------------------------------------------------------------- #
 
 
 def test_tc_b102_file_04_external_import_via_chooser(tmp_path: Path, monkeypatch) -> None:
-    """TC-B102-FILE-04 (R-B102-FILE-004, 2/2): submitting ``calib.json``
+    """TC-B102-FILE-04 (R-B102-FILE.4, 2/2): submitting ``calib.json``
     through the chooser's external row copies it into
     ``<project>/external/``, writes ``external/calib.json`` into ``#flow_ref``,
     keeps the original, reports ``imported as external/calib.json`` and closes
@@ -928,7 +928,7 @@ def test_tc_b102_file_04_import_external_ref_link_sources(tmp_path: Path) -> Non
 
 
 # --------------------------------------------------------------------------- #
-# TC-B102-FILE-05 — no-project refusal (R-B102-FILE-005)
+# TC-B102-FILE-05 — no-project refusal (R-B102-FILE-005.1, R-B102-FILE-005.2)
 # --------------------------------------------------------------------------- #
 
 
@@ -971,12 +971,12 @@ def test_tc_b102_file_05_no_project_refusal(tmp_path: Path, monkeypatch, attempt
 
 
 # --------------------------------------------------------------------------- #
-# TC-B102-FILE-06 — unreadable external (R-B102-FILE-006)
+# TC-B102-FILE-06 — unreadable external (R-B102-FILE.6)
 # --------------------------------------------------------------------------- #
 
 
 def test_tc_b102_file_06_unreadable_external_refusal(tmp_path: Path, monkeypatch) -> None:
-    """TC-B102-FILE-06 (R-B102-FILE-006): an external path pointing at a
+    """TC-B102-FILE-06 (R-B102-FILE.6): an external path pointing at a
     missing file paints the exact ``External file not readable: dead.json``
     — the NAME, never the full path (ruling 8) — copies nothing and leaves
     the field unchanged.
@@ -1003,12 +1003,12 @@ def test_tc_b102_file_06_unreadable_external_refusal(tmp_path: Path, monkeypatch
 
 
 # --------------------------------------------------------------------------- #
-# TC-B102-FILE-07 — hostile names render literally (R-B102-FILE-007)
+# TC-B102-FILE-07 — hostile names render literally (R-B102-FILE.7)
 # --------------------------------------------------------------------------- #
 
 
 def test_tc_b102_file_07_hostile_names_render_literally(tmp_path: Path) -> None:
-    """TC-B102-FILE-07 (R-B102-FILE-007): a candidate filename carrying every
+    """TC-B102-FILE-07 (R-B102-FILE.7): a candidate filename carrying every
     markup token family paints as literal text in the chooser and in the
     card annotation — the safe_text payload verbatim, zero markup spans,
     zero control bytes.
