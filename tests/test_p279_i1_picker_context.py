@@ -371,11 +371,11 @@ def test_r_a2l_refresh_060_9_unmounted_patch_panel_forwards_no_context():
     assert panel._a2l_picker.definitions_source is None
 
 
-def _check_entry(a2l, context, signature):
+def _check_entry(a2l, context, signature, picker="check"):
     from s19_app.tui.app.file_load import A2LPickerSnapshot
 
     return A2LPickerSnapshot(
-        picker="check",
+        picker=picker,
         signature=signature,
         a2l_source=a2l,
         definitions=MappingProxyType({}),
@@ -424,6 +424,32 @@ def test_r_a2l_refresh_060_11_check_panel_mismatched_entry_bulk_population(tmp_p
         assert dict(panel._picker.definitions) == dict(eager.definitions)
 
     asyncio.run(_with_panel(tmp_path, "check", body))
+
+
+def test_r_a2l_refresh_037_patch_panel_mismatched_entry_gets_no_context(tmp_path, monkeypatch):
+    a2l = _parsed(D171)
+    rows = _rows(a2l)
+    measurable = [tag for tag in rows if isinstance(tag.get("address"), int)]
+    context = _context(a2l, rows)
+    eager = _eager(measurable, a2l)
+    key = (1, 2, 3)
+
+    async def body(app, pilot, panel):
+        app.current_a2l_data = a2l
+        monkeypatch.setattr(app, "_compute_a2l_enriched_tags", lambda: rows)
+        app._a2l_enriched_key = key
+        app._accepted_a2l_picker_snapshots = MappingProxyType(
+            {"patch": _check_entry(a2l, context, (9, 9, 9), picker="patch")}
+        )
+        app._prefill_patch_editor()
+        await pilot.pause()
+        assert panel.a2l_describe_context is None
+        assert dict(app._accepted_a2l_picker_snapshots) == {}
+        assert panel._a2l_picker.param_rows == eager.param_rows
+        assert panel._a2l_picker.fmt_longest == eager.fmt_longest
+        assert dict(panel._a2l_picker.definitions) == dict(eager.definitions)
+
+    asyncio.run(_with_panel(tmp_path, "patch", body))
 
 
 # ----------------------------------------------------------------------------- R-PE-DEF.11.1 / .11.2 (was R-A2L-REFRESH.061, withdrawn in I2)
