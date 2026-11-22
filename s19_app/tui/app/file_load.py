@@ -115,14 +115,14 @@ class A2LAttachResult:
 @dataclass(frozen=True)
 class A2LAttachSnapshot:
     """Inc 2 (I-ALP-2.2): the generation-bound, read-only hand-off of one
-    direct attach's post-parse work — enriched tags, summary lines and the
-    two independent picker bulk descriptions — built on the attach worker
-    before the install callback is dispatched.
+    direct attach's post-parse work — enriched tags, summary lines and one
+    describe context shared by both picker entries — built on the attach
+    worker before the install callback is dispatched.
 
     The recorded expected pair is the install preflight authority; the
     enrichment key is ``(expected_a2l_generation, expected_image_generation,
     mem_size)`` with ``mem_size=-1`` without an image. Parsed payloads and
-    :class:`Definition` objects are shared read-only after hand-off, never
+    the describe context are shared read-only after hand-off, never
     recursively frozen.
     """
 
@@ -987,8 +987,8 @@ class FileLoadMixin:
                     request.a2l_cache,
                     progress=self._progress_forwarder("a2l_load", request.gen, 2),
                 )
-                # Inc 2 (I-ALP-2.2): complete enrichment, summary and both
-                # picker bulk describes off the UI thread before dispatching
+                # Inc 2 (I-ALP-2.2): complete enrichment, summary and the one
+                # describe context off the UI thread before dispatching
                 # installation; the request-owned image mapping and expected
                 # pair are the only application inputs besides the parsed
                 # payload.
@@ -1039,8 +1039,9 @@ class FileLoadMixin:
             request-owned image mapping, derive the existing three-part
             enrichment key and measurable-name sequence, build one
             describe context over the measurable names, shared read-only by
-            both the Check and Patch pickers (R-A2L-REFRESH.058), and pack the whole hand-off into one frozen,
-            read-only snapshot before the install callback is dispatched.
+            both the Check and Patch pickers, and pack the whole hand-off into
+            one frozen, read-only snapshot before the install callback is
+            dispatched.
 
         Args:
             a2l_path (Path): The parsed source path, used only as explicit
@@ -1076,10 +1077,9 @@ class FileLoadMixin:
             - ``build_describe_context`` builds one read-only context over
               the measurable names; the ``check`` and ``patch``
               :class:`A2LPickerSnapshot` entries both hold that same context
-              and share one empty :class:`MappingProxyType` as definitions
-              (R-A2L-REFRESH.058). No bulk describe runs; both entries share
-              the exact ``a2l_data`` object as their source for identity
-              comparison.
+              and share one empty :class:`MappingProxyType` as definitions.
+              No bulk describe runs; both entries share the exact
+              ``a2l_data`` object as their source for identity comparison.
             - No request, admission state, widget, mounted state, session
               member or live generation is read here.
 

@@ -678,7 +678,7 @@ def test_r_a2l_refresh_078_one_width_measurement_per_distinct_text(monkeypatch, 
 @pytest.mark.parametrize(
     "arm, units, naive",
     [
-        ("control", ("a" + "" * 10, "ab"), lambda t: _raw_cells(t)),
+        ("control", ("a" + "\x07" * 10, "ab"), lambda t: _raw_cells(t)),
         ("wide", ("ｋｍｋｍ", "abcdef"), lambda t: len(t.rstrip())),
     ],
     ids=["control", "wide"],

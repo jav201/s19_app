@@ -737,3 +737,83 @@ def test_r_a2l_def_174_unit_edge_sections_equal_bulk(tmp_path):
     for name in data["measurable"]:
         got = (formats[name].datatype, formats[name].kind, formats[name].unit)
         assert got == _fmt(data["bulk"][name]), name
+
+
+# ----------------------------------------------------------------------------
+# R-A2L-DEF.169 / .174 - every committed A2L (the context is the only load path)
+# ----------------------------------------------------------------------------
+
+def _committed_a2l_paths() -> list:
+    import subprocess
+
+    out = subprocess.run(["git", "ls-files", "*.a2l"], cwd=REPO_ROOT, check=True,
+                         capture_output=True, text=True).stdout.split("\n")
+    return sorted(p for p in out if p and "case_06_" not in p)
+
+
+def _outcome(call):
+    try:
+        return "ok", call()
+    except Exception as exc:  # noqa: BLE001 - the comparison is "raises or not"
+        return "raised", type(exc).__name__
+
+
+def _context_vs_bulk_problems(context_run, bulk_run, names: list) -> list:
+    """Empty when the context agrees with the bulk describe on raise/no-raise,
+    on every name's format fields and on the first 200 names' definitions."""
+    mod = _definition_module()
+    built = _outcome(context_run)
+    bulk = _outcome(bulk_run)
+    if built[0] != bulk[0]:
+        return [f"context {built[0]} ({built[1]}) but bulk {bulk[0]} ({bulk[1]})"]
+    if built[0] == "raised":
+        return []
+    context, bulk_defs = built[1], bulk[1]
+    unique = list(dict.fromkeys(names))
+    problems = [f"format {n!r}" for n in unique
+                if n not in context.formats or _fmt(context.formats[n]) != _fmt(bulk_defs[n])]
+    head = unique[:200]
+    described = mod.describe_in_context(head, context)
+    problems += [f"definition {n!r}" for n in head if described.get(n) != bulk_defs[n]]
+    return problems
+
+
+@pytest.mark.parametrize("rel", _committed_a2l_paths())
+def test_r_a2l_def_169_context_matches_bulk_on_every_committed_a2l(rel):
+    """R-A2L-DEF.169/.174 differential: on every committed A2L (case_06 is
+    host-sized and covered by the host arms) the context build raises iff the
+    bulk describe raises, and otherwise agrees with it."""
+    from s19_app.tui.a2l import enrich_a2l_tags_with_values
+    from s19_app.tui.a2l_parse import parse_a2l_file
+
+    mod = _definition_module()
+    a2l = parse_a2l_file(REPO_ROOT / rel)
+    names = [t["name"] for t in enrich_a2l_tags_with_values(a2l, None)
+             if isinstance(t.get("address"), int)]
+    problems = _context_vs_bulk_problems(
+        lambda: mod.build_describe_context(a2l, names),
+        lambda: mod.describe_definitions(names, a2l),
+        names,
+    )
+    assert not problems, f"{rel}: {problems[:5]}"
+
+
+def test_r_a2l_def_169_control_committed_a2l_comparator_can_fail():
+    """R-A2L-DEF.169/.174 control: the differential rejects a context that
+    differs from the bulk describe and a raise on one side only."""
+    mod = _definition_module()
+    data = _corpus("d171")
+    names = data["measurable"]
+    good = lambda: mod.build_describe_context(data["a2l"], names)  # noqa: E731
+    bulk = lambda: mod.describe_definitions(names, data["a2l"])  # noqa: E731
+    assert _context_vs_bulk_problems(good, bulk, names) == []
+    other = _corpus("balance_tube")
+    swapped = lambda: mod.build_describe_context(other["a2l"], other["measurable"])  # noqa: E731
+    assert _context_vs_bulk_problems(swapped, bulk, names), "different A2L must be rejected"
+
+    def boom():
+        raise ValueError("synthetic")
+
+    assert _context_vs_bulk_problems(boom, bulk, names), "one-sided raise must be rejected"
+    assert _context_vs_bulk_problems(boom, boom, names) == [], "both raising agree"
+    assert len(_committed_a2l_paths()) >= 20, "the committed-A2L list is not empty"

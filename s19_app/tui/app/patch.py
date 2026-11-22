@@ -370,7 +370,9 @@ class PatchMixin:
 
         Data Flow:
             - ``_refuse_if_busy`` first (the Patch gate); no A2L → the
-              ``nothing staged`` status; else ``describe_definition`` fresh,
+              ``nothing staged`` status; else ``_describe_for_stage`` (the
+              Patch picker's describe context first; the full single-name
+              describe only on a missing, stale or failing context),
               ``ChangeService.stage_definition`` over ``_strip_source_map``,
               ``_report_change_result`` then one status line per notice;
               ok → ``PatchEditorPanel.note_staged(name)`` and
@@ -380,8 +382,9 @@ class PatchMixin:
 
         Dependencies:
             Uses:
-                - describe_definition / ChangeService.stage_definition /
-                  _strip_source_map / _report_change_result
+                - _describe_for_stage / describe_definition /
+                  ChangeService.stage_definition / _strip_source_map /
+                  _report_change_result
                 - PatchEditorPanel.note_staged
             Used by:
                 - Textual message dispatch for ``StagingSheet``

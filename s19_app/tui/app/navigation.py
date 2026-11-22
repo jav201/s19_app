@@ -1134,10 +1134,12 @@ class NavigationMixin:
               rule can reach ``#rail_slot`` (a sibling of ``#workspace_body``,
               not a descendant), and also on ``#workspace_body`` so the
               per-screen proportional-pane rules keep their existing selector.
+            - The compose sets the start classes itself. This method changes
+              only a class whose state differs and restyles the shell once
+              when one did.
 
         Dependencies:
             Used by:
-                - the compose, which sets the start classes
                 - ``on_resize``, which calls this on each resize
         """
         narrow = width < 120

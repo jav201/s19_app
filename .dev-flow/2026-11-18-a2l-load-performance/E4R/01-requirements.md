@@ -37,10 +37,10 @@ R-A2L-DEF.162–.165: "on the E1 reference host" → "on the reference host" (ru
 ## Slice (changed product files → rows)
 | File | Rows |
 |---|---|
-| `s19_app/tui/a2l_definition.py` | R-A2L-DEF.166, .167, .168; R-A2L-REFRESH.053 |
-| `s19_app/tui/app/file_load.py` | R-A2L-REFRESH.037, .051, .052, .054 |
+| `s19_app/tui/a2l_definition.py` | R-A2L-DEF.166, .167, .168; R-A2L-REFRESH.053; R-A2L-REFRESH.050 (FA-TICKb 7f2286db `release_in_slices`; FA-TICK4u 92fac5fe the builder returns its list and dict) |
+| `s19_app/tui/app/file_load.py` | R-A2L-REFRESH.037, .051, .052, .054; R-A2L-REFRESH.040, .049 (FA-TICKac d80749f4: fixed `description=` on the A2L attach and file load workers, no request `repr()` on the UI thread) |
 | `s19_app/tui/app/loaded_state.py` | R-A2L-REFRESH.052, .054 |
-| `s19_app/tui/app/project_load.py` | R-A2L-REFRESH.052, .054 |
+| `s19_app/tui/app/project_load.py` | R-A2L-REFRESH.052, .054; R-A2L-REFRESH.041, .050, .051 (FA-TICKac d80749f4: fixed `description=`; `gc.disable()` first in `_project_load_worker`, the refusal re-enables) |
 | `s19_app/tui/app/patch.py` | LLR-078.2 (C-7), R-A2L-REFRESH.037 |
 | `s19_app/tui/screens_directionb/patch_editor/a2l_picker.py` | LLR-078.2 (C-7), R-A2L-REFRESH.037 |
 | `.github/workflows/tui-ci.yml` | R-TST-011, R-TST-019, R-TST-026 |
