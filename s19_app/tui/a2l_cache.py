@@ -89,7 +89,7 @@ class _OverCap(Exception):
     pass
 
 
-class _ProgressRaised(Exception):
+class _FaultRaised(Exception):
     pass
 
 
@@ -386,24 +386,37 @@ def _read_exact(fd: int, count: int) -> bytes:
     return b"".join(parts)
 
 
+def _passed_on(work, *args):
+    try:
+        return work(*args)
+    except OSError:
+        raise
+    except Exception as exc:
+        raise _FaultRaised() from exc
+
+
+def _sha256_of(data: bytes) -> bytes:
+    return hashlib.sha256(data).digest()
+
+
 def _chunks(fd: int, count: int, size: int, progress):
     position = _HEADER.size
     for _ in range(count):
-        prefix = _read_exact(fd, _PREFIX.size)
+        prefix = _passed_on(_read_exact, fd, _PREFIX.size)
         if len(prefix) != _PREFIX.size:
             raise ValueError("chunk prefix cut")
         length, want = _PREFIX.unpack(prefix)
         if length > size - position - _PREFIX.size:
             raise ValueError("chunk runs past the end of the entry")
-        data = _read_exact(fd, length)
-        if len(data) != length or hashlib.sha256(data).digest() != want:
+        data = _passed_on(_read_exact, fd, length)
+        if len(data) != length or _passed_on(_sha256_of, data) != want:
             raise ValueError("chunk digest differs")
         position += _PREFIX.size + length
         if progress is not None:
             try:
                 progress(position, size)
             except Exception as exc:
-                raise _ProgressRaised() from exc
+                raise _FaultRaised() from exc
         yield data
     if position != size:
         raise ValueError("chunks do not end at the end of the entry")
@@ -425,7 +438,7 @@ def _decode_entry(fd: int, size: int, state: CacheOn, digest: bytes, progress) -
         parsed = decode_records(_chunks(fd, count, size, progress))
     except OSError:
         raise
-    except _ProgressRaised as exc:
+    except _FaultRaised as exc:
         raise exc.__cause__
     except Exception:
         return None
@@ -442,6 +455,10 @@ def _read_in(folder: _Dir, state: CacheOn, name: str, digest: bytes, progress) -
         return "absent", None, 0
     except _LinkMet:
         return _NOT_REGULAR, None, 0
+    except OSError as exc:
+        if exc.errno == errno.ELOOP:
+            return _NOT_REGULAR, None, 0
+        raise
     try:
         fst = os.fstat(fd)
         if (fst.st_dev, fst.st_ino) != (st.st_dev, st.st_ino):

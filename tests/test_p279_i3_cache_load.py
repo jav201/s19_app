@@ -11,7 +11,8 @@ the definitions fix (entry name, entry format); nothing is retyped from the impl
 (``s19_app.tui.a2l_cache``, ``s19_app.tui.a2l_cache_codec``) are reached lazily inside each test body, so the
 module collects on the base revision and each node fails on its own. Every test isolates ``LOCALAPPDATA``,
 ``XDG_CACHE_HOME`` and ``HOME`` to temporary folders outside ``tmp_path`` that hold no repository marker.
-Host arms H-1 .. H-7 (case_06) are not here.
+Host arms H-1 and H-2 (case_06, CACHE.052 and .053) are here as nodes skipped unless ``S19_P279_HOST_CASE06``
+names case_06's A2L; H-3 .. H-7 are not here.
 """
 
 from __future__ import annotations
@@ -463,9 +464,31 @@ def _setup_dir_entry(c) -> None:
     path.mkdir()
 
 
+def _setup_link_swapped_before_open(c) -> None:
+    """The entry is a regular file at the check; a link to a copy of it replaces the name right before the open."""
+    path = _valid_entry_path(c)
+    target = c.env.outside / path.name
+    shutil.copy2(path, target)
+    name = path.name
+
+    def install() -> None:
+        real_os_open = os.open
+
+        def os_open(p, flags, *a, **k):
+            if _is_name_path(p, name) and not flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT) and not path.is_symlink():
+                path.unlink()
+                os.symlink(target, path)
+            return real_os_open(p, flags, *a, **k)
+
+        c.mp.setattr(os, "open", os_open)
+
+    c.deferred.append(install)
+
+
 ENTRY_ARMS = [(f"damaged-{form}", _setup_damaged(form), "damaged") for form in DAMAGED_FORMS] + [
     ("link-to-valid-entry", _setup_link_entry, "not a regular file"),
     ("folder-of-entry-name", _setup_dir_entry, "not a regular file"),
+    ("link-swapped-before-open", _setup_link_swapped_before_open, "not a regular file"),
 ]
 
 
@@ -1181,7 +1204,8 @@ def test_r_a2l_cache_043_read_and_store_failures_log_the_class_name_only(tmp_pat
     """R-A2L-CACHE.041 + R-A2L-CACHE.042 + R-A2L-CACHE.043 + R-A2L-CACHE.035 (8 arms): exactly one read failed or write
     failed line carrying the exception class name only (never the exception text, which names a path), a store
     failure logs no stored line, leaves no temporary file, the parser ran once and the load completed; a read
-    failure logs no miss line (E4-3: whether a usable entry holds the name is unknown)."""
+    failure is followed by exactly one miss line with the A2L file size (CACHE.034: no usable entry served the
+    load; E5 E4-3-G1 option b)."""
     res = _run_fault(tmp_path_factory, log, arm_id, prime)
     matching = [l for l in res.lines if regex.match(l)]
     assert len(matching) == 1 and regex.match(matching[0]).group(1) == cls, res.lines
@@ -1193,7 +1217,10 @@ def test_r_a2l_cache_043_read_and_store_failures_log_the_class_name_only(tmp_pat
     assert not any(".tmp-" in n for n in names), names
     if regex is F_READ_FAILED:
         assert res.after == res.before, "a read failure changed the cache folder"
-        assert [l for l in res.lines if F_MISS.match(l)] == [], res.lines
+        misses = [l for l in res.lines if F_MISS.match(l)]
+        assert len(misses) == 1, res.lines
+        assert res.lines.index(matching[0]) < res.lines.index(misses[0])
+        assert int(F_MISS.match(misses[0]).group(1)) == CASE01_A2L.stat().st_size
 
 
 @pytest.mark.parametrize("arm_id,prime,regex,cls", OTHER_ARMS, ids=[a[0] for a in OTHER_ARMS])
@@ -1474,6 +1501,111 @@ def test_r_a2l_cache_051_ui_ticks_stay_within_100ms_during_cache_work(tmp_path, 
         assert inside, "no tick fell inside the cache spans of the largest committed file: the arm would be vacuous"
     print(f"R-A2L-CACHE.051 {route}/{name}/{'warm' if warm else 'cold'}: spans={len(spans)} "
           f"span_ms={sum(e - s for s, e in spans) * 1000:.1f} ticks_inside={len(inside)} ticks_total={len(ticks.observations)}")
+
+
+HOST_CASE06_ENV = "S19_P279_HOST_CASE06"
+
+
+def _host_case06() -> Path:
+    """The case_06 A2L a host arm is given through ``S19_P279_HOST_CASE06``; without it the node skips."""
+    raw = os.environ.get(HOST_CASE06_ENV, "")
+    if not raw:
+        pytest.skip(f"host arm on case_06: set {HOST_CASE06_ENV} to its A2L path (reference host only)")
+    path = Path(raw)
+    assert path.is_file(), f"{HOST_CASE06_ENV} names no file"
+    return path
+
+
+class _StepClock:
+    """Times every call of the seam ``parse_a2l_cached`` (the parse step) and of the hit-payload rebuild."""
+
+    def __init__(self, mp) -> None:
+        deps = _deps()
+        self.steps: list = []
+        self.rebuilds: list = []
+        self.parse = _Parse(mp)
+        mp.setattr(deps, "parse_a2l_cached", self._timed(deps.parse_a2l_cached, self.steps))
+        if hasattr(deps, "_hit_payload"):
+            mp.setattr(deps, "_hit_payload", self._timed(deps._hit_payload, self.rebuilds))
+
+    @staticmethod
+    def _timed(real, sink: list):
+        def timed(*a, **k):
+            started = time.perf_counter()
+            try:
+                return real(*a, **k)
+            finally:
+                sink.append(time.perf_counter() - started)
+
+        return timed
+
+    def reset(self) -> None:
+        self.steps.clear()
+        self.rebuilds.clear()
+        self.parse.calls.clear()
+
+
+def _host_run(tmp_path: Path, env, clock: _StepClock, route: str, a2l: Path, *, warm: bool, label: str):
+    """One load of ``a2l`` on ``route`` in a fresh app (no in-memory entry) under its own cache base, stored
+    first through the seam when ``warm``; the cache base is deleted before returning."""
+    base = env.tpf.mktemp("xdgh")
+    os.chmod(base, 0o700)
+    env.mp.setenv("XDG_CACHE_HOME", str(base))
+    folder = base / "s19_app" / "a2l"
+    try:
+        if warm:
+            _seam(a2l)
+            assert folder.is_dir() and any(folder.iterdir()), f"{label}: the warm-up stored no entry"
+        clock.reset()
+        res = _run_route(tmp_path / label, env.mp, env, route, a2l)
+        _assert_ok(res, route)
+        assert len(clock.steps) == 1, f"{label}: {len(clock.steps)} parse steps in one load"
+        stored = folder.is_dir() and any(folder.iterdir())
+        return SimpleNamespace(step=clock.steps[0], parses=len(clock.parse.calls), rebuild=sum(clock.rebuilds),
+                               stored=stored)
+    finally:
+        shutil.rmtree(base, ignore_errors=True)
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_cache_052_host_case_06_hit_parse_step_within_3s(tmp_path, env, monkeypatch) -> None:
+    """R-A2L-CACHE.052 (host arm H-1; skipped unless ``S19_P279_HOST_CASE06`` names case_06's A2L): with a usable
+    entry and no in-memory entry, the parse step (the seam call on the load's worker) on the pair and attach routes
+    has a median of 3 runs <= 3.0 s and no run >= 4.0 s; each run has its own cache base, deleted after it."""
+    a2l = _host_case06()
+    clock = _StepClock(monkeypatch)
+    runs = {route: [_host_run(tmp_path, env, clock, route, a2l, warm=True, label=f"h1-{route}-{i}") for i in range(3)]
+            for route in ("project-pair", "attach")}
+    for route, rs in runs.items():
+        print(f"R-A2L-CACHE.052 {route}: step_s={[round(r.step, 3) for r in rs]} "
+              f"rebuild_s={[round(r.rebuild, 3) for r in rs]} parses={[r.parses for r in rs]}")
+    for route, rs in runs.items():
+        assert [r.parses for r in rs] == [0, 0, 0], f"{route}: a load with a usable entry parsed"
+        steps = [r.step for r in rs]
+        median = statistics.median(steps)
+        assert median <= report_margin(f"CACHE.052 {route} median", median, timing_bound(3.0)), (route, steps)
+        assert max(steps) < timing_bound(4.0), (route, steps)
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_cache_053_host_case_06_cold_store_costs_at_most_1_5s(tmp_path, env, monkeypatch) -> None:
+    """R-A2L-CACHE.053 (host arm H-2; skipped unless ``S19_P279_HOST_CASE06`` names case_06's A2L): the cold parse
+    step on the pair route with the cache setting on is at most 1.5 s longer than with it off, median of 3 runs
+    each (interleaved); every run, the off runs included, has its own cache base, deleted after it."""
+    a2l = _host_case06()
+    clock = _StepClock(monkeypatch)
+    on, off = [], []
+    for i in range(3):
+        monkeypatch.delenv("S19_A2L_CACHE", raising=False)
+        on.append(_host_run(tmp_path, env, clock, "project-pair", a2l, warm=False, label=f"h2-on-{i}"))
+        monkeypatch.setenv("S19_A2L_CACHE", "off")
+        off.append(_host_run(tmp_path, env, clock, "project-pair", a2l, warm=False, label=f"h2-off-{i}"))
+    monkeypatch.delenv("S19_A2L_CACHE", raising=False)
+    print(f"R-A2L-CACHE.053 pair: on_s={[round(r.step, 3) for r in on]} off_s={[round(r.step, 3) for r in off]}")
+    assert [r.parses for r in on + off] == [1] * 6, "a cold load did not parse exactly once"
+    assert all(r.stored for r in on) and not any(r.stored for r in off), "the on runs must store and the off runs not"
+    delta = statistics.median(r.step for r in on) - statistics.median(r.step for r in off)
+    assert delta <= report_margin("CACHE.053 pair on minus off", delta, timing_bound(1.5)), (on, off)
 
 
 def test_r_a2l_cache_049_progress_rises_in_proportion_to_the_entry_bytes_read(tmp_path, env, monkeypatch) -> None:

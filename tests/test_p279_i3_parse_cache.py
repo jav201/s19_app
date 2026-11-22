@@ -1527,13 +1527,9 @@ def test_r_a2l_cache_038_a_link_swapped_in_between_the_check_and_the_open_is_nev
             swapped.append(True)
 
     os_spy.hooks["open"] = swap
-    try:
-        result = mod.read_entry(state, name, digest)
-        outcome = result.outcome
-    except OSError:
-        outcome = "oserror"
+    result = mod.read_entry(state, name, digest)
     assert swapped, "the swap seam never ran: the entry was not opened by its name"
-    assert outcome in ("not a regular file", "oserror")
+    assert result.outcome == "not a regular file"
     assert os.path.islink(state.folder / name)
     assert target.read_bytes() == data
 
@@ -1580,6 +1576,33 @@ def test_r_a2l_cache_041_a_read_fault_on_the_third_chunk_raises_and_leaves_the_f
     os_spy.hooks.clear()
     assert len(count) >= 4, "the entry was not read through os.read"
     assert _tree_snapshot(Path(cenv["XDG_CACHE_HOME"])) == before
+
+
+def test_r_a2l_cache_046_055_memory_error_in_the_chunk_read_propagates_and_keeps_the_entry(cenv, monkeypatch):
+    """R-A2L-CACHE.046 + R-A2L-CACHE.055 (E5 F-1): a ``MemoryError`` raised by the read of the second chunk is not
+    a damaged entry: it reaches the caller of ``read_entry`` as itself and the valid entry stays byte-equal."""
+    mod = _store()
+    state = _state(cenv)
+    digest = _digest("memory-error")
+    name = mod.entry_name(digest, state.fingerprint)
+    items = [("sections", []), ("errors", []), ("tags", []), ("declared_spans", [])]
+    datas = [_record((), 0, items)] + [_record(("tags",), 1, [_tag(i)]) for i in range(5)]
+    _ensure_folders(state)
+    path = _write_entry(state, name, _build_entry(digest, state.fingerprint, datas))
+    data = path.read_bytes()
+    real, calls = mod._read_exact, []
+
+    def faulty(fd, count):
+        calls.append(count)
+        if len(calls) == 4:
+            raise MemoryError()
+        return real(fd, count)
+
+    monkeypatch.setattr(mod, "_read_exact", faulty)
+    with pytest.raises(MemoryError):
+        mod.read_entry(state, name, digest)
+    assert len(calls) == 4, "the fault did not land in the second chunk's read"
+    assert path.read_bytes() == data
 
 
 # ---------------------------------------------------------------------------

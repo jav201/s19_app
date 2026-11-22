@@ -103,6 +103,12 @@ def _hit_payload(path: Path, stored: dict) -> dict:
     }
 
 
+def _log_miss(size: int, hash_seconds: float) -> None:
+    _LOG.info(
+        "A2L parse cache miss: file_bytes=%d hash_seconds=%.3f", size, hash_seconds
+    )
+
+
 def _read_stage(path: Path, state, progress):
     """Look the load up in the disk cache: ``(payload, None)`` for a hit,
     ``(None, plan)`` when the parse may be stored afterwards, else
@@ -115,6 +121,7 @@ def _read_stage(path: Path, state, progress):
         result = _held(a2l_cache.read_entry, state, name, digest, progress)
     except OSError as exc:
         _LOG.info("A2L parse cache read failed: %s.", type(exc).__name__)
+        _log_miss(size, hash_seconds)
         return None, None
     if result.outcome == "hit":
         payload = _hit_payload(path, result.stored_parse)
@@ -126,9 +133,7 @@ def _read_stage(path: Path, state, progress):
         return payload, None
     if result.outcome != "absent":
         _LOG.info("A2L parse cache entry unusable: %s.", result.outcome)
-    _LOG.info(
-        "A2L parse cache miss: file_bytes=%d hash_seconds=%.3f", size, hash_seconds
-    )
+    _log_miss(size, hash_seconds)
     if result.outcome == "not a regular file":
         return None, None
     return None, (state, name, digest, size, mtime_ns)
