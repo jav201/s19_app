@@ -10,7 +10,7 @@ from pathlib import Path
 import stat
 import time
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Any, Callable, Optional, Tuple
 from textual.widgets import Label, ListItem
 from ...core import S19File
 from ...hexfile import IntelHexFile
@@ -78,7 +78,7 @@ _PAYLOAD_DERIVED_KEYS = (
 )
 
 
-def _held(work, *args):
+def _held(work: Callable[..., Any], *args: Any) -> Any:
     """Run ``work(*args)`` with the cyclic collector off, then restore the
     state the caller had."""
     was_enabled = gc.isenabled()
@@ -109,7 +109,9 @@ def _log_miss(size: int, hash_seconds: float) -> None:
     )
 
 
-def _read_stage(path: Path, state, progress):
+def _read_stage(
+    path: Path, state: a2l_cache.CacheOn, progress: Optional[A2LProgress]
+):
     """Look the load up in the disk cache: ``(payload, None)`` for a hit,
     ``(None, plan)`` when the parse may be stored afterwards, else
     ``(None, None)``."""
@@ -153,7 +155,11 @@ def _lookup(path: Path, progress):
         return None, None
 
 
-def _store_stage(path: Path, data: dict, plan) -> None:
+def _store_stage(
+    path: Path,
+    data: dict,
+    plan: tuple[a2l_cache.CacheOn, str, bytes, int, int],
+) -> None:
     """Store the parse unless the A2L changed during it."""
     state, name, digest, size, mtime_ns = plan
     now = os.stat(path)

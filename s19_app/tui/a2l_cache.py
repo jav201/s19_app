@@ -14,7 +14,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Mapping, Optional
+from typing import TYPE_CHECKING, Any, Callable, Iterator, Mapping, Optional
 
 from s19_app.tui.a2l_cache_codec import decode_records, encode_records
 from s19_app.tui.workspace import _DRIVE_ROOTED_RE, _path_traverses_reparse_point
@@ -110,6 +110,26 @@ def _parser_source() -> Optional[bytes]:
 
 
 def parser_fingerprint() -> Optional[bytes]:
+    """
+    Summary:
+        The 32-byte fingerprint of the parser: the cache format version, the
+        SHA-256 of ``a2l.py`` and the Python major.minor, hashed once and kept
+        for the process.
+
+    Returns:
+        Optional[bytes]: The fingerprint, or ``None`` when the parser source is
+            unreadable (the cache is then off).
+
+    Data Flow:
+        - The first call reads ``a2l.py`` and stores the result in ``_FINGERPRINT``.
+        - Later calls return the stored value, ``None`` included.
+
+    Dependencies:
+        Uses:
+            - ``_parser_source``
+        Used by:
+            - ``cache_state``
+    """
     if not _FINGERPRINT:
         source = _parser_source()
         if source is None:
@@ -122,6 +142,29 @@ def parser_fingerprint() -> Optional[bytes]:
 
 
 def content_digest(path: Path) -> tuple[bytes, int, int]:
+    """
+    Summary:
+        SHA-256 of a file's bytes with its size and mtime, the stat taken
+        before the read.
+
+    Args:
+        path (Path): The file to digest.
+
+    Returns:
+        tuple[bytes, int, int]: ``(digest, size, mtime_ns)``.
+
+    Raises:
+        OSError: The file cannot be stat-ed or read.
+
+    Data Flow:
+        - ``os.stat`` first, then 1 MiB blocks into one SHA-256.
+
+    Dependencies:
+        Uses:
+            - ``hashlib``
+        Used by:
+            - ``deps._read_stage`` / ``deps._store_stage`` (the re-digest)
+    """
     st = os.stat(path)
     sha = hashlib.sha256()
     with open(path, "rb") as handle:
@@ -131,6 +174,27 @@ def content_digest(path: Path) -> tuple[bytes, int, int]:
 
 
 def entry_name(digest: bytes, fingerprint: bytes) -> str:
+    """
+    Summary:
+        The entry's file name: the hex SHA-256 of the content digest followed by
+        the parser fingerprint, so a changed file or parser names a new entry.
+
+    Args:
+        digest (bytes): The content digest of the A2L file.
+        fingerprint (bytes): The parser fingerprint.
+
+    Returns:
+        str: 64 lower-case hex characters.
+
+    Data Flow:
+        - ``sha256(digest + fingerprint).hexdigest()``.
+
+    Dependencies:
+        Uses:
+            - ``hashlib``
+        Used by:
+            - ``deps._read_stage``
+    """
     return hashlib.sha256(digest + fingerprint).hexdigest()
 
 
@@ -231,6 +295,35 @@ def _is_nt(platform: Optional[str]) -> bool:
 
 
 def cache_state(env: Optional[Mapping[str, str]] = None, platform: Optional[str] = None) -> CacheOn | CacheOff:
+    """
+    Summary:
+        Decide whether the cache is on, from the environment at call time.
+        Creates nothing.
+
+    Args:
+        env (Optional[Mapping[str, str]]): Environment; ``None`` is ``os.environ``.
+        platform (Optional[str]): ``"nt"`` for the Windows rules, any other value
+            for the Linux rules; ``None`` is ``os.name``.
+
+    Returns:
+        CacheOn | CacheOff: ``CacheOn`` with the folder, base, size cap and
+            fingerprint, else ``CacheOff`` with one of ``OFF_REASONS``.
+
+    Data Flow:
+        - ``S19_A2L_CACHE`` words: ``off`` gives ``"setting"``, an unknown word
+          gives ``"setting not recognised"``.
+        - The folder comes from ``LOCALAPPDATA`` (Windows) or ``XDG_CACHE_HOME`` /
+          ``~/.cache`` (Linux) and must exist, hold no link, lie outside a
+          repository or work area and (Linux) be private.
+        - The parser fingerprint and ``S19_A2L_CACHE_MAX_MB`` complete the state.
+        - An ``OSError`` of the folder checks is ``"no cache folder"``.
+
+    Dependencies:
+        Uses:
+            - ``_setting_word``, ``_find_folder``, ``parser_fingerprint``, ``_size_cap``
+        Used by:
+            - ``deps._lookup``
+    """
     env = os.environ if env is None else env
     word = _setting_word(env.get("S19_A2L_CACHE"))
     if word == "off":
@@ -386,7 +479,32 @@ def _read_exact(fd: int, count: int) -> bytes:
     return b"".join(parts)
 
 
-def _passed_on(work, *args):
+def _passed_on(work: Callable[..., Any], *args: Any) -> Any:
+    """
+    Summary:
+        Run ``work(*args)``: an ``OSError`` passes as it is, any other exception
+        is wrapped in ``_FaultRaised`` so a decode fault stays apart from a read
+        fault.
+
+    Args:
+        work (Callable[..., Any]): The call.
+        *args (Any): Its arguments.
+
+    Returns:
+        Any: What ``work`` returns.
+
+    Raises:
+        _FaultRaised: ``work`` raised something other than ``OSError``.
+
+    Data Flow:
+        - Call, let ``OSError`` through, wrap the rest with ``from exc``.
+
+    Dependencies:
+        Uses:
+            - ``_FaultRaised``
+        Used by:
+            - ``_chunks``
+    """
     try:
         return work(*args)
     except OSError:
@@ -396,10 +514,29 @@ def _passed_on(work, *args):
 
 
 def _sha256_of(data: bytes) -> bytes:
+    """
+    Summary:
+        The SHA-256 digest of ``data``.
+
+    Args:
+        data (bytes): The bytes to hash.
+
+    Returns:
+        bytes: 32 bytes.
+
+    Data Flow:
+        - ``hashlib.sha256(data).digest()``.
+
+    Dependencies:
+        Uses:
+            - ``hashlib``
+        Used by:
+            - ``_chunks`` (through ``_passed_on``)
+    """
     return hashlib.sha256(data).digest()
 
 
-def _chunks(fd: int, count: int, size: int, progress):
+def _chunks(fd: int, count: int, size: int, progress: Optional["A2LProgress"]) -> Iterator[bytes]:
     position = _HEADER.size
     for _ in range(count):
         prefix = _passed_on(_read_exact, fd, _PREFIX.size)
@@ -427,7 +564,7 @@ def _shape_ok(parsed: object) -> bool:
     return isinstance(parsed, dict) and all(isinstance(parsed.get(key), list) for key in keys)
 
 
-def _decode_entry(fd: int, size: int, state: CacheOn, digest: bytes, progress) -> Optional[dict]:
+def _decode_entry(fd: int, size: int, state: CacheOn, digest: bytes, progress: Optional["A2LProgress"]) -> Optional[dict]:
     if size < _HEADER.size:
         return None
     magic, version, h_digest, h_print, count, body = _HEADER.unpack(_read_exact(fd, _HEADER.size))
@@ -445,7 +582,7 @@ def _decode_entry(fd: int, size: int, state: CacheOn, digest: bytes, progress) -
     return parsed if _shape_ok(parsed) else None
 
 
-def _read_in(folder: _Dir, state: CacheOn, name: str, digest: bytes, progress) -> tuple[str, Optional[dict], int]:
+def _read_in(folder: _Dir, state: CacheOn, name: str, digest: bytes, progress: Optional["A2LProgress"]) -> tuple[str, Optional[dict], int]:
     try:
         st = folder.lstat(name)
         if not stat.S_ISREG(st.st_mode):
@@ -476,6 +613,41 @@ def _read_in(folder: _Dir, state: CacheOn, name: str, digest: bytes, progress) -
 
 
 def read_entry(state: CacheOn, name: str, digest: bytes, progress: Optional["A2LProgress"] = None) -> ReadResult:
+    """
+    Summary:
+        Read and decode one cache entry. An absent or damaged entry is a result,
+        not an exception; a damaged entry is deleted before the call returns.
+
+    Args:
+        state (CacheOn): The cache that is on.
+        name (str): The entry file name (``entry_name``).
+        digest (bytes): The content digest the entry must carry.
+        progress (Optional[A2LProgress]): Called as ``progress(done, total)`` after
+            each chunk.
+
+    Returns:
+        ReadResult: ``outcome`` is ``"hit"`` (``stored_parse`` set), ``"absent"``,
+            ``"damaged"`` or ``"not a regular file"``, with the entry size and the
+            seconds spent.
+
+    Raises:
+        OSError: A read fault, a folder chain that meets a link, or a folder that
+            is not private; the folder is left unchanged.
+
+    Data Flow:
+        - Open the folder chain; lstat the entry (regular file, no link) and open it.
+        - Check the header, then per chunk its length and SHA-256 before decoding;
+          the chunks must end exactly at the end of the file.
+        - The decoded parse must hold lists under ``sections``, ``errors``, ``tags``
+          and ``declared_spans``.
+        - A hit sets the entry's mtime to now; a failed touch is ignored.
+
+    Dependencies:
+        Uses:
+            - ``_Dir``, ``_read_in``, ``_decode_entry``, ``decode_records``
+        Used by:
+            - ``deps._read_stage`` (through ``_held``)
+    """
     started = time.perf_counter()
     try:
         folder = _Dir.open(state)
@@ -566,6 +738,39 @@ def _evict_in(folder: _Dir, state: CacheOn, keep: str) -> tuple[int, int]:
 
 
 def store_entry(state: CacheOn, name: str, digest: bytes, stored_parse: dict) -> StoreResult:
+    """
+    Summary:
+        Write one cache entry and evict to the size cap. A previous entry of the
+        same name is unchanged on any failure.
+
+    Args:
+        state (CacheOn): The cache that is on.
+        name (str): The entry file name.
+        digest (bytes): The content digest of the A2L file.
+        stored_parse (dict): The parse to store, without the derived name maps.
+
+    Returns:
+        StoreResult: ``outcome`` is ``"stored"`` or ``"entry larger than the size
+            cap"``, with the entry size, the seconds spent and the files and bytes
+            evicted.
+
+    Raises:
+        OSError: A file or folder fault, or a folder that is not private.
+        ValueError: The parse is not marshallable or holds a too-large tuple.
+
+    Data Flow:
+        - Create the app folders (0700 on Linux) and re-check their owner and mode.
+        - Stream the records into ``<name>.tmp-<16 hex>``; abort past the size cap.
+        - One ``os.replace`` onto ``<name>``; then remove stale temporary files and
+          the oldest other entries until the total is within the cap.
+        - On failure the temporary file is removed and the exception propagates.
+
+    Dependencies:
+        Uses:
+            - ``_Dir``, ``_write_entry``, ``_evict``, ``encode_records``
+        Used by:
+            - ``deps._store_stage`` (through ``_held``)
+    """
     started = time.perf_counter()
     folder = _Dir.open(state, create=True)
     try:
@@ -594,6 +799,34 @@ def _clear_in(folder: _Dir) -> ClearResult:
 
 
 def clear_cache(env: Optional[Mapping[str, str]] = None, platform: Optional[str] = None) -> ClearResult | CacheOff:
+    """
+    Summary:
+        Delete every entry and temporary file of the cache folder, of every
+        fingerprint, for the ``--clear-a2l-cache`` start option. The cache
+        setting is not consulted; foreign files and links are never touched.
+
+    Args:
+        env (Optional[Mapping[str, str]]): Environment; ``None`` is ``os.environ``.
+        platform (Optional[str]): As for ``cache_state``.
+
+    Returns:
+        ClearResult | CacheOff: Files and bytes deleted and files that could not be
+            (a missing folder is ``ClearResult(0, 0, 0)``); ``CacheOff`` for an
+            unusable folder, with the reason.
+
+    Data Flow:
+        - Find the folder by the same rules as ``cache_state``.
+        - Open it once, then unlink each entry relative to that handle (Windows:
+          reparse check before each unlink).
+        - ``PermissionError`` is ``"cache folder not private"``; a link or
+          non-directory is ``"cache folder is a link"``.
+
+    Dependencies:
+        Uses:
+            - ``_find_folder``, ``_Dir``, ``_clear_in``
+        Used by:
+            - ``core.main`` (``--clear-a2l-cache``)
+    """
     env = os.environ if env is None else env
     windows = _is_nt(platform)
     try:

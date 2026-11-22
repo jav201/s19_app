@@ -51,6 +51,37 @@ def _placeholder(value: Any) -> Any:
 
 
 def encode_records(stored_parse: dict, bound: int = CHUNK_BOUND) -> Iterator[bytes]:
+    """
+    Summary:
+        Yield the stored parse as an ordered stream of marshal records, each
+        at most ``bound`` bytes unless it holds a single str or bytes.
+
+    Args:
+        stored_parse (dict): The parse to store: dicts (str keys), lists, tuples,
+            str, bytes, int, float, bool and None only.
+        bound (int): Largest record size in bytes; round-trip needs 1,024 or more.
+
+    Returns:
+        Iterator[bytes]: The marshal bytes of ``(path, kind, items)``, one record
+            per item; a split container shows as an empty placeholder in its parent
+            and is filled by later records naming its path.
+
+    Raises:
+        ValueError: A tuple whose marshal is larger than ``bound`` (a tuple is
+            never split).
+
+    Data Flow:
+        - The root is always opened; so is every dict or list of more than 1,024
+          items and every branch section, by length probes, never a trial dump.
+        - Slices of at most 1,024 items are dumped and halved until each fits.
+        - Opened children follow their parent's records, depth first.
+
+    Dependencies:
+        Uses:
+            - ``marshal.dumps``; the ``_emit`` / ``_slice`` / ``_split`` helpers
+        Used by:
+            - ``a2l_cache._write_entry`` (streams the records into an entry file)
+    """
     yield from _emit(stored_parse, (), bound)
 
 
@@ -107,6 +138,34 @@ def _single(kind: int, entry: Any, base: int, path: tuple, bound: int) -> Iterat
 
 
 def decode_records(chunks: Iterable[bytes]) -> dict:
+    """
+    Summary:
+        Rebuild the stored parse from its records: the inverse of
+        ``encode_records``, one ``marshal.loads`` per chunk.
+
+    Args:
+        chunks (Iterable[bytes]): The record bytes, in the order written.
+
+    Returns:
+        dict: The stored parse; values keep their types and the order of dict keys
+            and list items is kept.
+
+    Raises:
+        RecordDamaged: A chunk is not marshal data (code objects refused on
+            Python 3.13+), or a record does not fit the records before it.
+
+    Data Flow:
+        - Each chunk is loaded and applied to the container its path names.
+        - Nothing decoded is imported, evaluated or called.
+        - Any ``TypeError`` / ``KeyError`` / ``IndexError`` / ``AttributeError`` of
+          applying a record becomes ``RecordDamaged``.
+
+    Dependencies:
+        Uses:
+            - ``_loads`` and ``_apply`` of this module
+        Used by:
+            - ``a2l_cache._decode_entry`` (fed by ``_chunks``)
+    """
     root: dict = {}
     for chunk in chunks:
         record = _loads(chunk)
