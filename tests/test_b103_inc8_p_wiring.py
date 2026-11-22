@@ -140,17 +140,42 @@ def _spy_describes(monkeypatch) -> list[str]:
     return calls
 
 
+def _spy_context_describes(monkeypatch) -> list[tuple]:
+    """The names of every ``describe_in_context`` call, in call order."""
+    calls: list[tuple] = []
+    for module in list(sys.modules.values()):
+        if not getattr(module, "__name__", "").startswith("s19_app"):
+            continue
+        original = getattr(module, "describe_in_context", None)
+        if callable(original):
+
+            def counted(names, context, _original=original):
+                names = list(names)
+                calls.append(tuple(names))
+                return _original(names, context)
+
+            monkeypatch.setattr(module, "describe_in_context", counted)
+    return calls
+
+
 def test_r_pe_def_11_2_a_page_turn_and_a_filter_change_describe_nothing(tmp_path, monkeypatch):
+    """R-PE-DEF.11.2: a page turn and a filter change build the sheet rows with 0 full
+    describes and exactly 1 context describe per new page, holding that page's names."""
     a2l = tmp_path / "many.a2l"
     build_many_names_a2l(a2l, 201)
 
     async def body(app, pilot, panel):
         calls = _spy_describes(monkeypatch)
+        in_context = _spy_context_describes(monkeypatch)
         assert await pilot.click("#patch_param_page_next_button")
         await settle(pilot, 8)
+        page_two = tuple(names_of(_picker(panel).visible_params))
         await _set_filter(pilot, panel, "PNAME_00")
-        assert names_of(_picker(panel).visible_params), "the filter must still list rows"
+        filtered = tuple(names_of(_picker(panel).visible_params))
+        assert filtered, "the filter must still list rows"
         assert calls == [], f"a page change described {calls}"
+        assert page_two and filtered != page_two
+        assert in_context == [page_two, filtered], (in_context, page_two, filtered)
         assert any("PNAME_00" in line for line in body_rows(app)), "the sheet did repaint"
 
     drive(tmp_path, SIZE, body, a2l=a2l)

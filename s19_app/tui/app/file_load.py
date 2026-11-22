@@ -18,7 +18,6 @@ from ..a2l_definition import (
     DescribeContext,
     Definition,
     build_describe_context,
-    describe_definitions,
 )
 from ..mac import parse_mac_file
 from ..models import LoadedFile
@@ -138,10 +137,11 @@ class A2LAttachSnapshot:
 
 @dataclass(frozen=True)
 class A2LPickerSnapshot:
-    """Inc 2 (I-ALP-2.2): one picker's read-only bulk-describe hand-off for
-    an accepted direct attach — its literal picker key, the full enrichment
-    signature, the exact A2L source object for identity comparison and that
-    picker's own read-only definitions mapping.
+    """Inc 2 (I-ALP-2.2): one picker's read-only hand-off for an accepted
+    direct attach — its literal picker key, the full enrichment signature,
+    the exact A2L source object for identity comparison, the generation's
+    describe context and a read-only definitions mapping that is empty on
+    every product route.
     """
 
     picker: str
@@ -149,22 +149,6 @@ class A2LPickerSnapshot:
     a2l_source: dict
     definitions: Mapping[str, Definition]
     describe_context: Optional[DescribeContext] = None
-
-
-def _selected_describe_path(logger: Any) -> str:
-    """``lazy`` only for the exact value of ``S19_A2L_DESCRIBE``; read at
-    each call. Any other set value logs one fixed line (never the value)
-    and selects ``eager``."""
-    value = deps.os.environ.get("S19_A2L_DESCRIBE")
-    if value is None or value == "eager":
-        return "eager"
-    if value == "lazy":
-        return "lazy"
-    logger.info(
-        "A2L describe path: unrecognised S19_A2L_DESCRIBE value ignored; "
-        "eager used."
-    )
-    return "eager"
 
 
 @dataclass(frozen=True)
@@ -1053,10 +1037,9 @@ class FileLoadMixin:
             The Inc 2 (I-ALP-2.2) route-neutral producer: run the existing
             enrichment/summary service once over the parsed payload and the
             request-owned image mapping, derive the existing three-part
-            enrichment key and measurable-name sequence, describe every
-            measurable name once in one bulk describe shared read-only by
-            both the Check and Patch pickers (R-A2L-REFRESH.037 E4R /
-            operator D10), and pack the whole hand-off into one frozen,
+            enrichment key and measurable-name sequence, build one
+            describe context over the measurable names, shared read-only by
+            both the Check and Patch pickers (R-A2L-REFRESH.058), and pack the whole hand-off into one frozen,
             read-only snapshot before the install callback is dispatched.
 
         Args:
@@ -1076,7 +1059,7 @@ class FileLoadMixin:
                 and the independent read-only Check/Patch picker entries.
 
         Raises:
-            Exception: Any enrichment, summary or definition-describe
+            Exception: Any enrichment, summary or describe-context
                 failure propagates to the worker's existing attach-failure
                 route; no partial snapshot is returned or dispatched.
 
@@ -1090,24 +1073,19 @@ class FileLoadMixin:
             - Measurable names are the enriched tags with an integer
               address, in enrichment order — the same sequence the prefill
               seams hand to the pickers.
-            - On the eager path (``S19_A2L_DESCRIBE`` unset or any value
-              other than ``lazy``) ``describe_definitions`` runs once over
-              that same full name sequence and its result is wrapped in one
-              :class:`MappingProxyType` shared read-only by both the
-              ``check`` and ``patch`` :class:`A2LPickerSnapshot` entries
-              (R-A2L-REFRESH.037 E4R / operator D10); both entries also
-              share the exact ``a2l_data`` object as their source for
-              identity comparison.
-            - On the lazy path (the value is exactly ``lazy``) no bulk
-              describe runs: ``build_describe_context`` builds one
-              read-only context, the entries carry empty definitions and
-              both hold that same context (R-A2L-REFRESH.058).
+            - ``build_describe_context`` builds one read-only context over
+              the measurable names; the ``check`` and ``patch``
+              :class:`A2LPickerSnapshot` entries both hold that same context
+              and share one empty :class:`MappingProxyType` as definitions
+              (R-A2L-REFRESH.058). No bulk describe runs; both entries share
+              the exact ``a2l_data`` object as their source for identity
+              comparison.
             - No request, admission state, widget, mounted state, session
               member or live generation is read here.
 
         Dependencies:
             Uses:
-                - ``enrich_tags_and_render`` / ``describe_definitions``
+                - ``enrich_tags_and_render`` / ``build_describe_context``
                 - ``A2LAttachSnapshot`` / ``A2LPickerSnapshot``
             Used by:
                 - ``_a2l_attach_worker`` on the attach worker thread
@@ -1164,16 +1142,8 @@ class FileLoadMixin:
             for tag in enriched
             if isinstance(tag.get("address"), int)
         ]
-        context: Optional[DescribeContext] = None
-        selected = _selected_describe_path(self.logger)
-        self._a2l_describe_path = selected
-        if selected == "lazy":
-            context = build_describe_context(a2l_data, names)
-            picker_definitions: Mapping[str, Definition] = MappingProxyType({})
-        else:
-            picker_definitions = MappingProxyType(
-                describe_definitions(names, a2l_data)
-            )
+        context = build_describe_context(a2l_data, names)
+        picker_definitions: Mapping[str, Definition] = MappingProxyType({})
         self.logger.info(
             "A2L attach snapshot prepared: path=%s a2l_generation=%d "
             "image_generation=%d mem_size=%d names=%d",

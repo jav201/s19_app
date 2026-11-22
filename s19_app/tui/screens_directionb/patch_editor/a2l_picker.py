@@ -8,6 +8,7 @@ from textual.containers import Horizontal
 from textual.widgets import Button, DataTable, Input, Static
 from ...a2l import MAX_A2L_DECODE_BYTES
 from ...a2l_parameter_picker import A2LParameterPicker
+from ...a2l_definition import DescribeContext
 from ....utils import safe_text
 from ..shared import CheckLayout, check_layout
 from .sheet import StagingSheet
@@ -20,6 +21,12 @@ class A2lPickerMixin:
     # ------------------------------------------------------------------
     # A2L tab (batch-102 Inc 5, US-102-05 — the shared picker in pick mode)
     # ------------------------------------------------------------------
+
+    @property
+    def a2l_describe_context(self) -> Optional[DescribeContext]:
+        """The embedded picker's describe context of its last real
+        population, or ``None``."""
+        return self._a2l_picker.describe_context
 
     def set_a2l_parameters(
         self,
@@ -46,8 +53,8 @@ class A2lPickerMixin:
         panel forwards ``a2l_data=None`` (legacy: no data, and the snapshot
         survives for a later mount) and ignores a passed
         ``prepared_definitions``. A mounted panel also forwards a passed
-        ``describe_context`` (the lazy path, P-279) to the embedded picker,
-        where it wins over ``prepared_definitions``; an unmounted panel
+        ``describe_context`` (every accepted entry carries one) to the embedded
+        picker, where it wins over ``prepared_definitions``; an unmounted panel
         ignores it like the prepared definitions.
         """
         if not self.is_mounted:
@@ -237,7 +244,9 @@ class A2lPickerMixin:
 
         batch-103 Inc 8 (R-PE-DEF.10, .11): the staging sheet shows one row
         per name of the page, built from the picker's own population
-        describe and the A2L it came from — no describe here."""
+        describe (through the describe context when one is held, else the
+        population mapping) and the A2L it came from — no full describe
+        here."""
         self._apply_a2l_layout()
         if self._a2l_use_status:
             self._paint_a2l_use_status(self._a2l_use_status)

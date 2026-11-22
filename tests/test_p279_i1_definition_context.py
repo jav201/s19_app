@@ -301,6 +301,68 @@ def test_r_a2l_def_169_axis_span_recorded_by_a_map_equal_bulk(tmp_path):
 
 
 # ----------------------------------------------------------------------------
+# R-A2L-DEF.169 - m5: the bulk seed covers the context's final span (I2)
+# ----------------------------------------------------------------------------
+
+def _seed_covers(seed_last, final_last) -> bool:
+    """An upper end of ``None`` is open-ended (+infinity): it covers any end; a finite seed covers a
+    finite final end only when it is at least as large, and never an open-ended one."""
+    if seed_last is None:
+        return True
+    return final_last is not None and seed_last >= final_last
+
+
+def _bulk_seed_records(mod, monkeypatch, names: list, a2l: dict) -> list:
+    """The records the bulk describe seeds its occupancy index with (``(first, last, entry)``), captured
+    from the real ``_build_occupancy_index`` call of ``describe_definitions``."""
+    seen: list = []
+    real = getattr(mod, "_build_occupancy_index")
+
+    def capture(*args, **kwargs):
+        index = real(*args, **kwargs)
+        seen.append(list(index.records))
+        return index
+
+    monkeypatch.setattr(mod, "_build_occupancy_index", capture)
+    mod.describe_definitions(names, a2l)
+    monkeypatch.undo()
+    assert len(seen) == 1, "the bulk describe builds one index"
+    return seen[0]
+
+
+@pytest.mark.parametrize("request_size", [1, 50], ids=["one-name", "fifty-names"])
+@pytest.mark.parametrize("key", list(CORPUS))
+def test_r_a2l_def_169_bulk_seed_covers_the_final_span(key, request_size, monkeypatch):
+    """R-A2L-DEF.169/11 (m5): for every span entry of the in-repo fixture, the upper end the bulk describe
+    seeds its index with is at least the upper end of the context's final span (open-ended covers all)."""
+    mod = _definition_module()
+    data = _corpus(key)
+    context = _context(key)
+    final = {record[2][0]: record[1] for record in context._index.records}
+    seeds = _bulk_seed_records(mod, monkeypatch, data["unique"][:request_size], data["a2l"])
+    assert len(seeds) == len(final) == len(mod._walk_describe_maps(data["a2l"]).span_entries)
+    for first, seed_last, entry in seeds:
+        assert entry[0] in final, entry
+        assert _seed_covers(seed_last, final[entry[0]]), (key, entry[:3], seed_last, final[entry[0]])
+
+
+def test_r_a2l_def_169_bulk_seed_control_the_arm_sees_entries_and_can_fail(monkeypatch):
+    """R-A2L-DEF.169/11 oracle control: the corpus holds entries with a finite and with an open-ended seed,
+    and the comparison rejects a finite seed below the final end and a finite seed against an open end."""
+    mod = _definition_module()
+    total = sum(len(_context(key)._index.records) for key in CORPUS)
+    finite = open_ended = 0
+    for key in ("d171", "software_a"):
+        data = _corpus(key)
+        seeds = _bulk_seed_records(mod, monkeypatch, data["unique"][:1], data["a2l"])
+        finite += sum(1 for _, last, _ in seeds if last is not None)
+        open_ended += sum(1 for _, last, _ in seeds if last is None)
+    assert total > 0 and finite > 0 and open_ended > 0, (total, finite, open_ended)
+    assert not _seed_covers(0x10, 0x20) and not _seed_covers(0x10, None)
+    assert _seed_covers(0x20, 0x20) and _seed_covers(None, None) and _seed_covers(None, 0x20)
+
+
+# ----------------------------------------------------------------------------
 # R-A2L-DEF.170 - refusals
 # ----------------------------------------------------------------------------
 

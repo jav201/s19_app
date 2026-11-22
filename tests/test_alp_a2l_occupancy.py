@@ -643,10 +643,52 @@ def test_r_a2l_refresh_053_describe_leaves_no_cyclic_garbage(tmp_path):
     )
 
 
+def _disjoint_a2l(tmp_path, count: int = 8000):
+    """``count`` pairwise-disjoint VALUE characteristics: the parse payload and
+    the names in enrichment order."""
+    blocks = []
+    names = []
+    for i in range(count):
+        addr = 0x1000 + i * 0x40 + (i % 7) * 4
+        name = f"D{(i * 7919) % 10007}_{i}"
+        blocks.append(characteristic(name, "VALUE", f"0x{addr:X}", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+        names.append(name)
+    a2l = inline(tmp_path, *blocks)
+    assert len(a2l["tags"]) == count and len(a2l.get("errors") or []) == 0
+    return a2l, names
+
+
+def test_r_a2l_refresh_053_context_build_leaves_no_cyclic_garbage(tmp_path):
+    """R-A2L-REFRESH.053 (I2, the producer's call now) - building the describe
+    context of 8,000 pairwise-disjoint objects leaves no cyclic garbage: with
+    the context still referenced, an explicit ``gc.collect()`` after the call
+    returns fewer than 1,000 objects."""
+    mod = _mod()
+    a2l, names = _disjoint_a2l(tmp_path)
+    gc.collect()
+    gc.disable()
+    try:
+        context = mod.build_describe_context(a2l, names)
+        n = gc.collect()
+    finally:
+        gc.enable()
+    assert len(context.formats) == len(set(names)), "control: the context covers every name"
+    assert n < 1000, f"build_describe_context left {n} cyclic objects behind"
+
+
+def _local_len(frame, path: str) -> int:
+    """``len`` of a frame local, or of an attribute chain below it (``a.b``)."""
+    head, *rest = path.split(".")
+    value = frame.f_locals[head]
+    for attr in rest:
+        value = getattr(value, attr)
+    return len(value)
+
+
 @pytest.mark.parametrize(
     "route",
-    ["describe", "enrich"],
-    ids=["R-A2L-REFRESH.050/1", "R-A2L-REFRESH.050/2"],
+    ["describe", "enrich", "context"],
+    ids=["R-A2L-REFRESH.050/1", "R-A2L-REFRESH.050/2", "R-A2L-REFRESH.050/5"],
 )
 def test_r_a2l_refresh_050_producer_frees_private_containers_before_return(
     tmp_path, monkeypatch, route
@@ -693,6 +735,20 @@ def test_r_a2l_refresh_050_producer_frees_private_containers_before_return(
         def call():
             return target(all_names, a2l)
 
+    elif route == "context":
+        target = mod.build_describe_context
+        released = [
+            "entries",
+            "reads",
+            "walked.span_entries",
+            "walked.tag_consumed",
+            "walked.section_scans",
+        ]
+        patch_module = mod
+
+        def call():
+            return target(a2l, all_names)
+
     else:
         target = service_mod.enrich_tags_and_render
         released = ["source_tags", "checked_tags", "check_map"]
@@ -707,7 +763,7 @@ def test_r_a2l_refresh_050_producer_frees_private_containers_before_return(
     def profiler(frame, event, arg):
         if event == "return" and frame.f_code is target.__code__:
             for name in released:
-                observed[name] = len(frame.f_locals[name])
+                observed[name] = _local_len(frame, name)
 
     sys.setprofile(profiler)
     try:
@@ -735,6 +791,10 @@ def test_r_a2l_refresh_050_producer_frees_private_containers_before_return(
     result_noop = call()
     if route == "describe":
         assert result_noop == result_active
+    elif route == "context":
+        sample = all_names[:200]
+        assert dict(result_noop.formats) == dict(result_active.formats)
+        assert mod.describe_in_context(sample, result_noop) == mod.describe_in_context(sample, result_active)
     else:
         assert result_noop[0] == result_active[0]
         assert result_noop[1] == result_active[1]
@@ -800,6 +860,36 @@ def test_r_a2l_refresh_050_describe_frees_its_occupancy_index_before_return(
     result_noop = target(all_names, a2l)
     assert list(result_noop) == list(result_active)
     assert result_noop == result_active
+
+
+def test_r_a2l_refresh_050_context_build_frees_its_walk_entries_before_return(tmp_path):
+    """R-A2L-REFRESH.050 (I2, the producer's call now) - ``build_describe_context``
+    releases the span entries it walked and its own copy of them in slices
+    before it returns, so the ~220 k-entry lists never free in one C-level
+    dealloc with the GIL held. At the target frame's ``return`` profile event
+    both are empty, and the returned context still answers: its description of
+    a sample equals the bulk describe's (the release emptied nothing the
+    context shares)."""
+    mod = _mod()
+    a2l, names = _disjoint_a2l(tmp_path)
+    target = mod.build_describe_context
+    observed: dict[str, int] = {}
+
+    def profiler(frame, event, arg):
+        if event == "return" and frame.f_code is target.__code__:
+            observed["entries"] = _local_len(frame, "entries")
+            observed["walked.span_entries"] = _local_len(frame, "walked.span_entries")
+
+    sys.setprofile(profiler)
+    try:
+        context = target(a2l, names)
+    finally:
+        sys.setprofile(None)
+
+    assert set(observed) == {"entries", "walked.span_entries"}, "the build's return event was never observed"
+    assert observed == {"entries": 0, "walked.span_entries": 0}, observed
+    sample = names[:200]
+    assert mod.describe_in_context(sample, context) == mod.describe_definitions(sample, a2l)
 
 
 def _fa_tick3_cross_input(engine):

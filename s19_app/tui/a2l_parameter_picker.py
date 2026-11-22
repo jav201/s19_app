@@ -542,7 +542,8 @@ class A2LParameterPicker(Vertical):
 
         Raises:
             Exception: The non-context fallback describe is outside the
-                guard, so its failure propagates as it does on the eager path.
+                guard, so its failure propagates as it does on the
+                population-fallback describe.
         """
         context = self._describe_context
         if context is None:
@@ -728,8 +729,8 @@ class A2LParameterPicker(Vertical):
             self._param_rows[name] = (address, size, fmt_unit)
         self._fmt_longest = max(
             (
-                cell_len(_literal_parameter_text(value[2]).plain.rstrip())
-                for value in self._param_rows.values()
+                cell_len(_literal_parameter_text(text).plain.rstrip())
+                for text in {value[2] for value in self._param_rows.values()}
             ),
             default=0,
         )

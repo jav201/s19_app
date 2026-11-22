@@ -27,6 +27,7 @@ import ast
 import asyncio
 import copy
 import dataclasses
+import gc
 import hashlib
 import importlib
 import json
@@ -34,7 +35,6 @@ import re
 import sys
 import threading
 import time
-from collections import Counter
 from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
 from typing import Optional
@@ -787,6 +787,8 @@ def _arm_pipeline_spies(owner, monkeypatch, events: list, main: int) -> dict:
     spies["describe"] = Spy(monkeypatch, definition, "describe_definitions", before=_record("describe"))
     Spy(monkeypatch, picker, "describe_definitions", raising=False, before=_record("describe"))
     Spy(monkeypatch, fl, "describe_definitions", raising=False, before=_record("describe"))
+    spies["context"] = Spy(monkeypatch, definition, "build_describe_context", before=_record("context"))
+    Spy(monkeypatch, fl, "build_describe_context", raising=False, before=_record("context"))
     spies["install"] = Spy(monkeypatch, owner, "_install_attached_a2l", before=_record("install"))
     events.append(("UI", main))
     return spies
@@ -849,8 +851,8 @@ def _arm_zero_call_spies(app: S19TuiApp, monkeypatch, *, include_install: bool =
 @pytest.mark.parametrize("route", ["typed", "workarea", "startup"], ids=lambda x: x)
 def test_r029_worker_snapshot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, route: str) -> None:
     """R-A2L-REFRESH.029/1-/3: enrichment, summary and the one shared
-    picker describe complete off the UI thread before the install; visible
-    NEW cells exact."""
+    describe context complete off the UI thread before the install, with 0
+    bulk describes in preparation; visible NEW cells exact."""
     _guard_attach_snapshot_seams()
 
     base = tmp_path / "app"
@@ -929,12 +931,13 @@ def test_r029_worker_snapshot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, r
     names = [e[0] for e in events]
     assert names.count("enrichment") == 1, events
     assert names.count("summary") == 1, events
-    assert names.count("describe") == 1, events
+    assert names.count("context") == 1, events
+    assert names.count("describe") == 0, events
     assert names.count("install") == 1, events
-    prep = [e for e in events if e[0] in {"enrichment", "summary", "describe"}]
+    prep = [e for e in events if e[0] in {"enrichment", "summary", "context"}]
     installs = [e for e in events if e[0] == "install"]
     assert all(thread != main for _, thread in prep), events
-    assert max(i for i, e in enumerate(events) if e[0] in {"enrichment", "summary", "describe"}) < min(
+    assert max(i for i, e in enumerate(events) if e[0] in {"enrichment", "summary", "context"}) < min(
         i for i, e in enumerate(events) if e[0] == "install"
     ), events
     assert installs[0][1] == main, events
@@ -1269,7 +1272,7 @@ def test_r032_stale_direct_attach(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
         "copy",
         "parse",
         "enrichment",
-        "definitions",
+        "context",
         pytest.param("case06-full-processing", marks=pytest.mark.slow),
         "request-snapshot",
     ],
@@ -1490,13 +1493,11 @@ def test_r033_key_latency(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: 
             hold = Hold(monkeypatch, [(fl, "enrich_tags_and_render"), (service, "enrich_tags_and_render")])
         else:
             definition = _definition_module()
-            picker = _picker_module()
             hold = Hold(
                 monkeypatch,
                 [
-                    (definition, "describe_definitions"),
-                    (picker, "describe_definitions"),
-                    (fl, "describe_definitions"),
+                    (definition, "build_describe_context"),
+                    (fl, "build_describe_context"),
                 ],
             )
 
@@ -1606,7 +1607,7 @@ def _assert_progress_continuous(sampler: Sampler, what: str) -> None:
     "arm",
     [
         "enrichment",
-        "definitions",
+        "context",
         pytest.param("case06-full-processing", marks=pytest.mark.slow),
         "request-snapshot",
     ],
@@ -1752,13 +1753,11 @@ def test_r034_progress_throughout(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
         hold = Hold(monkeypatch, [(fl, "enrich_tags_and_render"), (service, "enrich_tags_and_render")])
     else:
         definition = _definition_module()
-        picker = _picker_module()
         hold = Hold(
             monkeypatch,
             [
-                (definition, "describe_definitions"),
-                (picker, "describe_definitions"),
-                (fl, "describe_definitions"),
+                (definition, "build_describe_context"),
+                (fl, "build_describe_context"),
             ],
         )
 
@@ -1946,6 +1945,25 @@ def _describe_spies(monkeypatch) -> list:
     return calls
 
 
+def _build_spies(monkeypatch) -> list:
+    """One record of every describe-context build across the attach-worker
+    binding and the definition module (thread-tagged, names kept)."""
+    definition = _definition_module()
+    fl = _fl_module()
+    calls: list = []
+    real = definition.build_describe_context
+
+    def spy(a2l_data, names):
+        materialized = list(names)
+        result = real(a2l_data, materialized)
+        calls.append({"names": materialized, "data": a2l_data, "thread": threading.get_ident()})
+        return result
+
+    monkeypatch.setattr(definition, "build_describe_context", spy)
+    monkeypatch.setattr(fl, "build_describe_context", spy, raising=False)
+    return calls
+
+
 @pytest.mark.parametrize(
     "arm",
     ["initial", "changed-generation", "filter-page-noop", "adapter-mismatch", "headless-unmounted"],
@@ -1976,37 +1994,52 @@ def test_r037_picker_snapshot_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPa
     same.write_bytes(old.read_bytes())
 
     describes = _describe_spies(monkeypatch)
+    builds = _build_spies(monkeypatch)
     main = threading.get_ident()
 
     if arm == "initial":
         definition = _definition_module()
+        picker_module = _picker_module()
         real_describe_one = definition._describe_one
-        describe_one_builds = Counter()
+        real_set_parameters = picker_module.A2LParameterPicker.set_parameters
+        population_ui_describe_one: list = []
+        in_population: list = []
 
         def counted_describe_one(name, *args, **kwargs):
-            describe_one_builds[name] += 1
+            if in_population and threading.get_ident() == main:
+                population_ui_describe_one.append(name)
             return real_describe_one(name, *args, **kwargs)
 
+        def marked_set_parameters(self, *args, **kwargs):
+            in_population.append(1)
+            try:
+                return real_set_parameters(self, *args, **kwargs)
+            finally:
+                in_population.pop()
+
         monkeypatch.setattr(definition, "_describe_one", counted_describe_one)
+        monkeypatch.setattr(picker_module.A2LParameterPicker, "set_parameters", marked_set_parameters)
 
         async def body(app, pilot):
             _mount_views(app)
             await pilot.pause()
             describes.clear()
-            describe_one_builds.clear()
+            builds.clear()
+            del population_ui_describe_one[:]
             await _typed_attach(app, pilot, old)
             await settle_workers(pilot)
-            worker_describes = [c for c in describes if c["thread"] != main]
-            ui_describes = [c for c in describes if c["thread"] == main]
-            assert len(worker_describes) == 1, describes
-            assert len(ui_describes) == 0, describes
+            worker_builds = [c for c in builds if c["thread"] != main]
+            ui_builds = [c for c in builds if c["thread"] == main]
+            assert len(worker_builds) == 1, builds
+            assert len(ui_builds) == 0, builds
             expected_names = [name for name, *_ in OLD_ROWS]
-            assert all(c["names"] == expected_names for c in worker_describes), describes
-            assert set(describe_one_builds) == set(expected_names), describe_one_builds
-            assert all(count == 1 for count in describe_one_builds.values()), describe_one_builds
+            assert all(c["names"] == expected_names for c in worker_builds), builds
+            assert describes == [], describes
+            assert population_ui_describe_one == [], population_ui_describe_one
             snapshot_map = _accepted_snapshots(app)
             assert snapshot_map is not None and set(snapshot_map) == {"check", "patch"}, snapshot_map
-            assert snapshot_map["check"].definitions is snapshot_map["patch"].definitions
+            context = snapshot_map["check"].describe_context
+            assert context is not None and context is snapshot_map["patch"].describe_context
             _assert_panel_state(_check_panel(app), OLD_ROWS)
             _assert_panel_state(_patch_panel(app), OLD_ROWS)
             return None
@@ -2020,14 +2053,16 @@ def test_r037_picker_snapshot_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPa
             await _typed_attach(app, pilot, same)
             await settle_workers(pilot)
             describes.clear()
+            builds.clear()
             same.write_bytes(new.read_bytes())
             await _typed_attach(app, pilot, same)
             await settle_workers(pilot)
-            worker_describes = [c for c in describes if c["thread"] != main]
-            ui_describes = [c for c in describes if c["thread"] == main]
-            assert len(worker_describes) == 1, describes
-            assert len(ui_describes) == 0, describes
-            assert all(c["names"] == [name for name, *_ in NEW_ROWS] for c in worker_describes), describes
+            worker_builds = [c for c in builds if c["thread"] != main]
+            ui_builds = [c for c in builds if c["thread"] == main]
+            assert len(worker_builds) == 1, builds
+            assert len(ui_builds) == 0, builds
+            assert all(c["names"] == [name for name, *_ in NEW_ROWS] for c in worker_builds), builds
+            assert describes == [], describes
             for panel in (_check_panel(app), _patch_panel(app)):
                 assert _param_rows(panel)["ARR12"] == (0x2000, 8, "f32"), _param_rows(panel)
                 visible = _picker_visible_shape(panel)
@@ -2046,6 +2081,7 @@ def test_r037_picker_snapshot_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPa
             await _typed_attach(app, pilot, big)
             await settle_workers(pilot)
             describes.clear()
+            builds.clear()
             picker_module = _picker_module()
             rebuilds: list = []
             real_rebuild = picker_module.A2LParameterPicker._rebuild_ledger
@@ -2073,6 +2109,7 @@ def test_r037_picker_snapshot_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPa
             assert len(rebuilds) >= 20, rebuilds
             assert all(0 < count <= 200 for count in rebuilds), rebuilds
             assert describes == [], describes
+            assert builds == [], builds
             assert _param_rows(check)["BIG_0000"] == (0x5000, 2, "u16"), _param_rows(check)["BIG_0000"]
             assert _param_rows(patch)["BIG_4199"] == (0x5000 + 4199 * 8, 2, "u16"), _param_rows(patch)["BIG_4199"]
             return None
@@ -2084,6 +2121,7 @@ def test_r037_picker_snapshot_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPa
             _mount_views(app)
             await pilot.pause()
             describes.clear()
+            builds.clear()
             await _typed_attach(app, pilot, old)
             await settle_workers(pilot)
             first_snapshot = _accepted_snapshots(app)
@@ -2096,6 +2134,7 @@ def test_r037_picker_snapshot_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPa
             # live signature) and the mounted panels consume it with 0 UI
             # describes — no invalidation, no stale definition paints.
             describes.clear()
+            builds.clear()
             await _load_image(app, pilot, img2)
             await settle_workers(pilot)
             replaced = _accepted_snapshots(app)
@@ -2104,8 +2143,9 @@ def test_r037_picker_snapshot_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPa
             fresh = replaced["check"]
             assert fresh.a2l_source is app.current_a2l_data, "the fresh snapshot does not carry the live A2L source"
             assert fresh.signature == app._a2l_enriched_key, (fresh.signature, app._a2l_enriched_key)
-            assert len([c for c in describes if c["thread"] != main]) == 1, describes
-            assert [c for c in describes if c["thread"] == main] == [], describes
+            assert len([c for c in builds if c["thread"] != main]) == 1, builds
+            assert [c for c in builds if c["thread"] == main] == [], builds
+            assert describes == [], describes
             _assert_panel_state(check, OLD_ROWS)
             _assert_panel_state(patch, OLD_ROWS)
             tag = next(t for t in app._a2l_enriched_tags if t["name"] == "OLD_SCALAR")
@@ -2119,6 +2159,7 @@ def test_r037_picker_snapshot_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPa
             proj_a2l = _project_a2l(src / "proj.a2l")
             _seed_project(app.workarea, "P_MIX", a2l=proj_a2l, image=img)
             describes.clear()
+            builds.clear()
             await _load_project(app, pilot, "P_MIX")
             await settle_workers(pilot)
             replaced = _accepted_snapshots(app)
@@ -2127,19 +2168,22 @@ def test_r037_picker_snapshot_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPa
             fresh = replaced["check"]
             assert fresh.a2l_source is app.current_a2l_data, "the project snapshot does not carry the live A2L source"
             assert fresh.signature == app._a2l_enriched_key, (fresh.signature, app._a2l_enriched_key)
-            assert len([c for c in describes if c["thread"] != main]) == 1, describes
-            assert [c for c in describes if c["thread"] == main] == [], describes
+            assert len([c for c in builds if c["thread"] != main]) == 1, builds
+            assert [c for c in builds if c["thread"] == main] == [], builds
+            assert describes == [], describes
             for panel in (check, patch):
                 assert _param_rows(panel)["ARR12"] == (0x2000, 6, "u16"), _param_rows(panel)
             # Matching control: an accepted direct attach repopulates the
             # mapping and the mounted panels consume the worker snapshot.
             describes.clear()
+            builds.clear()
             await _typed_attach(app, pilot, new)
             await settle_workers(pilot)
-            worker_describes = [c for c in describes if c["thread"] != main]
-            ui_describes = [c for c in describes if c["thread"] == main]
-            assert len(worker_describes) == 1, describes
-            assert len(ui_describes) == 0, describes
+            worker_builds = [c for c in builds if c["thread"] != main]
+            ui_builds = [c for c in builds if c["thread"] == main]
+            assert len(worker_builds) == 1, builds
+            assert len(ui_builds) == 0, builds
+            assert describes == [], describes
             repopulated = _accepted_snapshots(app)
             assert repopulated is not None and set(repopulated) == {"check", "patch"}, repopulated
             _assert_panel_state(check, NEW_ROWS)
@@ -2277,6 +2321,7 @@ def test_r037_picker_snapshot_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPa
                 assert len(kwargs) == 1, (kind, kwargs)
                 assert kwargs[0].get("a2l_data") is None, (kind, kwargs)
                 assert "prepared_definitions" not in kwargs[0], (kind, kwargs)
+                assert "describe_context" not in kwargs[0], (kind, kwargs)
             assert describes == [], describes
             assert _accepted_snapshots(app) is identity, "an unmounted call invalidated the accepted mapping"
             # Mount both against the same matching generation: each panel
@@ -2302,12 +2347,14 @@ def test_r037_picker_snapshot_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPa
 # ===========================================================================
 
 
-@pytest.mark.parametrize("arm", ["enrichment", "summary", "definitions"], ids=lambda x: x)
+@pytest.mark.parametrize("arm", ["enrichment", "summary", "context"], ids=lambda x: x)
 def test_r038_preparation_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
     """R-A2L-REFRESH.038/1-/3: an injected exception in one real preparation
-    stage ends with the exact existing failure outcome, keeps the current
-    image and every A2L-dependent state/view, still refreshes Workarea
-    Files (copy=True) and runs no install/refresh/sync/success."""
+    stage (enrichment, summary, describe-context build) ends with the exact
+    existing failure outcome, keeps the current image and every A2L-dependent
+    state/view, still refreshes Workarea Files (copy=True), runs no
+    install/refresh/sync/success, no describe or context build on the UI
+    thread, and leaves the collector enabled."""
     _guard_attach_snapshot_seams()
 
     base = tmp_path / "app"
@@ -2326,6 +2373,7 @@ def test_r038_preparation_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
     fired: list = []
     armed: dict = {"on": False}
     timeline: list = []
+    ui_calls: list = []
 
     if arm == "enrichment":
         real_enrich = getattr(fl, "enrich_tags_and_render", None)
@@ -2358,20 +2406,30 @@ def test_r038_preparation_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
             return real_render(*args, **kwargs) if real_render is not None else None
 
         monkeypatch.setattr(service, "render_a2l_view", render_boom)
-    else:  # definitions
+    else:  # context
+        real_build = definition.build_describe_context
         real_describe = definition.describe_definitions
 
-        def describe_boom(names, a2l_data):
+        def build_boom(a2l_data, names):
             if armed["on"] and threading.get_ident() != main:
-                timeline.append("describe")
+                timeline.append("context")
                 if not fired:
                     fired.append(True)
-                    raise ValueError("definitions boom")
+                    raise ValueError("context boom")
+            elif armed["on"]:
+                ui_calls.append("context")
+            return real_build(a2l_data, names)
+
+        def describe_spy(names, a2l_data):
+            if armed["on"] and threading.get_ident() == main:
+                ui_calls.append("describe")
             return real_describe(names, a2l_data)
 
-        monkeypatch.setattr(definition, "describe_definitions", describe_boom)
-        monkeypatch.setattr(picker, "describe_definitions", describe_boom, raising=False)
-        monkeypatch.setattr(fl, "describe_definitions", describe_boom, raising=False)
+        monkeypatch.setattr(definition, "build_describe_context", build_boom)
+        monkeypatch.setattr(fl, "build_describe_context", build_boom, raising=False)
+        monkeypatch.setattr(definition, "describe_definitions", describe_spy)
+        monkeypatch.setattr(picker, "describe_definitions", describe_spy, raising=False)
+        monkeypatch.setattr(fl, "describe_definitions", describe_spy, raising=False)
 
     async def body(app, pilot):
         _mount_views(app)
@@ -2412,8 +2470,10 @@ def test_r038_preparation_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
         # contract — a success line can only come from the OLD attach.
         if arm == "summary":
             assert timeline.count("enrichment") == 1 and timeline.count("summary") == 1, timeline
-        if arm == "definitions":
-            assert timeline == ["describe"], timeline
+        if arm == "context":
+            assert timeline == ["context"], timeline
+            assert ui_calls == [], ui_calls
+            assert gc.isenabled(), "the collector stayed disabled after the failed preparation"
         return None
 
     _run(base, body)
@@ -2964,11 +3024,11 @@ def test_at_alp_i2_2_case06_keys_and_progress(tmp_path: Path, monkeypatch: pytes
 
 
 def test_at_alp_i2_3_same_path_picker_generations(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """AT-ALP-I2-3: the real same-path OLD->NEW replacement describes once
-    (one shared read-only describe) per generation, paints the exact NEW
-    formats before success and describes zero times during later
+    """AT-ALP-I2-3: the real same-path OLD->NEW replacement builds one shared
+    read-only describe context per generation, paints the exact NEW formats
+    before success and runs 0 builds and 0 bulk describes during later
     filter/page/no-op actions.
-    Row: R-A2L-REFRESH.037 (one worker-built describe per generation, used by
+    Row: R-A2L-REFRESH.037 (one worker-built context per generation, used by
     both mounted pickers; 0 describes on later filter/page/no-op requests)."""
     _guard_attach_snapshot_seams()
 
@@ -2979,21 +3039,25 @@ def test_at_alp_i2_3_same_path_picker_generations(tmp_path: Path, monkeypatch: p
     _old_a2l(same)
     new_text = _new_a2l(src / "new.a2l").read_text(encoding="utf-8")
     describes = _describe_spies(monkeypatch)
+    builds = _build_spies(monkeypatch)
     main = threading.get_ident()
 
     async def body(app, pilot):
         _mount_views(app)
         await pilot.pause()
         describes.clear()
+        builds.clear()
         await _typed_attach(app, pilot, same)
         await settle_workers(pilot)
-        first_round = [c for c in describes if c["thread"] != main]
-        assert len(first_round) == 1, describes
+        first_round = [c for c in builds if c["thread"] != main]
+        assert len(first_round) == 1, builds
+        assert [c for c in builds if c["thread"] == main] == [], builds
         check = _check_panel(app)
         patch = _patch_panel(app)
         _assert_panel_state(check, OLD_ROWS)
         _assert_panel_state(patch, OLD_ROWS)
         describes.clear()
+        builds.clear()
         same.write_text(new_text, encoding="utf-8")
         formats_at_outcome: dict = {}
 
@@ -3008,17 +3072,19 @@ def test_at_alp_i2_3_same_path_picker_generations(tmp_path: Path, monkeypatch: p
         monkeypatch.setattr(app, "end_busy", end)
         await _typed_attach(app, pilot, same)
         await settle_workers(pilot)
-        second_round = [c for c in describes if c["thread"] != main]
-        assert len(second_round) == 1, describes
-        assert all(c["names"] == [name for name, *_ in NEW_ROWS] for c in second_round), describes
+        second_round = [c for c in builds if c["thread"] != main]
+        assert len(second_round) == 1, builds
+        assert [c for c in builds if c["thread"] == main] == [], builds
+        assert all(c["names"] == [name for name, *_ in NEW_ROWS] for c in second_round), builds
         assert formats_at_outcome == {
             "check": (0x2000, 8, "f32"),
             "patch": (0x2000, 8, "f32"),
         }, formats_at_outcome
         _assert_panel_state(check, NEW_ROWS)
         _assert_panel_state(patch, NEW_ROWS)
-        # Zero describes during subsequent filter/page/no-op actions.
+        # Zero describes and builds during subsequent filter/page/no-op actions.
         describes.clear()
+        builds.clear()
         picker_module = _picker_module()
         real_rebuild = picker_module.A2LParameterPicker._rebuild_ledger
 
@@ -3036,6 +3102,7 @@ def test_at_alp_i2_3_same_path_picker_generations(tmp_path: Path, monkeypatch: p
         assert _picker_of(check).set_parameters(rows, key, a2l_data=app.current_a2l_data) is False
         assert _picker_of(patch).set_parameters(rows, key, a2l_data=app.current_a2l_data) is False
         assert describes == [], describes
+        assert builds == [], builds
         return None
 
     _run(base, body)

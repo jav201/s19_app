@@ -1137,7 +1137,8 @@ class NavigationMixin:
 
         Dependencies:
             Used by:
-                - ``on_resize``
+                - the compose, which sets the start classes
+                - ``on_resize``, which calls this on each resize
         """
         narrow = width < 120
         shell = self.query_one("#workspace_shell")

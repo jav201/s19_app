@@ -39,7 +39,7 @@ from typing import Optional
 import pytest
 
 import s19_app.tui.app as app_module
-from s19_app.tui.a2l_definition import describe_definitions
+from s19_app.tui.a2l_definition import build_describe_context, describe_definitions
 from s19_app.tui.a2l_parse import parse_a2l_file
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens import ConfirmQuestionScreen
@@ -801,14 +801,15 @@ def test_r_a2l_refresh_050_near_1mib_real_content_tick_arm(
 @pytest.mark.slow
 @pytest.mark.parametrize(
     "route",
-    ["describe", "enrich"],
-    ids=["R-A2L-REFRESH.050/3", "R-A2L-REFRESH.050/4"],
+    ["describe", "enrich", "context"],
+    ids=["R-A2L-REFRESH.050/3", "R-A2L-REFRESH.050/4", "R-A2L-REFRESH.050/5"],
 )
 def test_r_a2l_refresh_050_case06_producer_return_gap(route: str) -> None:
     """R-A2L-REFRESH.050 (E4R) — the case_06 producer return→resume gap.
 
-    FA-TICK baseline 0.151–0.193 s: ``describe_definitions`` and
-    ``enrich_tags_and_render`` each freed their large private containers in
+    FA-TICK baseline 0.151–0.193 s: ``describe_definitions``,
+    ``enrich_tags_and_render`` and (I2, the producer's call now)
+    ``build_describe_context`` each freed their large private containers in
     one C-level dealloc that held the GIL, so the 50 ms UI tick ran late.
     With the sliced release the gap from the target frame's ``return``
     profile event to the caller's next statement must be <= 50 ms
@@ -819,6 +820,10 @@ def test_r_a2l_refresh_050_case06_producer_return_gap(route: str) -> None:
         target = describe_definitions
         args = ([tag["name"] for tag in a2l_data["tags"]], a2l_data)
         label = "R-A2L-REFRESH.050 case_06 describe return→resume gap"
+    elif route == "context":
+        target = build_describe_context
+        args = (a2l_data, [tag["name"] for tag in a2l_data["tags"]])
+        label = "R-A2L-REFRESH.050 case_06 context build return→resume gap"
     else:
         target = enrich_tags_and_render
         args = (a2l_data, {})  # mem map {} — see REPORT.md

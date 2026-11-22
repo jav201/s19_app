@@ -285,6 +285,27 @@ def _describe_spy(monkeypatch):
     return calls
 
 
+def _build_spy(monkeypatch):
+    """One record of every describe-context build (the attach worker's own
+    binding in ``s19_app.tui.app.file_load`` and the definition module)."""
+    import importlib
+    import threading
+
+    calls = []
+    real = definition_module.build_describe_context
+
+    def spy(a2l_data, names):
+        materialized = list(names)
+        result = real(a2l_data, materialized)
+        calls.append({"names": materialized, "data": a2l_data, "thread": threading.get_ident()})
+        return result
+
+    monkeypatch.setattr(definition_module, "build_describe_context", spy)
+    attach_module = importlib.import_module("s19_app.tui.app.file_load")
+    monkeypatch.setattr(attach_module, "build_describe_context", spy, raising=False)
+    return calls
+
+
 # R-PICKER-CORRECT.001/1 Check scalar=2, /2 Check ARR12=12,
 # /3 Patch scalar=2, /4 Patch ARR12=12; enriched byte_size is always 2.
 @pytest.mark.parametrize(
@@ -680,11 +701,13 @@ def test_r018_1_equal_signature_is_a_zero_describe_noop(tmp_path, monkeypatch):
 def test_r018_2_changed_generation_batches_once_per_picker(tmp_path, monkeypatch):
     """R-PICKER-CORRECT.018/2: ARR12 12/u16 -> 8/f32, one shared all-names call.
 
-    Operator D10 (R-A2L-REFRESH.037 as amended in E4R): the attach producer
-    runs one shared bulk describe per generation for BOTH pickers, so the
-    changed generation is described once in total, not once per picker.
+    Operator D10 (R-A2L-REFRESH.037, amended in I2): the attach producer
+    builds one shared describe context per generation for BOTH pickers, so
+    the changed generation is built once in total, not once per picker, and
+    no bulk describe runs.
     """
     describes = _describe_spy(monkeypatch)
+    builds = _build_spy(monkeypatch)
     first = _generation_a2l(tmp_path / "generation1.a2l")
     second = _generation_a2l(tmp_path / "generation2.a2l", datatype="FLOAT32_IEEE", matrix="2")
 
@@ -693,13 +716,15 @@ def test_r018_2_changed_generation_batches_once_per_picker(tmp_path, monkeypatch
         for editor in ("check", "patch"):
             await _show_panel(app, pilot, editor)
         describes.clear()
+        builds.clear()
         rows = await _load_a2l(app, pilot, second)
         assert next(row for row in rows if row["name"] == "ARR12")["length"] == 8
         return {editor: _row_result(app.query_one(f"#{editor}_editor_panel"), "ARR12") for editor in ("check", "patch")}
 
     results = _run(tmp_path, body)
-    assert len(describes) == 1
-    assert all(call["names"] == ["ARR12"] and call["data"] is not None for call in describes)
+    assert len(builds) == 1
+    assert all(call["names"] == ["ARR12"] and call["data"] is not None for call in builds)
+    assert describes == []
     for result in results.values():
         assert result["size"] == 8
         assert result["fmt"] == "f32"
@@ -748,8 +773,9 @@ def test_r018_3_none_always_repopulates_with_real_a2l_data(tmp_path, monkeypatch
 
 # R-PICKER-CORRECT.018/4: Inc 5 live reload refreshes both before the outcome.
 def test_r018_4_live_reload_refreshes_both_without_reentry(tmp_path, monkeypatch):
-    """R-PICKER-CORRECT.018/4: visible ARR12 12 -> 8 on reload, one shared describe (D10)."""
+    """R-PICKER-CORRECT.018/4: visible ARR12 12 -> 8 on reload, one shared context build (D10)."""
     describes = _describe_spy(monkeypatch)
+    builds = _build_spy(monkeypatch)
     first = _generation_a2l(tmp_path / "live1.a2l")
     second = _generation_a2l(tmp_path / "live2.a2l", matrix="2 2")
     outcomes = []
@@ -769,12 +795,14 @@ def test_r018_4_live_reload_refreshes_both_without_reentry(tmp_path, monkeypatch
 
         monkeypatch.setattr(app, "end_busy", end_busy)
         describes.clear()
+        builds.clear()
         await _load_a2l(app, pilot, second)
         return app._active_screen_key
 
     active = _run(tmp_path, body)
     assert active == "patch"
-    assert len(describes) == 1
+    assert len(builds) == 1
+    assert describes == []
     assert outcomes and outcomes[-1][1] == {"check": 8, "patch": 8}
 
 

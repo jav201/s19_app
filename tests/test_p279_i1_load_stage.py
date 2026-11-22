@@ -1,17 +1,18 @@
-"""P-279 I1, group G-APP (E4 tester): flag, snapshot producer and stage path.
+"""P-279 I1/I2, group G-LOAD (E4 tester): snapshot producer and stage path.
 
-Requirements: R-A2L-REFRESH.055-.059, .062, .064-.070 (the host-only arms of
-.059/.063/.066/.068 and the page arm of .070 for the Patch page are run by the
-orchestrator or belong to G-PICK; see ``02-test-cases-APP.md``).
+Requirements: R-A2L-REFRESH.029, .038, .039, .043, .058, .059, .062, .064,
+.066-.070 and .077 (the host-only arms of .059/.063/.066/.068.1 and the page
+arm of .070 for the Patch page are run by the orchestrator or belong to
+G-PICK; see ``02-test-cases-LOAD.md``).
 
 Every test drives a product route under Textual Pilot (typed A2L attach,
 image+A2L, project pair, project A2L-only; a stage is the sheet's own message
 posted on ``#patch_sheet``). Private seams are reached lazily inside each test
-body so the module collects on base and each node fails on its own. Flag arms
-set ``S19_A2L_DESCRIBE`` AFTER the product modules are imported (the .055
-control). Log lines are counted by exact text on the app's ``s19tui`` channel
-only (E4 R3: a line on any other logger fails). Absence checks read every
-logger and the app's visible status window.
+body so the module collects on base and each node fails on its own. The .077
+arms set ``S19_A2L_DESCRIBE`` AFTER the product modules are imported, so a
+product that still read it would see the value. Log lines are counted by exact
+text on the app's ``s19tui`` channel only (E4 R3: a line on any other logger
+fails). Absence checks read every logger and the app's visible status window.
 """
 from __future__ import annotations
 
@@ -32,12 +33,11 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 CASE01 = ROOT / "examples" / "case_01_basic_valid"
 PUBLIC = ROOT / "examples" / "case_00_public"
-FLAG = "S19_A2L_DESCRIBE"
+FLAG = "S19_A2L_DESCRIBE"  # R-A2L-REFRESH.077: set to prove the product ignores it
 ROUTES = ("attach", "image", "pair", "only")
 D171_SCALAR = "ASAM.C.SCALAR.UBYTE.IDENTICAL"
 D171_CURVE = "ASAM.C.CURVE.STD_AXIS"
 
-LINE_PATH = "A2L describe path: unrecognised S19_A2L_DESCRIBE value ignored; eager used."
 LINE_STALE = "A2L describe context stale: full describe used."
 LINE_MISSING = "A2L describe context missing: full describe used."
 LINE_FAILED = "A2L describe context failed: full describe used."
@@ -68,7 +68,7 @@ def _definition():
 
 
 def _set_flag(monkeypatch, value) -> None:
-    """Import the product first, then set the variable (the .055 control)."""
+    """Import the product first, then set the variable (the .077 arms)."""
     importlib.import_module("s19_app.tui.app")
     importlib.import_module("s19_app.tui.app.file_load")
     if value is None:
@@ -82,16 +82,19 @@ def _fx(kind: str, tmp_path: Path) -> dict:
     image is a synthetic span over the addresses of the two staged names)."""
     if kind == "case_01":
         return {"a2l": CASE01 / "firmware.a2l", "image": CASE01 / "firmware.s19"}
+    if kind == "d161":
+        return {"a2l": PUBLIC / "ASAP2_Demo_V161.a2l", "image": None}
     src = tmp_path / "src"
     src.mkdir(parents=True, exist_ok=True)
     mem = {0x810000 + i: (i * 7) & 0xFF for i in range(0x400)}
     return {"a2l": PUBLIC / "ASAP2_Demo_V171.a2l", "image": _i2()._write_image(src / "d171.s19", mem)}
 
 
-def _patch_all(monkeypatch, name: str, wrap):
-    """Replace ``name`` in the definition module and in every s19_app module
-    that imported it, with ``wrap(real)``. Returns the real function."""
-    real = getattr(_definition(), name)
+def _patch_all(monkeypatch, name: str, wrap, source=None):
+    """Replace ``name`` in its home module (the definition module unless
+    ``source`` names another) and in every s19_app module that imported it,
+    with ``wrap(real)``. Returns the real function."""
+    real = getattr(importlib.import_module(source) if source else _definition(), name)
     wrapper = wrap(real)
     for key, mod in list(sys.modules.items()):
         if not key.startswith("s19_app") or mod is None:
@@ -244,7 +247,7 @@ def _capture_producer(monkeypatch) -> list:
     return snapshots
 
 
-def _drive(tmp_path, monkeypatch, route, fx, *, flag, overlap=False) -> SimpleNamespace:
+def _drive(tmp_path, monkeypatch, route, fx, *, flag=None, overlap=False) -> SimpleNamespace:
     """One measured load through ``route``; the results are read inside."""
     _set_flag(monkeypatch, flag)
     i2 = _i2()
@@ -288,74 +291,110 @@ def _entries(out):
 
 
 # ---------------------------------------------------------------------------
-# R-A2L-REFRESH.055 / .056 / .057 - the flag.
+# R-A2L-REFRESH.077 - the environment variable has no effect on preparation.
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("route", ROUTES)
-def test_r_a2l_refresh_055_lazy_prepares_every_route(tmp_path, monkeypatch, route):
-    """055/1-4: ``lazy`` set after import: each route's accepted snapshot
-    carries a describe context and 0 bulk describes ran."""
-    out = _drive(tmp_path, monkeypatch, route, _fx("case_01", tmp_path), flag="lazy")
-    check, patch = _entries(out)
-    for entry in (check, patch):
-        assert _entry_ctx(entry) is not None, f"{route}: no describe context on the {entry.picker} entry"
-        assert len(entry.definitions) == 0, entry.definitions
-    assert out.rec.defs == [], f"{route}: bulk describes ran on the lazy path: {out.rec.defs}"
-
-
-@pytest.mark.parametrize("flag", ["LAZY", "Lazy"])
-@pytest.mark.parametrize("route", ROUTES)
-def test_r_a2l_refresh_055_case_variants_select_eager(tmp_path, monkeypatch, route, flag):
-    """055/5-12: only the exact value ``lazy`` selects the lazy path: ``LAZY``
-    and ``Lazy`` prepare eager (no context, the bulk definitions)."""
-    out = _drive(tmp_path, monkeypatch, route, _fx("case_01", tmp_path), flag=flag)
-    check, patch = _entries(out)
-    assert _entry_ctx(check) is None and _entry_ctx(patch) is None, f"{flag!r} selected lazy"
-    assert dict(patch.definitions) == out.rec.real_describe(out.names, out.data)
-    assert len(patch.definitions) > 0
-
-
-@pytest.mark.parametrize("flag", [None, "eager"], ids=["unset", "eager"])
-@pytest.mark.parametrize("route", ROUTES)
-def test_r_a2l_refresh_056_eager_is_todays_snapshot(tmp_path, monkeypatch, route, flag):
-    """056/1-8: unset or ``eager``: no context, the bulk definitions mapping
-    (the oracle is the bulk describe computed here) shared by both entries,
-    and the enrichment part of the snapshot equals a fresh enrichment."""
+def _assert_prepared_as_unset(out, route: str, value) -> None:
+    """The one shape every load has: one context shared by both entries, empty
+    definitions, the enrichment part equal to a fresh enrichment, 1 build and
+    0 bulk describes in preparation, no log line naming the variable and no
+    byte of its value in any line."""
     from s19_app.tui.services.a2l_service import enrich_tags_and_render
 
-    out = _drive(tmp_path, monkeypatch, route, _fx("case_01", tmp_path), flag=flag)
     check, patch = _entries(out)
-    assert _entry_ctx(check) is None and _entry_ctx(patch) is None
-    assert check.definitions is patch.definitions
-    want = out.rec.real_describe(out.names, out.data)
-    assert dict(check.definitions) == want
-    assert len(want) > 0
+    assert _entry_ctx(check) is not None, f"{route} {value!r}: no describe context on the check entry"
+    assert _entry_ctx(check) is _entry_ctx(patch), "the two entries hold different contexts"
+    assert len(check.definitions) == 0 and len(patch.definitions) == 0
+    assert len(out.rec.builds) == 1, out.rec.builds
+    assert out.rec.defs == [], f"{route}: bulk describes ran in preparation: {out.rec.defs}"
     image = out.mem if route != "attach" else None
     enriched, summary = enrich_tags_and_render(out.data, image, max_tag_lines=500)
     assert out.snap.enriched_tags == tuple(enriched)
     assert out.snap.summary_lines == tuple(summary)
     assert out.snap.enrichment_key == out.key
+    flagged = [m for m in out.messages if FLAG in m or "A2L describe path" in m]
+    assert flagged == [], flagged
+    joined = "\n".join(out.messages)
+    if value:
+        assert value[:200] not in joined, "the value reached the log"
+    assert "\x1b" not in joined
+
+
+@pytest.mark.parametrize("value", [None, "eager", "lazy", "LAZY", "Lazy"], ids=["unset", "eager", "lazy", "LAZY", "Lazy"])
+@pytest.mark.parametrize("route", ROUTES)
+def test_r_a2l_refresh_077_value_prepares_as_unset(tmp_path, monkeypatch, route, value):
+    """077/1-16: ``eager``, ``lazy``, ``LAZY`` and ``Lazy`` set after import
+    prepare each route exactly as the unset arm does (the oracle is the shape
+    computed in ``_assert_prepared_as_unset``, the same for every value)."""
+    out = _drive(tmp_path, monkeypatch, route, _fx("case_01", tmp_path), flag=value)
+    _assert_prepared_as_unset(out, route, value)
 
 
 @pytest.mark.parametrize("route", ROUTES)
 @pytest.mark.parametrize("label", list(HOSTILE))
-def test_r_a2l_refresh_057_hostile_values_use_eager_and_log_once(tmp_path, monkeypatch, route, label):
-    """057/1-6: each hostile value prepares eager, logs the exact fixed line
-    exactly once per load, and no byte of the value reaches the log."""
+def test_r_a2l_refresh_077_hostile_value_is_ignored(tmp_path, monkeypatch, route, label):
+    """077/17-40: each hostile value prepares as unset, logs no line that names
+    the variable, and no byte of the value reaches the log."""
     value = HOSTILE[label]
     out = _drive(tmp_path, monkeypatch, route, _fx("case_01", tmp_path), flag=value)
     assert os.environ.get(FLAG) == value, f"{label}: the platform did not accept the value"
-    check, patch = _entries(out)
-    assert _entry_ctx(check) is None and _entry_ctx(patch) is None, f"{label}: a hostile value selected lazy"
-    assert dict(patch.definitions) == out.rec.real_describe(out.names, out.data)
-    assert out.tap_count(LINE_PATH) == 1, [m for m in out.messages if "S19_A2L_DESCRIBE" in m]
-    flagged = [m for m in out.messages if "S19_A2L_DESCRIBE" in m or "A2L describe path" in m]
-    assert all(m == LINE_PATH for m in flagged), flagged
-    joined = "\n".join(out.messages)
-    if value:
-        assert value[:200] not in joined, f"{label}: the value reached the log"
-    assert "\x1b" not in joined
+    _assert_prepared_as_unset(out, route, value)
+
+
+def test_r_a2l_refresh_077_stage_reads_no_variable(tmp_path, monkeypatch):
+    """077/41: ``LAZY`` set after import, ONE A2L load (no image), then two
+    value stages: both stages describe their one name through the context and
+    no line naming the variable is on the ``s19tui`` channel."""
+    from tests.support.b100_workers import settle_workers
+
+    _set_flag(monkeypatch, "LAZY")
+    i2 = _i2()
+    fx = _fx("d171", tmp_path)
+    in_context: list = []
+
+    def wrap(real):
+        def spy(names, context):
+            names = list(names)
+            in_context.append(tuple(names))
+            return real(names, context)
+
+        return spy
+
+    _patch_all(monkeypatch, "describe_in_context", wrap)
+
+    async def drive(app, pilot):
+        tap = _Tap(app)
+        try:
+            await i2._typed_attach(app, pilot, fx["a2l"])
+            await settle_workers(pilot)
+            seen = _watch_stage(app, monkeypatch)
+            app.action_show_screen("patch")
+            for _ in range(8):
+                await pilot.pause()
+            del in_context[:]
+            await _stage_value(app, pilot, D171_SCALAR, "20")
+            await _stage_value(app, pilot, D171_SCALAR, "21")
+            named = [m for m in tap.everything() if FLAG in m or "A2L describe path" in m]
+            return len(seen), list(in_context), named, tap.count(LINE_MISSING)
+        finally:
+            tap.close()
+
+    staged, described, named, missing = i2._run(tmp_path / "app", drive)
+    assert staged == 2, staged
+    assert described.count((D171_SCALAR,)) == 2, described
+    assert named == [], named
+    assert missing == 0, missing
+
+
+def test_r_a2l_refresh_077_no_source_names_the_variable():
+    """077/42 (structural, partial): the variable's name occurs in no file under
+    ``s19_app/`` (the product neither reads nor mentions it)."""
+    needle = ("S19_A2L" + "_DESCRIBE").encode("ascii")
+    files = [p for p in (ROOT / "s19_app").rglob("*") if p.is_file() and "__pycache__" not in p.parts]
+    assert len(files) > 50, "control: the census sees the package"
+    offenders = [p.relative_to(ROOT).as_posix() for p in files if needle in p.read_bytes()]
+    assert offenders == [], offenders
 
 
 # ---------------------------------------------------------------------------
@@ -368,7 +407,7 @@ def test_r_a2l_refresh_057_hostile_values_use_eager_and_log_once(tmp_path, monke
 def test_r_a2l_refresh_058_one_context_built_off_the_ui_thread(tmp_path, monkeypatch, route, kind):
     """058/1-8: 1 build per load, on a worker; both entries hold the same
     context object."""
-    out = _drive(tmp_path, monkeypatch, route, _fx(kind, tmp_path), flag="lazy")
+    out = _drive(tmp_path, monkeypatch, route, _fx(kind, tmp_path))
     check, patch = _entries(out)
     assert len(out.rec.builds) == 1, out.rec.builds
     assert out.rec.builds[0] != out.rec.main, "the context was built on the UI thread"
@@ -376,32 +415,82 @@ def test_r_a2l_refresh_058_one_context_built_off_the_ui_thread(tmp_path, monkeyp
     assert len(check.definitions) == 0 and len(patch.definitions) == 0
 
 
+@pytest.mark.parametrize("kind", ["case_01", "d171", "d161"], ids=["case_01", "V171", "V161"])
+def test_r_a2l_refresh_029_snapshot_holds_one_context_with_every_format(tmp_path, monkeypatch, kind):
+    """029/4-6: a direct attach's snapshot is frozen, its enrichment equals a
+    fresh one, both entries hold one context built once on a worker whose
+    format fields cover every measurable name and equal the bulk describe's
+    datatype, kind and unit; 0 bulk describes ran in preparation."""
+    import dataclasses
+
+    from s19_app.tui.services.a2l_service import enrich_tags_and_render
+
+    out = _drive(tmp_path, monkeypatch, "attach", _fx(kind, tmp_path))
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        out.snap.enrichment_key = None
+    check, patch = _entries(out)
+    context = _entry_ctx(check)
+    assert context is not None and context is _entry_ctx(patch)
+    assert out.names and set(out.names) <= set(context.formats), "a measurable name has no format fields"
+    bulk = out.rec.real_describe(out.names, out.data)
+    for name in out.names:
+        fields = context.formats[name]
+        assert (fields.datatype, fields.kind, fields.unit) == (bulk[name].datatype, bulk[name].kind, bulk[name].unit), name
+    enriched, summary = enrich_tags_and_render(out.data, None, max_tag_lines=500)
+    assert out.snap.enriched_tags == tuple(enriched) and out.snap.summary_lines == tuple(summary)
+    assert len(out.rec.builds) == 1 and out.rec.builds[0] != out.rec.main, out.rec.builds
+    assert out.rec.defs == [], out.rec.defs
+
+
+def test_r_a2l_refresh_039_one_build_call_site():
+    """039/6 (structural, partial): ``build_describe_context`` is called from
+    exactly one place under ``s19_app/tui/app/`` and that place is the
+    snapshot producer's module."""
+    import ast
+
+    sites: list = []
+    for path in sorted((ROOT / "s19_app" / "tui" / "app").rglob("*.py")):
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if isinstance(node, ast.Call):
+                func = node.func
+                called = func.id if isinstance(func, ast.Name) else getattr(func, "attr", None)
+                if called == "build_describe_context":
+                    sites.append(path.name)
+    assert sites == ["file_load.py"], sites
+
+
 @pytest.mark.parametrize("route", ROUTES)
 def test_r_a2l_refresh_059_lazy_resolves_no_overlap(tmp_path, monkeypatch, route):
     """059/1-4: d171 (has overlapping objects): 0 overlap resolutions on the
-    load worker while preparing on the lazy path (the UI thread's page describe
-    resolves overlaps for its shown page and is not preparation)."""
-    out = _drive(tmp_path, monkeypatch, route, _fx("d171", tmp_path), flag="lazy", overlap=True)
-    assert _entry_ctx(_entries(out)[1]) is not None, "the lazy path was not taken"
+    load worker during preparation (the UI thread's page describe resolves
+    overlaps for its shown page and is not preparation)."""
+    out = _drive(tmp_path, monkeypatch, route, _fx("d171", tmp_path), overlap=True)
+    assert _entry_ctx(_entries(out)[1]) is not None, "the load built no describe context"
     worker = [t for t in out.rec.overlap if t != out.rec.main]
-    assert worker == [], f"{len(worker)} overlap resolutions on a worker during lazy preparation"
+    assert worker == [], f"{len(worker)} overlap resolutions on a worker during preparation"
 
 
 def test_r_a2l_refresh_059_control_eager_resolves_overlaps(tmp_path, monkeypatch):
-    """059 control: the overlap spy is alive - the eager path resolves some."""
-    out = _drive(tmp_path, monkeypatch, "attach", _fx("d171", tmp_path), flag=None, overlap=True)
-    worker = [t for t in out.rec.overlap if t != out.rec.main]
-    assert len(worker) > 0, "the overlap spy saw no worker resolution on the eager path (dead instrument)"
+    """059 instrument control: the overlap spy is alive - the same spy counts
+    more than 0 resolutions while the test runs the bulk describe of d171
+    directly (the load no longer has a bulk path to borrow)."""
+    out = _drive(tmp_path, monkeypatch, "attach", _fx("d171", tmp_path), overlap=True)
+    del out.rec.overlap[:]
+    bulk = out.rec.real_describe(out.names, out.data)
+    assert bulk, "control: the direct bulk describe returned nothing"
+    assert len(out.rec.overlap) > 0, "the overlap spy saw no resolution on a direct bulk describe (dead instrument)"
 
 
 # ---------------------------------------------------------------------------
-# R-A2L-REFRESH.065 - a build failure ends through each route's failure outcome.
+# R-A2L-REFRESH.038 / .043 - a context-build failure ends through each route's
+# failure outcome.
 # ---------------------------------------------------------------------------
 
 
-def _inject(monkeypatch, name, exc, armed):
+def _inject(monkeypatch, name, exc, armed, source=None):
     """Raise ``exc`` from ``name`` once ``armed["on"]`` is set."""
-    assert hasattr(_definition(), name), f"I-1: {name} is missing"
+    home = importlib.import_module(source) if source else _definition()
+    assert hasattr(home, name), f"{name} is missing"
 
     def wrap(real):
         def boom(*args, **kwargs):
@@ -411,7 +500,7 @@ def _inject(monkeypatch, name, exc, armed):
 
         return boom
 
-    _patch_all(monkeypatch, name, wrap)
+    _patch_all(monkeypatch, name, wrap, source)
 
 
 async def _fail_route(route, app, pilot, fx, i2, armed):
@@ -480,15 +569,14 @@ async def _fail_route(route, app, pilot, fx, i2, armed):
     )
 
 
-def _failure_run(tmp_path, monkeypatch, route, *, flag, exc_name):
-    _set_flag(monkeypatch, flag)
+def _failure_run(tmp_path, monkeypatch, route, *, exc_name, source=None):
     i2 = _i2()
     case = _fx("case_01", tmp_path)
     d171 = _fx("d171", tmp_path)
     fx = dict(d171, prior=case)
     rec = _spies(monkeypatch)
     armed = {"on": False}
-    _inject(monkeypatch, exc_name, ValueError("CONTEXT_CONTROL"), armed)
+    _inject(monkeypatch, exc_name, ValueError("CONTEXT_CONTROL"), armed, source)
     box = SimpleNamespace()
 
     async def body(app, pilot):
@@ -504,16 +592,18 @@ def _failure_run(tmp_path, monkeypatch, route, *, flag, exc_name):
 
 
 @pytest.mark.parametrize("route", ROUTES)
-def test_r_a2l_refresh_065_build_failure_keeps_previous_state(tmp_path, monkeypatch, route):
-    """065/1-4: an injected ValueError("CONTEXT_CONTROL") in the context build
-    ends the load with the route's existing failure outcome (the reference is
-    the same route failing in the eager describe); nothing is installed, the
-    previous state and project hashes are unchanged, 0 UI-thread describes,
-    and the direct attach ends with the exact .038 line."""
+def test_r_a2l_refresh_038_043_context_build_failure_keeps_previous_state(tmp_path, monkeypatch, route):
+    """038/4 (attach) and 043 (image, pair, only): an injected
+    ValueError("CONTEXT_CONTROL") in the context build ends the load with the
+    route's existing failure outcome (the reference is the same route failing
+    in the enrichment, a failure point independent of the describe path);
+    nothing is installed, the previous state and project hashes are unchanged,
+    0 UI-thread describes, and the direct attach ends with the exact .038 line."""
+    enrich = "s19_app.tui.services.a2l_service"
     with monkeypatch.context() as ref:
-        reference = _failure_run(tmp_path / "ref", ref, route, flag=None, exc_name="describe_definitions")
-    with monkeypatch.context() as lazy:
-        got = _failure_run(tmp_path / "lazy", lazy, route, flag="lazy", exc_name="build_describe_context")
+        reference = _failure_run(tmp_path / "ref", ref, route, exc_name="enrich_tags_and_render", source=enrich)
+    with monkeypatch.context() as ctx:
+        got = _failure_run(tmp_path / "ctx", ctx, route, exc_name="build_describe_context")
     result = got.result
     assert len(result.outcomes) == 1, result.outcomes
     assert result.outcomes == reference.result.outcomes, (result.outcomes, reference.result.outcomes)
@@ -576,7 +666,6 @@ def test_r_a2l_refresh_066_ticks_on_time_while_the_context_builds(tmp_path, monk
     from tests.support.b100_workers import settle_workers
     from tests.support.timing import report_margin, timing_bound, wait_until
 
-    _set_flag(monkeypatch, "lazy")
     i2 = _i2()
     fx = _fx("d171", tmp_path)
     gate = _BuildGate()
@@ -641,7 +730,6 @@ def test_r_a2l_refresh_067_previous_context_is_released(tmp_path, monkeypatch, r
     one gc.collect()."""
     from tests.support.b100_workers import settle_workers
 
-    _set_flag(monkeypatch, "lazy")
     i2 = _i2()
     fx = _fx("d171", tmp_path)
     holder: dict = {}
@@ -657,7 +745,7 @@ def test_r_a2l_refresh_067_previous_context_is_released(tmp_path, monkeypatch, r
             i2._seed_project(app.workarea, "proj_b", a2l=fx["a2l"], image=fx["image"])
             await i2._load_project(app, pilot, "proj_a")
         picker = i2._picker_of(i2._patch_panel(app))
-        assert _ctx_of(picker) is not None, "the lazy path built no context"
+        assert _ctx_of(picker) is not None, "the load built no describe context"
         holder["ref"] = weakref.ref(picker.describe_context)
         del picker
         if route == "attach":
@@ -673,52 +761,95 @@ def test_r_a2l_refresh_067_previous_context_is_released(tmp_path, monkeypatch, r
     assert i2._run(tmp_path / "app", body), "the previous generation's context is still alive after gc.collect()"
 
 
-def _live_definitions() -> int:
-    """The ``Definition`` objects alive now (the retained mapping or memo a
-    leak would keep; the settled whole-process count drifts too much to see it)."""
+def _live_definition_ids() -> set:
+    """The ids of the ``Definition`` objects alive now (the retained mapping or
+    memo a leak would keep; the settled whole-process count drifts too much to
+    see it)."""
     kind = _definition().Definition
-    return sum(1 for obj in gc.get_objects() if type(obj) is kind)
+    return {id(obj) for obj in gc.get_objects() if type(obj) is kind}
 
 
-def _interleaved_counts(tmp_path, monkeypatch, a2l) -> dict:
-    """Per path, the ``(objects, definitions)`` after each of 3 eager and 3
-    lazy loads of ``a2l`` in ONE app (the variable is read at each load), once
-    the workers settled and ``gc.collect()`` ran. Order E L L E E L: a drift of
-    the process mostly cancels (the lazy loads sit one third of a slot later
-    on average, the conservative side)."""
+def _reachable_definition_ids(page) -> set:
+    """The ids of a page's definitions and of the axis definitions they carry
+    (a curve or map holds its axis points' and axis object's ``Definition``)."""
+    ids = set()
+    for definition in page.values():
+        ids.add(id(definition))
+        for axis in definition.axes:
+            ids.update(id(nested) for nested in (axis.points, axis.axis_object_record) if nested is not None)
+    return ids
+
+
+def _parsed(name: str) -> tuple:
+    """The parse payload of a public fixture and its measurable names."""
+    from s19_app.tui.a2l import enrich_a2l_tags_with_values
+    from s19_app.tui.a2l_parse import parse_a2l_file
+
+    data = parse_a2l_file(PUBLIC / name)
+    names = [t["name"] for t in enrich_a2l_tags_with_values(data, None) if isinstance(t.get("address"), int)]
+    return data, names
+
+
+def _held_objects(build) -> int:
+    """The GC-tracked objects the result of ``build()`` holds: the count after
+    ``gc.collect()`` with the result still referenced, minus the count before."""
+    gc.collect()
+    before = len(gc.get_objects())
+    result = build()
+    gc.collect()
+    held = len(gc.get_objects()) - before
+    del result
+    return held
+
+
+@pytest.mark.parametrize(
+    "name", ["ASAP2_Demo_V171.a2l", "ASAP2_Demo_V161.a2l", "software_a.a2l"], ids=["d171", "V161", "software_a"]
+)
+def test_r_a2l_refresh_068_1_context_holds_no_more_objects_than_bulk(name):
+    """068.1/1-3: the tracked-object count a built context holds is at most the
+    count the bulk describe of the same payload and names holds (median of 3
+    measurements per fixture); the bulk side must hold some (instrument control)."""
+    definition = _definition()
+    data, names = _parsed(name)
+    assert names, "control: the fixture has measurable names"
+    context = [_held_objects(lambda: definition.build_describe_context(data, names)) for _ in range(3)]
+    bulk = [_held_objects(lambda: definition.describe_definitions(names, data)) for _ in range(3)]
+    assert statistics.median(bulk) > 0, f"control: the bulk describe holds objects: {bulk}"
+    assert statistics.median(context) <= statistics.median(bulk), (context, bulk)
+
+
+@pytest.mark.parametrize("name", ["software_a.a2l", "ASAP2_Demo_V171.a2l"], ids=["software_a", "V171"])
+def test_r_a2l_refresh_068_2_settled_load_keeps_only_the_shown_page(tmp_path, name):
+    """068.2/1-2: 3 direct attaches in one app: after each settled load and
+    ``gc.collect()`` every live ``Definition`` is one the Patch picker's shown
+    page reaches (its page definitions and the axis definitions they carry),
+    and that page holds at most 200 names (a 3,452-name A2L). A retained
+    name-to-Definition memo or population mapping holds more than the page."""
     from tests.support.b100_workers import settle_workers
 
-    _set_flag(monkeypatch, "eager")
     i2 = _i2()
-    counts = {"eager": [], "lazy": []}
+    seen: list = []
 
     async def body(app, pilot):
         i2._mount_views(app)
         await pilot.pause()
-        for flag in ("eager", "lazy", "lazy", "eager", "eager", "lazy"):
-            monkeypatch.setenv(FLAG, flag)
-            await i2._typed_attach(app, pilot, a2l)
+        for _ in range(3):
+            await i2._typed_attach(app, pilot, PUBLIC / name)
             await settle_workers(pilot)
             gc.collect()
-            objects = len(gc.get_objects()) + gc.get_freeze_count()
-            counts[flag].append((objects, _live_definitions()))
+            picker = i2._picker_of(i2._patch_panel(app))
+            page = picker.page_definitions()
+            live = _live_definition_ids()
+            seen.append(
+                (len(live), len(live - _reachable_definition_ids(page)), len(page), len(picker.visible_params), len(_measurable(app)))
+            )
 
     i2._run(tmp_path, body)
-    return counts
-
-
-@pytest.mark.parametrize("name", ["ASAP2_Demo_V171.a2l", "ASAP2_Demo_V161.a2l"])
-def test_r_a2l_refresh_068_lazy_holds_no_more_objects_than_eager(tmp_path, monkeypatch, name):
-    """068/1-2: 3 loads per path, ordered E L L E E L in one app: the median of
-    the settled GC-tracked object counts has lazy <= eager, and the retained
-    ``Definition`` objects (a memo kept per load would grow them) never exceed
-    what the eager path holds."""
-    counts = _interleaved_counts(tmp_path, monkeypatch, PUBLIC / name)
-    lazy_objects, lazy_defs = zip(*counts["lazy"])
-    eager_objects, eager_defs = zip(*counts["eager"])
-    assert statistics.median(lazy_objects) <= statistics.median(eager_objects), counts
-    assert min(eager_defs) > 0, f"control: the eager path holds its definitions: {counts}"
-    assert max(lazy_defs) <= min(eager_defs), f"lazy retains more definitions than eager: {counts}"
+    assert len(seen) == 3
+    for live, unreached, held, shown, total in seen:
+        assert 0 < shown <= 200 and held == shown, f"page of {shown} of {total} names, {held} definitions held: {seen}"
+        assert unreached == 0, f"{unreached} of {live} live Definitions are outside the shown page: {seen}"
+    assert seen[-1][0] <= seen[0][0], f"the live Definitions grew across loads: {seen}"
 
 
 # ---------------------------------------------------------------------------
@@ -743,10 +874,11 @@ def _count_walks(app) -> _Walks:
     return counted
 
 
-def _open_patch(tmp_path, monkeypatch, flag, body, *, clear_snapshots=False):
+def _open_patch(tmp_path, monkeypatch, body, *, clear_snapshots=False, flag=None):
     """Load d171 (A2L then image), optionally drop the accepted snapshots
     (population through the no-snapshot fallback), show the Patch screen, run
-    ``body(app, pilot, picker, tap, rec, fx)``."""
+    ``body(app, pilot, picker, tap, rec, fx)``. ``flag`` leaves the retired
+    environment variable set (the .069 stale-environment arm)."""
     _set_flag(monkeypatch, flag)
     i2 = _i2()
     rec = _spies(monkeypatch)
@@ -828,7 +960,7 @@ def _bulk(app, rec, name):
 
 
 def test_r_a2l_refresh_062_scalar_stage_walks_no_section(tmp_path, monkeypatch):
-    """062/1: lazy, fresh context, a scalar value stage: 0 section walks, 0
+    """062/1: fresh context, a scalar value stage: 0 section walks, 0
     full describes, and the staged definition equals the bulk one."""
 
     async def body(app, pilot, picker, tap, rec, fx):
@@ -841,14 +973,14 @@ def test_r_a2l_refresh_062_scalar_stage_walks_no_section(tmp_path, monkeypatch):
         await _stage_value(app, pilot, D171_SCALAR, "20")
         return seen, want, walks.walks, list(rec.defs), tap.everything()
 
-    seen, want, walks, defs, lines = _open_patch(tmp_path, monkeypatch, "lazy", body)
+    seen, want, walks, defs, lines = _open_patch(tmp_path, monkeypatch, body)
     assert seen == [want], (seen, want)
     assert walks == 0 and defs == [], (walks, defs)
     assert not [m for m in lines if m in CONTEXT_LINES], lines
 
 
 def test_r_a2l_refresh_062_bench_record_from_a_context_page_is_accepted(tmp_path, monkeypatch):
-    """062/2: lazy, fresh context: a curve bench record described through the
+    """062/2: fresh context: a curve bench record described through the
     context is not refused as changed in the A2L, and 0 section walks ran."""
 
     async def body(app, pilot, picker, tap, rec, fx):
@@ -862,7 +994,7 @@ def test_r_a2l_refresh_062_bench_record_from_a_context_page_is_accepted(tmp_path
         results = await _stage_record(app, pilot, monkeypatch, D171_CURVE, definition)
         return results, walks.walks, list(rec.defs), tap.everything()
 
-    results, walks, defs, lines = _open_patch(tmp_path, monkeypatch, "lazy", body)
+    results, walks, defs, lines = _open_patch(tmp_path, monkeypatch, body)
     assert results == [True], results
     assert not [m for m in lines if "changed in the A2L" in m], lines
     assert walks == 0 and defs == [], (walks, defs)
@@ -918,7 +1050,7 @@ def test_r_a2l_refresh_064_stale_context_uses_the_full_describe(tmp_path, monkey
         await _stage_value(app, pilot, D171_SCALAR, "20")
         return seen, want, old_def, tap.count(LINE_STALE), [d[1] for d in rec.defs]
 
-    seen, want, old_def, stale_lines, describes = _open_patch(tmp_path, monkeypatch, "lazy", body)
+    seen, want, old_def, stale_lines, describes = _open_patch(tmp_path, monkeypatch, body)
     assert seen == [want] and seen != [old_def], (seen, want, old_def)
     assert stale_lines == 1, stale_lines
     assert describes == [1], describes
@@ -926,9 +1058,9 @@ def test_r_a2l_refresh_064_stale_context_uses_the_full_describe(tmp_path, monkey
 
 @pytest.mark.parametrize("kind", ["value", "bench"])
 def test_r_a2l_refresh_069_missing_context_logs_once_and_uses_the_full_describe(tmp_path, monkeypatch, kind):
-    """069/1-2: lazy, the Patch picker populated through the no-snapshot
-    fallback (no context): a stage or a bench record logs the missing line
-    once and describes with one full single-name describe."""
+    """069/1-2: the Patch picker populated through the population fallback (no
+    context): a stage or a bench record logs the missing line once and
+    describes with one full single-name describe."""
 
     async def body(app, pilot, picker, tap, rec, fx):
         assert _ctx_of(picker) is None, "premise: the picker holds no context"
@@ -944,16 +1076,17 @@ def test_r_a2l_refresh_069_missing_context_logs_once_and_uses_the_full_describe(
             want = [True]
         return got, want, tap.count(LINE_MISSING), [d[1] for d in rec.defs], tap.everything()
 
-    got, want, missing, describes, lines = _open_patch(tmp_path, monkeypatch, "lazy", body, clear_snapshots=True)
+    got, want, missing, describes, lines = _open_patch(tmp_path, monkeypatch, body, clear_snapshots=True)
     assert got == ([want] if kind == "value" else want), (got, want)
     assert missing == 1, missing
     assert describes == [1], describes
     assert not [m for m in lines if m in (LINE_STALE, LINE_FAILED) or "changed in the A2L" in m], lines
 
 
-def test_r_a2l_refresh_069_unset_logs_no_context_line(tmp_path, monkeypatch):
-    """069/3: the variable unset, no context: the full describe runs and none
-    of the three context lines is logged."""
+def test_r_a2l_refresh_069_stale_env_still_logs_missing_once(tmp_path, monkeypatch):
+    """069/4: the retired variable left set to ``eager``, no context: the full
+    describe runs and the missing line is logged exactly once (it was 0 when
+    the variable selected the eager path)."""
 
     async def body(app, pilot, picker, tap, rec, fx):
         assert _ctx_of(picker) is None
@@ -961,42 +1094,61 @@ def test_r_a2l_refresh_069_unset_logs_no_context_line(tmp_path, monkeypatch):
         seen = _watch_stage(app, monkeypatch)
         tap.reset()
         await _stage_value(app, pilot, D171_SCALAR, "20")
-        return seen, want, tap.everything()
+        return seen, want, tap.count(LINE_MISSING), tap.everything()
 
-    seen, want, lines = _open_patch(tmp_path, monkeypatch, None, body, clear_snapshots=True)
+    seen, want, missing, lines = _open_patch(tmp_path, monkeypatch, body, clear_snapshots=True, flag="eager")
     assert seen == [want], (seen, want)
-    assert not [m for m in lines if m in CONTEXT_LINES], lines
+    assert missing == 1, missing
+    assert not [m for m in lines if m in (LINE_STALE, LINE_FAILED)], lines
 
 
-def test_r_a2l_refresh_057_stage_path_never_rereads_the_flag(tmp_path, monkeypatch):
-    """057/7: a hostile value set after import, ONE A2L load (no image), then
-    two value stages: the fixed line is on the ``s19tui`` channel exactly once
-    in total (the selection made when the load's preparation started holds for
-    the generation; a stage never re-reads the variable)."""
+def test_r_a2l_refresh_069_after_a_failed_preparation_logs_missing_once(tmp_path, monkeypatch):
+    """069/3 (P-337 M2): an accepted load, then a direct attach whose context
+    build raises (the load ends in its failure outcome), the accepted map
+    emptied and the Patch picker repopulated through the fallback, then a value
+    stage: the missing line is logged exactly once, one full single-name
+    describe runs and the definition equals the bulk one."""
     from tests.support.b100_workers import settle_workers
+    from tests.support.timing import wait_until
 
-    _set_flag(monkeypatch, "LAZY")
     i2 = _i2()
-    fx = _fx("d171", tmp_path)
+    armed = {"on": False}
+    _inject(monkeypatch, "build_describe_context", ValueError("CONTEXT_CONTROL"), armed)
 
-    async def drive(app, pilot):
-        tap = _Tap(app)
-        try:
-            await i2._typed_attach(app, pilot, fx["a2l"])
-            await settle_workers(pilot)
-            seen = _watch_stage(app, monkeypatch)
-            app.action_show_screen("patch")
-            for _ in range(8):
-                await pilot.pause()
-            await _stage_value(app, pilot, D171_SCALAR, "20")
-            await _stage_value(app, pilot, D171_SCALAR, "21")
-            return len(seen), tap.count(LINE_PATH)
-        finally:
-            tap.close()
+    async def body(app, pilot, picker, tap, rec, fx):
+        assert _ctx_of(picker) is not None, "premise: the accepted load gave the picker a context"
+        outcomes: list = []
+        real_end = app.end_busy
 
-    staged, lines = i2._run(tmp_path / "app", drive)
-    assert staged == 2, staged
-    assert lines == 1, lines
+        def end(key, gen, outcome):
+            outcomes.append(str(outcome))
+            return real_end(key, gen, outcome)
+
+        monkeypatch.setattr(app, "end_busy", end)
+        armed["on"] = True
+        await i2._submit_typed(app, pilot, str(fx["a2l"]))
+        await wait_until(pilot, lambda: bool(outcomes), "the failure outcome", timeout=60.0)
+        await settle_workers(pilot)
+        if len(app.screen.query("#result_ok")) > 0:
+            await pilot.press("escape")
+        armed["on"] = False
+        assert outcomes and "NOT loaded" in outcomes[0], outcomes
+        app._accepted_a2l_picker_snapshots = MappingProxyType({})
+        rows = [t for t in app._compute_a2l_enriched_tags() if isinstance(t.get("address"), int)]
+        app.query_one("#patch_editor_panel").set_a2l_parameters(rows, None, a2l_data=app.current_a2l_data)
+        assert _ctx_of(picker) is None, "premise: the repopulated picker holds no context"
+        want = _bulk(app, rec, D171_SCALAR)
+        seen = _watch_stage(app, monkeypatch)
+        tap.reset()
+        rec.reset()
+        await _stage_value(app, pilot, D171_SCALAR, "20")
+        return seen, want, tap.count(LINE_MISSING), [d[1] for d in rec.defs], tap.everything()
+
+    seen, want, missing, describes, lines = _open_patch(tmp_path, monkeypatch, body)
+    assert seen == [want], (seen, want)
+    assert missing == 1, missing
+    assert describes == [1], describes
+    assert not [m for m in lines if m in (LINE_STALE, LINE_FAILED)], lines
 
 
 def _raise_in_context_describe(monkeypatch):
@@ -1024,14 +1176,14 @@ def test_r_a2l_refresh_070_stage_survives_a_raising_context(tmp_path, monkeypatc
         await _stage_value(app, pilot, D171_SCALAR, "20")
         return seen, want, tap.count(LINE_FAILED), tap.everything(), [d[1] for d in rec.defs]
 
-    seen, want, failed, lines, describes = _open_patch(tmp_path, monkeypatch, "lazy", body)
+    seen, want, failed, lines, describes = _open_patch(tmp_path, monkeypatch, body)
     assert seen == [want], (seen, want)
     assert failed == 1, failed
     assert not [m for m in lines if "CONTEXT_CONTROL" in m], lines
     assert describes == [1], describes
 
 
-def _page_rows(flag, tmp_path, monkeypatch, inject):
+def _page_rows(tmp_path, monkeypatch, inject, *, clear_snapshots=False):
     """The painted rows of the Patch picker after a filter change."""
 
     async def body(app, pilot, picker, tap, rec, fx):
@@ -1050,17 +1202,19 @@ def _page_rows(flag, tmp_path, monkeypatch, inject):
             await pilot.pause()
         return i2._picker_visible_shape(panel), tap.count(LINE_FAILED), tap.everything()
 
-    return _open_patch(tmp_path, monkeypatch, flag, body)
+    return _open_patch(tmp_path, monkeypatch, body, clear_snapshots=clear_snapshots)
 
 
 def test_r_a2l_refresh_070_page_change_survives_a_raising_context(tmp_path, monkeypatch):
     """070/1: describe_in_context raises TypeError("CONTEXT_CONTROL") on a
-    page change: the rows equal the eager path's, the failed line is logged
-    once and carries no exception text."""
-    with monkeypatch.context() as eager_mp:
-        eager_rows, _n, _lines = _page_rows(None, tmp_path / "eager", eager_mp, False)
-    with monkeypatch.context() as lazy_mp:
-        rows, failed, lines = _page_rows("lazy", tmp_path / "lazy", lazy_mp, True)
-    assert rows == eager_rows and rows, (rows, eager_rows)
+    page change: the rows equal those of a population-fallback run of the same
+    filter (no snapshot, no injection), the failed line is logged once and
+    carries no exception text."""
+    with monkeypatch.context() as fallback_mp:
+        reference, _n, _lines = _page_rows(tmp_path / "fallback", fallback_mp, False, clear_snapshots=True)
+    with monkeypatch.context() as ctx_mp:
+        rows, failed, lines = _page_rows(tmp_path / "ctx", ctx_mp, True)
+    assert rows == reference and rows, (rows, reference)
     assert failed == 1, failed
     assert not [m for m in lines if "CONTEXT_CONTROL" in m], lines
+

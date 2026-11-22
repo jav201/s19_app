@@ -1,7 +1,9 @@
 """P-279 I1 E4, group G-PICK: the Check and Patch pickers through the describe context.
 
 Requirements: R-A2L-REFRESH.060 (format column and longest cell from the format fields),
-R-A2L-REFRESH.061 (page rows from the context describe) and the page-change arm of
+R-PE-DEF.11.1 and .11.2 (page rows from the context describe; was R-A2L-REFRESH.061,
+withdrawn in I2), R-A2L-REFRESH.078 (one width measurement per distinct format text) and the
+page-change arm of
 R-A2L-REFRESH.070 (a raise inside the context describe falls back to the non-context
 describe and logs one fixed line). The stage arm of .070 belongs to the App group.
 Cases: ``records/2026-11-20-p279/I1/E4/02-test-cases-PICK.md``.
@@ -424,10 +426,10 @@ def test_r_a2l_refresh_060_11_check_panel_mismatched_entry_bulk_population(tmp_p
     asyncio.run(_with_panel(tmp_path, "check", body))
 
 
-# ----------------------------------------------------------------------------- .061
+# ----------------------------------------------------------------------------- R-PE-DEF.11.1 / .11.2 (was R-A2L-REFRESH.061, withdrawn in I2)
 
 
-def test_r_a2l_refresh_061_1_page_definitions_equal_bulk_no_bulk_describe(monkeypatch):
+def test_r_pe_def_11_1_1_page_definitions_equal_bulk_no_bulk_describe(monkeypatch):
     a2l = _parsed(D171)
     rows = _rows(a2l)
     context = _context(a2l, rows)
@@ -446,7 +448,7 @@ def test_r_a2l_refresh_061_1_page_definitions_equal_bulk_no_bulk_describe(monkey
     asyncio.run(_with_picker(body))
 
 
-def test_r_a2l_refresh_061_2_same_page_twice_one_context_describe(monkeypatch):
+def test_r_pe_def_11_2_1_same_page_twice_one_context_describe_no_walk(monkeypatch):
     a2l = _parsed(D171)
     rows = _rows(a2l)
     context = _context(a2l, rows)
@@ -463,7 +465,7 @@ def test_r_a2l_refresh_061_2_same_page_twice_one_context_describe(monkeypatch):
     asyncio.run(_with_picker(body))
 
 
-def test_r_a2l_refresh_061_3_filter_change_same_page_new_key_second_describe(monkeypatch):
+def test_r_pe_def_11_2_2_filter_change_same_page_new_key_second_describe(monkeypatch):
     a2l = _parsed(D171)
     rows = _rows(a2l)
     context = _context(a2l, rows)
@@ -484,13 +486,13 @@ def test_r_a2l_refresh_061_3_filter_change_same_page_new_key_second_describe(mon
     asyncio.run(_with_picker(body))
 
 
-def test_r_a2l_refresh_061_4_eager_population_page_definitions_is_population_mapping():
+def test_r_pe_def_11_1_2_population_fallback_page_definitions_is_population_mapping():
     a2l = _parsed(D171)
     eager = _eager(_rows(a2l), a2l)
     assert eager.page_definitions() is eager.definitions
 
 
-def test_r_a2l_refresh_061_5_software_a_three_pages_sheet_rows_equal_eager(tmp_path, monkeypatch):
+def test_r_pe_def_11_1_3_software_a_three_pages_sheet_rows_equal_eager(tmp_path, monkeypatch):
     a2l = _parsed(SOFTWARE_A)
     rows = _rows(a2l)
     pages = ceil(len(rows) / PAGE)
@@ -608,3 +610,91 @@ def test_r_a2l_refresh_070_3_panel_filter_page_raise_rows_equal_eager_one_line(t
         _assert_fixed_line_only(tap, got[0], app)
 
     asyncio.run(_with_panel(tmp_path, "patch", body))
+
+
+# ----------------------------------------------------------------------------- .078
+
+
+def _independent_width(text: str) -> int:
+    """The cell width of one format text, computed here (not by the product helper):
+    every C0/C1 control becomes one U+FFFD cell, the trailing space is stripped."""
+    from rich.cells import cell_len
+
+    replaced = "".join("�" if ord(c) <= 31 or 127 <= ord(c) <= 159 else c for c in text)
+    return cell_len(replaced.rstrip())
+
+
+def _raw_cells(text: str) -> int:
+    """The width of a text without the control replacement (a C0 control is zero cells wide)."""
+    from rich.cells import cell_len
+
+    return cell_len(text.rstrip())
+
+
+def _unmounted_picker(kind: str):
+    """An unmounted Check (default ids) or Patch (``patch_param``) picker: no ledger row is painted."""
+    cls = _mod("s19_app.tui.a2l_parameter_picker").A2LParameterPicker
+    return cls() if kind == "check" else cls(id_prefix="patch_param", mode="pick")
+
+
+def _count_measurements(monkeypatch) -> list:
+    """Count the width measurements: each builds one literal text of a format cell."""
+    target = _mod("s19_app.tui.a2l_parameter_picker")
+    calls: list = []
+    monkeypatch.setattr(
+        target,
+        "_literal_parameter_text",
+        _counting(getattr(target, "_literal_parameter_text"), calls, "measure"),
+    )
+    return calls
+
+
+@pytest.mark.parametrize(
+    "path, dedupes",
+    [(D171, True), (CASE01, False), (SOFTWARE_A, True)],
+    ids=["d171", "case_01", "software_a"],
+)
+@pytest.mark.parametrize("kind", ["check", "patch"])
+def test_r_a2l_refresh_078_one_width_measurement_per_distinct_text(monkeypatch, kind, path, dedupes):
+    """R-A2L-REFRESH.078/1-6: measurements <= distinct format texts; the longest cell equals the
+    largest per-row width (computed here). A population that measured every row fails on d171
+    and software_a, whose rows repeat their format texts."""
+    a2l = _parsed(path)
+    rows = _rows(a2l)
+    context = _context(a2l, rows)
+    picker = _unmounted_picker(kind)
+    assert not picker.is_mounted
+    calls = _count_measurements(monkeypatch)
+    picker.set_parameters(rows, "sig", describe_context=context)
+    texts = [cells[2] for cells in picker.param_rows.values()]
+    distinct = set(texts)
+    assert len(texts) == len(rows) and distinct
+    if dedupes:
+        assert len(distinct) < len(texts), "control: the population repeats a format text"
+    assert len(calls) <= len(distinct), (len(calls), len(distinct), len(texts))
+    assert picker.fmt_longest == max(_independent_width(text) for text in texts)
+
+
+@pytest.mark.parametrize(
+    "arm, units, naive",
+    [
+        ("control", ("a" + "" * 10, "ab"), lambda t: _raw_cells(t)),
+        ("wide", ("ｋｍｋｍ", "abcdef"), lambda t: len(t.rstrip())),
+    ],
+    ids=["control", "wide"],
+)
+def test_r_a2l_refresh_078_control_and_wide_units_keep_the_longest_cell(arm, units, naive):
+    """R-A2L-REFRESH.078/7: units with a C0 control (one cell each after replacement) or a double-width
+    character (two cells) give the largest per-row width; a code-point or raw-control length differs."""
+    rows = [
+        {"name": f"P{index}", "address": 0x100 + index, "datatype": "UBYTE", "compu_method_unit": unit}
+        for index, unit in enumerate(units)
+    ]
+    picker = _unmounted_picker("check")
+    picker.set_parameters(rows, "sig")
+    texts = [cells[2] for cells in picker.param_rows.values()]
+    assert any(unit in text for unit in units for text in texts), "control: the units reach the cells"
+    expected = max(_independent_width(text) for text in texts)
+    assert picker.fmt_longest == expected
+    assert expected != max(naive(text) for text in texts), "control: the naive length would differ"
+

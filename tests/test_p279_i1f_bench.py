@@ -545,6 +545,28 @@ def test_r_pe_bench_111_3_control_a_paint_before_the_stale_check_is_counted(monk
     assert held.paints == 1, held
 
 
+async def _unmounted_result(monkeypatch):
+    async with _session(monkeypatch, hold=True) as (pilot, sheet, probe, gate):
+        _show(sheet, D171, 0)
+        await wait_until(pilot, gate.entered.is_set, "the first summary did not start")
+        await sheet.remove()
+        await pilot.pause()
+        kind, name, _token, _definition, _edit = sheet._active_job
+        sheet._held = True  # the removed sheet starts no further job: only the held result is delivered
+        paints_before = probe.paints
+        sheet._job_done(kind, name, sheet.generation, None, {})
+        return sheet, probe, kind, probe.paints - paints_before
+
+
+def test_r_pe_bench_111_3_a_result_after_unmount_arms_no_timer(monkeypatch):
+    """Arm 3 (P-354 b): the sheet is unmounted while a page decode is held, then the result is delivered
+    (the job-done seam, as the worker calls it): 0 paints and 0 deferred paints armed by it."""
+    sheet, probe, kind, paints = asyncio.run(_unmounted_result(monkeypatch))
+    assert kind == "summary" and not sheet.is_attached and sheet._page, (kind, sheet.is_attached)
+    assert paints == 0, paints
+    assert probe.timers == [] and sheet._window_timer is None, (len(probe.timers), sheet._window_timer)
+
+
 # ----------------------------------------------------------------------------- R-PE-BENCH.113
 
 

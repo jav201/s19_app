@@ -270,12 +270,12 @@ class ProducerSpy:
 
 
 def _arm_construction_spies(monkeypatch) -> dict:
-    """Thread-tagged enrichment/summary/definition construction records."""
+    """Thread-tagged enrichment/summary/describe-context/bulk-describe records."""
     fl = _fl_module()
     service = _service_module()
     definition = _definition_module()
     picker = _picker_module()
-    records: dict = {"enrich": [], "summary": [], "describe": []}
+    records: dict = {"enrich": [], "summary": [], "describe": [], "build": []}
     real_enrich = getattr(fl, "enrich_tags_and_render", None)
 
     def enrich_spy(*args, **kwargs):
@@ -301,6 +301,14 @@ def _arm_construction_spies(monkeypatch) -> dict:
     monkeypatch.setattr(definition, "describe_definitions", describe_spy)
     monkeypatch.setattr(picker, "describe_definitions", describe_spy, raising=False)
     monkeypatch.setattr(fl, "describe_definitions", describe_spy, raising=False)
+    real_build = definition.build_describe_context
+
+    def build_spy(a2l_data, names):
+        records["build"].append(threading.get_ident())
+        return real_build(a2l_data, names)
+
+    monkeypatch.setattr(definition, "build_describe_context", build_spy)
+    monkeypatch.setattr(fl, "build_describe_context", build_spy, raising=False)
     return records
 
 
@@ -463,10 +471,11 @@ def _assert_frozen_snapshot(snap) -> None:
 
 
 def _assert_ui_quiet(main: int, records: dict) -> None:
-    """0 UI-thread enrichment/summary/definition constructions."""
+    """0 UI-thread enrichment/summary/describe-context/bulk-describe constructions."""
     assert main not in records["enrich"], records
     assert main not in records["summary"], records
     assert main not in records["describe"], records
+    assert main not in records["build"], records
 
 
 # ===========================================================================
@@ -482,8 +491,9 @@ def _assert_ui_quiet(main: int, records: dict) -> None:
 def test_r039_shared_snapshot_interface(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
     """R-A2L-REFRESH.039/1-/5: every route calls the one Inc 2 producer
     exactly once with the stage pair; the returned snapshot is frozen,
-    carries enrichment/summary/definition data, is consumed (current key +
-    accepted picker mapping + painted sentinels) and builds nothing on UI."""
+    carries enrichment/summary data and one describe context (1 build per
+    route, 0 bulk describes), is consumed (current key + accepted picker
+    mapping + painted sentinels) and builds nothing on UI."""
     _guard_inc3_interface()
 
     base = tmp_path / "app"
@@ -514,6 +524,8 @@ def test_r039_shared_snapshot_interface(tmp_path: Path, monkeypatch: pytest.Monk
             _assert_frozen_snapshot(call.result)
             assert set(call.result.picker_snapshots) == {"check", "patch"}
             assert call.result.enriched_tags and call.result.summary_lines
+            assert len(constructions["build"]) == 1, constructions
+            assert constructions["describe"] == [], constructions
             snap_map = _accepted_snapshots(app)
             assert snap_map is not None and set(snap_map) == {"check", "patch"}, snap_map
             assert app._a2l_enriched_key == (
@@ -531,6 +543,7 @@ def test_r039_shared_snapshot_interface(tmp_path: Path, monkeypatch: pytest.Monk
             constructions["enrich"].clear()
             constructions["summary"].clear()
             constructions["describe"].clear()
+            constructions["build"].clear()
             producer.calls.clear()
             await _load_image(app, pilot, img2)
             await settle_workers(pilot)
@@ -544,7 +557,8 @@ def test_r039_shared_snapshot_interface(tmp_path: Path, monkeypatch: pytest.Monk
             assert app._a2l_enriched_key == (a0 + 1, i0 + 1, len(IMG2))
             assert len(constructions["enrich"]) == 1, constructions
             assert len(constructions["summary"]) == 1, constructions
-            assert len(constructions["describe"]) == 1, constructions
+            assert len(constructions["build"]) == 1, constructions
+            assert constructions["describe"] == [], constructions
             _assert_ui_quiet(main, constructions)
             _assert_panel_state(_check_panel(app), OLD_ROWS)
             _assert_panel_state(_patch_panel(app), OLD_ROWS)
@@ -564,7 +578,8 @@ def test_r039_shared_snapshot_interface(tmp_path: Path, monkeypatch: pytest.Monk
             assert app.current_file is not None and app.current_file.mac_records
             assert len(constructions["enrich"]) == 1, constructions
             assert len(constructions["summary"]) == 1, constructions
-            assert len(constructions["describe"]) == 1, constructions
+            assert len(constructions["build"]) == 1, constructions
+            assert constructions["describe"] == [], constructions
             _assert_ui_quiet(main, constructions)
             snap_map = _accepted_snapshots(app)
             assert snap_map is not None and set(snap_map) == {"check", "patch"}, snap_map
@@ -587,7 +602,8 @@ def test_r039_shared_snapshot_interface(tmp_path: Path, monkeypatch: pytest.Monk
             assert app._a2l_enriched_key == (2, 0, -1)
             assert len(constructions["enrich"]) == 1, constructions
             assert len(constructions["summary"]) == 1, constructions
-            assert len(constructions["describe"]) == 1, constructions
+            assert len(constructions["build"]) == 1, constructions
+            assert constructions["describe"] == [], constructions
             _assert_ui_quiet(main, constructions)
             snap_map = _accepted_snapshots(app)
             assert snap_map is not None and set(snap_map) == {"check", "patch"}, snap_map
@@ -610,7 +626,8 @@ def test_r039_shared_snapshot_interface(tmp_path: Path, monkeypatch: pytest.Monk
             assert not app.current_file.mac_records and app.current_file.mac_path is None
             assert len(constructions["enrich"]) == 1, constructions
             assert len(constructions["summary"]) == 1, constructions
-            assert len(constructions["describe"]) == 1, constructions
+            assert len(constructions["build"]) == 1, constructions
+            assert constructions["describe"] == [], constructions
             _assert_ui_quiet(main, constructions)
             snap_map = _accepted_snapshots(app)
             assert snap_map is not None and set(snap_map) == {"check", "patch"}, snap_map

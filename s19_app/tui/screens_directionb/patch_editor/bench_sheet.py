@@ -138,6 +138,8 @@ class ArrayBenchSheet(StagingSheet):
 
     def _paint_after_page_result(self) -> bool:
         """Paint a page result when the batch has drained or a paint window has passed; else arm one deferred paint."""
+        if not self.is_attached:
+            return False
         elapsed = time.monotonic() - self._painted_at
         if not self._page_decodes_pending() or elapsed >= BENCH_PAINT_INTERVAL_S:
             self._paint()

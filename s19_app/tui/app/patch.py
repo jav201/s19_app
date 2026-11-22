@@ -1829,14 +1829,13 @@ class PatchMixin:
         a fixed log line for a stale, missing or failing context)."""
         try:
             panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
-            context = panel._a2l_picker.describe_context
+            context = panel.a2l_describe_context
         except Exception:
             context = None
         if context is None:
-            if getattr(self, "_a2l_describe_path", "eager") == "lazy":
-                self.logger.info(
-                    "A2L describe context missing: full describe used."
-                )
+            self.logger.info(
+                "A2L describe context missing: full describe used."
+            )
         elif context.source is not a2l_data:
             self.logger.info("A2L describe context stale: full describe used.")
         else:
@@ -1862,7 +1861,8 @@ class PatchMixin:
         C-7: the panel is presentational, so the I-ALP-2.3 snapshot adapter
         lives here in the caller. The caller reads the accepted picker
         snapshot's ``patch`` entry and forwards ``a2l_data`` plus, on a
-        signature/A2L-source match, the prepared definitions; a present-but-
+        signature/A2L-source match, the entry's describe context (its
+        definitions are empty on every product route); a present-but-
         mismatched entry empties the whole mapping before the fallback
         populate runs. A not-yet-mounted panel keeps the legacy no-data call,
         so the snapshot survives for a later mount.
