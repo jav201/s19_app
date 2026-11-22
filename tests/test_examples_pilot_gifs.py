@@ -193,7 +193,7 @@ _CASES = _discover_cases()
 def test_case_pilot_capture_and_gif(case_id: str, case_dir: Path, tmp_path: Path) -> None:
     """Drive the TUI headlessly for one case and emit SVG frames + a GIF.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     primary = _pick_primary(case_dir)
     if primary is None:

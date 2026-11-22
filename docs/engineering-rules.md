@@ -200,8 +200,8 @@ asserts an observable:
 4. Margin finding: A margin under 20 % in the serial lane's QC-TM section is a gate finding; the finding gives the base tree's time beside it.
 5. Painted-outcome oracle: A test that waits on a painted outcome collects the lines painted since its trigger (StatusLog.since(mark)) and asserts the one it needs; it never waits on the newest line alone.
 6. Observable census: When an increment changes the order or the source of an observable, its gate greps tests/ for every node that asserts that observable and runs them, whatever module they sit in.
-7. Handled press: A new or changed arm that checks the state a press, a value it sets or a posted action leaves waits through a shared wait for a sign that the app handled it, also when it asserts that nothing changed; it never reads after fixed pauses alone. (Origin: batch-101 Inc 15 — four arms read after one pause and failed on the Windows host; R-TST-158. Existing one-pause reads are a census backlog row.)
+7. Handled press: A new or changed arm that checks the state a press, a value it sets or a posted action leaves waits through a shared wait for a sign that the app handled it, also when it asserts that nothing changed; it never reads after fixed pauses alone. (Origin: batch-101 Inc 15 — four arms read after one pause and failed on the Windows host; R-TST.158. Existing one-pause reads are a census backlog row.)
 
 (Origin: batch-101 Inc 2 — the serial/parallel lane split, the QC-TM margin
-section, and the timing-arm census; requirements R-TST-007, 030, 047, 048,
-052, 060 and the wait/hook rows R-TST-020 … 046.)
+section, and the timing-arm census; requirements R-TST.7, R-TST.30, R-TST.47, R-TST.48,
+R-TST.52, R-TST.60 and the wait/hook rows R-TST.20 … R-TST.46.)

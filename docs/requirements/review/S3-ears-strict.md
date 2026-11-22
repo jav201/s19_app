@@ -258,7 +258,7 @@ Replaces: the A2L and MAC colour blocks (their rules are S2 R-A2L-080 … 088 an
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-LEGEND.10 | U | The system shall draw every severity colour, on every screen, from the palette of CTX-LEGEND. | Partly: the A2L and MAC tables use terminal colours; MAC warnings are orange, not pale yellow (D3-18). The Load-result panel (batch-100, S11 R-LOADRES-14 … .16) uses the palette (`screens.py:1711-1777`). |
+| R-LEGEND.10 | U | The system shall draw every severity colour, on every screen, from the palette of CTX-LEGEND. | Partly: the A2L and MAC tables use terminal colours; MAC warnings are orange, not pale yellow (D3-18). The Load-result panel (batch-100, S11 R-LOADRES.14 … .16) uses the palette (`screens.py:1711-1777`). |
 | R-LEGEND.11 | U | The system shall show the legend rows of CTX-LEGEND. | Partly: the A2L, MAC and Issues rows say things the screens do not do (D3-19). |
 | R-LEGEND-SOURCE.1 | U | The system shall show the same legend rows in the legend window and in the project report. | Yes; tested. |
 | R-TUI.47 | U | The system shall name each colour of the Hex block after the style the hex view uses for it. | Yes; tested. |
@@ -364,7 +364,7 @@ Code-change items for the batch: D3-9 … D3-25, plus the removals D3-4 … D3-8
 
 **Reconciled with batch-100 (s19_app 570b4b5)**
 
-- From S11: the Load-result panel (batch-100 HLR-178) paints its OK colour, warning colour and `not readable` mark from the palette of CTX-LEGEND (green `#54efae`, pale yellow `#f6ff8f`, red `#fd8383`, grey `#969aad` for labels; `screens.py:1711-1777`, `insight_style.py:64-66`, `render/format.py:12-18`). The rows are S11's (R-LOADRES-14 … .16); "Code today" of R-LEGEND.10 names the panel. No S3 row added, changed in text or retired; no decision.
+- From S11: the Load-result panel (batch-100 HLR-178) paints its OK colour, warning colour and `not readable` mark from the palette of CTX-LEGEND (green `#54efae`, pale yellow `#f6ff8f`, red `#fd8383`, grey `#969aad` for labels; `screens.py:1711-1777`, `insight_style.py:64-66`, `render/format.py:12-18`). The rows are S11's (R-LOADRES.14 … .16); "Code today" of R-LEGEND.10 names the panel. No S3 row added, changed in text or retired; no decision.
 
 ## 6. Counts
 

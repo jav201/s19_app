@@ -394,7 +394,7 @@ def test_kind_of_value_names_assembly_without_proving_operand_types() -> None:
     B prints its evidence and is dismissed by reading it; a wrong A is a blind spot
     that looks measured. This module exists because of the second kind.
 
-    Traces: R-TST-201.
+    Traces: R-TST.201.
     """
     assert kind_of_value(ast.parse('f"{a}{b}"', mode="eval").body) == "fstring"
     assert kind_of_value(ast.parse('"#" + wid', mode="eval").body) == "concat"
@@ -406,7 +406,7 @@ def test_kind_of_value_names_assembly_without_proving_operand_types() -> None:
 def test_evidence_is_a_location_a_reader_can_open() -> None:
     """`Binding.evidence` is what turns a classification into something checkable.
 
-    Traces: R-TST-201.
+    Traces: R-TST.201.
     """
     assert Binding("assign", "concat", "t/f.py", 12).evidence() == (
         "assign->concat at t/f.py:12"

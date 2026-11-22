@@ -783,7 +783,7 @@ def _paint_clock_start(app: S19TuiApp, pressed: float) -> float:
 
     Inc 9b started the clock at the later of the click and the install,
     because the router defers the load until after the click. Batch-101
-    Inc 3 (R-TST-110): the click is not a start at all -- a worker may end
+    Inc 3 (R-TST.110): the click is not a start at all -- a worker may end
     the load long after it, and ``max`` then charged the wait for the load
     to the panel. ``pressed`` stays a parameter for the call sites and is
     not read. A missing stamp is a failed test, never a silent fall-back to
@@ -1569,7 +1569,7 @@ def test_tc_b100_61_files_at_the_cap_all_missing_are_bounded(tmp_path: Path) -> 
 
 
 # ---------------------------------------------------------------------------
-# Batch-101 Inc 3 -- the panel and append clocks (R-TST-110 ... R-TST-113)
+# Batch-101 Inc 3 -- the panel and append clocks (R-TST.110 ... R-TST.113)
 # ---------------------------------------------------------------------------
 
 _PANEL_SITES = (
@@ -1692,7 +1692,7 @@ def _distinct_folders_scene(tmp_path: Path) -> dict:
 def test_r_tst_111_112_arm_values_equal_the_product_stamps(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path, scene: str
 ) -> None:
-    """R-TST-111 and R-TST-112: each timing arm's recorded panel / append
+    """R-TST.111 and R-TST.112: each timing arm's recorded panel / append
     value equals the difference of the product's own stamps, read by an
     observer that shares nothing with the arm. The arm runs once; its
     ``report_margin`` calls are

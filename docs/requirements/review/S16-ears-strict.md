@@ -147,7 +147,7 @@ Form column: U = ubiquitous. "Code today": **Yes**, **Yes; tested** (test named)
 | R-TUI-059.21 | U | The system shall show the parts of the Flow Builder in the order of CTX-BUILDER. | Yes; tested (`test_tc_b97_13_pipeline_cards_and_cables_replace_list_and_canvas`, `test_tc_b97_47_copy_paste_strip_on_one_row_inside`). |
 | R-TUI-059.22 | U | The system shall show the flow's name and its saved state on the ribbon. | Yes; tested (`test_tc_b97_49_ribbon_saved_state_is_a_word`). |
 | R-FB-RIB.1 | When | When the chain or the variables change after a load or a save, the system shall show `· unsaved` on the ribbon. | **NEW** · Yes; tested (`test_tc_b97_49_ribbon_paints_saved_then_unsaved`, `test_at002_name_strip_glyph_dirty_then_saved`). An unsaved flow is one item of the load question (S5 R-LOADQ-001.4, CTX-LOADQ: `flow <flow name>`). |
-| R-FB-RIB.2 | While | While a project is open, the system shall show the project folder on the ribbon. | **NEW** · Yes; tested (`test_tc_b97_49_session_on_the_ribbon`). After a save as, the new project folder (S11 R-SAVEAS-8, `test_tc_b100_31_flow_session_folder_follows_q`; batch-100 LLR-171.1l). |
+| R-FB-RIB.2 | While | While a project is open, the system shall show the project folder on the ribbon. | **NEW** · Yes; tested (`test_tc_b97_49_session_on_the_ribbon`). After a save as, the new project folder (S11 R-SAVEAS.8, `test_tc_b100_31_flow_session_folder_follows_q`; batch-100 LLR-171.1l). |
 | R-FB-RIB.3 | U | The system shall show every name, ref, command, path and finding on the Flow Builder as plain text, never as markup. | Yes; tested (`test_tc_b97_20_hostile_refs_render_literally`, `test_at_flow_block_label_markup_safe`, `test_at_b94_18_hostile_names_render_literally`). |
 | R-FB-RIB.4 | When | When the operator presses Space on a chip of a Flow window, the system shall press that chip. | **NEW** · Yes (`flow_screens.py:944-960`). |
 | R-FB-RIB.5 | While | While the Flow Builder is shown at 118 columns by 54 rows or more, the system shall keep the foot row in view without scrolling. | **NEW** · Yes; tested (`test_tc_b97_17_run_is_the_one_filled_action_on_one_foot_row`). |
@@ -387,7 +387,7 @@ Form column: U = ubiquitous. "Code today": **Yes**, **Yes; tested** (test named)
 
 **Reconciled with batch-100 (s19_app 570b4b5)**
 
-- From S11 and the sweep: R-FB-RIB.2 cites S11 R-SAVEAS-8 (after a save as the Flow panels use the new project folder, batch-100 LLR-171.1l, TC-B100-31). Cell change only.
+- From S11 and the sweep: R-FB-RIB.2 cites S11 R-SAVEAS.8 (after a save as the Flow panels use the new project folder, batch-100 LLR-171.1l, TC-B100-31). Cell change only.
 - From S5: R-FB-RIB.1's unsaved state is the "unsaved flow" of S5 CTX-LOADQ; the cell cites S5 R-LOADQ-001.4. Cell change only.
 - From the sweep: batch-100 LLR-171.4i, .4j (no flow or chain set saved outside the work area) are engine rows in S15 (R-FLOW-FILE.11, R-FLOW-SET.7, S15 D15-18); no S16 row.
 - No row added, changed in text or retired; no decision added or superseded.

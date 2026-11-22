@@ -881,7 +881,7 @@ def test_a16_canonicaliser_residue_guard_can_actually_fire(tmp_path: Path) -> No
     suite (tests/__init__.py documents why the bare `conftest` spelling is not
     importable under the repo's own pytest config). No assertion changed.
 
-    Traces: R-TST-203.
+    Traces: R-TST.203.
     """
     from tests.conftest import canonical_report_bytes
 

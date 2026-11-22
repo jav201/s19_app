@@ -1,7 +1,7 @@
 name: tui-ci
 
 # Two-tier gate (batch-07 CI-1, operator decision 2026-06-10), two lanes each
-# (batch-101 Inc 2, R-TST-010/011):
+# (batch-101 Inc 2, R-TST.10, R-TST.11):
 #  - PRs run the lean suite (-m "not slow"): lane 1 in parallel over the
 #    runner's CPUs without the wall-clock timing arms, then lane 2 the timing
 #    arms serially (-m "serial_timing and not slow").
@@ -9,7 +9,7 @@ name: tui-ci
 #    tests) over two jobs. In tui-ci, lane 1 parallel (-m "not serial_timing")
 #    and lane 2 serial (-m "serial_timing and not slow"); lane 2 also runs
 #    after a red or timed-out lane 1. Beside it, the push-only tui-ci-heavy job
-#    (R-TST-019/026) runs the slow timing arms serially
+#    (R-TST.19, R-TST.26) runs the slow timing arms serially
 #    (-m "slow and serial_timing"), so the two jobs together run every timing
 #    arm (-m serial_timing).
 on:
@@ -88,7 +88,7 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     # 123 = ceil(1.5 x 41 min x 2): 41 min is the laptop wall of
-    # -m "slow and serial_timing" run serially, 2 the CI factor (R-TST-026).
+    # -m "slow and serial_timing" run serially, 2 the CI factor (R-TST.26).
     timeout-minutes: 123
     steps:
       - name: Check out repository

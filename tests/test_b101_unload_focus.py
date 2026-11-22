@@ -892,7 +892,7 @@ def test_r_tui_012l_8_1_load_status_drops_a_cf_character(tmp_path: Path) -> None
         await load_image(pilot, app, image)
         # The load line reaches the message lines directly (not through
         # ``set_status``), so the wait reads every painted line, never the
-        # newest alone (R-TST-050 / QC-OR; fixed at E4 integration, I-D8).
+        # newest alone (R-TST.50 / QC-OR; fixed at E4 integration, I-D8).
         await wait_until(
             pilot,
             lambda: any(line.startswith("Loaded ") for line in app.log_lines),

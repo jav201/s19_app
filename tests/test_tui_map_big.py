@@ -1252,7 +1252,7 @@ def test_b77_gapless_fixture_is_unequal_and_gapless(tmp_path: Path) -> None:
     non-zero, changing the allocation the golden pins and silently voiding the
     "gapless no-op" the requirement names.
 
-    Traces: R-TST-203.
+    Traces: R-TST.203.
     """
     loaded = _gapless_unequal_loaded(tmp_path)
 
@@ -1768,6 +1768,8 @@ def test_tc_b77_32_b77_style_band_token_survives_selection(
 ) -> None:
     """TC-B77-32 — selecting and MOVING the selection never touches ``band-*``.
 
+    Traces: R-MAP-SEL.1.
+
     Asserted across a move, not a single application: a marker that replaced
     the band token would be invisible to a test that only ever looked at one
     selected row, because that row's band class would already be gone at the
@@ -1825,6 +1827,8 @@ def test_tc_b77_33_b77_style_selection_rule_sets_no_foreground_no_inversion() ->
     None
 ):
     """TC-B77-33 — LLR-117.2's inspection arm, read from the stylesheet.
+
+    Traces: R-MAP-SEL.1.
 
     Revision 1's wording — "sets no ``color:`` property" — is satisfied by
     ``text-style: reverse``, which swaps foreground and background and so

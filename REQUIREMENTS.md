@@ -386,19 +386,19 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-163 · LLR-163.1 … .7 | **absorbed** · S5: R-TUI-006.1 … .5, R-TUI-002.9; S8: R-PATCH-SAVE-FOLDER-001.5, .6; S11: R-PROJ-002.2, R-PROJ-ROLLBACK.8; S17: R-SEG-PLACE.3, .5, R-SEG-EXP.12 | Reuse for every placement (S5 D5-38). LLR-163.2 (size before bytes) is design; LLR-163.3, .4, .6 were true at 093a7c0 (S8 D8-36, S17 D17-44); LLR-163.5 is the reused-variant status, LLR-163.7 the save plan's action words (S11 CTX-SAVE; `predict_placement` is mechanism, S11 D11-50). |
 | HLR-164 · LLR-164.1 … .4 | **absorbed** · S11: R-TUI-012.5 … .15, .20, .21, R-TUI-013.2, R-PROJ-MERGE.1 … .3, R-PROJ-ROLLBACK.1 … .6, .12 | Name guards, merge, a failed save leaves nothing. The AST census of LLR-164.4 is mechanism (S11 D11-50, D11-51). |
 | HLR-165 · LLR-165.1 … .4 | **absorbed** · S11: R-PROJ-RESET.1, .3, .4; S2: R-A2L-004.13; S5: R-WS-LOADED.6, .10 | Reset after the read, before the first install; `_session_snapshot` is a test seam (S11 D11-63). LLR-165.4 (an unload drops the parsed A2L) was in the code at 093a7c0 (S2 D2-32); S5's unload rows cite it. |
-| HLR-166 · LLR-166.1, .2 | **absorbed** · S6: R-SHELL-FOCUS.3, .4, .5, .7, R-FOCUS-LOAD.1 | Focus after a load completes or is cancelled, and after the Load-result panel closes; the panel's own first focus is S11's (R-LOADRES-8). |
-| HLR-167 · LLR-167.1 … .8, .6a … .6g | **absorbed** · S11: R-PROJ-IMAGE.1 … .14, R-PROJ-001.1 … .12, R-TUI-012.16, .17, .28, .29, R-SAVEDLG-16, R-SAVEDLG-24, R-PROJ-DOC.15 … .17; S10: R-PE-038, R-PE-039.1 … .4 | Emit on data (S11 D11-52, LED .14 over LED .13); the LLR-167.7 split is mechanism. LLR-167.8 (the Patch Editor's unsaved mark after Save project) is S10's (D10-46). |
+| HLR-166 · LLR-166.1, .2 | **absorbed** · S6: R-SHELL-FOCUS.3, .4, .5, .7, R-FOCUS-LOAD.1 | Focus after a load completes or is cancelled, and after the Load-result panel closes; the panel's own first focus is S11's (R-LOADRES.8). |
+| HLR-167 · LLR-167.1 … .8, .6a … .6g | **absorbed** · S11: R-PROJ-IMAGE.1 … .14, R-PROJ-001.1 … .12, R-TUI-012.16, .17, .28, .29, R-SAVEDLG.16, R-SAVEDLG.24, R-PROJ-DOC.15 … .17; S10: R-PE-038, R-PE-039.1 … .4 | Emit on data (S11 D11-52, LED .14 over LED .13); the LLR-167.7 split is mechanism. LLR-167.8 (the Patch Editor's unsaved mark after Save project) is S10's (D10-46). |
 | HLR-168 · LLR-168.1 … .4 | **absorbed** · S11: R-PROJ-SAVEBACK.1 … .3, R-PROJ-002.4, .10, .11, R-PROJ-WRITER.1 … .4, R-VAR-001.1, R-VAR-002.19, R-PROJ-IMAGE.13; S8: R-CHG-003.8, .19, .20 | Every in-project writer rewrites project.json (S11 D11-59). The save-back itself is unchanged; S8 cites the S11 rows (D8-37). |
-| HLR-169 · LLR-169.1 … .9 | **absorbed** · S11: R-PROJCHK-1 … R-PROJCHK-18, R-PROJ-OPEN.1, .2, R-VAR-002.2, .14, R-MANIFEST-READ.3 … .11, .17, R-MANIFEST-WRITE.2, .3, R-MAN-WRITE-001.4, R-MAN-VERIFY-001.2, R-MANIFEST-KEEP.1 … .5 | Read cap 1 MiB (S11 D11-57); private staging is mechanism. |
+| HLR-169 · LLR-169.1 … .9 | **absorbed** · S11: R-PROJCHK.1 … R-PROJCHK.18, R-PROJ-OPEN.1, .2, R-VAR-002.2, .14, R-MANIFEST-READ.3 … .11, .17, R-MANIFEST-WRITE.2, .3, R-MAN-WRITE-001.4, R-MAN-VERIFY-001.2, R-MANIFEST-KEEP.1 … .5 | Read cap 1 MiB (S11 D11-57); private staging is mechanism. |
 | HLR-170 · LLR-170.1 … .3 | **absorbed** · S11: R-PROJ-DOC.1 … .22, R-MANIFEST-READ.15, R-MANIFEST-WRITE.5, .6 | The active change document is saved and reopened. |
-| HLR-171 · LLR-171.1 … .1o, .5, .6 … .6b, .7 … .7c | **absorbed** · S11: R-SAVEAS-1 … R-SAVEAS-14, R-TUI-012.25 … .27, .29, .31, .32, R-PROJ-MERGE.2, R-PROJ-GATHER.10, .11, R-PROJ-ASSIGN-001.5 … .7, R-PROJ-ROLLBACK.14, .15; S16: R-FB-RIB.2; S13: R-CRC-TEMPLATE-001.12 | Save as copies the project. LLR-171.1l (the Flow panels follow the new folder) is S11 R-SAVEAS-8, cited by S16; LLR-171.5's `copied but not recorded` status is S11 R-PROJ-GATHER.10, cited by S13. |
+| HLR-171 · LLR-171.1 … .1o, .5, .6 … .6b, .7 … .7c | **absorbed** · S11: R-SAVEAS.1 … R-SAVEAS.14, R-TUI-012.25 … .27, .29, .31, .32, R-PROJ-MERGE.2, R-PROJ-GATHER.10, .11, R-PROJ-ASSIGN-001.5 … .7, R-PROJ-ROLLBACK.14, .15; S16: R-FB-RIB.2; S13: R-CRC-TEMPLATE-001.12 | Save as copies the project. LLR-171.1l (the Flow panels follow the new folder) is S11 R-SAVEAS.8, cited by S16; LLR-171.5's `copied but not recorded` status is S11 R-PROJ-GATHER.10, cited by S13. |
 | HLR-171a · LLR-171.2 … .2h | **absorbed** · S11: R-PROJ-A2LONLY.1 … .5, R-TUI-013.8, .20, R-PROJ-RESET.1; S5: R-WS-LOADED.5 | LLR-171.2e was retired by the batch (LLR-173.4a); its branch is a guard (S11 D11-68). LLR-171.2h (the A2L unload of an A2L-only session) is cited by S5's unload row. |
 | HLR-171b · LLR-171.3 … .4j | **absorbed** · S11: R-PROJ-CONTAIN.1, R-TUI-012.15, .24, .34, .36, R-TUI-013.2, .15, .16, R-MAN-WRITE-001.5, R-MANIFEST-WRITE.8, R-PROJ-002.8; S15: R-FLOW-FILE.11, R-FLOW-SET.7 | LLR-171.4d was withdrawn by the batch. LLR-171.4i, .4j (a flow or a chain set is not saved outside the work area) are not implemented at 570b4b5: both S15 rows read No (S15 D15-18, code change). |
 | HLR-172 · LLR-172.1, .1a … .1n, .2, .2a … .2k, .3 | **absorbed** · S5: R-RECENT-001.1 … .20, R-RECENT-002.1 … .9, R-RECENT-003.1; S7: R-LOADDLG.31, .32 | Per-user recent-sources store (S5 D5-45); the store problem's lines in the Load dialog are S7's. |
 | HLR-172a · LLR-172.5, .5a … .5k | **absorbed** · S7: R-TUI-043.2, R-TUI-043.14 … .24, R-LOADDLG.64, .65, .68; S11: R-TUI-013.18 | A typed absolute project path opens the project; refusals by class (S7 CTX-LOADDLG). LLR-172.5j, .5k (one match function, one wording table) are implementation (S7 D7-13). S7 R-LOADDLG.66 is retired into S11 R-TUI-013.18 (S7 D7-34). |
 | HLR-172b · LLR-172.4, .4a … .4f, .6, .6a … .6c | **absorbed** · S5: R-WS-FILES.1, .3, .5, .7 … .15; S11: R-TUI-013.2 | LLR-172.4 (one lister, AST census) is design (S5 D5-48); LLR-172.4e (names ending in a dot or a space) is S11's project list. |
 | HLR-173 · LLR-173.1, .1e, .1g, .2, .2a … .2e, .2j, .2m, .3 … .3d, .4 … .4g, .4l, .4m, .6d, .6f, .6k … .6n, .7 | **absorbed** · S7: R-TUI-043.1, R-LOADDLG.1 … .53, R-DLG.1, CTX-KEYBAR row 1; S6: R-TUI-022.2; S11: R-TUI-013.2, .17 | One Load dialog (P-A verdict C). LLR-173.1, .1e, .6l are implementation (S7 D7-13); LLR-173.4a's folder rule is S11's project list; the palette labels of LLR-173.2m are S6's (D6-38). S7 R-LOADDLG.67 is retired into S11 R-TUI-013.17 (S7 D7-34). |
-| HLR-173a · LLR-173.6, .6a … .6c, .4n | **absorbed** · S7: R-LOADDLG.44 … .50, .82; S11: R-TUI-014.4, R-LOADRES-18 | The `●` marks equal the installed set. The install half of LLR-173.4n and LLR-173.6a are S11's. The work-area row's `becomes the active variant of project <P>` line (LLR-173.6c) promises a sync the pick does not do (S11 D11-29). |
+| HLR-173a · LLR-173.6, .6a … .6c, .4n | **absorbed** · S7: R-LOADDLG.44 … .50, .82; S11: R-TUI-014.4, R-LOADRES.18 | The `●` marks equal the installed set. The install half of LLR-173.4n and LLR-173.6a are S11's. The work-area row's `becomes the active variant of project <P>` line (LLR-173.6c) promises a sync the pick does not do (S11 D11-29). |
 | HLR-173b · LLR-173.1f, .4h … .4k | **absorbed** · S7: R-LOADDLG.35, .36, .51, .52, .62, .71, .81 | A recent row reopens its recorded path; nothing is read at it before the load. |
 | HLR-173c · LLR-173.1a … .1c, .2f, .2g | **absorbed** · S7: R-LOADDLG.54 … .63, R-TUI-043.2, R-TUI-043.15 | Enter, Alt+L and Load load the load source. |
 | HLR-173d · LLR-173.2h, .2i, .5, .5a … .5e | **absorbed** · S7: R-LOADDLG.69 … .80 | An empty or refused load request is explained in the reason line. |
@@ -408,23 +408,23 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-174b · LLR-174.2c, .2e, .2f, .2p, .3, .3c | **absorbed** · S5: R-LOADQ-003.1, .5, R-LOADQ-004.2, .4, .5, R-LOADQ-005.4 | LLR-174.3's order (reset after the answer) is design; its observable part is R-LOADQ-003.2. |
 | HLR-174c · LLR-174.2b, .2d, .2e, .2f, .2p, .3a, .3c, .3d | **absorbed** · S5: R-LOADQ-003.2 … .5, R-LOADQ-004.1, .3, .4, .5; S6: R-SHELL-FOCUS.4 | The focus after the close is S6's (LLR-166.1). |
 | HLR-174d · LLR-174.2i, .2k … .2o, .2q | **absorbed** · S5: R-LOADQ-005.1 … .3, .5 | Texts in S5 CTX-LOADQ. |
-| HLR-175 · LLR-175.1, .4, .4c … .4g, .4j, .5, .5a | **absorbed** · S11: R-SAVEDLG-7, R-SAVEDLG-8, R-SAVEDLG-19 … R-SAVEDLG-24, R-SAVEDLG-27, R-PROJ-ASSIGN-UI-001.6 | The 150 ms recompute and the once-per-open digests are mechanism (S11 D11-50). |
-| HLR-175a · LLR-175.3c, .4a, .4b, .4k … .4m | **absorbed** · S11: R-SAVEDLG-11 … R-SAVEDLG-18 | `SaveProjectScreen.plan` (LLR-175.4k) is a test seam. |
-| HLR-175b · LLR-175.1a … .1p, .3f, .6 | **absorbed** · S11: R-SAVEDLG-9 … R-SAVEDLG-11, R-TUI-012.8 … .18, .23 … .33 | Refusals painted in the dialog (S11 D11-56). LLR-175.6 is mechanism. |
+| HLR-175 · LLR-175.1, .4, .4c … .4g, .4j, .5, .5a | **absorbed** · S11: R-SAVEDLG.7, R-SAVEDLG.8, R-SAVEDLG.19 … R-SAVEDLG.24, R-SAVEDLG.27, R-PROJ-ASSIGN-UI-001.6 | The 150 ms recompute and the once-per-open digests are mechanism (S11 D11-50). |
+| HLR-175a · LLR-175.3c, .4a, .4b, .4k … .4m | **absorbed** · S11: R-SAVEDLG.11 … R-SAVEDLG.18 | `SaveProjectScreen.plan` (LLR-175.4k) is a test seam. |
+| HLR-175b · LLR-175.1a … .1p, .3f, .6 | **absorbed** · S11: R-SAVEDLG.9 … R-SAVEDLG.11, R-TUI-012.8 … .18, .23 … .33 | Refusals painted in the dialog (S11 D11-56). LLR-175.6 is mechanism. |
 | HLR-175c · LLR-175.3, .3a | **absorbed** · S11: R-TUI-012.2 | Escape closes the dialog and saves nothing. |
-| HLR-175d · LLR-175.3b | **absorbed** · S11: R-TUI-012.3, .8, R-SAVEDLG-9 | An empty Save is explained in the dialog. |
-| HLR-175e · LLR-175.2, .2a | **absorbed** · S11: R-SAVEDLG-6, R-TUI-012.4 | The dialog saves only into the work area. |
-| HLR-175f · LLR-175.3d, .3e, .3g … .3j, .4h, .4i, .5b | **absorbed** · S11: R-TUI-012.1, .7, .22, R-SAVEDLG-1 … R-SAVEDLG-5, R-SAVEDLG-25, R-SAVEDLG-26 | One dialog with the name, the summary and two buttons. LLR-175.5b (first frame first) is mechanism. |
+| HLR-175d · LLR-175.3b | **absorbed** · S11: R-TUI-012.3, .8, R-SAVEDLG.9 | An empty Save is explained in the dialog. |
+| HLR-175e · LLR-175.2, .2a | **absorbed** · S11: R-SAVEDLG.6, R-TUI-012.4 | The dialog saves only into the work area. |
+| HLR-175f · LLR-175.3d, .3e, .3g … .3j, .4h, .4i, .5b | **absorbed** · S11: R-TUI-012.1, .7, .22, R-SAVEDLG.1 … R-SAVEDLG.5, R-SAVEDLG.25, R-SAVEDLG.26 | One dialog with the name, the summary and two buttons. LLR-175.5b (first frame first) is mechanism. |
 | HLR-176 · LLR-176.1, .1a, .1g, .1n, .1p, .1r, .1t, .2, .2a, .2b, .4 … .4b | **absorbed** · S6: R-PROGRESS-LINE.1, .8, .9, R-PROGRESS-SHOWN.1, .3, R-SHELL-STATUS.5, .6; S2: R-A2L-004.11 | The progress line (S6 CTX-BUSY). LLR-176.2, .2a (the bar-site census) are implementation (S6 D6-33, D6-34); LLR-176.4a, .4b (same result with or without a callback; the frozen-engine list) are implementation (S2 D2-33). |
 | HLR-176a · LLR-176.1e, .1f, .1g, .1q | **absorbed** · S6: R-PROGRESS-LINE.3, .4, R-PROGRESS-END.2 | One timer and main-thread writes (.1e count, .1q) are implementation; held steps declared (S6 D6-35). |
 | HLR-176b · LLR-176.1b, .1c, .1d | **absorbed** · S6: R-PROGRESS-BAR.1, .2 | The bar value is CTX-BUSY's; the clamp of bad step data (.1d) is an internal contract (S6 D6-34). |
 | HLR-176c · LLR-176.1i … .1m, .1o, .1s, .2c, .2d | **absorbed** · S6: R-PROGRESS-END.1 … .5, R-PROGRESS-SHOWN.2, .4, R-PROGRESS-BAR.1, .5, R-PROGRESS-LINE.7; S12: R-RPT-LOG.1 … .4; S14: R-CMP-005.13 … .15, R-BEFORE-AFTER-REPORT-001.31 | Each action's own outcome text stays in its chapter (S5 R-TUI-012L.12, S2 R-A2L-004.1, S11, S12, S14); the report's end follows S6 R-PROGRESS-END.3 (S12 D12-30). |
 | HLR-176d · LLR-176.1h, .1j | **absorbed** · S6: R-PROGRESS-LINE.2, R-PROGRESS-END.2 | One owner of the status text while an action runs. |
-| HLR-177 · LLR-177.1 … .1k, .2 … .2c, .5, .5a, LLR-176.3 | **absorbed** · S6: R-PROGRESS-LINE.3, .5, R-PROGRESS-BAR.3, R-BUSY-RUN.1; S2: R-A2L-004.3, .6 … .12; S5: R-TUI-012L.5; S11: R-PROJ-RESET.1, R-LOADRES-2, R-PROJ-ROLLBACK.17, .18, R-TUI-013.17 | Worker threads, frozen requests and main-thread writes (.1, .1a, .1b, .1d, .1e, .1i) are implementation (S6 D6-33, S2 D2-33). The results and failures of each action (.1f … .1h, .1j, .1k, .2 … .2c) are in its chapter (S6 D6-42). The copy on the screen's thread is a held step (S6 D6-35, S5 D5-50). |
+| HLR-177 · LLR-177.1 … .1k, .2 … .2c, .5, .5a, LLR-176.3 | **absorbed** · S6: R-PROGRESS-LINE.3, .5, R-PROGRESS-BAR.3, R-BUSY-RUN.1; S2: R-A2L-004.3, .6 … .12; S5: R-TUI-012L.5; S11: R-PROJ-RESET.1, R-LOADRES.2, R-PROJ-ROLLBACK.17, .18, R-TUI-013.17 | Worker threads, frozen requests and main-thread writes (.1, .1a, .1b, .1d, .1e, .1i) are implementation (S6 D6-33, S2 D2-33). The results and failures of each action (.1f … .1h, .1j, .1k, .2 … .2c) are in its chapter (S6 D6-42). The copy on the screen's thread is a held step (S6 D6-35, S5 D5-50). |
 | HLR-177a · LLR-177.3 … .3i | **absorbed** · S6: R-BUSY-REFUSE.1 … .8; S10: R-PE-110, R-PE-111; S12: R-RPT-002.28 | The busy line and the refused list are S6 CTX-BUSY; reports are never refused (R-BUSY-REFUSE.7). |
 | HLR-177b · LLR-177.4, .4a, .4b, .4d | **absorbed** · S6: R-SHELL-START.5, R-QUIT.1 … .6 | Supersedes S6 D6-9 for the "session action running" state (S6 D6-36). |
 | HLR-177c · LLR-177.4c, .4e | **absorbed** · S6: R-QUIT.7 … .12 | Quit waits for the end; withdrawn on a failure or unsaved work. |
-| HLR-178 · LLR-178.1 … .3 | **absorbed** · S11: R-TUI-013.12, .13, R-LOADRES-1 … R-LOADRES-18; S7: R-LOADDLG.83; S3: R-LEGEND.10 | Problem rows bounded at 102 (S11 D11-54); the panel's colours are the S3 palette. The open project's preview of the last load result (LLR-178.3, last sentence) is not built at 570b4b5: S7 R-LOADDLG.83 reads No (S7 D7-35). |
+| HLR-178 · LLR-178.1 … .3 | **absorbed** · S11: R-TUI-013.12, .13, R-LOADRES.1 … R-LOADRES.18; S7: R-LOADDLG.83; S3: R-LEGEND.10 | Problem rows bounded at 102 (S11 D11-54); the panel's colours are the S3 palette. The open project's preview of the last load result (LLR-178.3, last sentence) is not built at 570b4b5: S7 R-LOADDLG.83 reads No (S7 D7-35). |
 
 **Batch-101 event rows** (CTX-RETIRED "batch-101 event row"; operator decision 2026-11-19). One line per R-TST row of batch-101 whose obligation names one fixed CI run, merge or tree. Each line keeps the row's approved text (FORWARD's "Final text") and its source; none is a requirement.
 
@@ -450,7 +450,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | R-B102-CLIP-005 | **retired** | Superseded by batch-103 Inc 1a (D-1 A, D-3 A): the 2.0 s PowerShell rescue is a design value; the observable bound is S7: R-TUI-043.10.2, R-PASTE.13 (2.5 s). |
 | R-B102-CLIP-006 | **absorbed** · S7: R-TUI-043.6 … R-TUI-043.8, R-PASTE.18 | No OS value: the app clipboard; both empty: the box text is selected and the paste failure warning shows. |
 
-**Batch-only ids** (batch 2026-11-20-cleanup, TR-02; ruling I1-D4). One line per HLR; each points batch-only LLRs that canon rows already cover.
+**Batch-only ids** (batch 2026-11-20-cleanup, TR-02; ruling I1-D4). One line per HLR; each points batch-only LLRs that canon rows already cover, or that the canon superseded.
 
 | Id | Where it lives now | Note |
 |---|---|---|
@@ -466,7 +466,10 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-121 · LLR-121.2, .4 | **absorbed** · S6: R-SHELL-START.1, R-TUI-033.1, R-TUI-016.1; S4: R-TUI-040.1; S5: R-WS-LOADED.1 | Batch 2026-08-06-batch-78, built in 2026-08-07-batch-79. The command bar's find and go-to boxes are gone: the frame of CTX-SHELL has none, `/` and `g` use the window's own boxes (S6 D6-3). .2: the search and go-to rows of S4.3 and S4.4 hold unchanged; the frozen-payload check is a test method. .4: process (increment order); its test helpers read the loaded panel and the context line. Not retired (I2-D5). |
 | HLR-N8-3 · LLR-N8-3.2 | **absorbed** · S3: R-LEGEND-MAP.2, R-LEGEND-MAP.3 | Batch 2026-07-23-batch-n8. Band rows derived from S4 CTX-ENTROPY (CTX-LEGEND "map sheet"). |
 | HLR-V1 | **absorbed** · S13: R-CRC-PRESET-001.1 … R-CRC-PRESET-001.8 | Batch 2026-07-20-batch-58. The form is CTX-DESIGNER column 1 and Store placement; a preset pick fills it and leaves the preset unchanged. LLR-V1.1, .2 are other increments' rows. |
-| HLR-111 · LLR-111.1, .2 | **absorbed** · S4: R-TUI-103B.4, R-TUI-103B.3, R-TUI-062.9 | Batch 2026-08-01-batch-77. Widths by mapped bytes; one ╱ column per gap. |
+| HLR-111 · LLR-111.1, .2, .3, .4 | **absorbed** · S4: R-TUI-103B.4, R-TUI-103B.3, R-TUI-062.9, R-TUI-103B.5, R-TUI-103B.1, R-TUI-103B.2 | Batch 2026-08-01-batch-77. Widths by mapped bytes; one ╱ column per gap. .3: no segment outside the bar (R-TUI-103B.5). .4: a gapless bar at a fixed width shares its columns by largest remainder (R-TUI-103B.1, R-TUI-103B.2, R-TUI-103B.4); the golden that checks it is a test method (I3-D2). |
+| HLR-112 · LLR-112.2 | **absorbed** · S4: R-TUI-072.2, R-TUI-072.1 | Batch 2026-08-01-batch-77, revision 7 of its 01-requirements.md. Labels that do not fit are dropped legibly: first and last kept, no tick narrower than its label. HLR-112 and its other LLRs are other increments' rows. |
+| HLR-115 · LLR-115.3 | **retired** | Batch 2026-08-01-batch-77, revision 7. Superseded by S4 D4-21: Enter on a region row opens the main hex view (S4: R-TUI-062.3). Enter-inspects is today's code, the defect D4-21 records (I3-D4). HLR-115 and its other LLRs are other increments' rows. |
+| HLR-116 · LLR-116.2 | **absorbed** · S4: R-TUI-062.6 | Batch 2026-08-01-batch-77, revision 7. The selection is resolved after the reset, on a post-refresh hook (design); what the operator sees is the first or same-address region selected. HLR-116 and its other LLRs are other increments' rows. |
 
 
 #### S0.3 · The requirements file (CTX-CANON; from batch-101 Inc 1)
@@ -593,58 +596,58 @@ R-DOC-ARCHIVE.2 (keep in the architecture archive each line that batch-101 Inc 1
 |---|---|---|
 | R-TST-001 | U | The system shall register the pytest marker `serial_timing` with the description `a wall-clock timing arm; run apart and serially (-m serial_timing)`. |
 | R-TST-002 | U | The system shall carry the `serial_timing` marker on every timing arm. |
-| R-TST-003 | If | If a timing arm does not carry the `serial_timing` marker, then the system shall fail its marker guard with the text `timing arm without serial_timing: <file>::<test>`. |
-| R-TST-004 | If | If a test that is not a timing arm carries the `serial_timing` marker, then the system shall fail its marker guard with the text `serial_timing on a test that is not a timing arm: <file>::<test>`. |
-| R-TST-005 | U | The system shall treat as a timing arm each test that matches a static form of *Timing arm* (Definitions). |
-| R-TST-006 | U | The system shall not treat as a timing arm a test whose clock interval no ordering assert reads. |
-| R-TST-007 | U | The system shall give in its test conventions the release gate as the parallel lane `pytest -n 8 -m "not serial_timing"` followed by the serial lane `pytest -m serial_timing`, both on the LAN Linux host. |
-| R-TST-009 | When | When the release gate runs on the LAN Linux host, the system shall finish both lanes within 75 min of wall time in total. |
-| R-TST-010 | When | When a pull request runs the CI workflow, the system shall run `pytest -v -rs -n auto -m "not slow and not serial_timing"` and then `pytest -q -rs -m "serial_timing and not slow"` in that workflow. |
-| R-TST-011 | When | When a push runs the CI workflow, the system shall run `pytest -v -rs -n auto -m "not serial_timing"` and then `pytest -q -rs -m "serial_timing and not slow"` in that workflow. |
-| R-TST-012 | If | If the first lane of a CI run fails, then the system shall still run the serial lane of that CI run and mark the job failed. |
-| R-TST-013 | U | The system shall check out the repository with its full history in the `tui-ci` job of its CI workflow. |
-| R-TST-014 | When | When the CI workflow runs, the system shall run the 6 history arms without skipping them. |
-| R-TST-015 | U | The system shall stop lane 1 of its CI workflow at the lane's time limit: 220 minutes on a push, 120 minutes on a pull request. |
-| R-TST-016 | U | The system shall stop the `tui-ci` job of its CI workflow after 300 minutes. |
-| R-TST-017 | If | If lane 1 of a push run reaches its time limit, then the system shall still run lane 2 of that run. |
-| R-TST-018 | U | The system shall install pytest-xdist 3.8.0 in the `tui-ci` job of its CI workflow. |
-| R-TST-019 | When | When a push runs the CI workflow, the system shall run `pytest -q -rs -m "slow and serial_timing"` in the `tui-ci-heavy` job of that workflow. |
-| R-TST-026 | U | The system shall stop the `tui-ci-heavy` job of its CI workflow after 123 minutes. |
-| R-TST-020 | U | The system shall bound the wait of each shared wait helper by the wall clock, 60 s by default. |
-| R-TST-021 | U | The system shall make each shared wait helper yield the event loop for at least 0.05 s between two checks of its predicate. |
-| R-TST-022 | U | The system shall make the `settled` shared wait let the app process one pause before its first check of the predicate. |
-| R-TST-023 | U | The system shall make each shared wait helper accept every call it accepted at `b3bf42e`, with the same parameter names, order and defaults for the positional parameters. |
-| R-TST-024 | If | If a shared wait's condition does not hold within its bound, then the system shall make the shared wait helper raise `AssertionError` with its text from table W. |
-| R-TST-025 | When | When the shared project-load helper measures a project load, the system shall stop the clock when the app's project install callback returns. |
-| R-TST-030 | U | The system shall state in its test conventions the post-press rule: `An arm that checks the state a key press leaves while a real worker runs holds the worker at a forced slow step or records the state at the product hook; it never samples after the press.` |
-| R-TST-031 | U | The system shall verify the quit-confirm half of AT-B100-18 with the save worker held at a forced slow step, and the parse half of AT-B100-17 from the states recorded at the progress hook. |
-| R-TST-032 | U | The system shall verify that a new set run restarts the confirm dwell with an injected dwell clock, independent of host speed. |
-| R-TST-040 | U | The system shall pass each upper timing bound of a timing arm through the margin reporter, which returns the bound unchanged. |
-| R-TST-041 | If | If an upper timing bound of a timing arm is not a margin-reporter call, then the system shall fail its margin guard with the text `timing bound without report_margin: <file>:<line>`. |
-| R-TST-042 | When | When a timing arm reports a margin, the system shall attach the margin report to that test's item as the property `qc_tm`, so that its call report, its teardown report and the junit XML carry it. |
-| R-TST-043 | When | When a test session that recorded at least one margin report ends, the system shall print a section titled `QC-TM timing margins` with one row per margin report of a call-phase test report, `<margin>%  <measured> s / <bound> s  <label>  <nodeid>`, in ascending margin order. |
-| R-TST-044 | If | If a reported margin is below 20 %, then the system shall begin that row of the QC-TM section with `LOW `. |
-| R-TST-045 | When | When the test suite prints the QC-TM section, the system shall end it with the line `QC-TM: <n> bounds, <k> under 20 % margin`. |
-| R-TST-046 | If | If a timing arm's measured interval exceeds its bound, then the system shall record its margin report, with a negative margin, before the arm's assertion fails. |
-| R-TST-047 | U | The system shall state in its test conventions the clock rule: `A timing arm stops its clock at a stamp the product emits (a commit handler, a painted line, an install callback), never when a poll notices.` |
-| R-TST-048 | U | The system shall state in its test conventions the margin rule: `A margin under 20 % in the serial lane's QC-TM section is a gate finding; the finding gives the base tree's time beside it.` |
-| R-TST-049 | If | If a function that a change wraps as a timing arm (a `serial_timing` marker or a `report_margin` call added against the merge-base with main) differs from its base version by anything other than that marker and the `report_margin(label, measured, bound)` wraps, then the system shall fail its wrap guard with the text `wrapped timing arm changed beyond marker and report_margin: <file>::<function>`. |
-| R-TST-050 | U | The system shall give status oracles every status line the app paints after a mark, in paint order and without a cap. |
-| R-TST-051 | If | If a test file holds more newest-line waits than its newest-line baseline (0 for a file absent from it), then the system shall fail its oracle guard with the text `newest-line wait added in <file>: <count> > baseline <n>; collect the painted lines with StatusLog.since(mark)`. |
-| R-TST-052 | U | The system shall state in its test conventions the oracle rule: `A test that waits on a painted outcome collects the lines painted since its trigger (StatusLog.since(mark)) and asserts the one it needs; it never waits on the newest line alone.` |
-| R-TST-060 | U | The system shall state in its test conventions the census rule: `When an increment changes the order or the source of an observable, its gate greps tests/ for every node that asserts that observable and runs them, whatever module they sit in.` |
-| R-TST-080 | U | The system shall hold the tool-version token, and no tool version, wherever a report golden records the tool version. |
-| R-TST-081 | When | When a report golden test compares a report with its golden, the system shall put the package's version, as `s19_app.version` gives it at run time, in place of the tool-version token. |
-| R-TST-082 | If | If a report prints a tool version other than the package's version, then the system shall fail the report golden test. |
+| R-TST.3 | If | If a timing arm does not carry the `serial_timing` marker, then the system shall fail its marker guard with the text `timing arm without serial_timing: <file>::<test>`. |
+| R-TST.4 | If | If a test that is not a timing arm carries the `serial_timing` marker, then the system shall fail its marker guard with the text `serial_timing on a test that is not a timing arm: <file>::<test>`. |
+| R-TST.5 | U | The system shall treat as a timing arm each test that matches a static form of *Timing arm* (Definitions). |
+| R-TST.6 | U | The system shall not treat as a timing arm a test whose clock interval no ordering assert reads. |
+| R-TST.7 | U | The system shall give in its test conventions the release gate as the parallel lane `pytest -n 8 -m "not serial_timing"` followed by the serial lane `pytest -m serial_timing`, both on the LAN Linux host. |
+| R-TST.9 | When | When the release gate runs on the LAN Linux host, the system shall finish both lanes within 75 min of wall time in total. |
+| R-TST.10 | When | When a pull request runs the CI workflow, the system shall run `pytest -v -rs -n auto -m "not slow and not serial_timing"` and then `pytest -q -rs -m "serial_timing and not slow"` in that workflow. |
+| R-TST.11 | When | When a push runs the CI workflow, the system shall run `pytest -v -rs -n auto -m "not serial_timing"` and then `pytest -q -rs -m "serial_timing and not slow"` in that workflow. |
+| R-TST.12 | If | If the first lane of a CI run fails, then the system shall still run the serial lane of that CI run and mark the job failed. |
+| R-TST.13 | U | The system shall check out the repository with its full history in the `tui-ci` job of its CI workflow. |
+| R-TST.14 | When | When the CI workflow runs, the system shall run the 6 history arms without skipping them. |
+| R-TST.15 | U | The system shall stop lane 1 of its CI workflow at the lane's time limit: 220 minutes on a push, 120 minutes on a pull request. |
+| R-TST.16 | U | The system shall stop the `tui-ci` job of its CI workflow after 300 minutes. |
+| R-TST.17 | If | If lane 1 of a push run reaches its time limit, then the system shall still run lane 2 of that run. |
+| R-TST.18 | U | The system shall install pytest-xdist 3.8.0 in the `tui-ci` job of its CI workflow. |
+| R-TST.19 | When | When a push runs the CI workflow, the system shall run `pytest -q -rs -m "slow and serial_timing"` in the `tui-ci-heavy` job of that workflow. |
+| R-TST.26 | U | The system shall stop the `tui-ci-heavy` job of its CI workflow after 123 minutes. |
+| R-TST.20 | U | The system shall bound the wait of each shared wait helper by the wall clock, 60 s by default. |
+| R-TST.21 | U | The system shall make each shared wait helper yield the event loop for at least 0.05 s between two checks of its predicate. |
+| R-TST.22 | U | The system shall make the `settled` shared wait let the app process one pause before its first check of the predicate. |
+| R-TST.23 | U | The system shall make each shared wait helper accept every call it accepted at `b3bf42e`, with the same parameter names, order and defaults for the positional parameters. |
+| R-TST.24 | If | If a shared wait's condition does not hold within its bound, then the system shall make the shared wait helper raise `AssertionError` with its text from table W. |
+| R-TST.25 | When | When the shared project-load helper measures a project load, the system shall stop the clock when the app's project install callback returns. |
+| R-TST.30 | U | The system shall state in its test conventions the post-press rule: `An arm that checks the state a key press leaves while a real worker runs holds the worker at a forced slow step or records the state at the product hook; it never samples after the press.` |
+| R-TST.31 | U | The system shall verify the quit-confirm half of AT-B100-18 with the save worker held at a forced slow step, and the parse half of AT-B100-17 from the states recorded at the progress hook. |
+| R-TST.32 | U | The system shall verify that a new set run restarts the confirm dwell with an injected dwell clock, independent of host speed. |
+| R-TST.40 | U | The system shall pass each upper timing bound of a timing arm through the margin reporter, which returns the bound unchanged. |
+| R-TST.41 | If | If an upper timing bound of a timing arm is not a margin-reporter call, then the system shall fail its margin guard with the text `timing bound without report_margin: <file>:<line>`. |
+| R-TST.42 | When | When a timing arm reports a margin, the system shall attach the margin report to that test's item as the property `qc_tm`, so that its call report, its teardown report and the junit XML carry it. |
+| R-TST.43 | When | When a test session that recorded at least one margin report ends, the system shall print a section titled `QC-TM timing margins` with one row per margin report of a call-phase test report, `<margin>%  <measured> s / <bound> s  <label>  <nodeid>`, in ascending margin order. |
+| R-TST.44 | If | If a reported margin is below 20 %, then the system shall begin that row of the QC-TM section with `LOW `. |
+| R-TST.45 | When | When the test suite prints the QC-TM section, the system shall end it with the line `QC-TM: <n> bounds, <k> under 20 % margin`. |
+| R-TST.46 | If | If a timing arm's measured interval exceeds its bound, then the system shall record its margin report, with a negative margin, before the arm's assertion fails. |
+| R-TST.47 | U | The system shall state in its test conventions the clock rule: `A timing arm stops its clock at a stamp the product emits (a commit handler, a painted line, an install callback), never when a poll notices.` |
+| R-TST.48 | U | The system shall state in its test conventions the margin rule: `A margin under 20 % in the serial lane's QC-TM section is a gate finding; the finding gives the base tree's time beside it.` |
+| R-TST.49 | If | If a function that a change wraps as a timing arm (a `serial_timing` marker or a `report_margin` call added against the merge-base with main) differs from its base version by anything other than that marker and the `report_margin(label, measured, bound)` wraps, then the system shall fail its wrap guard with the text `wrapped timing arm changed beyond marker and report_margin: <file>::<function>`. |
+| R-TST.50 | U | The system shall give status oracles every status line the app paints after a mark, in paint order and without a cap. |
+| R-TST.51 | If | If a test file holds more newest-line waits than its newest-line baseline (0 for a file absent from it), then the system shall fail its oracle guard with the text `newest-line wait added in <file>: <count> > baseline <n>; collect the painted lines with StatusLog.since(mark)`. |
+| R-TST.52 | U | The system shall state in its test conventions the oracle rule: `A test that waits on a painted outcome collects the lines painted since its trigger (StatusLog.since(mark)) and asserts the one it needs; it never waits on the newest line alone.` |
+| R-TST.60 | U | The system shall state in its test conventions the census rule: `When an increment changes the order or the source of an observable, its gate greps tests/ for every node that asserts that observable and runs them, whatever module they sit in.` |
+| R-TST.80 | U | The system shall hold the tool-version token, and no tool version, wherever a report golden records the tool version. |
+| R-TST.81 | When | When a report golden test compares a report with its golden, the system shall put the package's version, as `s19_app.version` gives it at run time, in place of the tool-version token. |
+| R-TST.82 | If | If a report prints a tool version other than the package's version, then the system shall fail the report golden test. |
 
 #### S0.12 · Test suite: panel and append timing arms (from batch-101 Inc 3)
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-TST-110 | When | When a panel arm measures the paint of the Load-result panel, the system shall start the clock at the install stamp. |
-| R-TST-111 | When | When a panel arm measures the paint of the Load-result panel, the system shall stop the clock at the panel paint stamp. |
-| R-TST-112 | When | When an append arm measures the variant append, the system shall stop the clock at the outcome-line stamp. |
-| R-TST-113 | U | The system shall hold 1 second as the bound of every panel-paint and variant-append interval of the panel arms and the append arms. |
+| R-TST.110 | When | When a panel arm measures the paint of the Load-result panel, the system shall start the clock at the install stamp. |
+| R-TST.111 | When | When a panel arm measures the paint of the Load-result panel, the system shall stop the clock at the panel paint stamp. |
+| R-TST.112 | When | When an append arm measures the variant append, the system shall stop the clock at the outcome-line stamp. |
+| R-TST.113 | U | The system shall hold 1 second as the bound of every panel-paint and variant-append interval of the panel arms and the append arms. |
 
 #### S0.13 · Test suite: waits of the Windows-only arms (from batch-101 Inc 15)
 
@@ -652,26 +655,26 @@ R-DOC-ARCHIVE.2 (keep in the architecture archive each line that batch-101 Inc 1
 |---|---|---|
 | R-TST-150 | When | When the TC-331 arm requests the load of a change file, the system shall read the state of Edit JSON only after the change document's source path names that file. |
 | R-TST-151 | When | When the TC-331 arm presses Parse pasted, the system shall read the state of Edit JSON only after the change document has no source path. |
-| R-TST-152 | When | When the TC-B94-27 arm presses Bind with the ref lane A already reads, the system shall read lane A's bindings only after the panel has handled that press. |
-| R-TST-153 | When | When the TC-B94-27 arm presses Bind with `variant_b.hex` on lane A, the system shall read both lanes' bindings, lane B's box and lane B's painted cards only after the panel has handled that press. |
+| R-TST.152 | When | When the TC-B94-27 arm presses Bind with the ref lane A already reads, the system shall read lane A's bindings only after the panel has handled that press. |
+| R-TST.153 | When | When the TC-B94-27 arm presses Bind with `variant_b.hex` on lane A, the system shall read both lanes' bindings, lane B's box and lane B's painted cards only after the panel has handled that press. |
 | R-TST-154 | If | If the app has not handled the press within the shared wait's bound, then the system shall fail the arm with the text `did not settle: <description>`, the description from table D. |
-| R-TST-155 | U | The system shall make each wait of R-TST-150 … R-TST-153, R-TST-159 … R-TST-162 and R-TST-164 (D9) through the shared wait. |
-| R-TST-158 | U | The system shall state in its test conventions the handled-press rule: `A new or changed arm that checks the state a press, a value it sets or a posted action leaves waits through a shared wait for a sign that the app handled it, also when it asserts that nothing changed; it never reads after fixed pauses alone.` |
+| R-TST-155 | U | The system shall make each wait of R-TST-150 … R-TST.153, R-TST-159 … R-TST-162 and R-TST.164 (D9) through the shared wait. |
+| R-TST.158 | U | The system shall state in its test conventions the handled-press rule: `A new or changed arm that checks the state a press, a value it sets or a posted action leaves waits through a shared wait for a sign that the app handled it, also when it asserts that nothing changed; it never reads after fixed pauses alone.` |
 | R-TST-159 | When | When the AT-030c arm sets the change-file dropdown to `dropped.json`, the system shall read the change document's entries only after the change document's source path names `dropped.json`. |
 | R-TST-160 | When | When the TC-051 arm requests an apply, the system shall act on the save-back prompt only after the prompt is shown. |
 | R-TST-161 | When | When the TC-051 arm presses Don't save, the system shall read the prompt, the saved path and the work area only after the save-back prompt is hidden again. |
 | R-TST-162 | When | When the TC-051 arm presses Write file with a typed name, the system shall read the saved path and the work-area files only after the save-back prompt is hidden again. |
-| R-TST-163 | U | The system shall place each wait of R-TST-150 … R-TST-153, R-TST-159 … R-TST-162 and R-TST-164 (D9) as the statement that directly follows its table-D trigger. |
-| R-TST-164 | When | When the TC-B94-27 arm imports the template `base` a second time, the system shall read lane B's bindings and lane B's box only after the panel's lane names read `["base", "base_2"]` and lane B's box `#fx_in_1_0` is mounted with a non-empty screen region. |
+| R-TST-163 | U | The system shall place each wait of R-TST-150 … R-TST.153, R-TST-159 … R-TST-162 and R-TST.164 (D9) as the statement that directly follows its table-D trigger. |
+| R-TST.164 | When | When the TC-B94-27 arm imports the template `base` a second time, the system shall read lane B's bindings and lane B's box only after the panel's lane names read `["base", "base_2"]` and lane B's box `#fx_in_1_0` is mounted with a non-empty screen region. |
 
 #### S0.14 · Test suite: tooling and oracle guards (from the batch-103 trace audit)
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-TST-200 | U | The system shall keep the visual-evidence tools, the pilot capture of `tests/test_examples_pilot_gifs.py` and the gallery sync of `tools/sync_evidence.py`, to the contract their docstrings and command-line help state. |
-| R-TST-201 | U | The system shall keep the address-origin tool `tools/address_origin.py` to the contract its docstrings state. |
-| R-TST-202 | When | When the generator `tests/fixtures/synth/generate.py` writes the synthetic corpus, the system shall give the corpus the same bytes on every run, at least one file of each coverage class and the Intel HEX extents its manifest pins. |
-| R-TST-203 | If | If a report golden would keep a host path after canonicalisation, or the AT-B77-02 fixture would hold runs of equal length or a gap, then the system shall fail the guard of that oracle. |
+| R-TST.200 | U | The system shall keep the visual-evidence tools, the pilot capture of `tests/test_examples_pilot_gifs.py` and the gallery sync of `tools/sync_evidence.py`, to the contract their docstrings and command-line help state. |
+| R-TST.201 | U | The system shall keep the address-origin tool `tools/address_origin.py` to the contract its docstrings state. |
+| R-TST.202 | When | When the generator `tests/fixtures/synth/generate.py` writes the synthetic corpus, the system shall give the corpus the same bytes on every run, at least one file of each coverage class and the Intel HEX extents its manifest pins. |
+| R-TST.203 | If | If a report golden would keep a host path after canonicalisation, or the AT-B77-02 fixture would hold runs of equal length or a gap, then the system shall fail the guard of that oracle. |
 
 #### S0.15 · The old→new id map (CTX-IDMAP; from batch 2026-11-20-cleanup I0)
 
@@ -2630,6 +2633,7 @@ Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC.54 … R
 | R-TUI-073.3 | U | The system shall count in a region row's symbols the named tags whose extent overlaps the region. |
 | R-TUI-073.4 | U | The system shall keep the columns of the region rows aligned for any size and symbol count. |
 | R-TUI-062.1 | When | When the operator clicks a region row once, the system shall select the region and show it in the inspector. |
+| R-MAP-SEL.1 | While | While a region row is selected, the system shall show the row's band glyph and band colour. |
 | R-TUI-062.2 | When | When the operator double-clicks a region row, the system shall open the main hex view at the region's start. |
 | R-TUI-062.3 | When | When the operator presses Enter on a region row, the system shall open the main hex view at the region's start. |
 | R-TUI-062.4 | When | When the operator presses Down in the region list, the system shall select the next region and show it in the inspector. |
@@ -2793,7 +2797,7 @@ empty state      No file loaded - press Ctrl+L (or 'l') to load a file, or 'p' t
 | R-TUI-002.2 | When | When the operator loads a file that is already in the work area, the system shall read it where it is. |
 | R-TUI-006.1 | If | If the destination holds a reuse candidate with the same content, then the system shall use that file and write nothing. |
 | R-TUI-006.2 | If | If the file's name is taken in the destination by a different content, then the system shall name the new file with the lowest free numbered name. |
-| R-TUI-011 | U | The system shall keep every copy in `temp/` until the operator deletes it. |
+| R-TUI.11 | U | The system shall keep every copy in `temp/` until the operator deletes it. |
 | R-TUI-002.3 | If | If the file to copy is a link, then the system shall refuse it with the reason `Refusing to copy: source is a symbolic link or reparse point: <path>`. |
 | R-TUI-002.4 | If | If the file to copy is larger than the copy limit, then the system shall refuse it with the reason `Refusing to copy: source size <n> bytes exceeds cap <limit> bytes: <path>`. |
 | R-TUI-002.5 | If | If a copy would be written outside the work area, then the system shall refuse it with the reason `Refusing to place: destination is not contained inside <work area>: <path>`, where `<work area>` is the work-area folder's path. |
@@ -6365,34 +6369,34 @@ patched name     <variant id>-patched.s19 (S19 variant) · <variant id>-patched.
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-SAVEDLG-1 | When | When the Save dialog opens, the system shall place the focus in the name box. |
-| R-SAVEDLG-2 | While | While a project is open, the system shall open the Save dialog with the open project's name in the name box, all of it selected. |
-| R-SAVEDLG-3 | U | The system shall put every printable key pressed in the name box into the name box. |
-| R-SAVEDLG-4 | When | When the operator presses alt+s in the Save dialog or Enter in the name box, the system shall act as when Save is pressed. |
-| R-SAVEDLG-5 | If | If the operator presses Ctrl+L, Ctrl+S, Ctrl+K or Ctrl+D while the Save dialog is open, then the system shall run no app action for that key. |
-| R-SAVEDLG-6 | U | The system shall offer no choice of parent folder in the Save dialog. |
-| R-SAVEDLG-7 | When | When the typed name changes, the system shall paint the target line for the new name. |
-| R-SAVEDLG-8 | While | While the Save dialog is open, the system shall paint in the summary the summary rows of the save plan for the typed name. |
-| R-SAVEDLG-9 | If | If the save for the typed name is refused, then the system shall paint its refusal text in the target line. |
-| R-SAVEDLG-10 | If | If the save for the typed name is refused, then the system shall paint no summary row. |
-| R-SAVEDLG-11 | If | If the operator confirms Save while the save for the typed name is refused or its plan differs from the painted plan, then the system shall keep the Save dialog open. |
-| R-SAVEDLG-12 | If | If the operator confirms Save while the plan for the typed name differs from the painted plan, then the system shall paint the plan for the typed name. |
-| R-SAVEDLG-13 | If | If the operator confirms Save while the plan for the typed name differs from the painted plan, then the system shall add the line `the summary changed — check it, then save again` to the target line. |
-| R-SAVEDLG-14 | When | When the operator confirms Save while the painted plan is the plan for the typed name and is not refused, the system shall close the Save dialog. |
-| R-SAVEDLG-15 | When | When the Save dialog closes on a confirmed Save, the system shall run the save of the painted plan. |
-| R-SAVEDLG-16 | When | When the system runs the save of a painted plan, the system shall write exactly the files that the plan's rows name, besides the gather of S11.4. |
-| R-SAVEDLG-17 | When | When the system runs a save that the Save dialog did not prepare, the system shall prepare the save plan for its name and run that plan. |
-| R-SAVEDLG-18 | If | If a load lands while the Save dialog is open, then the system shall compute the next plan from the session after that load. |
-| R-SAVEDLG-19 | While | While a data file is loaded, the system shall paint the image description as a summary row. |
-| R-SAVEDLG-20 | While | While the session image differs from the image last loaded or saved, the system shall paint the pending line as a summary row. |
-| R-SAVEDLG-21 | If | If the save plan skips links or junctions, then the system shall paint the links row. |
-| R-SAVEDLG-22 | While | While the save plan is a merge with an image row, the system shall paint the active-variant row. |
-| R-SAVEDLG-23 | If | If the target's project.json has a keep reason, then the system shall add the keep note of CTX-SAVE to the project.json row. |
-| R-SAVEDLG-24 | When | When the save plan copies the open project's sub-folders, the system shall paint one sub-folder row per sub-folder with its file count. |
-| R-SAVEDLG-25 | While | While the summary holds more rows than it shows, the system shall keep Save and Cancel visible. |
-| R-SAVEDLG-26 | U | The system shall let the operator scroll the summary to its last row with the keyboard alone. |
-| R-SAVEDLG-27 | U | The system shall paint each summary row on one line, ending a cut row with `…`. |
-| R-SAVEDLG-28 | U | The system shall paint no internal decision id in the Save dialog. |
+| R-SAVEDLG.1 | When | When the Save dialog opens, the system shall place the focus in the name box. |
+| R-SAVEDLG.2 | While | While a project is open, the system shall open the Save dialog with the open project's name in the name box, all of it selected. |
+| R-SAVEDLG.3 | U | The system shall put every printable key pressed in the name box into the name box. |
+| R-SAVEDLG.4 | When | When the operator presses alt+s in the Save dialog or Enter in the name box, the system shall act as when Save is pressed. |
+| R-SAVEDLG.5 | If | If the operator presses Ctrl+L, Ctrl+S, Ctrl+K or Ctrl+D while the Save dialog is open, then the system shall run no app action for that key. |
+| R-SAVEDLG.6 | U | The system shall offer no choice of parent folder in the Save dialog. |
+| R-SAVEDLG.7 | When | When the typed name changes, the system shall paint the target line for the new name. |
+| R-SAVEDLG.8 | While | While the Save dialog is open, the system shall paint in the summary the summary rows of the save plan for the typed name. |
+| R-SAVEDLG.9 | If | If the save for the typed name is refused, then the system shall paint its refusal text in the target line. |
+| R-SAVEDLG.10 | If | If the save for the typed name is refused, then the system shall paint no summary row. |
+| R-SAVEDLG.11 | If | If the operator confirms Save while the save for the typed name is refused or its plan differs from the painted plan, then the system shall keep the Save dialog open. |
+| R-SAVEDLG.12 | If | If the operator confirms Save while the plan for the typed name differs from the painted plan, then the system shall paint the plan for the typed name. |
+| R-SAVEDLG.13 | If | If the operator confirms Save while the plan for the typed name differs from the painted plan, then the system shall add the line `the summary changed — check it, then save again` to the target line. |
+| R-SAVEDLG.14 | When | When the operator confirms Save while the painted plan is the plan for the typed name and is not refused, the system shall close the Save dialog. |
+| R-SAVEDLG.15 | When | When the Save dialog closes on a confirmed Save, the system shall run the save of the painted plan. |
+| R-SAVEDLG.16 | When | When the system runs the save of a painted plan, the system shall write exactly the files that the plan's rows name, besides the gather of S11.4. |
+| R-SAVEDLG.17 | When | When the system runs a save that the Save dialog did not prepare, the system shall prepare the save plan for its name and run that plan. |
+| R-SAVEDLG.18 | If | If a load lands while the Save dialog is open, then the system shall compute the next plan from the session after that load. |
+| R-SAVEDLG.19 | While | While a data file is loaded, the system shall paint the image description as a summary row. |
+| R-SAVEDLG.20 | While | While the session image differs from the image last loaded or saved, the system shall paint the pending line as a summary row. |
+| R-SAVEDLG.21 | If | If the save plan skips links or junctions, then the system shall paint the links row. |
+| R-SAVEDLG.22 | While | While the save plan is a merge with an image row, the system shall paint the active-variant row. |
+| R-SAVEDLG.23 | If | If the target's project.json has a keep reason, then the system shall add the keep note of CTX-SAVE to the project.json row. |
+| R-SAVEDLG.24 | When | When the save plan copies the open project's sub-folders, the system shall paint one sub-folder row per sub-folder with its file count. |
+| R-SAVEDLG.25 | While | While the summary holds more rows than it shows, the system shall keep Save and Cancel visible. |
+| R-SAVEDLG.26 | U | The system shall let the operator scroll the summary to its last row with the keyboard alone. |
+| R-SAVEDLG.27 | U | The system shall paint each summary row on one line, ending a cut row with `…`. |
+| R-SAVEDLG.28 | U | The system shall paint no internal decision id in the Save dialog. |
 
 #### S11.3 · Save: what is written
 
@@ -6752,66 +6756,66 @@ patched name     <variant id>-patched.s19 (S19 variant) · <variant id>-patched.
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-SAVEAS-1 | When | When the system saves as, the system shall copy each regular file of the open project that the save does not write itself, at the top level and at every depth of its sub-folders, to the same path in the new project folder. |
-| R-SAVEAS-2 | When | When the system saves as, the system shall copy no backup of project.json. |
-| R-SAVEAS-3 | When | When the system saves as, the system shall copy no file reached through a link or junction. |
-| R-SAVEAS-4 | If | If a save as skips links or junctions, then the system shall show, after the save status, the status `Save as: links or junctions not copied: <painted list> — copy those files into the project if it needs them.` |
-| R-SAVEAS-5 | When | When the system saves as, the system shall leave every file of the open project unchanged. |
-| R-SAVEAS-6 | When | When the system saves as, the system shall write into the new project.json the carried records of the open project. |
-| R-SAVEAS-7 | If | If the open project's project.json is a link, then the system shall carry no record from it into the new project. |
-| R-SAVEAS-8 | When | When a save as completes, the system shall make the new project folder the Flow panels' session folder. |
-| R-SAVEAS-9 | When | When a save as completes, the system shall bind a Patch Editor document whose file lies in the previous project folder to that file's copy in the new project folder. |
-| R-SAVEAS-10 | If | If the open project's folder no longer exists when the system saves to a new folder, then the system shall save the session's files without a copy from the open project. |
-| R-SAVEAS-11 | If | If the open project's folder no longer exists when the system saves to a new folder, then the system shall show, after the save status, the status `The open project folder '<painted folder name>' was not found — its other files were not copied; copy them into '<painted clean name>' if you still have them.` |
-| R-SAVEAS-12 | If | If a folder from the work area down to a file the save as copies is a link when the system reads that file, then the system shall refuse the save with the status `Project NOT saved: could not save — <painted path> changed while saving — check the folder.` |
-| R-SAVEAS-13 | If | If a save-as copy fails after the project folder exists, then the system shall refuse the save with the status `Project NOT saved: could not save — <painted path> could not be copied — check the folder.` |
-| R-SAVEAS-14 | If | If a top-level file of a save as lands at another name than its plan row because the new project already holds the same bytes, then the system shall refuse the save with the status `Project NOT saved: the plan named <name> (<action word>) but the file landed at <name> (<action word>) — <landed name> already holds the same bytes as <name> — remove the duplicate copy from the open project folder '<painted folder name>', then save again.` |
+| R-SAVEAS.1 | When | When the system saves as, the system shall copy each regular file of the open project that the save does not write itself, at the top level and at every depth of its sub-folders, to the same path in the new project folder. |
+| R-SAVEAS.2 | When | When the system saves as, the system shall copy no backup of project.json. |
+| R-SAVEAS.3 | When | When the system saves as, the system shall copy no file reached through a link or junction. |
+| R-SAVEAS.4 | If | If a save as skips links or junctions, then the system shall show, after the save status, the status `Save as: links or junctions not copied: <painted list> — copy those files into the project if it needs them.` |
+| R-SAVEAS.5 | When | When the system saves as, the system shall leave every file of the open project unchanged. |
+| R-SAVEAS.6 | When | When the system saves as, the system shall write into the new project.json the carried records of the open project. |
+| R-SAVEAS.7 | If | If the open project's project.json is a link, then the system shall carry no record from it into the new project. |
+| R-SAVEAS.8 | When | When a save as completes, the system shall make the new project folder the Flow panels' session folder. |
+| R-SAVEAS.9 | When | When a save as completes, the system shall bind a Patch Editor document whose file lies in the previous project folder to that file's copy in the new project folder. |
+| R-SAVEAS.10 | If | If the open project's folder no longer exists when the system saves to a new folder, then the system shall save the session's files without a copy from the open project. |
+| R-SAVEAS.11 | If | If the open project's folder no longer exists when the system saves to a new folder, then the system shall show, after the save status, the status `The open project folder '<painted folder name>' was not found — its other files were not copied; copy them into '<painted clean name>' if you still have them.` |
+| R-SAVEAS.12 | If | If a folder from the work area down to a file the save as copies is a link when the system reads that file, then the system shall refuse the save with the status `Project NOT saved: could not save — <painted path> changed while saving — check the folder.` |
+| R-SAVEAS.13 | If | If a save-as copy fails after the project folder exists, then the system shall refuse the save with the status `Project NOT saved: could not save — <painted path> could not be copied — check the folder.` |
+| R-SAVEAS.14 | If | If a top-level file of a save as lands at another name than its plan row because the new project already holds the same bytes, then the system shall refuse the save with the status `Project NOT saved: the plan named <name> (<action word>) but the file landed at <name> (<action word>) — <landed name> already holds the same bytes as <name> — remove the duplicate copy from the open project folder '<painted folder name>', then save again.` |
 
 #### S11.15 · Load result: problems (from batch-100 HLR-169; CTX-LOADRES)
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-PROJCHK-1 | When | When the system loads a project, the system shall check every recorded file of project.json against the project folder. |
-| R-PROJCHK-2 | If | If the project has no project.json, then the system shall list a `no project.json` problem for project.json. |
-| R-PROJCHK-3 | If | If project.json is a damaged manifest, then the system shall list a `manifest damaged` problem with the reason of the first finding. |
-| R-PROJCHK-4 | If | If a recorded file is absent, then the system shall list a `missing` problem with the reason `recorded in project.json, not on disk`. |
-| R-PROJCHK-5 | If | If a recorded file is not a regular file or cannot be read, then the system shall list a `not readable` problem with the reason `not a regular file` or `the file cannot be read`. |
-| R-PROJCHK-6 | If | If a recorded file's size differs from its record, then the system shall list a `changed on disk` problem with the reason `saved <n> B, now <m> B`. |
-| R-PROJCHK-7 | If | If a recorded file has its recorded size and another SHA-256, then the system shall list a `changed on disk` problem with the reason `same size (<n> B), different content`. |
-| R-PROJCHK-8 | If | If a project file with a data or A2L suffix directly in the project folder has no files record, then the system shall list a `not recorded` problem with the reason `in the project, not in project.json`. |
-| R-PROJCHK-9 | If | If project.json is not damaged and records no files, then the system shall list a `no digests saved` problem for project.json. |
-| R-PROJCHK-10 | If | If a variant file does not read as an S19 or Intel HEX image, then the system shall list a `not readable` problem with the reason `not an S19 or HEX file`. |
-| R-PROJCHK-11 | If | If a variant file reads without errors and holds no data byte, then the system shall list a `not readable` problem with the reason `0 data bytes`. |
-| R-PROJCHK-12 | If | If a variant file reads with diagnostics and holds at least one data byte, then the system shall open it. |
-| R-PROJCHK-13 | If | If the recorded variant is not a variant of the project, then the system shall list a `missing` problem for its file with the reason `recorded as the active variant`. |
-| R-PROJCHK-14 | If | If one file has more than one problem, then the system shall list only its problem of highest precedence. |
-| R-PROJCHK-15 | U | The system shall list the problems of a project load in precedence order. |
-| R-PROJCHK-16 | If | If a project load finds problems, then the system shall open every project file that reads. |
-| R-PROJCHK-17 | U | The system shall write the issue codes and exception class names of a project load to the log only. |
-| R-PROJCHK-18 | U | The system shall give each problem the next step of CTX-LOADRES. |
+| R-PROJCHK.1 | When | When the system loads a project, the system shall check every recorded file of project.json against the project folder. |
+| R-PROJCHK.2 | If | If the project has no project.json, then the system shall list a `no project.json` problem for project.json. |
+| R-PROJCHK.3 | If | If project.json is a damaged manifest, then the system shall list a `manifest damaged` problem with the reason of the first finding. |
+| R-PROJCHK.4 | If | If a recorded file is absent, then the system shall list a `missing` problem with the reason `recorded in project.json, not on disk`. |
+| R-PROJCHK.5 | If | If a recorded file is not a regular file or cannot be read, then the system shall list a `not readable` problem with the reason `not a regular file` or `the file cannot be read`. |
+| R-PROJCHK.6 | If | If a recorded file's size differs from its record, then the system shall list a `changed on disk` problem with the reason `saved <n> B, now <m> B`. |
+| R-PROJCHK.7 | If | If a recorded file has its recorded size and another SHA-256, then the system shall list a `changed on disk` problem with the reason `same size (<n> B), different content`. |
+| R-PROJCHK.8 | If | If a project file with a data or A2L suffix directly in the project folder has no files record, then the system shall list a `not recorded` problem with the reason `in the project, not in project.json`. |
+| R-PROJCHK.9 | If | If project.json is not damaged and records no files, then the system shall list a `no digests saved` problem for project.json. |
+| R-PROJCHK.10 | If | If a variant file does not read as an S19 or Intel HEX image, then the system shall list a `not readable` problem with the reason `not an S19 or HEX file`. |
+| R-PROJCHK.11 | If | If a variant file reads without errors and holds no data byte, then the system shall list a `not readable` problem with the reason `0 data bytes`. |
+| R-PROJCHK.12 | If | If a variant file reads with diagnostics and holds at least one data byte, then the system shall open it. |
+| R-PROJCHK.13 | If | If the recorded variant is not a variant of the project, then the system shall list a `missing` problem for its file with the reason `recorded as the active variant`. |
+| R-PROJCHK.14 | If | If one file has more than one problem, then the system shall list only its problem of highest precedence. |
+| R-PROJCHK.15 | U | The system shall list the problems of a project load in precedence order. |
+| R-PROJCHK.16 | If | If a project load finds problems, then the system shall open every project file that reads. |
+| R-PROJCHK.17 | U | The system shall write the issue codes and exception class names of a project load to the log only. |
+| R-PROJCHK.18 | U | The system shall give each problem the next step of CTX-LOADRES. |
 
 #### S11.16 · Load result: status and panel (from batch-100 HLR-178; CTX-LOADRES)
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-LOADRES-1 | If | If the summary line is longer than 118 characters, then the system shall shorten the load target, then the project name, each to no fewer than 8 characters ending in `…`. |
-| R-LOADRES-2 | When | When a project load that the operator started from the Load dialog completes, the system shall open the Load-result panel. |
-| R-LOADRES-3 | When | When the Load-result panel opens, the system shall show the title, the summary grid, the heading and the problem rows of CTX-LOADRES. |
-| R-LOADRES-4 | When | When the system composes the result of a project load, the system shall give the load reason that applies. |
-| R-LOADRES-5 | If | If derived_from records the opened variant, then the system shall show the relation line. |
-| R-LOADRES-6 | U | The system shall call a variant the latest saved only when it is the recorded variant. |
-| R-LOADRES-7 | If | If more problems are found than the problem bound, then the system shall list the first 102 and one row that counts the rest. |
-| R-LOADRES-8 | When | When the Load-result panel opens, the system shall put the focus on the problem list. |
-| R-LOADRES-9 | When | When the operator presses tab in the Load-result panel, the system shall move the focus to Close. |
-| R-LOADRES-10 | When | When the operator presses escape in the Load-result panel or Enter on Close, the system shall close the panel. |
-| R-LOADRES-11 | When | When the operator presses v in the Load-result panel, the system shall open the Select variant dialog in place of the panel. |
-| R-LOADRES-12 | U | The system shall let the operator scroll the problem list to its last row with the keyboard alone. |
-| R-LOADRES-13 | U | The system shall show names in the Load-result panel, the file status and the summary line as plain text, never as markup. |
-| R-LOADRES-14 | If | If the opened variant is the recorded variant, then the system shall paint the load reason in the OK colour (S3 CTX-LEGEND). |
-| R-LOADRES-15 | If | If the opened variant is not the recorded variant, then the system shall paint the load reason in the warning colour (S3 CTX-LEGEND). |
-| R-LOADRES-16 | U | The system shall paint the mark and the problem word of each problem row in the warning colour (S3 CTX-LEGEND). |
-| R-LOADRES-17 | If | If a manifest entry cannot be checked because it is too long or loops through a junction, then the system shall list it as a skipped row and go on with the load. |
-| R-LOADRES-18 | If | If a variant of the project did not read during the load, then the system shall follow its name in the Others list of the Load-result panel with `   not readable`. |
+| R-LOADRES.1 | If | If the summary line is longer than 118 characters, then the system shall shorten the load target, then the project name, each to no fewer than 8 characters ending in `…`. |
+| R-LOADRES.2 | When | When a project load that the operator started from the Load dialog completes, the system shall open the Load-result panel. |
+| R-LOADRES.3 | When | When the Load-result panel opens, the system shall show the title, the summary grid, the heading and the problem rows of CTX-LOADRES. |
+| R-LOADRES.4 | When | When the system composes the result of a project load, the system shall give the load reason that applies. |
+| R-LOADRES.5 | If | If derived_from records the opened variant, then the system shall show the relation line. |
+| R-LOADRES.6 | U | The system shall call a variant the latest saved only when it is the recorded variant. |
+| R-LOADRES.7 | If | If more problems are found than the problem bound, then the system shall list the first 102 and one row that counts the rest. |
+| R-LOADRES.8 | When | When the Load-result panel opens, the system shall put the focus on the problem list. |
+| R-LOADRES.9 | When | When the operator presses tab in the Load-result panel, the system shall move the focus to Close. |
+| R-LOADRES.10 | When | When the operator presses escape in the Load-result panel or Enter on Close, the system shall close the panel. |
+| R-LOADRES.11 | When | When the operator presses v in the Load-result panel, the system shall open the Select variant dialog in place of the panel. |
+| R-LOADRES.12 | U | The system shall let the operator scroll the problem list to its last row with the keyboard alone. |
+| R-LOADRES.13 | U | The system shall show names in the Load-result panel, the file status and the summary line as plain text, never as markup. |
+| R-LOADRES.14 | If | If the opened variant is the recorded variant, then the system shall paint the load reason in the OK colour (S3 CTX-LEGEND). |
+| R-LOADRES.15 | If | If the opened variant is not the recorded variant, then the system shall paint the load reason in the warning colour (S3 CTX-LEGEND). |
+| R-LOADRES.16 | U | The system shall paint the mark and the problem word of each problem row in the warning colour (S3 CTX-LEGEND). |
+| R-LOADRES.17 | If | If a manifest entry cannot be checked because it is too long or loops through a junction, then the system shall list it as a skipped row and go on with the load. |
+| R-LOADRES.18 | If | If a variant of the project did not read during the load, then the system shall follow its name in the Others list of the Load-result panel with `   not readable`. |
 
 
 

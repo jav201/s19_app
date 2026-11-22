@@ -100,7 +100,7 @@ def test_coherent_single_run_capture_is_accepted(tmp_path):
     """GREEN side. Without this the RED test below could pass on a broken guard
     that simply refuses everything.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, LIVE_CASES, at=time.time() - 3600)
@@ -117,7 +117,7 @@ def test_two_run_mtime_spread_is_refused_and_names_the_files(tmp_path):
     must refuse and must name what it saw, because a refusal that does not say
     which files are the second run leaves the operator to re-derive it by hand.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     old = time.time() - 11 * 86400
@@ -146,7 +146,7 @@ def test_allow_recapture_still_refuses_the_half_run(tmp_path):
     case. If this test goes green on the flag alone, the flag has turned the
     guard into decoration.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, LIVE_CASES, at=time.time() - 11 * 86400)
@@ -167,7 +167,7 @@ def test_allow_recapture_accepts_a_whole_case_recaptured(tmp_path):
     All six of that case's assets move into the second window together. Without
     the flag it is still refused; that assertion is what keeps the default strict.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, LIVE_CASES, at=time.time() - 3600)
@@ -190,7 +190,7 @@ def test_incomplete_case_is_refused_without_any_mtime_threshold(tmp_path):
     has nothing to say. Completeness must still reject it — a guard that depends
     on a tunable number is a guard someone will tune.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, LIVE_CASES, at=time.time() - 3600, frames=("frame_00_Loaded.svg",))
@@ -203,7 +203,7 @@ def test_incomplete_case_is_refused_without_any_mtime_threshold(tmp_path):
 
 
 def test_complete_capture_passes_the_completeness_guard(tmp_path):
-    """Traces: R-TST-200."""
+    """Traces: R-TST.200."""
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, LIVE_CASES, at=time.time() - 3600)
     tally = assert_cases_complete(build_plan(src, vault))
@@ -220,7 +220,7 @@ def test_complete_capture_passes_the_completeness_guard(tmp_path):
 def test_nested_destination_is_refused(tmp_path):
     """RED side: any filename that would land outside the one flat directory.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     svgs = tmp_path / "svgs"
     svgs.mkdir()
@@ -232,7 +232,7 @@ def test_nested_destination_is_refused(tmp_path):
 
 
 def test_flat_destination_is_the_vault_naming_convention(tmp_path):
-    """Traces: R-TST-200."""
+    """Traces: R-TST.200."""
     svgs = tmp_path / "svgs"
     svgs.mkdir()
     dst = flat_destination(svgs, "case_00_public", "frame_04_Hex_page+.svg")
@@ -247,7 +247,7 @@ def test_a_sync_creates_no_subdirectory_even_when_the_source_is_nested(tmp_path)
     second level under a case directory. The walk must not descend into it, and
     the vault must end the sync with zero subdirectories.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, LIVE_CASES, at=time.time() - 3600)
@@ -272,7 +272,7 @@ def test_desktop_ini_is_never_counted_as_evidence(tmp_path):
     """RED side is the naive count, asserted explicitly so the test cannot pass
     vacuously on an empty directory.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     d = tmp_path / "svgs"
     d.mkdir()
@@ -292,7 +292,7 @@ def test_desktop_ini_never_reaches_the_live_asset_list(tmp_path):
     """The same trap one level up: the reject-check must not date a gallery by a
     `desktop.ini`, which is how "newest 2026-08-25" was 18 days wrong.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     vault = _make_vault(tmp_path / "vault")
     svgs = vault / "pilot" / "svgs"
@@ -318,7 +318,7 @@ def test_retired_case_is_excluded_and_the_live_lookalike_is_not(tmp_path):
     same name without the `pv__` prefix, is LIVE and has fresh evidence — a glob
     cannot tell them apart and would delete live evidence.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, ("case_06_large_nested_a2l", RETIRED), at=time.time() - 3600)
@@ -333,7 +333,7 @@ def test_the_exclusion_is_an_exact_name_set_not_a_pattern(tmp_path):
     """A structural assertion on the constant itself: if a future author turns it
     into a pattern this fails, which is the only moment anyone would notice.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     assert RETIRED_CASES == frozenset({RETIRED})
     assert not any(ch in name for name in RETIRED_CASES for ch in "*?[]")
@@ -344,7 +344,7 @@ def test_retired_leftovers_in_the_vault_are_not_flagged_as_stale(tmp_path):
     report them, or every sync reports a permanent failure and the check gets
     ignored — a rule that cries wolf is how people learn to skip the gate.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     vault = _make_vault(tmp_path / "vault")
     svgs = vault / "pilot" / "svgs"
@@ -367,7 +367,7 @@ def test_the_vault_side_filter_also_keeps_the_live_lookalike(tmp_path):
     being checked for freshness and can rot unnoticed, which is precisely the
     six-week freeze this whole module exists to prevent.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     vault = _make_vault(tmp_path / "vault")
     svgs = vault / "pilot" / "svgs"
@@ -390,7 +390,7 @@ def test_the_vault_side_filter_also_keeps_the_live_lookalike(tmp_path):
 def test_first_sync_reports_new_second_reports_identical(tmp_path):
     """Idempotence, asserted rather than assumed.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, LIVE_CASES, at=time.time() - 3600)
@@ -411,7 +411,7 @@ def test_a_changed_svg_is_reported_changed_while_an_identical_gif_is_not(tmp_pat
     one "verified" figure, the GIF column would drown the SVG column exactly as it
     did the three times this was measured by hand.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, LIVE_CASES, at=time.time() - 3600)
@@ -437,7 +437,7 @@ def test_timestamps_alone_would_certify_a_copy_that_never_happened(tmp_path):
     timestamp comparison reads as "fresh" — while its bytes are wrong. A
     timestamp check passes here. The content check must not.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, ("case_00_public",), at=time.time() - 3600)
@@ -455,7 +455,7 @@ def test_timestamps_alone_would_certify_a_copy_that_never_happened(tmp_path):
 
 
 def test_dry_run_writes_nothing(tmp_path):
-    """Traces: R-TST-200."""
+    """Traces: R-TST.200."""
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, LIVE_CASES, at=time.time() - 3600)
     plans = build_plan(src, vault)
@@ -474,7 +474,7 @@ def test_previous_bytes_are_kept_aside_before_an_overwrite(tmp_path):
     """The backup must hold the OLD bytes. Asserting it merely exists would pass
     on a backup taken after the write, which preserves nothing.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, ("case_00_public",), at=time.time() - 3600)
@@ -494,7 +494,7 @@ def test_nothing_is_ever_deleted(tmp_path):
     """An unrelated file in the gallery survives a sync. The tool overwrites; it
     does not reconcile, and it does not prune.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, LIVE_CASES, at=time.time() - 3600)
@@ -514,7 +514,7 @@ def test_stale_asset_fails_the_reject_check_and_exits_non_zero(tmp_path, capsys)
     """RED side, through the CLI, because the exit code is the part that matters:
     a FAIL that returns 0 is a FAIL nobody sees.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     vault = _make_vault(tmp_path / "vault")
     svgs = vault / "pilot" / "svgs"
@@ -540,7 +540,7 @@ def test_stale_asset_fails_the_reject_check_and_exits_non_zero(tmp_path, capsys)
 
 
 def test_fresh_gallery_passes_the_reject_check(tmp_path, capsys):
-    """Traces: R-TST-200."""
+    """Traces: R-TST.200."""
     vault = _make_vault(tmp_path / "vault")
     (vault / "pilot" / "svgs" / "pilot_case_00_public_frame_00_Loaded.svg").write_text(
         "<svg/>", encoding="utf-8"
@@ -561,7 +561,7 @@ def test_cli_aborts_the_whole_sync_on_an_incoherent_capture(tmp_path, capsys):
     """End to end: the guard must stop the copy, not warn beside it. Nothing may
     reach the vault.
 
-    Traces: R-TST-200.
+    Traces: R-TST.200.
     """
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, LIVE_CASES, at=time.time() - 11 * 86400)
@@ -576,7 +576,7 @@ def test_cli_aborts_the_whole_sync_on_an_incoherent_capture(tmp_path, capsys):
 
 
 def test_cli_happy_path_is_idempotent(tmp_path, capsys):
-    """Traces: R-TST-200."""
+    """Traces: R-TST.200."""
     src, vault = tmp_path / "src", _make_vault(tmp_path / "vault")
     _make_source(src, LIVE_CASES, at=time.time() - 3600)
     args = [

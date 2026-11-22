@@ -11,13 +11,15 @@ sources are strings or files under ``tmp_path``; census functions of
 tree; the margin-property and summary cases run inner sessions through
 ``pytester.runpytest_subprocess``.
 
-Rows guarded here: R-TST-001 .. 007, 010 .. 013, 015 .. 018, 020 .. 025,
-030 .. 032 (static part), 040 .. 042, 043 .. 046, 050 .. 051, 080 .. 082,
+Rows guarded here: R-TST-001, R-TST-002, R-TST.3 .. R-TST.7, R-TST.10 .. R-TST.13,
+R-TST.15 .. R-TST.18, R-TST.20 .. R-TST.25, R-TST.30 .. R-TST.32 (static part),
+R-TST.40 .. R-TST.42, R-TST.43 .. R-TST.46, R-TST.50 .. R-TST.51,
+R-TST.80 .. R-TST.82,
 plus the accepted E4 addenda E3S-1 (parallel lane prints no QC-TM text),
 E3S-2 (committed-evidence redaction gate) and E3S-6 (workflow read as text
 with the injection/trigger ratchet).  The gate-run, CI-run and E5-measured
-cases (R-TST-008, 009, 014, 018/2, 023/2, 070 .. 072, 090, 091 and the
-3-of-3 lane arms of R-TST-031/032) are not pytest nodes; they are owed to
+cases (R-TST-008, R-TST.9, R-TST.14, R-TST.18/2, R-TST.23/2, R-TST-070 .. R-TST-072,
+R-TST-090, R-TST-091 and the 3-of-3 lane arms of R-TST.31, R-TST.32) are not pytest nodes; they are owed to
 the gate and CI evidence and are listed in the E4 tester notes.
 
 On the base tree (main, before any Inc 2 code) every test in this module
@@ -55,7 +57,7 @@ CONVENTIONS_PATH = REPO_ROOT / "docs" / "engineering-rules.md"
 BATCH_ROOT = REPO_ROOT / ".dev-flow" / "2026-11-01-batch-101"
 EVIDENCE_ROOT = BATCH_ROOT / "evidence"
 
-# Install budget before lane 1 starts (R-TST-016/017, note N-3).
+# Install budget before lane 1 starts (R-TST.16, R-TST.17, note N-3).
 _SETUP_MINUTES = 3
 
 MARKER_LINE = (
@@ -83,31 +85,31 @@ XDIST_INSTALL_LINE = 'python -m pip install "pytest-xdist==3.8.0"'
 CONVENTIONS_SECTION_TITLE = "Test timing, waits and oracles (batch-101 Inc 2)"
 
 _CONVENTION_RULES = {
-    "R-TST-030": (
+    "R-TST.30": (
         "An arm that checks the state a key press leaves while a real worker "
         "runs holds the worker at a forced slow step or records the state at "
         "the product hook; it never samples after the press."
     ),
-    "R-TST-047": (
+    "R-TST.47": (
         "A timing arm stops its clock at a stamp the product emits (a commit "
         "handler, a painted line, an install callback), never when a poll "
         "notices."
     ),
-    "R-TST-048": (
+    "R-TST.48": (
         "A margin under 20 % in the serial lane's QC-TM section is a gate "
         "finding; the finding gives the base tree's time beside it."
     ),
-    "R-TST-052": (
+    "R-TST.52": (
         "A test that waits on a painted outcome collects the lines painted "
         "since its trigger (StatusLog.since(mark)) and asserts the one it "
         "needs; it never waits on the newest line alone."
     ),
-    "R-TST-060": (
+    "R-TST.60": (
         "When an increment changes the order or the source of an observable, "
         "its gate greps tests/ for every node that asserts that observable "
         "and runs them, whatever module they sit in."
     ),
-    "R-TST-158": (
+    "R-TST.158": (
         "A new or changed arm that checks the state a press, a value it sets "
         "or a posted action leaves waits through a shared wait for a sign "
         "that the app handled it, also when it asserts that nothing changed; "
@@ -170,7 +172,7 @@ _GOLDENS_WITH_VERSION = [
     "tests/goldens/batch99/at288-pre-move-report.bin",
 ]
 
-# The tree R-TST-040's base-tree counts are pinned to (01-requirements.md).
+# The tree R-TST.40's base-tree counts are pinned to (01-requirements.md).
 _BOUND_BASE_COMMIT = "b3bf42e"
 
 
@@ -272,7 +274,7 @@ def _marker_guard_lines(arms, sampled, marked) -> list:
 
 
 def _margin_guard_lines(root: Path) -> list:
-    """The margin guard's failure lines (R-TST-041), one per raw upper bound."""
+    """The margin guard's failure lines (R-TST.41), one per raw upper bound."""
     from tests.support import suite_census
 
     sites = suite_census.unreported_upper_bounds(root, suite_census.timing_arms(root))
@@ -280,7 +282,7 @@ def _margin_guard_lines(root: Path) -> list:
 
 
 def _newest_guard_lines(root: Path, baseline: dict) -> list:
-    """The newest-line guard's failure lines (R-TST-051), one per file above
+    """The newest-line guard's failure lines (R-TST.51), one per file above
     its baseline."""
     from tests.support import suite_census
 
@@ -386,7 +388,7 @@ def test_r_tst_001_serial_timing_marker_is_registered() -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-002 (with R-TST-005/5) — every timing arm carries the marker
+# R-TST-002 (with R-TST.5/5) — every timing arm carries the marker
 # ---------------------------------------------------------------------------
 
 
@@ -431,7 +433,7 @@ def test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text() -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-003 / R-TST-004 — the marker guard names both violation kinds
+# R-TST.3 / R-TST.4 — the marker guard names both violation kinds
 # ---------------------------------------------------------------------------
 
 _PLANTED_UNMARKED_ARM = """import time
@@ -485,7 +487,7 @@ def test_r_tst_004_a_marked_non_arm_is_named(tmp_path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-005 — the detector finds each planted timing-arm form
+# R-TST.5 — the detector finds each planted timing-arm form
 # ---------------------------------------------------------------------------
 
 _FORM_SOURCES = {
@@ -606,7 +608,7 @@ def test_r_tst_005_detector_finds_each_timing_arm_form(tmp_path, form) -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-006 — intervals no ordering assert reads are not arms
+# R-TST.6 — intervals no ordering assert reads are not arms
 # ---------------------------------------------------------------------------
 
 
@@ -632,16 +634,16 @@ def test_r_tst_006_detector_ignores_intervals_no_assert_reads() -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-007, 030, 047, 048, 052, 060 — the conventions sentences verbatim
+# R-TST.7, R-TST.30, R-TST.47, R-TST.48, R-TST.52, R-TST.60 — the conventions sentences verbatim
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize(
-    "rule_id", ["R-TST-007", "R-TST-030", "R-TST-047", "R-TST-048", "R-TST-052", "R-TST-060", "R-TST-158"]
+    "rule_id", ["R-TST.7", "R-TST.30", "R-TST.47", "R-TST.48", "R-TST.52", "R-TST.60", "R-TST.158"]
 )
 def test_r_tst_007_conventions_hold_each_test_rule(rule_id) -> None:
     text = CONVENTIONS_PATH.read_text(encoding="utf-8")
-    if rule_id == "R-TST-007":
+    if rule_id == "R-TST.7":
         assert CONVENTIONS_SECTION_TITLE in text
         section = text.split(CONVENTIONS_SECTION_TITLE, 1)[1]
         section = section.split("\n#", 1)[0]
@@ -658,7 +660,7 @@ def test_r_tst_007_conventions_hold_each_test_rule(rule_id) -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-010 .. 019, 026 — the CI workflow, read as text (E3S-6 ratchet included)
+# R-TST.10 .. R-TST.19, R-TST.26 — the CI workflow, read as text (E3S-6 ratchet included)
 # ---------------------------------------------------------------------------
 
 
@@ -818,14 +820,14 @@ def test_r_tst_010_2_injection_ratchet_reads_every_run_line_of_every_job() -> No
 
 
 def test_r_tst_011_push_runs_two_lanes() -> None:
-    """Traces: R-TST-011, R-TST-019."""
+    """Traces: R-TST.11, R-TST.19."""
     text = WORKFLOW_PATH.read_text(encoding="utf-8")
     jobs = _workflow_jobs(text)
     steps = _job_steps(jobs["tui-ci"])
     runs = [_step_run(step) for step in _lane_steps(steps, "push")]
     assert runs == [PUSH_LANE_1, PUSH_LANE_2]
     assert _script_injections(text) == []
-    # R-TST-019: a push also runs the slow timing arms, in a push-only job that
+    # R-TST.19: a push also runs the slow timing arms, in a push-only job that
     # waits on no other job (a red tui-ci would skip it) and sets up as tui-ci.
     assert "tui-ci-heavy" in jobs, "the push-only tui-ci-heavy job must stay present"
     heavy = jobs["tui-ci-heavy"]
@@ -855,7 +857,7 @@ def test_r_tst_012_serial_lane_runs_after_a_red_lane() -> None:
 
 
 def test_r_tst_013_014_ci_checks_out_full_history() -> None:
-    """Traces: R-TST-013, R-TST-014."""
+    """Traces: R-TST.13, R-TST.14."""
     text = WORKFLOW_PATH.read_text(encoding="utf-8")
     jobs = _workflow_jobs(text)
     assert "snapshot" in jobs, "snapshot job must stay present"
@@ -880,7 +882,7 @@ def test_r_tst_013_014_ci_checks_out_full_history() -> None:
 
 
 def test_r_tst_013_snapshot_job_changes_only_persist_credentials() -> None:
-    """R-TST-013/1 (E5 F9): the snapshot checkout carries only
+    """R-TST.13/1 (E5 F9): the snapshot checkout carries only
     persist-credentials: false (no fetch-depth), and the snapshot job differs
     from its base only by that setting."""
     text = WORKFLOW_PATH.read_text(encoding="utf-8")
@@ -910,7 +912,7 @@ def test_r_tst_013_snapshot_job_changes_only_persist_credentials() -> None:
 
 
 def test_r_tst_015_016_017_ci_time_limits() -> None:
-    """Traces: R-TST-015, R-TST-016, R-TST-017, R-TST-026."""
+    """Traces: R-TST.15, R-TST.16, R-TST.17, R-TST.26."""
     text = WORKFLOW_PATH.read_text(encoding="utf-8")
     jobs = _workflow_jobs(text)
     tui_lines = jobs["tui-ci"]
@@ -923,7 +925,7 @@ def test_r_tst_015_016_017_ci_time_limits() -> None:
     assert _step_value(pr_1, "timeout-minutes") == "120"
     assert _step_value(push_2, "timeout-minutes") == "75"
     assert _step_value(pr_2, "timeout-minutes") == "30"
-    # R-TST-017: lane 2 still runs after a red or timed-out lane 1.
+    # R-TST.17: lane 2 still runs after a red or timed-out lane 1.
     assert _step_value(pr_2, "if") == LANE_2_IF_PR
     assert _step_value(push_2, "if") == LANE_2_IF_PUSH
     job_level = [
@@ -941,7 +943,7 @@ def test_r_tst_015_016_017_ci_time_limits() -> None:
             + int(_step_value(lane_2, "timeout-minutes"))
         )
         assert total <= job_limit, (_step_run(lane_1), total, job_limit)
-    # R-TST-026: the push-only heavy job has its own limit,
+    # R-TST.26: the push-only heavy job has its own limit,
     # ceil(1.5 x 41 min laptop wall x CI factor 2) = 123.
     assert "tui-ci-heavy" in jobs, "the push-only tui-ci-heavy job must stay present"
     heavy_level = [
@@ -961,7 +963,7 @@ def test_r_tst_018_ci_installs_pinned_xdist() -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-020 .. 022 — the one yielding, wall-clock-bounded wait
+# R-TST.20 .. R-TST.22 — the one yielding, wall-clock-bounded wait
 # ---------------------------------------------------------------------------
 
 
@@ -979,7 +981,7 @@ def test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock() -> None:
     assert str(excinfo.value) == "never"
     assert elapsed >= 0.5
     assert elapsed < timing_support.report_margin(
-        "R-TST-020 wall-clock bound", elapsed, 1.5
+        "R-TST.20 wall-clock bound", elapsed, 1.5
     )
 
     pilot = _FakePilot()
@@ -996,7 +998,7 @@ def test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock() -> None:
     started = time.perf_counter()
     asyncio.run(_drive())
     fast = time.perf_counter() - started
-    assert fast < timing_support.report_margin("R-TST-020 fast return", fast, 0.4)
+    assert fast < timing_support.report_margin("R-TST.20 fast return", fast, 0.4)
 
 
 def _shape_range_loops(shape) -> int:
@@ -1074,7 +1076,7 @@ def test_r_tst_022_settled_pauses_before_its_first_check() -> None:
     assert seen and seen[0] >= 1, "settled must pause once before its first check"
     # The pause-first wait is also the wall-clock-bounded wait: the keyword-
     # only ``timeout`` of interface I-1/I-7 must be there (this row's bounded
-    # wait is what R-TST-020 creates; without it the pause-first order is the
+    # wait is what R-TST.20 creates; without it the pause-first order is the
     # old unbounded count loop).
     timeout_param = inspect.signature(b97_probes.settled).parameters.get("timeout")
     assert timeout_param is not None
@@ -1143,7 +1145,7 @@ def test_r_tst_023_shared_wait_signatures_are_kept() -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-024 — the nine wait-failure texts (W1 .. W9)
+# R-TST.24 — the nine wait-failure texts (W1 .. W9)
 # ---------------------------------------------------------------------------
 
 
@@ -1220,7 +1222,7 @@ def test_r_tst_024_shared_wait_failure_texts(case, tmp_path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-025 — the project-load clock stops at the install callback
+# R-TST.25 — the project-load clock stops at the install callback
 # ---------------------------------------------------------------------------
 
 
@@ -1256,12 +1258,12 @@ def test_r_tst_025_load_project_clock_stops_at_the_install_callback(tmp_path) ->
 
 
 # ---------------------------------------------------------------------------
-# R-TST-031 / 032 — the post-press and dwell arms keep their forms (static)
+# R-TST.31 / R-TST.32 — the post-press and dwell arms keep their forms (static)
 # ---------------------------------------------------------------------------
 
 
 def test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms() -> None:
-    """Traces: R-TST-031, R-TST-032."""
+    """Traces: R-TST.31, R-TST.32."""
     from tests.support import suite_census
 
     workers_text = (TESTS_ROOT / "test_b100_workers.py").read_text(encoding="utf-8")
@@ -1308,7 +1310,7 @@ def test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms() -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-040 / 041 — every upper timing bound passes through the reporter
+# R-TST.40 / R-TST.41 — every upper timing bound passes through the reporter
 # ---------------------------------------------------------------------------
 
 
@@ -1419,7 +1421,7 @@ def _wrap_marks(node) -> tuple:
 
 def _wrap_drift(base_source: str, head_source: str) -> list:
     """Functions that gained a serial_timing marker or a report_margin wrap
-    against the base and differ from it by anything else (R-TST-049)."""
+    against the base and differ from it by anything else (R-TST.49)."""
     import copy
 
     base_functions = _module_functions(ast.parse(base_source))
@@ -1497,7 +1499,7 @@ def test_r_tst_040_041_every_upper_timing_bound_is_reported() -> None:
 
 
 def test_r_tst_040_1_base_tree_reports_its_37_bounds(tmp_path) -> None:
-    """R-TST-040/1, 040/3, 040/4 base halves: the census of the b3bf42e tree
+    """R-TST.40/1, R-TST.40/3, R-TST.40/4 base halves: the census of the b3bf42e tree
     reports exactly its 37 upper bounds, the 3 list-appended reads among them,
     and none of the count or lower-bound comparisons."""
     root = _extract_tests_tree(_BOUND_BASE_COMMIT, tmp_path)
@@ -1541,7 +1543,7 @@ _PLANTED_RAW_BOUNDS = [
 
 
 def test_r_tst_041_margin_guard_names_each_raw_bound(tmp_path) -> None:
-    """R-TST-041/1, 041/2: a float literal, an int literal, a scaled
+    """R-TST.41/1, R-TST.41/2: a float literal, an int literal, a scaled
     timing_bound call and a module constant, each named by the guard."""
     root = tmp_path / "tests"
     root.mkdir()
@@ -1578,7 +1580,7 @@ def test_positions():
 
 
 def test_r_tst_040_3_counts_and_lower_bounds_are_not_bounds(tmp_path) -> None:
-    """R-TST-040/3 (E3A-3): a count from the non-interval tuple position, a
+    """R-TST.40/3 (E3A-3): a count from the non-interval tuple position, a
     non-interval dict key and a lower bound are not upper timing bounds; the
     interval position and key beside them are."""
     root = tmp_path / "tests"
@@ -1603,7 +1605,7 @@ def test_appended():
 
 
 def test_r_tst_040_4_appended_and_conditional_reads_are_bounds(tmp_path) -> None:
-    """R-TST-040/4 (N-1): an item of a list appended an interval, read through
+    """R-TST.40/4 (N-1): an item of a list appended an interval, read through
     a conditional expression, is a timing arm and an upper timing bound."""
     from tests.support import suite_census
 
@@ -1618,7 +1620,7 @@ def test_r_tst_040_4_appended_and_conditional_reads_are_bounds(tmp_path) -> None
 
 
 # ---------------------------------------------------------------------------
-# R-TST-042 .. 046 — the qc_tm property, the QC-TM section (inner runs)
+# R-TST.42 .. R-TST.46 — the qc_tm property, the QC-TM section (inner runs)
 # ---------------------------------------------------------------------------
 
 _INNER_CONTEST = '''
@@ -1745,7 +1747,7 @@ def test_c():
 
 
 def test_r_tst_043_045_qc_tm_section_rows_and_count(pytester) -> None:
-    """Traces: R-TST-043, R-TST-045."""
+    """Traces: R-TST.43, R-TST.45."""
     result = _inner_run(pytester, {"test_qc_tm_rows.py": _PLANTED_THREE_ARMS})
     assert result.ret == 0, result.stdout.str()
     rows, count_line = _qc_tm_rows(result.stdout.str())
@@ -1825,7 +1827,7 @@ def test_r_tst_046_over_bound_arm_still_reports(pytester) -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-050 / 051 — the status oracle reads every painted line; the ratchet
+# R-TST.50 / R-TST.51 — the status oracle reads every painted line; the ratchet
 # ---------------------------------------------------------------------------
 
 
@@ -1852,7 +1854,7 @@ def test_r_tst_050_status_log_keeps_every_painted_line(tmp_path) -> None:
     assert seen["since"] == [f"line {i}" for i in range(1, 7)], seen
     assert seen["app_log_lines"] == 4, seen
     # The QC-OR ratchet on the same tree: no file holds more newest-line
-    # waits than its baseline (R-TST-051/1's pass state).
+    # waits than its baseline (R-TST.51/1's pass state).
     violations = _newest_guard_lines(TESTS_ROOT, suite_census.NEWEST_LINE_BASELINE)
     assert not violations, "\n".join(violations)
 
@@ -1879,7 +1881,7 @@ def _planted_reader_wait(pilot, app):
 
 
 def test_r_tst_051_newest_line_waits_do_not_grow(tmp_path) -> None:
-    """R-TST-051/2-4: the guard's own text for a wait added in a new file, in a
+    """R-TST.51/2 .. R-TST.51/4: the guard's own text for a wait added in a new file, in a
     baselined file (planted under that file's own path, so its baseline n
     applies) and through a support-module newest-line reader."""
     from tests.support import suite_census
@@ -2180,7 +2182,7 @@ def test_r_tst_070_2_reviewed_exemptions_stay_narrow(tmp_path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-080 .. 082 — version-agnostic report goldens
+# R-TST.80 .. R-TST.82 — version-agnostic report goldens
 # ---------------------------------------------------------------------------
 
 
