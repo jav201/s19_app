@@ -70,6 +70,17 @@ def a2l_holds_collector(incoming: Optional[Path], installed: Optional[Path]) -> 
     return False
 
 
+def _load_reads_a2l(context: Optional[FileLoadRequest]) -> bool:
+    """Whether a file-load worker reads or parses an A2L, and so holds the
+    cyclic collector from its start (D-13, as the attach and project
+    workers do): the read's allocations otherwise end in a long collection
+    on the worker. A load without an A2L keeps the collector on, so its
+    install does not run the full collection meant for an A2L load."""
+    return context is not None and (
+        bool(context.a2l_files) or context.a2l_path is not None
+    )
+
+
 @dataclass(frozen=True)
 class A2LAttachRequest:
     """Inc 12b (S-b): the A2L attach worker's immutable request.
@@ -1963,6 +1974,8 @@ class FileLoadMixin:
                 - ``_load_workarea_file`` (in-place workarea arm)
         """
         try:
+            if _load_reads_a2l(context):
+                gc.disable()
             load_started = time.perf_counter()
             self.logger.info(
                 "Load phase boundary: worker_parse_start path=%s", path.name
@@ -1979,6 +1992,8 @@ class FileLoadMixin:
                 self.call_from_thread(self._handle_load_error, path, exc, gen)
                 return
             if loaded is None:
+                if not gc.isenabled():
+                    gc.enable()
                 suffix = path.suffix.lower()
                 self.call_from_thread(
                     self._handle_load_error,

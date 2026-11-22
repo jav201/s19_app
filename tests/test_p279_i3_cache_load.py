@@ -54,6 +54,7 @@ from tests.test_alp_inc2_a2l_attach import (
     _seed_project,
     _typed_attach,
 )
+from tests.test_alp_inc3_snapshot_parity import _drive_typed_no_assert
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLES = ROOT / "examples"
@@ -1443,6 +1444,77 @@ def test_r_a2l_cache_056_collector_is_off_during_every_read_and_store(tmp_path, 
     kinds = {k for k, _v in samples}
     assert ("read-start" in kinds) and ("store-start" in kinds if not warm else "read-chunk" in kinds), (route, warm, kinds)
     assert len(samples) >= 2 and all(v is False for _k, v in samples), (route, warm, [x for x in samples if x[1]])
+
+
+_IMAGE_GC_OUTCOMES = ("success", "parse-raises", "unsupported", "prepare-raises")
+
+
+@pytest.mark.parametrize("outcome", _IMAGE_GC_OUTCOMES)
+def test_r_a2l_cache_051_r_a2l_refresh_051_image_worker_holds_the_collector_for_the_whole_worker(
+        tmp_path, env, monkeypatch, log, outcome) -> None:
+    """R-A2L-CACHE.051, .056 (P-H3-1) and R-A2L-REFRESH.051 (4 arms): an image load with case_01's A2L installed
+    and its stored parse on disk (no in-memory entry) has the collector off at the seam's start, at its return and
+    at the image parse - the whole worker, not only inside the cache's own hold - and, whether the load is
+    installed or fails in the image parse, on an unsupported payload or in the preparation, the collector is
+    enabled at the outcome and after the worker.
+    Why: with the collector on around the read, the first allocation after it pays a 331-424 ms collection on
+    the worker (E4-H3 cause B) and a due UI tick fires 390 ms late on case_06. Negative controls: 1f4e4a73a
+    samples True at the seam's start (RED); a hold that the unsupported-payload exit does not undo leaves the
+    collector off at that outcome (RED)."""
+    deps = _deps()
+    samples: list = []
+    real_seam, real_parse = deps.parse_a2l_cached, S19TuiApp._parse_data_file
+
+    def seam(*a, **k):
+        samples.append(("seam-start", gc.isenabled()))
+        try:
+            return real_seam(*a, **k)
+        finally:
+            samples.append(("seam-return", gc.isenabled()))
+
+    def parse(self_, *a, **k):
+        samples.append(("image-parse", gc.isenabled()))
+        if outcome == "parse-raises":
+            raise ValueError("H3_CONTROL")
+        return None if outcome == "unsupported" else real_parse(self_, *a, **k)
+
+    def boom(self_, *a, **k):
+        raise ValueError("H3_CONTROL")
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        await _typed_attach(app, pilot, CASE01_A2L)
+        await settle_workers(pilot)
+        app._a2l_cache_key = None
+        app._a2l_cache_data = None
+        log.messages.clear()
+        outcomes: list = []
+        real_end = S19TuiApp.end_busy
+
+        def end(key, gen, text):
+            outcomes.append((key, str(text), gc.isenabled()))
+            return real_end(app, key, gen, text)
+
+        monkeypatch.setattr(app, "end_busy", end)
+        monkeypatch.setattr(deps, "parse_a2l_cached", seam)
+        monkeypatch.setattr(S19TuiApp, "_parse_data_file", parse)
+        if outcome == "prepare-raises":
+            monkeypatch.setattr(S19TuiApp, "_prepare_load_payload", boom)
+        await _drive_typed_no_assert(app, pilot, CASE01_IMAGE)
+        await settle_workers(pilot)
+        await wait_until(pilot, lambda: any(o[0] == "file_load" for o in outcomes), "the image outcome", timeout=120.0)
+        await settle_workers(pilot)
+        await pilot.pause()
+        return outcomes, gc.isenabled()
+
+    outcomes, gc_after = _run(tmp_path, body)
+    assert log.matching(F_HIT), "the image worker never read the stored parse: the arm would be vacuous"
+    assert [k for k, _v in samples][:3] == ["seam-start", "seam-return", "image-parse"], samples
+    assert all(v is False for _k, v in samples), (outcome, samples)
+    mine = [o for o in outcomes if o[0] == "file_load"]
+    assert len(mine) == 1 and mine[0][1].startswith("Loaded") is (outcome == "success"), (outcome, outcomes)
+    assert mine[0][2] is True and gc_after is True, (outcome, outcomes, gc_after)
 
 
 class _Ticks:
