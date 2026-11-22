@@ -35,6 +35,7 @@ import asyncio
 from pathlib import Path
 from typing import Awaitable, Callable
 
+import pytest
 from rich.text import Text
 from textual.widgets import DataTable, Static
 
@@ -305,3 +306,70 @@ def test_build_mac_coverage_strip_counts() -> None:
     assert "3 matches" in strip.plain
     # numeric-only strip → no payload/markup surface
     assert isinstance(strip, Text)
+
+
+# ---------------------------------------------------------------------------
+# R-TUI-071.1 / .2 — the strip follows a loaded MAC, not the primary's type.
+# ---------------------------------------------------------------------------
+
+_TWO_MAC_RECORDS = [
+    {"parse_ok": True, "name": "SENSOR_A", "address": 0x1000, "line_number": 1, "parse_error": ""},
+    {"parse_ok": True, "name": "SENSOR_B", "address": 0x1004, "line_number": 2, "parse_error": ""},
+]
+
+
+def _hex_loaded(tmp: Path, mac_records: list[dict]) -> "object":
+    """Build a real tiny Intel HEX ``LoadedFile`` (0x1000..0x100F) with the given MAC records."""
+    from s19_app.hexfile import IntelHexFile
+    from s19_app.tui.changes.io import emit_intel_hex_from_mem_map
+    from s19_app.tui.services.load_service import build_loaded_hex
+
+    mem = {0x1000 + off: 0 for off in range(16)}
+    hex_path = tmp / "img.hex"
+    hex_path.write_text(emit_intel_hex_from_mem_map(mem, [(0x1000, 0x1010)]), encoding="ascii")
+    loaded = build_loaded_hex(hex_path, IntelHexFile(str(hex_path)), None, None)
+    loaded.mac_records = mac_records
+    loaded.mac_diagnostics = []
+    return loaded
+
+
+@pytest.mark.parametrize("case", ["hex_primary_with_mac", "s19_primary_without_mac"])
+def test_r_tui_071_strip_follows_the_mac_not_the_primary_type(case: str) -> None:
+    """Traces: R-TUI-071.1 (hex_primary_with_mac), R-TUI-071.2 (s19_primary_without_mac).
+
+    Case /2 first shows the strip with a MAC, then loads an S19 primary with no
+    MAC record: the strip must be blanked (not stale, not ``0 of 0``).
+
+    Why: the strip follows a loaded MAC whatever the primary's type (batch-47
+    LLR-071.2); ``test_at071_strip`` loads only an S19 primary with a MAC, so a
+    gate keyed on the S19 type, or a strip left drawn with no MAC, passes it.
+    """
+    for size in _SIZES:
+
+        def _install(app: S19TuiApp, tmp: Path) -> None:
+            app.current_a2l_path = None
+            app.current_a2l_data = None
+            if case == "hex_primary_with_mac":
+                app.current_file = _hex_loaded(tmp, _TWO_MAC_RECORDS)
+            else:
+                # A MAC is loaded first so the strip is drawn; the observer then
+                # swaps in a MAC-less primary, so only a real blanking empties it.
+                app.current_file = _s19_loaded(tmp, _TWO_MAC_RECORDS)
+
+        async def _observe(app: S19TuiApp, pilot: object) -> None:
+            if case == "s19_primary_without_mac":
+                assert _strip_text(app).strip(), "precondition: strip drawn while a MAC is loaded"
+                app.current_file = _s19_loaded(app.current_file.path.parent, [])
+                app.update_mac_view()
+                await pilot.pause()
+            text = _strip_text(app)
+            if case == "hex_primary_with_mac":
+                assert "MAC→S19" in text and "of 2" in text, (
+                    f"strip must show for a HEX primary with a MAC; got {text!r}"
+                )
+            else:
+                assert text.strip() == "", (
+                    f"strip must be empty with no MAC loaded; got {text!r}"
+                )
+
+        _drive_mac(size, _install, _observe)
