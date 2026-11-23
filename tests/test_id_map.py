@@ -729,6 +729,33 @@ def test_rewrite_file_dash_tail_needs_a_separator():
     assert len(skips) == 1 and _skip_has(skips, "t.md", 1, "shorthand", "R-ZZT-010")
 
 
+_L9 = "R-ZZT-009\tR-ZZT.9\trename\tREQUIREMENTS.md:9@ef5ab17c"
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        "R-ZZT-009 \u2026 -012\n",
+        "R-ZZT-009 .. -012\n",
+        "R-ZZT-009 \u2013 -012\n",
+    ],
+    ids=["ellipsis", "two-dots", "en-dash"],
+)
+def test_rewrite_file_dash_tail_after_any_shorthand_separator(line):
+    """Every shorthand separator may carry a dash tail; renaming only the head strands it. R-DOC-IDMAP.18/6"""
+    text = line.encode("utf-8")
+    new, hits, skips = _rw("t.md", text, (_L9,))
+    assert (new, hits) == (text, [])
+    assert skips == ["t.md:1\tshorthand\tR-ZZT-009"]
+
+
+def test_rewrite_file_separator_without_number_keeps_the_token():
+    """A separator with no number after it is prose; the head is a plain token to rename. R-DOC-IDMAP.18/7"""
+    new, hits, skips = _rw("t.md", b"R-ZZT-009 \xe2\x80\xa6 (see below)\n", (_L9,))
+    assert new == "R-ZZT.9 \u2026 (see below)\n".encode("utf-8")
+    assert (len(hits), skips) == (1, [])
+
+
 def test_rewrite_file_non_utf8_is_binary_skip():
     """Decoding with replacement and writing back would corrupt a binary file. R-DOC-IDMAP.16/1"""
     data = b"\xff\xfe R-ZZT-011"

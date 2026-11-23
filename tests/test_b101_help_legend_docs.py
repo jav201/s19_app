@@ -586,7 +586,7 @@ _REFERENCE_PATTERNS = (
     re.compile(r"change 1", re.I),
     re.compile(r"change 2", re.I),
     re.compile(r"\b(?:LLR|HLR)-\d"),
-    re.compile(r"\bR-[A-Z][A-Z0-9]*-"),
+    re.compile(r"\bR-[A-Z][A-Z0-9]*[-.]"),
     re.compile(r"E3 ruling", re.I),
     re.compile(r"\binc-?\d", re.I),
 )
@@ -607,6 +607,17 @@ def test_r_whelp_13_1_no_reference_to_unopenable_things() -> None:
     assert _reference_hits(_with_step_appended("flow", "(LLR-003.7)")) != []
     assert _reference_hits(_with_step_appended("workspace", "see folders.html")) != []
     assert _reference_hits(_with_step_appended("reports", "(Change 2)")) != []
+
+
+@pytest.mark.parametrize(
+    "cite",
+    ["(R-ZZT.11)", "(R-ZZT-011)", "(R-ZZT-011.1)"],
+    ids=["new-form", "old-form", "dotted"],
+)
+def test_r_whelp_13_3_requirement_ids_in_any_form_are_references(cite: str) -> None:
+    """A requirement id in help text is a reference to an unopenable thing, in the old and the new form. R-WHELP.13/3"""
+    hits = _reference_hits(_with_step_appended("checks", cite))
+    assert [(k, n) for k, n, _ in hits] == [("checks", 1)]
 
 
 def _folder_constants() -> Dict[str, str]:

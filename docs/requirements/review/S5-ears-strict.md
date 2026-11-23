@@ -1,6 +1,6 @@
 # S5 — Workspace & file I/O: context notes and strict EARS rows (2026-10-30)
 
-Input: `REQUIREMENTS.by-module.md` chapter S5 (lines 2186–2479): R-TUI-029, 001, 002, 005, 006, 008, 011, 015, 066, and three "information contract" blocks (R-TUI-113, 114, 115).
+Input: `REQUIREMENTS.by-module.md` chapter S5 (lines 2186–2479): R-TUI-029, R-TUI-001, R-TUI-002, R-TUI-005, R-TUI-006, R-TUI-008, R-TUI.11, R-TUI-015, R-TUI-066, and three "information contract" blocks (R-TUI-113, 114, 115).
 Code: `s19_app/tui/workspace.py` (work-area part), `services/load_service.py`, `services/folder_open_service.py`, `open_folder_chip.py`, `screens_directionb.py::LoadedArtifactsPanel` / `EmptyStatePanel`, the S5 functions of `app.py`, the `#ws_*`, `#sections_*`, `#files_*`, `#loaded_*` rules of `styles.tcss`. Two read-only code readings, every fact with `file:line`. No test was run.
 Reconciled with s19_app 570b4b5 (batch-100) on 2026-11-01: rows and cites in S5.2, S5.3, S5.4, S5.5, S5.6, S5.7, S5.9 and S5.10 verified at 570b4b5; other cites refer to 093a7c0.
 
@@ -25,7 +25,7 @@ Result:
 |---|---|---|
 | R-TUI-113 / 114 / 115 | Process records (IFC method, validator rules, batch decisions) inside the product requirements. No operator behaviour. | Out of the chapter; they stay in their batch records (D5-1). |
 | R-TUI-001 | "a work area … at startup": not where. It is `.s19tool/workarea/` under the folder the app starts in; launching from another folder creates another work area. If a folder cannot be created the app stops with a traceback. | Location in CTX-WORKAREA; a clear error (R-TUI-001.5, D5-12). |
-| R-TUI-002 / 011 | "Loading must copy into the work area before parsing." Project loads and work-area file picks read files that are already in the work area, in place. | "A file from outside the work area" (R-TUI-002.1, .2). |
+| R-TUI-002 / R-TUI.11 | "Loading must copy into the work area before parsing." Project loads and work-area file picks read files that are already in the work area, in place. | "A file from outside the work area" (R-TUI-002.1, .2). |
 | R-TUI-006 | "unique filenames when needed": the rule is not stated, and byte-identical files are reused, not renamed. | Both rules with the exact name pattern (R-TUI-006.1, .2). |
 | R-TUI-005 | "against the app working directory and the repo root". The repo-root fallback walks up to 6 parent folders looking for `pyproject.toml`; for an operator it can open a file from an unrelated folder. | Typed path, then the start folder; repo-root fallback removed (D5-8). |
 | R-TUI-008 | "open the workarea": no key, no folder named, no failure text; the key has no guard although the folder chips do. | Rows with key, folder, texts; same guard as the chips (D5-13). |

@@ -285,10 +285,9 @@ removed file    A file the tree holds no longer (it stays in git history):
                  followed by a letter, a digit, `-<letter or digit>` or `.<digit>` (so R-ZZT-001 never matches
                  inside R-ZZT-001.1, and R-ZZQ-7 never inside R-ZZQ-70).
   shorthand citation  An R-form old id followed by shorthand: optional spaces, one of `/`, `..`, `…`, `–`, `,`,
-                 optional spaces and a three-digit number with an optional letter (R-ZZT-010/011, R-ZZT-001 .. 007,
-                 R-ZZT-003, 006, R-ZZT-103 … 103b); or optional spaces, `,` or `/`, optional spaces, `-` and a
-                 three-digit number with an optional letter (R-ZZT-010, -011; R-ZZT-031 / -034); or
-                 `-<lower-case letter>` lists (R-ZZT-043-g/h); or `*`.
+                 optional spaces, an optional `-` and a three-digit number with an optional letter
+                 (R-ZZT-010/011, R-ZZT-001 .. 007, R-ZZT-003, 006, R-ZZT-103 … 103b, R-ZZT-010, -011,
+                 R-ZZT-031 / -034, R-ZZT-009 … -012); or `-<lower-case letter>` lists (R-ZZT-043-g/h); or `*`.
                  `/` with a 1- or 2-digit number is a test-case suffix (R-ZZT-005/5) and leaves a plain id token.
   citation       An id token or a shorthand citation.
   live file      A file tracked in git, other than the map the run reads, docs/requirements/id-map.tsv, files under docs/requirements/history/,
