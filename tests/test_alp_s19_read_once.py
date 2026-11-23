@@ -83,7 +83,7 @@ def test_r_a2l_refresh_050_s19_reader_reads_the_file_once(
 def test_r_read_002_s19_reader_line_semantics_unchanged(
     tmp_path: Path,
 ) -> None:
-    """R-READ-002, R-READ-001.1, R-READ-007.1, R-READ-007.3, R-PARSE-002 and
+    """R-READ.2, R-READ-001.1, R-READ-007.1, R-READ-007.3, R-PARSE.2 and
     R-READ-006.1 — in-memory iteration preserves S19 line semantics.
 
     The input mixes CRLF lines, one lone-CR line ending, blank lines, a
@@ -94,12 +94,12 @@ def test_r_read_002_s19_reader_line_semantics_unchanged(
     tree. Expected values below were produced by the base tree at 7f2286db.
 
     What this node pins, row by row:
-    - R-READ-002: CR LF and the lone CR each end a line (this input has no
+    - R-READ.2: CR LF and the lone CR each end a line (this input has no
       bare LF line end).
     - R-READ-001.1: the blank line makes no record.
     - R-READ-007.1 and R-READ-007.3: the S3 record after S9 makes no record
       and gives the ``S19-AFTER-TERMINATOR`` notice.
-    - R-PARSE-002: the damaged ``S1ZZ`` line gives ``Invalid byte count hex``.
+    - R-PARSE.2: the damaged ``S1ZZ`` line gives ``Invalid byte count hex``.
     - R-READ-006.1: the S5 count (2) equals the data-record tally, which
       counts the rejected S1 line before the terminator, so no
       ``S19-COUNT-MISMATCH`` notice is attached.

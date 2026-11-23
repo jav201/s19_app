@@ -48,7 +48,7 @@ def test_r_a2l_def_136_1_describing_every_object_is_fast():
     built = [d for d in result.values() if d.refusal is None]
     assert any(d.kind == "number" for d in built) and any(d.kind == "enum" for d in built)
     # Integration fix (orchestrator, 2026-11-07): the bound goes through the repo's
-    # timing helpers so the R-TST-002 census sees a timing arm and QC-TM reports it.
+    # timing helpers so the R-TST.2 census sees a timing arm and QC-TM reports it.
     median = statistics.median(runs)
     assert median <= report_margin("R-A2L-DEF.136 describe 13990", median, timing_bound(BOUND_SECONDS)), runs
 

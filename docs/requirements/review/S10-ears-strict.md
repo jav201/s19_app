@@ -250,7 +250,7 @@ Reading the file, the load status and the finding lines are S8's (R-CHG-001.19 �
 |---|---|---|---|
 | R-CHG-004.1 | U | The system shall edit one change document at a time in the Patch Editor. | Yes; tested. |
 | R-PE.40 | U | The system shall show one ledger row per entry, in document order. | Yes; tested. |
-| R-PE-041 | U | The system shall show the ledger subtitle of CTX-PE-LEDGER. | Yes; tested. |
+| R-PE.41 | U | The system shall show the ledger subtitle of CTX-PE-LEDGER. | Yes; tested. |
 | R-PE.42 | U | The system shall show every ledger address in full. | Yes; tested. |
 | R-PE.43 | If | If a Value / bytes, Status or Linkage cell is wider than its column, then the system shall show its start and one `…`. | Yes; tested. |
 | R-PE.44 | If | If the document has no entry and no finding, then the system shall show the ledger line `No entries yet: Add one, paste a change-set or Load a file.` | Yes; tested. |
@@ -346,7 +346,7 @@ S8 owns what these controls do: Validate (R-CHG-VAL.1 … .4), the apply and its
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-PE-110 | While | While a session action runs, the system shall refuse Add, Edit, Remove, Load, a dropdown pick, Refresh, Parse pasted, Validate, Apply loaded changes, Save, Run checks, Execute scope, Undo and Redo (buttons, Ctrl+Z and Ctrl+Y), Write file, both Edit JSON popups and their results, and the accept of the unsaved-changes popup. | Yes; tested (`test_tc_b100_53_patch_editor_changes_are_refused_while_busy`, `test_tc_b100_53_patch_editor_continuations_are_refused_while_busy`). |
+| R-PE.110 | While | While a session action runs, the system shall refuse Add, Edit, Remove, Load, a dropdown pick, Refresh, Parse pasted, Validate, Apply loaded changes, Save, Run checks, Execute scope, Undo and Redo (buttons, Ctrl+Z and Ctrl+Y), Write file, both Edit JSON popups and their results, and the accept of the unsaved-changes popup. | Yes; tested (`test_tc_b100_53_patch_editor_changes_are_refused_while_busy`, `test_tc_b100_53_patch_editor_continuations_are_refused_while_busy`). |
 | R-PE.111 | While | While a project load runs, the system shall make the paste buffer read-only. | Yes; tested (`test_tc_b100_53_paste_box_is_read_only_during_a_project_load`). |
 
 ### S10.9 · Checks and the execution scope (CTX-PE)
@@ -383,7 +383,7 @@ The check run and its display are S9 (S9.1, S9.2); running a scope is S11.
 | D10-12 | The current Patch Editor is described only by S0's HLR-005 … 008, HLR-144, HLR-161 and the Patch Editor parts of HLR-148, 149, 157. | Absorbed as rows here; pointers left in S0. |
 | D10-45 | Overlap item of the handoff: D10-20 (a dropdown pick skips the unsaved-changes popup) against batch-100 Inc 10 (`5dd2249`). Batch-100 LLR-174.2t (owned with HLR-174 by S5) shows the Load button's popup on a dropdown pick while the panel is dirty, keeps the document and the flag on cancel with the same status, and clears the dropdown so the same pick asks again (`app.py:6768-6782`). It is the Patch Editor's own popup, not S5's image-load question (LLR-174.2j). | D10-20 is settled as it decided: R-PE.16 reads Yes; new row R-PE.112 for the cleared choice. Nothing is superseded. |
 | D10-46 | Batch-100 LLR-167.8 (Inc 5, re-pinned at Inc 8a; LED .72, .73): a completed Save project clears the panel's dirty flag only when a file in the project now holds every entry the panel shows: the draft document was written (or reused) there and the paste buffer holds no unparsed text (`app.py:2509-2541`, `:12262-12277`). A refused or rolled-back save, a failed document write and a file-backed document leave the flag set. The read goes through a public reader of the panel (`screens_directionb.py:5867-5876`, LLR-174.1c). | Rows R-PE.38, R-PE-039.1 … .4; "unparsed paste text" defined in CTX-PE-DOC. Save project's own rows and the outcome line for a file-backed document with unsaved edits are S11's (R-PROJ-DOC.15, .16, .17). |
-| D10-47 | Batch-100 HLR-177a (Inc 12b, LLR-177.3e): every Patch Editor handler that reaches the change service, the two popup results and the two popup accept arms first refuse while a session action runs (`app.py:4489`, `:4704`, `:4912`, `:4939`, `:4994`, `:5022`, `:5063`, `:5117`, `:5185`, `:5238`, `:6756`, `:6777`, `:6872`, `:6886`); a project load makes the paste buffer read-only until it ends (`app.py:13469-13475`, `:20330-20337`). These handlers changed only by that check. | Rows R-PE-110, R-PE.111 (the Patch Editor part, rule D-9); the busy line and the rules that end the refusal are S6's. The other S10 rows keep their cells. |
+| D10-47 | Batch-100 HLR-177a (Inc 12b, LLR-177.3e): every Patch Editor handler that reaches the change service, the two popup results and the two popup accept arms first refuse while a session action runs (`app.py:4489`, `:4704`, `:4912`, `:4939`, `:4994`, `:5022`, `:5063`, `:5117`, `:5185`, `:5238`, `:6756`, `:6777`, `:6872`, `:6886`); a project load makes the paste buffer read-only until it ends (`app.py:13469-13475`, `:20330-20337`). These handlers changed only by that check. | Rows R-PE.110, R-PE.111 (the Patch Editor part, rule D-9); the busy line and the rules that end the refusal are S6's. The other S10 rows keep their cells. |
 | D10-48 | Tests that verify implementation only (not cited as row evidence): `test_tc_b100_44_no_private_dirty_read_outside_the_panel` (a source census) and `test_tc_b100_44_guard_reads_the_public_reader` (the reader seam, LLR-174.1c). | No rows. |
 
 **Remove (rule use/defer/delete)**
@@ -453,11 +453,11 @@ The check run and its display are S9 (S9.1, S9.2); running a scope is S11.
 
 **Reconciled with batch-100 (s19_app 570b4b5)**
 
-- Rows added (8): R-PE.112 (the dropdown is cleared on cancel, LLR-174.2t); R-PE.38, R-PE-039.1 … .4 (Save project and the dirty flag, LLR-167.8); R-PE-110, R-PE.111 (busy refusal and the read-only paste buffer, LLR-177.3e).
+- Rows added (8): R-PE.112 (the dropdown is cleared on cancel, LLR-174.2t); R-PE.38, R-PE-039.1 … .4 (Save project and the dirty flag, LLR-167.8); R-PE.110, R-PE.111 (busy refusal and the read-only paste buffer, LLR-177.3e).
 - Rows changed: R-PE.16 No → Yes (D10-20 done in Inc 10). Cells changed (tests named): R-PE.15, R-PE.19, R-PE.36, R-PE.37; R-TUI-049.3 re-verified (still Partly).
 - Rows retired: none. Decisions added: D10-45 … D10-48. Decisions superseded: none; D10-20 is marked done.
 - Passed (scratch `passed-sweep.md`): S5 (the Patch Editor dirty flag and unparsed paste text feed the project-load question), S6 (the Patch Editor busy rows live here), S11 (the Save project outcome line for a file-backed document with unsaved edits).
-- Consolidation (items from S5, S6, S11): R-PE-110 text adds Ctrl+Z / Ctrl+Y and the accept of the unsaved-changes popup (refused at `app.py:4994`, `:5022`, `:6777`, `:6886`; S6 CTX-BUSY lists them). R-PE.38, R-PE-039.1 … .4 and D10-46 cite S11 R-PROJ-DOC.15 … .17. R-PE.102 Yes → Partly (S11 D11-25, re-verified open). Already here: D10-20 settled (D10-45), the dirty flag's writers (R-PE.36, .037, `test_tc_b100_44_patch_editor_reader_follows_its_writers`), the read-only paste buffer (R-PE.111); batch backlog S10-03 is closed by Inc 12b.
+- Consolidation (items from S5, S6, S11): R-PE.110 text adds Ctrl+Z / Ctrl+Y and the accept of the unsaved-changes popup (refused at `app.py:4994`, `:5022`, `:6777`, `:6886`; S6 CTX-BUSY lists them). R-PE.38, R-PE-039.1 … .4 and D10-46 cite S11 R-PROJ-DOC.15 … .17. R-PE.102 Yes → Partly (S11 D11-25, re-verified open). Already here: D10-20 settled (D10-45), the dirty flag's writers (R-PE.36, .037, `test_tc_b100_44_patch_editor_reader_follows_its_writers`), the read-only paste buffer (R-PE.111); batch backlog S10-03 is closed by Inc 12b.
 
 ## 6. Counts
 

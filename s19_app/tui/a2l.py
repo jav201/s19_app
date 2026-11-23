@@ -4885,7 +4885,7 @@ def render_a2l_view(
     a2l_data: Optional[dict], tag_checks: Optional[list[dict]] = None, max_tag_lines: Optional[int] = None
 ) -> str:
     """Render a concise, human-readable A2L summary: errors, then sections,
-    then tags (R-A2L-076, .077)."""
+    then tags (R-A2L.76, .077)."""
     if not a2l_data:
         return "No A2L loaded."
     errors = a2l_data.get("errors") or []

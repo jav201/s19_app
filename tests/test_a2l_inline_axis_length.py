@@ -1,6 +1,6 @@
 """Inline-axis length summer for CURVE/MAP CHARACTERISTICs — batch-55 (P-1b).
 
-Requirements ``R-A2L-008`` (the inline-axis length summer), ``R-A2L-014`` (the
+Requirements ``R-A2L-008`` (the inline-axis length summer), ``R-A2L.14`` (the
 ``MAX_A2L_DECODE_BYTES`` byte-decode clamp). A CURVE/MAP with inline STD_AXIS /
 FIX_AXIS axes reports a correct byte ``length`` (summing the resolved
 RECORD_LAYOUT on-disk span × inline axis point-counts) so its bytes become

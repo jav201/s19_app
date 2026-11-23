@@ -2,7 +2,7 @@
 
 E4 tester tests for the bulk-add slice. Oracles come from the Inc 4 design
 packet: ``.dev-flow/2026-11-03-batch-102/inc-4/01-requirements.md``
-(R-B102-BULK-001..007), ``02-test-cases.md`` (TC-B102-BULK-01..07),
+(R-B102-BULK.1 .. R-B102-BULK-007), ``02-test-cases.md`` (TC-B102-BULK-01..07),
 ``codewire-graph.md`` and the E3 rulings
 ``.dev-flow/2026-11-03-batch-102/design/E3-rulings-inc4.md``:
 
@@ -58,7 +58,7 @@ from tests.b97_probes import record_statuses, settle
 SIZE = (118, 54)
 MIN_SIZE = (80, 24)
 
-#: The exact instruction the modal shall paint (R-B102-BULK-001; the E3
+#: The exact instruction the modal shall paint (R-B102-BULK.1; the E3
 #: correction-of-artifact addenda fixes the prototype's wording to this line).
 INSTRUCTION = "Separate names with new lines, commas, semicolons or spaces."
 
@@ -238,13 +238,13 @@ def spy_load_spec(monkeypatch, counter: dict) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# TC-B102-BULK-01 — R-B102-BULK-001 — the bulk-add control opens the modal
+# TC-B102-BULK-01 — R-B102-BULK.1 — the bulk-add control opens the modal
 # --------------------------------------------------------------------------- #
 
 
 @pytest.mark.parametrize("preseed", ["empty", "picked"])
 def test_tc_b102_bulk_01_modal_opens_with_instruction_focus(tmp_path: Path, preseed: str) -> None:
-    """TC-B102-BULK-01 (R-B102-BULK-001, full; E3 ruling 5): activating
+    """TC-B102-BULK-01 (R-B102-BULK.1, full; E3 ruling 5): activating
     ``#check_param_bulk_button`` — composed by the picker, which emits
     ``BulkAddRequested``, and pushed by the Check Editor host — opens
     ``BulkParameterAddScreen`` holding a multiline ``#bulk_param_text`` (a
@@ -258,7 +258,7 @@ def test_tc_b102_bulk_01_modal_opens_with_instruction_focus(tmp_path: Path, pres
     one-line filter input, or drop/alter the exact instruction line.
     """
     assert bulk_modal_class_or_none() is not None, (
-        "screens.BulkParameterAddScreen: the bulk modal ships (R-B102-BULK-001)"
+        "screens.BulkParameterAddScreen: the bulk modal ships (R-B102-BULK.1)"
     )
 
     async def body(app, pilot, panel):
@@ -293,12 +293,12 @@ def test_tc_b102_bulk_01_modal_opens_with_instruction_focus(tmp_path: Path, pres
 
 
 # --------------------------------------------------------------------------- #
-# TC-B102-BULK-02 — R-B102-BULK-002 — every separator splits, empties drop
+# TC-B102-BULK-02 — R-B102-BULK.2 — every separator splits, empties drop
 # --------------------------------------------------------------------------- #
 
 
 def test_tc_b102_bulk_02_separators_split_and_empty_tokens_drop(tmp_path: Path) -> None:
-    """TC-B102-BULK-02 (R-B102-BULK-002, full): the parser splits on new
+    """TC-B102-BULK-02 (R-B102-BULK.2, full): the parser splits on new
     lines, commas, semicolons and whitespace, trims each token and ignores
     empties, preserving order INCLUDING repeated tokens:
     ``Alpha\\nBeta, Gamma; Delta   Alpha`` → the five parsed names of the TC;
@@ -309,7 +309,7 @@ def test_tc_b102_bulk_02_separators_split_and_empty_tokens_drop(tmp_path: Path) 
     parse only new lines, or treat the buffer as one string.
     """
     parse = getattr(picker_module(), "parse_parameter_list", None)
-    assert parse is not None, "parse_parameter_list: the bulk parser ships (R-B102-BULK-002)"
+    assert parse is not None, "parse_parameter_list: the bulk parser ships (R-B102-BULK.2)"
     parsed = parse("Alpha\nBeta, Gamma; Delta   Alpha")
     assert parsed == ["Alpha", "Beta", "Gamma", "Delta", "Alpha"], parsed
     assert "" not in parsed, parsed

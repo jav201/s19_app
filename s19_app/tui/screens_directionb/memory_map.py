@@ -822,7 +822,7 @@ class MemoryMapPanel(Container):
             addressed by CLASS (re-mounted every render; an id would trip
             ``DuplicateIds``) with markup-safe ``safe_text`` content.
 
-            batch-77 (R-TUI-103 / LLR-111.1, .2, .7) changes what the bar is
+            batch-77 (R-TUI-103B.2 … R-TUI-103B.4 / LLR-111.1, .2, .7) changes what the bar is
             drawn against, on both axes. The BASIS is the measured container
             width rather than a fixed constant, and the DENOMINATOR is the total
             MAPPED bytes of the emitted runs rather than the image address span.

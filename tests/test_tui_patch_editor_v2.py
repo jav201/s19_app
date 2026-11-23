@@ -545,8 +545,8 @@ def test_save_back_prompt(tmp_path: Path) -> None:
     the work area, a reserved device name is refused (3 adversarial cases —
     the v2 replacement for the retired batch-04 containment tests).
 
-    Inc 15 (R-TST-160, R-TST-161, R-TST-162, R-TST-154, R-TST-155,
-    R-TST-163): every read after an apply or a save-back answer waits
+    Inc 15 (R-TST.160, R-TST.161, R-TST.162, R-TST.154, R-TST.155,
+    R-TST.163): every read after an apply or a save-back answer waits
     through the shared wait for the prompt to show or hide.
     """
     from textual.containers import Container
@@ -787,7 +787,7 @@ def test_check_run_display(tmp_path: Path) -> None:
     fail→``sev-error``, uncheckable→``sev-warning``) and a status line
     stating the three aggregate counts. No stub is injected anywhere.
 
-    Traces: R-CHK-PE-001, R-CHK-PE-002, R-CHK-PE-003.
+    Traces: R-CHK-PE.1, R-CHK-PE.2, R-CHK-PE.3.
     """
     from textual.widgets import Label, Static
 
@@ -1620,7 +1620,7 @@ def test_at030c_directly_dropped_file_is_listed_and_loadable(
     must be listed in the dropdown and loadable. This stays green even under a
     reverted save handler, so it is structurally a guard, NOT the C-12 gate.
 
-    Inc 15 (R-TST-159, R-TST-154, R-TST-155, R-TST-163): the entry read
+    Inc 15 (R-TST.159, R-TST.154, R-TST.155, R-TST.163): the entry read
     waits through the shared wait for the pick to load ``dropped.json``.
     """
     from textual.widgets import Select
@@ -3599,7 +3599,7 @@ def test_tc331_disable_guard_predicate_tracks_source_path(
     fresh (None) → enabled; after a file load (not None) → disabled; after a
     subsequent paste (None) → enabled again.
 
-    Inc 15 (R-TST-150, R-TST-151, R-TST-154, R-TST-155, R-TST-163): the
+    Inc 15 (R-TST.150, R-TST.151, R-TST.154, R-TST.155, R-TST.163): the
     two reads wait through the shared wait for the load and the paste to
     reach the change document.
     """

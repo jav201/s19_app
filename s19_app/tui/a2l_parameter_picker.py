@@ -9,7 +9,7 @@ repopulate the ledger or lose the operator's picks (R-B102-SEL-004).
 :func:`parse_parameter_list` splits a pasted name list, ``Add list`` emits
 :class:`A2LParameterPicker.BulkAddRequested` for the host to push the modal,
 and :meth:`A2LParameterPicker.include_names` includes exact source matches in
-one pass, emitting the same ``SelectionChanged`` contract (R-B102-BULK-001..007).
+one pass, emitting the same ``SelectionChanged`` contract (R-B102-BULK.1 .. R-B102-BULK-007).
 
 ``id_prefix`` rebuilds every child id and internal event route, while a
 ``layout_provider`` carries the host's proportional widths. ``mode="highlight"``
@@ -61,7 +61,7 @@ if TYPE_CHECKING:
     from textual.timer import Timer
 
 #: One ledger page: at most this many rows are mounted per rebuild
-#: (R-B102-SEL-001). A derive-class DataTable pays the mounted rows, not the
+#: (R-B102-SEL.1). A derive-class DataTable pays the mounted rows, not the
 #: filtered set, so a 10 000-parameter A2L renders like a 200-row one.
 PAGE_SIZE = 200
 
@@ -76,7 +76,7 @@ _EMPTY_FILTER = "No parameter matches the filter."
 
 
 def parse_parameter_list(text: str) -> list:
-    """Split a bulk-pasted name list into trimmed tokens (R-B102-BULK-002).
+    """Split a bulk-pasted name list into trimmed tokens (R-B102-BULK.2).
 
     Summary:
         The bulk modal's pure parser. New lines, carriage returns, commas
@@ -406,12 +406,12 @@ class A2LParameterPicker(Vertical):
             page turned); carries ``shown`` / ``total`` / ``page`` /
             ``page_count`` for observers.
         ``BulkAddRequested``: the operator activated the bulk-add control;
-            the host pushes the bulk modal for this picker (R-B102-BULK-001).
+            the host pushes the bulk modal for this picker (R-B102-BULK.1).
             Pick mode only.
     """
 
     class SelectionChanged(Message, namespace="a2l_parameter_picker"):
-        """The picked parameter set changed (R-B102-SEL-003).
+        """The picked parameter set changed (R-B102-SEL.3).
 
         Args:
             names (tuple): The picked parameter names in inclusion order.
@@ -422,7 +422,7 @@ class A2LParameterPicker(Vertical):
             self.names = names
 
     class BulkAddRequested(Message, namespace="a2l_parameter_picker"):
-        """The bulk-add control was activated (R-B102-BULK-001).
+        """The bulk-add control was activated (R-B102-BULK.1).
 
         The picker stays presentational (C-7 / E3 ruling 5): it composes
         ``#check_param_bulk_button`` but never pushes the modal itself —
@@ -644,7 +644,7 @@ class A2LParameterPicker(Vertical):
         prepared_definitions: Optional[Mapping[str, Definition]] = None,
         describe_context: Optional[DescribeContext] = None,
     ) -> bool:
-        """Populate the ledger (R-B102-SEL-001, R-B102-SEL-004, R-B102-SEL-006).
+        """Populate the ledger (R-B102-SEL.1, R-B102-SEL-004, R-B102-SEL-006).
 
         Normalizes rows into ``{name: (address, size, fmt_unit)}``. Only a
         positive, non-boolean integer ``length`` supplies ``size``; missing or
@@ -980,7 +980,7 @@ class A2LParameterPicker(Vertical):
         )
 
     def _rebuild_ledger(self) -> None:
-        """The one-page renderer (R-B102-SEL-001/002/005/006).
+        """The one-page renderer (R-B102-SEL.1 / R-B102-SEL-002 / R-B102-SEL-005 / R-B102-SEL-006).
 
         Filters source names case-insensitively, clamps the page to the
         result, clears the table and mounts at most one page of rows keyed by
@@ -1082,7 +1082,7 @@ class A2LParameterPicker(Vertical):
         )
 
     def _toggle_highlighted(self) -> None:
-        """Include or exclude the highlighted ledger row (R-B102-SEL-003).
+        """Include or exclude the highlighted ledger row (R-B102-SEL.3).
 
         Toggles only that row's mark cell and posts ``SelectionChanged`` — the
         ledger is never rebuilt here. Pick mode only: highlight mode composes

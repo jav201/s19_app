@@ -1597,7 +1597,7 @@ class A2lViewMixin:
             Write the shown A2L tag-table page's cells in place after a value
             recompute, so the Raw/Physical cells read the written bytes while
             the first shown row, the cursor, the scroll and the detail card
-            stay (R-A2L-048, -049, -105, R2-7).
+            stay (R-A2L.48, R-A2L.49, R-A2L.105, R2-7).
 
         Args:
             None

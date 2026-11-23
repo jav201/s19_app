@@ -814,7 +814,7 @@ def test_r_tui_042a_5_6_resize_resizes_the_tag_cell(tmp_path: Path) -> None:
     _explore(tmp_path, page_long(48), (220, 60), _check)
 
 
-# --- Patch Editor / Save project drive (the R-A2L-048/2 route, E3A-18) -------
+# --- Patch Editor / Save project drive (the R-A2L.48/2 route, E3A-18) -------
 
 
 def _write_doc(path: Path, entries) -> Path:

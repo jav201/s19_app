@@ -2,7 +2,7 @@
 
 E4 tester tests for the shared-picker slice. Oracles come from the Inc 3
 design packet: ``.dev-flow/2026-11-03-batch-102/inc-3/01-requirements.md``
-(R-B102-SEL-001..007), ``02-test-cases.md`` (TC-B102-SEL-01..07),
+(R-B102-SEL.1 .. R-B102-SEL-007), ``02-test-cases.md`` (TC-B102-SEL-01..07),
 ``codewire-graph.md`` and the E3 rulings
 ``.dev-flow/2026-11-03-batch-102/design/E3-rulings-inc3.md`` (máximo 200
 filas; debounce 150 ms; conteo en ``#check_param_status``; ids de paginación
@@ -179,13 +179,13 @@ def spy_ledger_rebuilds(monkeypatch, counter: dict):
 
 
 # --------------------------------------------------------------------------- #
-# TC-B102-SEL-01 — R-B102-SEL-001 — one page mounted at population
+# TC-B102-SEL-01 — R-B102-SEL.1 — one page mounted at population
 # --------------------------------------------------------------------------- #
 
 
 @pytest.mark.parametrize("count,expected", [(0, 0), (199, 199), (10000, 200)])
 def test_tc_b102_sel_01_population_mounts_at_most_one_page(tmp_path: Path, count: int, expected: int) -> None:
-    """TC-B102-SEL-01 (R-B102-SEL-001, full): parameter sets of 0, 199 and
+    """TC-B102-SEL-01 (R-B102-SEL.1, full): parameter sets of 0, 199 and
     10 000 rows mount ``0``, ``199`` and ``200`` ledger rows — never more than
     one 200-row page per population (E3 ruling: máximo 200 filas).
 
@@ -256,12 +256,12 @@ def test_tc_b102_sel_02_filter_is_debounced_and_reports_truncation(tmp_path: Pat
 
 
 # --------------------------------------------------------------------------- #
-# TC-B102-SEL-03 — R-B102-SEL-003 — a toggle touches only the mark + preview
+# TC-B102-SEL-03 — R-B102-SEL.3 — a toggle touches only the mark + preview
 # --------------------------------------------------------------------------- #
 
 
 def test_tc_b102_sel_03_repeated_includes_touch_only_marks_and_preview(tmp_path: Path, monkeypatch) -> None:
-    """TC-B102-SEL-03 (R-B102-SEL-003, full): three consecutive toggles on two
+    """TC-B102-SEL-03 (R-B102-SEL.3, full): three consecutive toggles on two
     highlighted rows raise then lower the picked count (0→1→2→1, one duplicate
     toggle) while the ledger rebuild count stays at zero after mount and the
     picked-count preview follows each toggle.
@@ -269,7 +269,7 @@ def test_tc_b102_sel_03_repeated_includes_touch_only_marks_and_preview(tmp_path:
     RED on base: the shared picker does not ship. Mutant: make
     ``_toggle_highlighted`` call ``_rebuild_ledger``.
     """
-    assert picker_class_or_none() is not None, "sdb.A2LParameterPicker: the shared picker ships (R-B102-SEL-003)"
+    assert picker_class_or_none() is not None, "sdb.A2LParameterPicker: the shared picker ships (R-B102-SEL.3)"
     rebuilds = {"n": 0}
     spy_ledger_rebuilds(monkeypatch, rebuilds)
 
@@ -526,7 +526,7 @@ def test_tc_b102_sel_07_hostile_parameter_name_reads_literally(tmp_path: Path) -
 
 
 # --------------------------------------------------------------------------- #
-# R-CHKED-001 — every parameter of the loaded A2L, one row each, across pages
+# R-CHKED.1 — every parameter of the loaded A2L, one row each, across pages
 # --------------------------------------------------------------------------- #
 
 
@@ -548,11 +548,11 @@ async def _names_on_both_pages(panel, pilot) -> tuple:
 
 
 def test_r_chked_001_1_every_parameter_once_across_the_pages(tmp_path: Path) -> None:
-    """R-CHKED-001/1 (verification): 250 parameters on 200-row pages. Page 1 shows
+    """R-CHKED.1/1 (verification): 250 parameters on 200-row pages. Page 1 shows
     200 rows and page 2 shows 50; together they hold every parameter exactly once.
 
-    Why: the fold reworded R-CHKED-001 to "in the ledger's pages" because
-    R-B102-SEL-001 caps a page at 200 rows; the every-parameter half must still
+    Why: the fold reworded R-CHKED.1 to "in the ledger's pages" because
+    R-B102-SEL.1 caps a page at 200 rows; the every-parameter half must still
     hold. Mutant: a page slice one row short drops a parameter -> RED.
     """
 
@@ -567,11 +567,11 @@ def test_r_chked_001_1_every_parameter_once_across_the_pages(tmp_path: Path) -> 
 
 
 def test_r_chked_001_2_a_loaded_a2l_lists_every_parameter_once(tmp_path: Path) -> None:
-    """R-CHKED-001/2 (validation, black box): the operator loads an A2L with 250
+    """R-CHKED.1/2 (validation, black box): the operator loads an A2L with 250
     CHARACTERISTICs and opens the Check Editor from the rail; paging through the
     ledger shows each of the 250 parameters exactly once.
 
-    Mutant: as R-CHKED-001/1 -> RED.
+    Mutant: as R-CHKED.1/1 -> RED.
     """
     a2l = write_wide_a2l(tmp_path, 250)
 

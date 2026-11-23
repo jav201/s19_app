@@ -1375,13 +1375,13 @@ def test_r_a2l_read_39_length_error(tmp_path: Path) -> None:
 
 
 def test_r_a2l_013_data_size_length(tmp_path: Path) -> None:
-    """R-A2L-013/1, /2: a DATA_SIZE or LENGTH gives the length."""
+    """R-A2L.13/1, /2: a DATA_SIZE or LENGTH gives the length."""
     text = _body(meas("X", " ECU_ADDRESS 0x10", " MATRIX_DIM 2", " LENGTH 4"))
     assert _tag(_parse(tmp_path, text), "X")["length"] == 4
 
 
 def test_r_a2l_014_datatype_times_matrix(tmp_path: Path) -> None:
-    """R-A2L-014/1, /2: datatype size x MATRIX_DIM."""
+    """R-A2L.14/1, /2: datatype size x MATRIX_DIM."""
     text = _body(meas("X", " ECU_ADDRESS 0x1234", " MATRIX_DIM 2 2"))
     assert _tag(_parse(tmp_path, text), "X")["length"] == 8
     assert _tag(_parse(tmp_path, _body(meas("X", " ECU_ADDRESS 0x10"))), "X")["length"] == 2
@@ -1396,7 +1396,7 @@ def test_r_a2l_read_57_array_size(tmp_path: Path) -> None:
 
 
 def test_r_a2l_016_val_blk_matrix(tmp_path: Path) -> None:
-    """R-A2L-016/1: a VAL_BLK sized by its layout datatype x MATRIX_DIM."""
+    """R-A2L.16/1: a VAL_BLK sized by its layout datatype x MATRIX_DIM."""
     text = _body('/begin CHARACTERISTIC CK6 ""\n VAL_BLK 0x3000 RL_U16 0 CM_ID 0 65535\n MATRIX_DIM 4\n/end CHARACTERISTIC')
     assert _tag(_parse(tmp_path, text), "CK6", "CHARACTERISTIC")["length"] == 8
 
@@ -1408,7 +1408,7 @@ def test_r_a2l_read_53_val_blk_number(tmp_path: Path) -> None:
 
 
 def test_r_a2l_017_ascii_length(tmp_path: Path) -> None:
-    """R-A2L-017/1, /2: an ASCII sized by MATRIX_DIM or NUMBER."""
+    """R-A2L.17/1, /2: an ASCII sized by MATRIX_DIM or NUMBER."""
     text = _body('/begin CHARACTERISTIC A1 ""\n ASCII 0x10 RL_U8 0 CM_ID 0 65535\n MATRIX_DIM 8\n/end CHARACTERISTIC')
     assert _tag(_parse(tmp_path, text), "A1", "CHARACTERISTIC")["length"] == 8
     text2 = _body('/begin CHARACTERISTIC A2 ""\n ASCII 0x10 RL_U8 0 CM_ID 0 65535\n NUMBER 8\n/end CHARACTERISTIC')
@@ -1843,7 +1843,7 @@ def test_r_a2l_read_50_summary_header_without_comment(tmp_path: Path) -> None:
 
 
 def test_r_a2l_076_errors_then_sections(tmp_path: Path) -> None:
-    """R-A2L-076/1, /2: a file with errors lists its sections."""
+    """R-A2L.76/1, /2: a file with errors lists its sections."""
     data = parse_a2l_file(REPO_ROOT / "examples" / "case_00_public" / "merge_inc_test.a2l")
     view = render_a2l_view(data)
     assert "A2L parse errors:" in view and "A2L Sections:" in view
@@ -1854,7 +1854,7 @@ def test_r_a2l_076_errors_then_sections(tmp_path: Path) -> None:
 
 
 def test_r_a2l_077_errors_then_tags(tmp_path: Path) -> None:
-    """R-A2L-077/1: a file with errors lists its tags."""
+    """R-A2L.77/1: a file with errors lists its tags."""
     text = _body(meas("X", " ECU_ADDRESS 0x10")) + "\n/end X\n"
     data = _parse(tmp_path, text)
     view = render_a2l_view(data)

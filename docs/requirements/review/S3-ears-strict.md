@@ -24,7 +24,7 @@ Result:
 |---|---|---|
 | Issues policy, "Optional info" | Three INFO categories (valid but not image-backed, not checked without a primary image, virtual objects). **None exists**: no producer emits them. | Removed from the requirements (D3-6). INFO gets one real meaning (D3-5). |
 | Issues policy, "Errors" | Lists empty MAC name, invalid MAC address, invalid A2L address field type. The codes exist but can never fire: the parsers reject those cases earlier, as MAC parse errors. | Unreachable codes removed (D3-4). |
-| Issues policy, "Errors" | Lists broken GROUP/FUNCTION references as an error; the code raises a WARNING, and only for the one-line form. The standard `/begin REF_CHARACTERISTIC` block form is never checked. | WARNING, both forms (R-VAL-033, D3-13). |
+| Issues policy, "Errors" | Lists broken GROUP/FUNCTION references as an error; the code raises a WARNING, and only for the one-line form. The standard `/begin REF_CHARACTERISTIC` block form is never checked. | WARNING, both forms (R-VAL.33, D3-13). |
 | Issues policy, "Warnings" | "duplicate-address alias when policy emits warning": there is no policy setting; the parameter is never passed, and its documented value `error` does nothing. | Fixed severities per kind of shared address (R-VAL.22 … R-VAL.24, D3-5). |
 | Issues policy, "Warnings" | "symbol-only-in-A2L". In the most common session (S19/HEX + A2L, no MAC) **every** tag with an address gets `A2L symbol '<x>' missing from MAC.`; with S19 + MAC and no A2L, every MAC record gets the mirror warning. | Only when the other file is loaded (R-VAL.45, R-VAL.46, D3-9). |
 | Whole chapter | A2L structure checks (parse errors, duplicates, unknown blocks, broken references) run **only when an S19/HEX is loaded**. An A2L loaded alone, or with a MAC only, reports nothing. | Whenever an A2L is loaded (R-VAL.30, D3-10). |
@@ -186,13 +186,13 @@ Form column: U = ubiquitous. "Code today": **Yes** (read from the code), **Yes; 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
 | R-VAL.30 | If | If the A2L file has a parse error (S2 R-A2L-001.4 … 001.6), then the system shall raise the ERROR issue `A2L_STRUCTURE_ERROR` with the parse error as its message. | Partly: only in a primary session (D3-10). |
-| R-VAL-031 | If | If two or more tags have the same name, ignoring case, then the system shall raise one ERROR issue `A2L_DUPLICATE_SYMBOL` with the message `A2L symbol '<name>' is defined multiple times.` | Partly: primary session only (D3-10); name lower-cased (D3-17). |
+| R-VAL.31 | If | If two or more tags have the same name, ignoring case, then the system shall raise one ERROR issue `A2L_DUPLICATE_SYMBOL` with the message `A2L symbol '<name>' is defined multiple times.` | Partly: primary session only (D3-10); name lower-cased (D3-17). |
 | R-VAL-032 | If | If an A2L section's name is not a block name of ASAM MCD-2 MC, then the system shall raise the WARNING issue `A2L_UNRECOGNIZED_BLOCK` with the section's line number and the message `Unrecognized A2L block '<NAME>'.` | Partly: 21 standard names (MOD_COMMON, AXIS_DESCR …) are raised too, then shown as INFO with a note (D3-12); primary session only (D3-10). |
-| R-VAL-033 | If | If a GROUP or FUNCTION refers, inline or in a child REF_CHARACTERISTIC, REF_MEASUREMENT, DEF_CHARACTERISTIC, IN_MEASUREMENT or OUT_MEASUREMENT block, to a name that no tag has, then the system shall raise the WARNING issue `A2L_BROKEN_REFERENCE` with the message `<GROUP\|FUNCTION> references unknown symbol '<name>'.` | Partly: child blocks are not checked (D3-13); primary session only (D3-10). |
+| R-VAL.33 | If | If a GROUP or FUNCTION refers, inline or in a child REF_CHARACTERISTIC, REF_MEASUREMENT, DEF_CHARACTERISTIC, IN_MEASUREMENT or OUT_MEASUREMENT block, to a name that no tag has, then the system shall raise the WARNING issue `A2L_BROKEN_REFERENCE` with the message `<GROUP\|FUNCTION> references unknown symbol '<name>'.` | Partly: child blocks are not checked (D3-13); primary session only (D3-10). |
 | R-VAL.34 | U | The system shall compare a reference with tag names respecting case. | Yes. |
-| R-VAL.35 | If | If a tag's schema is not complete (S2 R-A2L-072) and no ERROR A2L issue names it, then the system shall raise the ERROR issue `A2L_TAG_SCHEMA_INCOMPLETE` with the message `A2L tag '<name>' is schema-incomplete: <reason>.` | Yes; tested. |
+| R-VAL.35 | If | If a tag's schema is not complete (S2 R-A2L.72) and no ERROR A2L issue names it, then the system shall raise the ERROR issue `A2L_TAG_SCHEMA_INCOMPLETE` with the message `A2L tag '<name>' is schema-incomplete: <reason>.` | Yes; tested. |
 | R-VAL.36 | If | If a tag's address is more than 0xFFFFFFFF, then the system shall raise the WARNING issue `A2L_ADDRESS_EXCEEDS_32BIT` with the message `A2L tag '<name>' address <address> exceeds the 32-bit address range (> 0xFFFFFFFF).` | Yes; tested. |
-| R-VAL.37 | If | If a tag's BYTE_ORDER value is not a byte order (S2 R-A2L-028), then the system shall raise the WARNING issue `A2L_UNKNOWN_BYTE_ORDER` with the message `A2L tag '<name>' has unknown byte order '<value>'.` | No (S2 D2-3). |
+| R-VAL.37 | If | If a tag's BYTE_ORDER value is not a byte order (S2 R-A2L.28), then the system shall raise the WARNING issue `A2L_UNKNOWN_BYTE_ORDER` with the message `A2L tag '<name>' has unknown byte order '<value>'.` | No (S2 D2-3). |
 | R-VAL.38 | If | If an A2L issue would name an unnamed tag, then the system shall use `Unnamed A2L tag at address <address>` in its message, or `Unnamed A2L tag (no address recorded)` when the tag has no address. | Yes; tested. |
 
 **Between files** (primary session)
@@ -221,7 +221,7 @@ Form column: U = ubiquitous. "Code today": **Yes** (read from the code), **Yes; 
 
 ### S3.3 · The Issues screen (CTX-ISSUES-SCREEN)
 
-Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED.1. File-derived text here follows S1's R-TUI-103 family (the Issues view is on its list).
+Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED.1. File-derived text here follows S1's safe-text rows R-TUI-103.1 … R-TUI.105 (the Issues view is on its list).
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
@@ -254,7 +254,7 @@ Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED.
 
 ### S3.4 · Colours and the legend (CTX-LEGEND)
 
-Replaces: the A2L and MAC colour blocks (their rules are S2 R-A2L-080 … 088 and R-MAC.31 … R-MAC.35), amendments C and F, R-LEGEND-SOURCE.1, R-LEGEND-MODAL-001, R-LEGEND-GEOMETRY-001, R-TUI.47.
+Replaces: the A2L and MAC colour blocks (their rules are S2 R-A2L.80 … R-A2L.88 and R-MAC.31 … R-MAC.35), amendments C and F, R-LEGEND-SOURCE.1, R-LEGEND-MODAL-001, R-LEGEND-GEOMETRY-001, R-TUI.47.
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
@@ -301,7 +301,7 @@ Focus on `Close` and closing with Esc: R-LEGEND-MODAL-001.11, .12 (tested on the
 
 | # | The situation | Recommendation (applied) |
 |---|---|---|
-| D3-1 | The A2L and MAC colour blocks restate rules S2 now has as rows; the "Notes" on tag length restate S2 R-A2L-013 … 020. | The rules live in S2 (the screen that shows them). S3 keeps the legend that explains them. |
+| D3-1 | The A2L and MAC colour blocks restate rules S2 now has as rows; the "Notes" on tag length restate S2 R-A2L.13 … R-A2L.20. | The rules live in S2 (the screen that shows them). S3 keeps the legend that explains them. |
 | D3-2 | R-TUI-042 bundles three features of three groups. | (a) A2L table density → two rows added to S2 (R-TUI-042a.1/.2). (b) → S3.3. (c) Workspace coverage signals → S5. |
 | D3-3 | R-LEGEND-SOURCE.1 requires a file placement to keep a frozen file untouched. | Row: the window and the report show the same rows. The placement rule goes to the design notes. |
 | D3-27 | `k` on the Memory Map opens the legend window with a four-box sheet and no legend block (`screens.py:1296-1305`, `:1341-1355`; the map maps to no block, `app.py:7306`). No row described the sheet (S0 HLR-132, HLR-134), and R-LEGEND-MODAL-001.8 asked for every block there. | Rows follow the code: R-LEGEND-MODAL-001.8 leaves out the Memory Map; the sheet is CTX-LEGEND "map sheet" and R-LEGEND-MAP.1 … .5. Its key line stays S4's (R-TUI-062.10, D4-21). |
@@ -321,10 +321,10 @@ Focus on `Close` and closing with Esc: R-LEGEND-MODAL-001.11, .12 (tested on the
 | # | The situation | Recommendation (applied) |
 |---|---|---|
 | D3-9 | **The largest one.** S19/HEX + A2L with no MAC: every tag with an address gets `A2L symbol '<x>' missing from MAC.` (WARNING). S19 + MAC with no A2L: every MAC record gets the mirror warning. The Issues list fills with noise in the most common session. | Raise them only when the other file is loaded (R-VAL.45, R-VAL.46). |
-| D3-10 | A2L structure checks run only in a primary session: an A2L alone, or with a MAC, reports no parse error, duplicate or broken reference. | Run them whenever an A2L is loaded (R-VAL.30 … R-VAL-033). |
+| D3-10 | A2L structure checks run only in a primary session: an A2L alone, or with a MAC, reports no parse error, duplicate or broken reference. | Run them whenever an A2L is loaded (R-VAL.30 … R-VAL.33). |
 | D3-11 | In a primary session the A2L structure rules run twice; dedup hides it, except that one call path reports every inline reference as broken. | Run them once. |
 | D3-12 | The recognised-block list has 15 names; standard blocks (MOD_COMMON, MOD_PAR, AXIS_DESCR …) are raised as WARNING, and the Issues view then re-labels 21 of them as INFO with a long note. | Put the standard names in the rule; drop the display triage and its note. `A2L_UNRECOGNIZED_BLOCK` then means a block the standard does not have. |
-| D3-13 | `A2L_BROKEN_REFERENCE` checks only the one-line form; the standard child-block form is never checked (and is itself flagged as unknown). | Check both forms (R-VAL-033). Keep WARNING: a broken group reference does not change any value. |
+| D3-13 | `A2L_BROKEN_REFERENCE` checks only the one-line form; the standard child-block form is never checked (and is itself flagged as unknown). | Check both forms (R-VAL.33). Keep WARNING: a broken group reference does not change any value. |
 | D3-14 | Rejected lines and checksum failures (S1 diagnostics) reach the operator only as a count and the log; a MAC read failure never becomes an issue; integrity notices skip dedup and are missing from the report object. | Each becomes an issue (R-VAL.17, R-VAL.18), all through the same dedup (R-VAL.13). This also answers S1's open point O1 (should the Issues panel list each diagnostic): yes. |
 | D3-15 | Overlap issues: S19 only (never HEX), computed by re-reading the file on disk, and for a tag only its start address. | Use the loaded image's overlap addresses (S1 R-IMG-002, both formats) and the whole tag span. |
 | D3-16 | A tag with an address and no length is "not checked" (grey) in the table, but the issue check treats it as 1 byte and may warn it is out of range. | Same rule as the table: no length, not checked, no issue. |

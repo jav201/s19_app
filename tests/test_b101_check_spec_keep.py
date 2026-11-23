@@ -20,8 +20,8 @@ is in each docstring; the node name starts with the id in test spelling):
   - R-CHKED-041.3/1..6 the entries with no named parameter become unlabelled
                        memory rows (/5 and /6 through the panel seam).
   - R-CHKED.25/1..3   fields included in this session read the image.
-  - R-CHKED-026/1..4   fields loaded from a spec keep the spec's bytes (D9-11).
-  - R-CHKED-027/1,2    fields outside the image are left out; spec fields stay.
+  - R-CHKED.26/1..4   fields loaded from a spec keep the spec's bytes (D9-11).
+  - R-CHKED.27/1,2    fields outside the image are left out; spec fields stay.
   - R-CHKED.56/1..3   a parameter a new A2L moves, renames or resizes becomes
                        an unlabelled memory row keeping its spec entry.
 
@@ -956,7 +956,7 @@ def test_r_chked_041_3_6_symbol_range_mismatch_memory_row(tmp_path: Path, facts:
 
 
 # ---------------------------------------------------------------------------
-# US-CHK-SPEC-1 - R-CHKED.25, R-CHKED-026, R-CHKED-027
+# US-CHK-SPEC-1 - R-CHKED.25, R-CHKED.26, R-CHKED.27
 # ---------------------------------------------------------------------------
 
 
@@ -1063,7 +1063,7 @@ async def patched_pick(pilot, app, log, f: Facts, tmp_path: Path, address: int, 
 
 
 def test_r_chked_026_1_write_keeps_spec_bytes(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-026/1 (D9-11): case 08 and its A2L loaded; a Patch Editor
+    """Case R-CHKED.26/1 (D9-11): case 08 and its A2L loaded; a Patch Editor
     apply set ``0x0`` to ``93``; the pilot spec picked; Write as
     ``rewritten.chk.json`` -> entries ``0x0`` ``6C``, ``0x14`` ``A0 BE``,
     ``0xC00FFC`` ``FF FF FF FF`` (the spec's bytes, not the image's).
@@ -1081,7 +1081,7 @@ def test_r_chked_026_1_write_keeps_spec_bytes(tmp_path: Path, facts: Facts) -> N
 
 
 def test_r_chked_026_2_validate_reports_the_drift(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-026/2: as /1; Validate pressed -> status ``Checks: 2
+    """Case R-CHKED.26/2: as /1; Validate pressed -> status ``Checks: 2
     passed, 1 failed, 0 uncheckable`` and the result row ``0x0-0x0 expected
     [6C] actual [93] -> fail``.
 
@@ -1103,7 +1103,7 @@ def test_r_chked_026_2_validate_reports_the_drift(tmp_path: Path, facts: Facts) 
 
 
 def test_r_chked_026_3_memory_row_keeps_spec_bytes(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-026/3: case 08 and its A2L loaded; a Patch Editor apply set
+    """Case R-CHKED.26/3: case 08 and its A2L loaded; a Patch Editor apply set
     the image bytes at ``0xC00FFC``-``0xC00FFF`` to ``00 00 00 00``; the pilot
     spec picked; Write as ``mem.chk.json`` -> entry ``0xC00FFC`` ``FF FF FF
     FF``.
@@ -1126,7 +1126,7 @@ def test_r_chked_026_3_memory_row_keeps_spec_bytes(tmp_path: Path, facts: Facts)
 def test_r_chked_026_4_spec_bytes_survive_same_range_reload(
     tmp_path: Path, facts: Facts
 ) -> None:
-    """Case R-CHKED-026/4 (E3 SEC5-1: the key is name, address and size): as
+    """Case R-CHKED.26/4 (E3 SEC5-1: the key is name, address and size): as
     /1 (``0x0`` set to ``93``, the pilot spec picked); key ``1``;
     ``firmware.a2l`` loaded again through the Load dialog; key ``=``; Write as
     ``reloaded.chk.json`` -> included ``[VALUE_0001, VALUE_0002]``; entries
@@ -1150,7 +1150,7 @@ def test_r_chked_026_4_spec_bytes_survive_same_range_reload(
 
 
 def test_r_chked_027_1_session_field_outside_left_out(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-027/1: case 08 loaded; a memory row ``0x0F000000`` size 4
+    """Case R-CHKED.27/1: case 08 loaded; a memory row ``0x0F000000`` size 4
     (outside the image) and, as a control, one inside the image (``SERIAL``)
     added; Write as ``out.chk.json`` -> the file holds no entry at
     ``0xF000000`` and one entry at the inside row; status ``Check Editor: 1
@@ -1171,7 +1171,7 @@ def test_r_chked_027_1_session_field_outside_left_out(tmp_path: Path, facts: Fac
 
 
 def test_r_chked_027_2_loaded_fields_kept_without_image(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-027/2: case 08's A2L loaded, the image unloaded (Workspace
+    """Case R-CHKED.27/2: case 08's A2L loaded, the image unloaded (Workspace
     ``[u]``); the pilot spec picked; Write as ``noimage.chk.json`` -> the file
     holds the 3 pilot-spec entries with the spec's bytes and no status mentions
     ``outside the loaded image``.
@@ -1523,11 +1523,11 @@ def test_r_chked_010_4_session_field_moved_stays_included(tmp_path: Path, facts:
     ], written
 
 
-# --- C-10: R-CHKED-057/1 - an in-place write clears the validation results --
+# --- C-10: R-CHKED.57/1 - an in-place write clears the validation results --
 
 
 def test_r_chked_057_1_apply_clears_the_validation_results(tmp_path: Path, facts: Facts) -> None:
-    """Case R-CHKED-057/1 (E5 C-10, SEC E5-S1), driven by keys and clicks:
+    """Case R-CHKED.57/1 (E5 C-10, SEC E5-S1), driven by keys and clicks:
     case 08 and its A2L loaded, the pilot spec picked, Validate clicked ->
     ``Checks: 3 passed, 0 failed, 0 uncheckable``, the row ``0x0-0x0 expected
     [6C] actual [6C] -> pass`` under ``validation complete``; key ``6``, a

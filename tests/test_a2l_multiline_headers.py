@@ -1,7 +1,7 @@
 """Multi-line A2L CHARACTERISTIC header + AXIS_DESCR body assembly — batch-54.
 
-Requirements ``R-A2L-011`` (char multi-line + no-regression), ``R-A2L-012``
-(axis MaxAxisPoints + external flag), ``R-A2L-013`` (comment-strip safety).
+Requirements ``R-A2L.11`` (char multi-line + no-regression), ``R-A2L.12``
+(axis MaxAxisPoints + external flag), ``R-A2L.13`` (comment-strip safety).
 
 The real ASAM demo (``examples/case_00_public/ASAP2_Demo_V161.a2l``) spreads a
 CHARACTERISTIC's 7 mandatory params (``Type Address Deposit MaxDiff Conversion
@@ -225,7 +225,7 @@ def test_at100_axis_descr_short_body_no_crash(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# AT-101 — hostile comment corpus through parse_a2l_file (gate-blocking, R-A2L-013).
+# AT-101 — hostile comment corpus through parse_a2l_file (gate-blocking, R-A2L.13).
 # ---------------------------------------------------------------------------
 
 # Each case = (id, body, expected_char_type). ``None`` means the malformed body
@@ -267,7 +267,7 @@ _HOSTILE_CASES = [
 def test_at101_hostile_comment_corpus(tmp_path: Path, case_id: str, body: str, expected: str | None) -> None:
     """8 hostile comment/quote bodies: 0 raise; malformed→None; valid→parse.
 
-    Intent: R-A2L-013 (C-17) — the stripper is crash-free and content-preserving
+    Intent: R-A2L.13 (C-17) — the stripper is crash-free and content-preserving
     over malformed input. Driving through ``parse_a2l_file`` exercises the whole
     load path, not just the helper. The per-case ``expected`` distinguishes
     genuine degradation (None) from cases where valid mandatory params must

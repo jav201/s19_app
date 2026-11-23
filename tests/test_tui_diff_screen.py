@@ -1574,7 +1574,7 @@ def test_tc_b78_48_hostile_artifact_summary_renders_verbatim(tmp_path: Path) -> 
     """TC-B78-48 - a markup-shaped artifact summary renders verbatim, with no
     ``MarkupError``.
 
-    Intent: C-17 / R-CMP-003.4, R-TUI-103b. The artifact-usage summaries are the one
+    Intent: C-17 / R-CMP-003.4, R-TUI.105. The artifact-usage summaries are the one
     file-derived string reaching this column. Pre-change they were passed
     through ``rich.markup.escape`` into a ``markup=True`` ``Static``; the
     widget-type swap is exactly where an escape call gets lost. The panel now

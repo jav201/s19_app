@@ -309,12 +309,12 @@ def test_e5_p11_typedef_refused_length_not_reappearing(tmp_path: Path) -> None:
 
 # ---------------------------------------------------------------------------
 # P12 — declared FNC_VALUES datatype wins over a misleading deposit name
-# (CTX *datatype (CHARACTERISTIC)*; R-A2L-015, .016, .43).
+# (CTX *datatype (CHARACTERISTIC)*; R-A2L.15, .016, .43).
 # ---------------------------------------------------------------------------
 
 
 def test_e5_p12_declared_fnc_values_datatype_wins(tmp_path: Path) -> None:
-    """R-A2L-015: a layout named ``__UBYTE_Z`` whose FNC_VALUES is ULONG sizes 4,
+    """R-A2L.15: a layout named ``__UBYTE_Z`` whose FNC_VALUES is ULONG sizes 4,
     not the deposit-name hint of 1."""
     text = (
         "ASAP2_VERSION 1 71\n/project P\n"
@@ -424,12 +424,12 @@ def test_e5_p15_length_zero_inline_axis_refusal_final(tmp_path: Path) -> None:
 
 # ---------------------------------------------------------------------------
 # P16 — a CURVE on a declared UWORD layout with two inline axis points takes
-# the full layout span 4, not the scalar deposit length 2 (R-A2L-018).
+# the full layout span 4, not the scalar deposit length 2 (R-A2L.18).
 # ---------------------------------------------------------------------------
 
 
 def test_e5_p16_curve_declared_uword_two_axis_points_full_span(tmp_path: Path) -> None:
-    """R-A2L-018: a CURVE with a declared UWORD record layout and two inline
+    """R-A2L.18: a CURVE with a declared UWORD record layout and two inline
     axis points sizes to its whole record (2 × UWORD = 4), not the scalar
     deposit length 2."""
     text = _body(

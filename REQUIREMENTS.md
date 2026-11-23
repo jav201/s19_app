@@ -322,13 +322,13 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 |---|---|---|
 | HLR-001 · LLR-001.1 … .4 | **retired** | Code placement (batch-92 move of the hex renderer to `s19_app/render/hexview.py`). Hex rows are S4.1. |
 | HLR-002 · LLR-002.1 … .3 | **retired** | Code placement (range-index re-exports removed). |
-| HLR-003 · LLR-003.1 … .3 | **retired** | Code placement (`safe_text` moved to `s19_app/utils.py`). The safe-text behaviour is S1: R-TUI-103 … 103b. |
+| HLR-003 · LLR-003.1 … .3 | **retired** | Code placement (`safe_text` moved to `s19_app/utils.py`). The safe-text behaviour is S1: R-TUI.103 … R-TUI.105. |
 | HLR-004 · LLR-004.1 … .3 | **retired** | Code placement (palette constants moved to `s19_app/render/format.py`). Colours are S3 CTX-LEGEND and S6 CTX-THEME. |
 | HLR-005 · LLR-005.1, .2 | **absorbed** · S10: R-PE.12 … R-PE.19 | Unsaved-changes popup; a dropdown pick is guarded since batch-100 Inc 10 (R-PE.16, S10 D10-45; D10-20 done). |
 | HLR-006 · LLR-006.1, .2 | **retired** | Deleted behaviour: the variant dropdown and variant help were removed in batch-94 (S10 D10-4). |
 | HLR-007 · LLR-007.1, .2 | **absorbed** · S10: R-PE.80, R-PE.81 | The apply itself is S8.5. |
 | HLR-008 · LLR-008.1, .2 | **absorbed** · S10: R-PE.10, R-PE.11, R-TUI-052.1 … .3 | Refresh rescans the folder (D10-5). |
-| HLR-009 · LLR-009.1 … .3 | **absorbed** · S9: R-CHKED-001 … R-CHKED.53 | The Check Editor, S9.4 (D9-3). |
+| HLR-009 · LLR-009.1 … .3 | **absorbed** · S9: R-CHKED.1 … R-CHKED.53 | The Check Editor, S9.4 (D9-3). |
 | HLR-010 · LLR-010.1, .2 | **absorbed** · S14: R-DIFF-CHK.1 … R-DIFF-CHK.11 | Check-spec addendum of the diff report, S14.6 (D14-6). |
 | HLR-011 · LLR-011.1, .2 | **absorbed** · S9: R-CHKED.48 | Plain text on the Check Editor (S1 CTX-TEXT). |
 | HLR-012 · LLR-012.1, .2 | **absorbed** · S3: R-VAL-032.1 … .3 | S3 replaces the INFO re-label: standard block names raise no issue (D3-12). |
@@ -364,10 +364,10 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-142 · LLR-142.1, .2 | **absorbed** · S15: R-FLOW-SRC.1 … .10, R-FLOW-PATCH.4; S16: R-FB-ADD.17 | The Builder's A2L field is prototype first (S16 D16-25). |
 | HLR-143 · LLR-143.1, .2 | **absorbed** · S15: R-FLOW-RPT.1 … .14; S14: R-DIFF-FLOWCHG.1 … .8 | Flow report and flow changes in the diff report. |
 | HLR-144 · LLR-144.1 … .12 | **absorbed** · S10: R-TUI-063.1 … R-TUI-049.3.2 | The Patch Editor, S10.1 … S10.8 (D10-3, D10-12). |
-| HLR-145 · LLR-145.1 … .10 | **absorbed** · S9: R-CHKED-001 … R-CHKED.53 | The Check Editor, S9.4. |
+| HLR-145 · LLR-145.1 … .10 | **absorbed** · S9: R-CHKED.1 … R-CHKED.53 | The Check Editor, S9.4. |
 | HLR-146 · LLR-146.1 … .14 | **absorbed** · S16: R-TUI-059.20 … R-FB-PIPE.5 | The Flow Builder, S16.1 … S16.3. |
 | HLR-147 · LLR-147.1 … .13 | **absorbed** · S16: R-FX-SCR.1 … R-FX-WAIT.13 | Flow Execution, S16.7 … S16.9. |
-| HLR-148 · LLR-148.1 … .10 | **absorbed** · S5: R-CHIP-001.1 … .11; S7: R-WHELP.1 … .15; S9: R-CHKED-002, R-CHKED.17; S10: R-PE.60, R-PE.73; S16: R-FB-RUN.1 | Chips, help entries, empty-state lines. Glyph vocabularies (LLR-148.7) are design. |
+| HLR-148 · LLR-148.1 … .10 | **absorbed** · S5: R-CHIP-001.1 … .11; S7: R-WHELP.1 … .15; S9: R-CHKED.2, R-CHKED.17; S10: R-PE.60, R-PE.73; S16: R-FB-RUN.1 | Chips, help entries, empty-state lines. Glyph vocabularies (LLR-148.7) are design. |
 | HLR-149 · LLR-149.1 … .6 | **absorbed** · S10: R-TUI-064.1 … .3; S9: R-CHKED.49, R-CHKED.50; S16: R-FB-RIB.5, R-FB-RIB.6, R-FX-SIZE.1, R-FX-SIZE.2 | The four editor windows at 118 × 54 or more and below it. |
 | HLR-150 · LLR-150.1 … .7 | **absorbed** · S7: R-KEYBAR.1 … R-KEYBAR.15 | The key bar, S7.5. |
 | HLR-151 · LLR-151.1 | **absorbed** · S7: R-LOADDLG.1, R-LOADDLG.54, R-LOADDLG.60, R-LOADDLG.70 | LLR-151.1 (the Load project dialog) is superseded by batch-100 HLR-173 (Inc 9b): the one Load dialog, S7.2. S11 R-TUI-013.4 is retired (S11 D11-55). |
@@ -377,7 +377,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-155 · LLR-155.1 … .8 | **absorbed** · S5: R-TUI-002.5, R-TUI-006.1, R-TUI-006.2; S8: R-PATCH-SAVE-FOLDER-001.10, R-CHG-003.18, R-CHG-003.19; S11: R-TUI-012.14; S13: R-CRC-WRITE-001.5 … .26; S15: R-FLOW-WRITE.1 … .8, R-FLOW-CHAIN.1 … .10 | Private staging and exclusive create are design. Reports that probe a free name first: S14 D14-11, S15 D15-12. |
 | HLR-156 · LLR-156.1 … .4 | **absorbed** · S15: R-FLOW-PATCH.1 … .11, R-FLOW-RPT.1 … .14, R-FLOW-CHAIN.11 … .18 | PATCH step status. |
 | HLR-157 · LLR-157.1 … .4 | **absorbed** · S8: R-CHG-002.1, R-CHG-003.8, R-CHG-003.21, R-CHG-003.23 | Save-back writes source plus document (S8 D8-3); the Patch Editor controls are S10.8 (D10-12). |
-| HLR-158 · LLR-158.1 … .3 | **absorbed** · S2: R-A2L-024, R-A2L-025, R-A2L-026, R-A2L-027, R-A2L-056, R-A2L-057, R-A2L-058.1, R-A2L-058.2, R-A2L-058.3, R-A2L-006.7 | Decoding. Encoding is deferred with the symbol input (S10 D10-13, D10-42). |
+| HLR-158 · LLR-158.1 … .3 | **absorbed** · S2: R-A2L.24, R-A2L.25, R-A2L.26, R-A2L.27, R-A2L.56, R-A2L.57, R-A2L-058.1, R-A2L-058.2, R-A2L-058.3, R-A2L-006.7 | Decoding. Encoding is deferred with the symbol input (S10 D10-13, D10-42). |
 | HLR-159 · LLR-159.1, .2 | **absorbed** · S13: R-CRC-CHECK-002.1 … .4; S15: R-FLOW-CRC.1 … .8 | Empty and partly covered CRC targets. |
 | HLR-160 · LLR-160.1 … .5 | **absorbed** · S17: R-SEG-NAME.1 … R-SEG-PLACE.18 | Export names and placement, S17.7 (D17-12). |
 | HLR-161 · LLR-161.1, .2 | **absorbed** · S10: R-PE.31 | The help-window note is S7's (passed by S10). |
@@ -425,7 +425,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-176c · LLR-176.1i … .1m, .1o, .1s, .2c, .2d | **absorbed** · S6: R-PROGRESS-END.1 … .5, R-PROGRESS-SHOWN.2, .4, R-PROGRESS-BAR.1, .5, R-PROGRESS-LINE.7; S12: R-RPT-LOG.1 … .4; S14: R-CMP-005.13 … .15, R-BEFORE-AFTER-REPORT-001.31 | Each action's own outcome text stays in its chapter (S5 R-TUI-012L.12, S2 R-A2L-004.1, S11, S12, S14); the report's end follows S6 R-PROGRESS-END.3 (S12 D12-30). |
 | HLR-176d · LLR-176.1h, .1j | **absorbed** · S6: R-PROGRESS-LINE.2, R-PROGRESS-END.2 | One owner of the status text while an action runs. |
 | HLR-177 · LLR-177.1 … .1k, .2 … .2c, .5, .5a, LLR-176.3 | **absorbed** · S6: R-PROGRESS-LINE.3, .5, R-PROGRESS-BAR.3, R-BUSY-RUN.1; S2: R-A2L-004.3, .6 … .12; S5: R-TUI-012L.5; S11: R-PROJ-RESET.1, R-LOADRES.2, R-PROJ-ROLLBACK.17, .18, R-TUI-013.17 | Worker threads, frozen requests and main-thread writes (.1, .1a, .1b, .1d, .1e, .1i) are implementation (S6 D6-33, S2 D2-33). The results and failures of each action (.1f … .1h, .1j, .1k, .2 … .2c) are in its chapter (S6 D6-42). The copy on the screen's thread is a held step (S6 D6-35, S5 D5-50). |
-| HLR-177a · LLR-177.3 … .3i | **absorbed** · S6: R-BUSY-REFUSE.1 … .8; S10: R-PE-110, R-PE.111; S12: R-RPT-002.28 | The busy line and the refused list are S6 CTX-BUSY; reports are never refused (R-BUSY-REFUSE.7). |
+| HLR-177a · LLR-177.3 … .3i | **absorbed** · S6: R-BUSY-REFUSE.1 … .8; S10: R-PE.110, R-PE.111; S12: R-RPT-002.28 | The busy line and the refused list are S6 CTX-BUSY; reports are never refused (R-BUSY-REFUSE.7). |
 | HLR-177b · LLR-177.4, .4a, .4b, .4d | **absorbed** · S6: R-SHELL-START.5, R-QUIT.1 … .6 | Supersedes S6 D6-9 for the "session action running" state (S6 D6-36). |
 | HLR-177c · LLR-177.4c, .4e | **absorbed** · S6: R-QUIT.7 … .12 | Quit waits for the end; withdrawn on a failure or unsaved work. |
 | HLR-178 · LLR-178.1 … .3 | **absorbed** · S11: R-TUI-013.12, .13, R-LOADRES.1 … R-LOADRES.18; S7: R-LOADDLG.83; S3: R-LEGEND.10 | Problem rows bounded at 102 (S11 D11-54); the panel's colours are the S3 palette. The open project's preview of the last load result (LLR-178.3, last sentence) is not built at 570b4b5: S7 R-LOADDLG.83 reads No (S7 D7-35). |
@@ -472,16 +472,16 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-072 · LLR-072.3 | **absorbed** · S4: R-TUI-072.1, R-TUI-072.2 | Batch 2026-07-15-batch-47, as amended by 2026-08-01-batch-77 (Amendment B); the 5-tick text it replaced was superseded there (I1-D2). |
 | HLR-073 · LLR-073.2 | **absorbed** · S4: R-TUI-073.1, R-TUI-062.2 | Batch 2026-07-15-batch-47. The ↵ glyph closes each region row (CTX-MAP); what Enter does is S4 D4-21. |
 | HLR-074 · LLR-074.2 | **absorbed** · S4: R-TUI-074.6, R-TUI-074.7 | Batch 2026-07-15-batch-47. The 3-row peek was superseded by HLR-126 and HLR-128 (peek rows). |
-| HLR-075 · LLR-075.1, .3, .4, .6 | **absorbed** · S10: R-TUI-063.6, R-PE-041, R-TUI-063.8, R-PE.101, R-PE.5; S9: R-CHK-PE-008, R-CHK-PE-009 | Batch 2026-07-16-batch-48. The three titled windows became the landing pane and its subtitles (S10 D10-3). .3: the variant half of the line went with batch-94 HLR-006 (S10 D10-4); the scope line stays. .4: no variant text reaches the line any more; its test guards the line as a test method. .6: every ledger cell is plain text. .2 entered the canon as fold R-PE-LEDGER.1 (I4-D3). LLR-075.5 is another increment's row. |
+| HLR-075 · LLR-075.1, .3, .4, .6 | **absorbed** · S10: R-TUI-063.6, R-PE.41, R-TUI-063.8, R-PE.101, R-PE.5; S9: R-CHK-PE.8, R-CHK-PE.9 | Batch 2026-07-16-batch-48. The three titled windows became the landing pane and its subtitles (S10 D10-3). .3: the variant half of the line went with batch-94 HLR-006 (S10 D10-4); the scope line stays. .4: no variant text reaches the line any more; its test guards the line as a test method. .6: every ledger cell is plain text. .2 entered the canon as fold R-PE-LEDGER.1 (I4-D3). LLR-075.5 is another increment's row. |
 | HLR-076 · LLR-076.1, .2 | **absorbed** · S10: R-TUI-064.4, R-TUI-064.5 | Batch 2026-07-16-batch-48. Every Patch Editor button is a one-row chip. The three colour groups by function and their scoping to the Patch Editor are design (S10 D10-2); the groups take no verdict hue (CTX-PE verdict hues), so the batch's green and yellow groups are superseded. LLR-076.3, .4 are not migrated rows. |
-| HLR-077 · LLR-077.1 … .6 | **absorbed** · S9: R-CHK-PE-001, R-CHK-PE.13, R-CHK-PE.14, R-CHK-PE.15, R-CHK-PE.16; S10: R-PE.40 | Batch 2026-07-16-batch-48. HLR-077 itself: the check glyph leads each ledger row's Kind cell, by document order, with no column added (CTX-PE-LEDGER); it shows only for the current run (CTX-CHECK-TEXT), `·` otherwise. The fallback ◐ for an unknown result token (.3) and the census of the refresh sites (.5) are design. |
+| HLR-077 · LLR-077.1 … .6 | **absorbed** · S9: R-CHK-PE.1, R-CHK-PE.13, R-CHK-PE.14, R-CHK-PE.15, R-CHK-PE.16; S10: R-PE.40 | Batch 2026-07-16-batch-48. HLR-077 itself: the check glyph leads each ledger row's Kind cell, by document order, with no column added (CTX-PE-LEDGER); it shows only for the current run (CTX-CHECK-TEXT), `·` otherwise. The fallback ◐ for an unknown result token (.3) and the census of the refresh sites (.5) are design. |
 | HLR-078 · LLR-078.1 … .5 | **absorbed** · S9: R-CHK-PE.4, R-CHK-PE.5, R-CHK-PE.11, R-CHK-PE.16 | Batch 2026-07-16-batch-48. The patch strip of CTX-CHECK-TEXT sits above the result rows; undo and redo end the current run, so the strip clears (.3). .4: the bar is filled in proportion to the passed entries and empty with no entry. .5: the strip holds counts, glyphs and the bar only; a blocked run's reason is the blocked line. .2 is design. |
 | HLR-079 · LLR-079.1 … .4 | **absorbed** · S10: R-PATCH-PASTE-001.7, R-PATCH-PASTE-001.8, R-PATCH-PASTE-001.9, R-PE.5 | Batch 2026-07-16-batch-48. The paste buffer's JSON in the JSON hues, in place, as literal text; the paste gauge is now `<used>K / 64.0K` (CTX-PE-JSON). .2: text that is not JSON keeps its characters. The highlight mechanism, its fallback (.1) and a tokenizer that never raises (.2) are design. LLR-079.5 is not a migrated row. |
 | HLR-080 · LLR-080.1 … .4, .6, .7 | **absorbed** · S10: R-PE.50, R-PE.51, R-PE.52, R-PE.56, R-PE.57, R-PE.58, R-PE.59, R-PE.60, R-TUI-064.3 | Batch 2026-07-16-batch-48. The before/after card is today's before → after strip of the Inspector tab (CTX-PE-STRIP); it shows only addresses, column offsets and bytes (.7). .1, .2 are design. .5 entered the canon as fold R-PE-STRIP.1 (I4-D4). |
 | HLR-081 · LLR-081.1 … .4 | **absorbed** · S10: R-TUI-057.9, R-TUI-057.8 | Batch 2026-07-16-batch-48. The history strip of CTX-PE-DOC follows every history change. .1, .2 are design; .4 is process (batch-48 added no shared key binding). |
-| HLR-082 · LLR-082.1, .2, .3, .6 | **absorbed** · S3: R-TUI-025.2, R-TUI-042b.2, R-ISSUES.1, R-ISSUES.2; S1: R-TUI-103b | Batch 2026-07-18-batch-49. HLR-082 itself: the severity strip above the issue list, the glyph on each group header, the pane titles and the coloured summary fields of CTX-ISSUES-SCREEN. .1: the strip's counts and 5-cell bars. .3: the header glyphs. .6: the strip, the glyphs, the titles and the summary carry counts and fixed text only; issue text is file-derived text of S1. .4 and .5 entered the canon as folds R-ISSUES.1 and R-ISSUES.2 (I2-D6, I2-D7). |
+| HLR-082 · LLR-082.1, .2, .3, .6 | **absorbed** · S3: R-TUI-025.2, R-TUI-042b.2, R-ISSUES.1, R-ISSUES.2; S1: R-TUI.105 | Batch 2026-07-18-batch-49. HLR-082 itself: the severity strip above the issue list, the glyph on each group header, the pane titles and the coloured summary fields of CTX-ISSUES-SCREEN. .1: the strip's counts and 5-cell bars. .3: the header glyphs. .6: the strip, the glyphs, the titles and the summary carry counts and fixed text only; issue text is file-derived text of S1. .4 and .5 entered the canon as folds R-ISSUES.1 and R-ISSUES.2 (I2-D6, I2-D7). |
 | HLR-083 · LLR-083.1, .3, .5 | **absorbed** · S6: R-TUI-021.1, R-TUI-021.2, R-TUI-021.3, R-TUI-021.6, R-TUI-021.7, R-TUI-022.2, R-TUI-022.6; S9: R-CHKS.1, R-CHKS.8, R-CHKS.13; S5: R-TUI-029.4 | Batch 2026-07-18-batch-49. Checks is the rail item ☑ on key 9 (CTX-SHELL; the 9th place of batch-49 moved as later items came); the screen's parts are CTX-CHECKS-SCREEN. HLR-083 itself: key 9 or the palette shows the Checks screen, hides the others and moves the one active mark (R-TUI-021.2, R-TUI-021.6, R-TUI-022.6; I4-D2). LLR-083.6 waits for P-279 (I2-D9). |
-| HLR-084 · LLR-084.1 … .8 | **absorbed** · S9: R-CHKS.1 … R-CHKS.14; S5: R-TUI-029.4 | Batch 2026-07-18-batch-49: the Checks screen is S9.3 (S9 D9-3). .1 → R-CHKS.5 … .7, .10; .2 → R-CHKS.5 … .7, R-CHKS.12, the row accessor is design (I4-D2); .3 → R-CHKS.1 … R-CHKS.5, R-CHKS.8; .4 → R-CHKS.8, R-CHKS-009; .5 → R-CHKS.13; .6 → R-TUI-029.4, R-CHKS.4; .7 → R-CHKS.2, R-CHKS.3 (I4-D2); .8 → R-CHKS.14 (I1-D3). |
+| HLR-084 · LLR-084.1 … .8 | **absorbed** · S9: R-CHKS.1 … R-CHKS.14; S5: R-TUI-029.4 | Batch 2026-07-18-batch-49: the Checks screen is S9.3 (S9 D9-3). .1 → R-CHKS.5 … .7, .10; .2 → R-CHKS.5 … .7, R-CHKS.12, the row accessor is design (I4-D2); .3 → R-CHKS.1 … R-CHKS.5, R-CHKS.8; .4 → R-CHKS.8, R-CHKS.9; .5 → R-CHKS.13; .6 → R-TUI-029.4, R-CHKS.4; .7 → R-CHKS.2, R-CHKS.3 (I4-D2); .8 → R-CHKS.14 (I1-D3). |
 | R-TUI-085 | **absorbed** · S15: R-FLOW-SRC.4, R-FLOW-SRC.6, R-FLOW-SRC.7, R-FLOW-STATUS.1 | Batch 2026-07-20-batch-51 (its HLR id, not a canon R-TUI row). Rejected lines end the LOAD notices with one finding each and the flow goes on; an unresolved source stops the flow and the later blocks are skipped (CTX-FLOW). An integrity notice now stops the flow (R-FLOW-SRC.5). |
 | R-TUI-086 | **absorbed** · S15: R-FLOW-CHECK.1, R-FLOW-CHECK.2, R-FLOW-CHECK.3, R-FLOW-CHECK.4, R-FLOW-CHECK.5, R-FLOW-CHECK.6, R-FLOW-CHECK.7 | Batch 2026-07-20-batch-51 (its HLR). A CHECK block reads the image without changing it and never stops the flow; gating advisory or block-own-op decides its own status only. |
 | R-TUI-087 | **absorbed** · S15: R-FLOW-STATUS.1, R-FLOW-STATUS.2, R-FLOW-STATUS.3, R-FLOW-STATUS.4, R-FLOW-RPT.13 | Batch 2026-07-20-batch-51 (its HLR). The run ends ok, completed-with-issues or error, and the report carries it; paused came later. |
@@ -641,8 +641,8 @@ R-DOC-ARCHIVE.2 (keep in the architecture archive each line that batch-101 Inc 1
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-TST-001 | U | The system shall register the pytest marker `serial_timing` with the description `a wall-clock timing arm; run apart and serially (-m serial_timing)`. |
-| R-TST-002 | U | The system shall carry the `serial_timing` marker on every timing arm. |
+| R-TST.1 | U | The system shall register the pytest marker `serial_timing` with the description `a wall-clock timing arm; run apart and serially (-m serial_timing)`. |
+| R-TST.2 | U | The system shall carry the `serial_timing` marker on every timing arm. |
 | R-TST.3 | If | If a timing arm does not carry the `serial_timing` marker, then the system shall fail its marker guard with the text `timing arm without serial_timing: <file>::<test>`. |
 | R-TST.4 | If | If a test that is not a timing arm carries the `serial_timing` marker, then the system shall fail its marker guard with the text `serial_timing on a test that is not a timing arm: <file>::<test>`. |
 | R-TST.5 | U | The system shall treat as a timing arm each test that matches a static form of *Timing arm* (Definitions). |
@@ -700,18 +700,18 @@ R-DOC-ARCHIVE.2 (keep in the architecture archive each line that batch-101 Inc 1
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-TST-150 | When | When the TC-331 arm requests the load of a change file, the system shall read the state of Edit JSON only after the change document's source path names that file. |
-| R-TST-151 | When | When the TC-331 arm presses Parse pasted, the system shall read the state of Edit JSON only after the change document has no source path. |
+| R-TST.150 | When | When the TC-331 arm requests the load of a change file, the system shall read the state of Edit JSON only after the change document's source path names that file. |
+| R-TST.151 | When | When the TC-331 arm presses Parse pasted, the system shall read the state of Edit JSON only after the change document has no source path. |
 | R-TST.152 | When | When the TC-B94-27 arm presses Bind with the ref lane A already reads, the system shall read lane A's bindings only after the panel has handled that press. |
 | R-TST.153 | When | When the TC-B94-27 arm presses Bind with `variant_b.hex` on lane A, the system shall read both lanes' bindings, lane B's box and lane B's painted cards only after the panel has handled that press. |
-| R-TST-154 | If | If the app has not handled the press within the shared wait's bound, then the system shall fail the arm with the text `did not settle: <description>`, the description from table D. |
-| R-TST-155 | U | The system shall make each wait of R-TST-150 … R-TST.153, R-TST-159 … R-TST-162 and R-TST.164 (D9) through the shared wait. |
+| R-TST.154 | If | If the app has not handled the press within the shared wait's bound, then the system shall fail the arm with the text `did not settle: <description>`, the description from table D. |
+| R-TST.155 | U | The system shall make each wait of R-TST.150 … R-TST.153, R-TST.159 … R-TST.162 and R-TST.164 (D9) through the shared wait. |
 | R-TST.158 | U | The system shall state in its test conventions the handled-press rule: `A new or changed arm that checks the state a press, a value it sets or a posted action leaves waits through a shared wait for a sign that the app handled it, also when it asserts that nothing changed; it never reads after fixed pauses alone.` |
-| R-TST-159 | When | When the AT-030c arm sets the change-file dropdown to `dropped.json`, the system shall read the change document's entries only after the change document's source path names `dropped.json`. |
-| R-TST-160 | When | When the TC-051 arm requests an apply, the system shall act on the save-back prompt only after the prompt is shown. |
-| R-TST-161 | When | When the TC-051 arm presses Don't save, the system shall read the prompt, the saved path and the work area only after the save-back prompt is hidden again. |
-| R-TST-162 | When | When the TC-051 arm presses Write file with a typed name, the system shall read the saved path and the work-area files only after the save-back prompt is hidden again. |
-| R-TST-163 | U | The system shall place each wait of R-TST-150 … R-TST.153, R-TST-159 … R-TST-162 and R-TST.164 (D9) as the statement that directly follows its table-D trigger. |
+| R-TST.159 | When | When the AT-030c arm sets the change-file dropdown to `dropped.json`, the system shall read the change document's entries only after the change document's source path names `dropped.json`. |
+| R-TST.160 | When | When the TC-051 arm requests an apply, the system shall act on the save-back prompt only after the prompt is shown. |
+| R-TST.161 | When | When the TC-051 arm presses Don't save, the system shall read the prompt, the saved path and the work area only after the save-back prompt is hidden again. |
+| R-TST.162 | When | When the TC-051 arm presses Write file with a typed name, the system shall read the saved path and the work-area files only after the save-back prompt is hidden again. |
+| R-TST.163 | U | The system shall place each wait of R-TST.150 … R-TST.153, R-TST.159 … R-TST.162 and R-TST.164 (D9) as the statement that directly follows its table-D trigger. |
 | R-TST.164 | When | When the TC-B94-27 arm imports the template `base` a second time, the system shall read lane B's bindings and lane B's box only after the panel's lane names read `["base", "base_2"]` and lane B's box `#fx_in_1_0` is mounted with a non-empty screen region. |
 
 #### S0.14 · Test suite: tooling and oracle guards (from the batch-103 trace audit)
@@ -789,7 +789,7 @@ CTX-LOAD  Loading a file
 |---|---|---|
 | R-READ-001.1 | When | When the system reads an empty line, the system shall create no record from it. |
 | R-READ-001.2 | When | When the system reads an empty line, the system shall record no diagnostic for it. |
-| R-READ-002 | U | The system shall treat CR, LF and CR LF as line ends. |
+| R-READ.2 | U | The system shall treat CR, LF and CR LF as line ends. |
 | R-VAL-002.1 | If | If a line before the end of reading has a line defect, then the system shall reject the line. |
 | R-VAL-002.2 | If | If a line before the end of reading has one or more line defects, then the system shall record exactly one diagnostic for it. |
 | R-VAL-002.3 | If | If a line has more than one line defect, then the system shall give its diagnostic the message of the first defect in check order. |
@@ -844,7 +844,7 @@ CTX-S19  Motorola S-record (S19)
 |---|---|---|
 | R-PARSE.1 | If | If an S19 line has defect S-1, then the system shall record the diagnostic `Invalid S-record format: <line>`. |
 | R-PARSE.7 | If | If an S19 line has defect S-2, then the system shall record the diagnostic `Unsupported S-record type: <type>`. |
-| R-PARSE-002 | If | If an S19 line has defect S-3, then the system shall record the diagnostic `Invalid byte count hex: <count>`. |
+| R-PARSE.2 | If | If an S19 line has defect S-3, then the system shall record the diagnostic `Invalid byte count hex: <count>`. |
 | R-PARSE.8 | If | If an S19 line has defect S-4, then the system shall record the diagnostic `Length mismatch: expected <n> chars, found <m>`. |
 | R-PARSE.9 | If | If an S19 line has defect S-5, then the system shall record the diagnostic `Line too short for address field`. |
 | R-PARSE.3 | If | If an S19 line has defect S-6, then the system shall record the diagnostic `Invalid address hex: <address>`. |
@@ -979,9 +979,9 @@ CTX-TEXT  Text from a file, on screen
 | Id | Form | Requirement |
 |---|---|---|
 | R-TUI-103.1 | When | When the system displays file-derived text other than a painted name in one of the safe-text views, the system shall show each run of break characters as one space. |
-| R-TUI-103 | When | When the system displays file-derived text in one of the safe-text views, the system shall display no other control character. |
-| R-TUI-103a | When | When the system displays file-derived text other than a painted name in one of the safe-text views, the system shall display every other character unchanged and in the same order. |
-| R-TUI-103b | When | When the system displays file-derived text in one of the safe-text views, the system shall apply no markup that the text spells out. |
+| R-TUI.103 | When | When the system displays file-derived text in one of the safe-text views, the system shall display no other control character. |
+| R-TUI.104 | When | When the system displays file-derived text other than a painted name in one of the safe-text views, the system shall display every other character unchanged and in the same order. |
+| R-TUI.105 | When | When the system displays file-derived text in one of the safe-text views, the system shall apply no markup that the text spells out. |
 
 #### S1.6 · Version
 
@@ -1174,7 +1174,7 @@ width left      The tag table's visible content width minus the Address and Leng
 name width      The width left minus 4 cells for Tag padding, glyph and space (w).
 painted tag name  Characters outside U+0021 … U+007E become U+FFFD before the
                 middle cut of R-TUI-042a.3/.5; the Tag cell is the scoped exception
-                to R-TUI-103a and R-TUI-103.1. The detail card keeps the full name.
+                to R-TUI.104 and R-TUI-103.1. The detail card keeps the full name.
 first shown row The tag table's top viewport row, the first row painted at the
                 table's scroll position.
 axis value      A point of a CURVE's point table has an axis value when the CURVE's
@@ -1504,7 +1504,7 @@ R-A2L-004.5 was retired at the batch-103 fold: R-A2L-REFRESH.020 replaces its te
 | R-A2L-READ.40 | When | When the system reads a BLOB section, the system shall list a declared span with the BLOB's name, its address word as address and its size word as length. |
 | R-A2L-READ.41 | When | When the system reads an INSTANCE section, the system shall list a declared span with the INSTANCE's name and its address word as address. |
 | R-A2L-READ.42 | When | When an INSTANCE names a TYPEDEF_MEASUREMENT, the system shall take the span's length as the size of the typedef's datatype × the typedef's MATRIX_DIM × the INSTANCE's MATRIX_DIM. |
-| R-A2L-READ.43 | When | When an INSTANCE names a TYPEDEF_CHARACTERISTIC of kind VALUE, VAL_BLK or ASCII, the system shall take the span's length as the length that R-A2L-015, R-A2L-016 or R-A2L-017 gives the typedef × the INSTANCE's MATRIX_DIM. |
+| R-A2L-READ.43 | When | When an INSTANCE names a TYPEDEF_CHARACTERISTIC of kind VALUE, VAL_BLK or ASCII, the system shall take the span's length as the length that R-A2L.15, R-A2L.16 or R-A2L.17 gives the typedef × the INSTANCE's MATRIX_DIM. |
 | R-A2L-READ.44 | When | When an INSTANCE names a TYPEDEF_BLOB or a TYPEDEF_STRUCTURE, the system shall take the span's length as the typedef's size word × the INSTANCE's MATRIX_DIM. |
 | R-A2L-READ.45 | If | If the system cannot size an INSTANCE by R-A2L-READ.42 to .44, then the system shall list its span with no length. |
 | R-A2L-READ.46 | If | If a declared span's length is below 1 or above 1,048,576 bytes, then the system shall list the span with no length. |
@@ -1542,32 +1542,32 @@ Replaces: the "RECORD_LAYOUT Interpretation" block, the byte-order precedence, t
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-A2L-010 | When | When the system reads a CHARACTERISTIC, the system shall take its address from its header. |
-| R-A2L-011 | If | If a tag has an ECU_ADDRESS line, then the system shall take the tag's address from that line. |
-| R-A2L-012 | If | If a MEASUREMENT has no ECU_ADDRESS line, then the system shall give it no address. |
-| R-A2L-013 | If | If a tag whose sizes agree has a DATA_SIZE or LENGTH keyword, then the system shall take its length from that keyword. |
-| R-A2L-014 | If | If a MEASUREMENT has no DATA_SIZE, LENGTH or ARRAY_SIZE keyword, then the system shall take its length as the size of its datatype × its MATRIX_DIM (1 when absent). |
-| R-A2L-015 | If | If a VALUE CHARACTERISTIC has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its datatype. |
-| R-A2L-016 | If | If a VAL_BLK CHARACTERISTIC has a MATRIX_DIM keyword and no DATA_SIZE or LENGTH keyword, then the system shall take its length as the size of its datatype × its MATRIX_DIM. |
-| R-A2L-017 | If | If an ASCII CHARACTERISTIC has no DATA_SIZE or LENGTH keyword, then the system shall take its length as the number after its NUMBER keyword, else as its MATRIX_DIM. |
-| R-A2L-018 | If | If a CURVE or MAP has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its whole record: the components of its record layout, with their alignment, for its number of axis points. |
-| R-A2L-019 | If | If an axis of a CURVE or MAP takes its points from another section, then the system shall count the points of that section. |
-| R-A2L-020 | If | If the system cannot determine a tag's length, then the system shall give the tag no length. |
-| R-A2L-021 | If | If a tag has a DATA_TYPE line, then the system shall take its datatype from that line. |
-| R-A2L-022 | If | If a CHARACTERISTIC's record layout names a datatype, then the system shall take the tag's datatype from the record layout. |
-| R-A2L-023 | If | If a CHARACTERISTIC's record layout names no datatype, then the system shall take the datatype the deposit name spells out. |
-| R-A2L-024 | If | If a tag has a BYTE_ORDER line, then the system shall use that byte order for the tag. |
-| R-A2L-025 | If | If a tag has no BYTE_ORDER line and its record layout has one, then the system shall use the record layout's byte order. |
-| R-A2L-026 | If | If neither a tag nor its record layout has a BYTE_ORDER line, then the system shall use the BYTE_ORDER of the MOD_COMMON of the tag's module. |
-| R-A2L-027 | If | If no BYTE_ORDER applies to a tag, then the system shall use little-endian. |
-| R-A2L-028 | If | If a BYTE_ORDER line holds a value that is not a byte order, then the system shall raise the WARNING issue `A2L_UNKNOWN_BYTE_ORDER` for that tag. |
-| R-A2L-029 | If | If a BYTE_ORDER line holds a value that is not a byte order, then the system shall apply the next rule of R-A2L-024 … 027. |
-| R-A2L-030 | If | If a tag has a UNIT or PHYS_UNIT line, then the system shall take as its unit the whole value of that line, without quotes. |
-| R-A2L-031 | If | If a tag has no UNIT or PHYS_UNIT line, then the system shall take as its unit the unit of its conversion method. |
-| R-A2L-032 | U | The system shall show the same unit for a tag in the tag table, the detail card and the description window. |
-| R-A2L-033 | U | The system shall read a conversion method's unit from its conversion line, whether that line is the /begin line or a later one. |
-| R-A2L-034 | U | The system shall give each tag the memory region of the MEMORY_SEGMENT that holds its address. |
-| R-A2L-035 | If | If no MEMORY_SEGMENT holds a tag's address, then the system shall give the tag the memory region unknown. |
+| R-A2L.10 | When | When the system reads a CHARACTERISTIC, the system shall take its address from its header. |
+| R-A2L.11 | If | If a tag has an ECU_ADDRESS line, then the system shall take the tag's address from that line. |
+| R-A2L.12 | If | If a MEASUREMENT has no ECU_ADDRESS line, then the system shall give it no address. |
+| R-A2L.13 | If | If a tag whose sizes agree has a DATA_SIZE or LENGTH keyword, then the system shall take its length from that keyword. |
+| R-A2L.14 | If | If a MEASUREMENT has no DATA_SIZE, LENGTH or ARRAY_SIZE keyword, then the system shall take its length as the size of its datatype × its MATRIX_DIM (1 when absent). |
+| R-A2L.15 | If | If a VALUE CHARACTERISTIC has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its datatype. |
+| R-A2L.16 | If | If a VAL_BLK CHARACTERISTIC has a MATRIX_DIM keyword and no DATA_SIZE or LENGTH keyword, then the system shall take its length as the size of its datatype × its MATRIX_DIM. |
+| R-A2L.17 | If | If an ASCII CHARACTERISTIC has no DATA_SIZE or LENGTH keyword, then the system shall take its length as the number after its NUMBER keyword, else as its MATRIX_DIM. |
+| R-A2L.18 | If | If a CURVE or MAP has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its whole record: the components of its record layout, with their alignment, for its number of axis points. |
+| R-A2L.19 | If | If an axis of a CURVE or MAP takes its points from another section, then the system shall count the points of that section. |
+| R-A2L.20 | If | If the system cannot determine a tag's length, then the system shall give the tag no length. |
+| R-A2L.21 | If | If a tag has a DATA_TYPE line, then the system shall take its datatype from that line. |
+| R-A2L.22 | If | If a CHARACTERISTIC's record layout names a datatype, then the system shall take the tag's datatype from the record layout. |
+| R-A2L.23 | If | If a CHARACTERISTIC's record layout names no datatype, then the system shall take the datatype the deposit name spells out. |
+| R-A2L.24 | If | If a tag has a BYTE_ORDER line, then the system shall use that byte order for the tag. |
+| R-A2L.25 | If | If a tag has no BYTE_ORDER line and its record layout has one, then the system shall use the record layout's byte order. |
+| R-A2L.26 | If | If neither a tag nor its record layout has a BYTE_ORDER line, then the system shall use the BYTE_ORDER of the MOD_COMMON of the tag's module. |
+| R-A2L.27 | If | If no BYTE_ORDER applies to a tag, then the system shall use little-endian. |
+| R-A2L.28 | If | If a BYTE_ORDER line holds a value that is not a byte order, then the system shall raise the WARNING issue `A2L_UNKNOWN_BYTE_ORDER` for that tag. |
+| R-A2L.29 | If | If a BYTE_ORDER line holds a value that is not a byte order, then the system shall apply the next rule of R-A2L.24 … R-A2L.27. |
+| R-A2L.30 | If | If a tag has a UNIT or PHYS_UNIT line, then the system shall take as its unit the whole value of that line, without quotes. |
+| R-A2L.31 | If | If a tag has no UNIT or PHYS_UNIT line, then the system shall take as its unit the unit of its conversion method. |
+| R-A2L.32 | U | The system shall show the same unit for a tag in the tag table, the detail card and the description window. |
+| R-A2L.33 | U | The system shall read a conversion method's unit from its conversion line, whether that line is the /begin line or a later one. |
+| R-A2L.34 | U | The system shall give each tag the memory region of the MEMORY_SEGMENT that holds its address. |
+| R-A2L.35 | If | If no MEMORY_SEGMENT holds a tag's address, then the system shall give the tag the memory region unknown. |
 | R-A2L-036.1 | When | When the system reads a MEMORY_SEGMENT block, the system shall take its first record word as the segment's name. |
 | R-A2L-036.2 | When | When the system reads a MEMORY_SEGMENT block whose address word is a Number of at least 0, whose record word after the address word is a Number above 0, and whose two Numbers sum to at most 2^32 (0x100000000), the system shall take the address word's value as the segment's base. |
 | R-A2L-036.3 | When | When the system reads a MEMORY_SEGMENT block that has a base, the system shall take as the segment's size the value of the record word after its address word. |
@@ -1587,35 +1587,35 @@ Replaces: the "Raw Memory Extraction", "Raw Value Decoding" and "COMPU_METHOD Ex
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-A2L-040 | When | When every byte of a tag's span is in the image, the system shall read the tag's raw bytes. |
-| R-A2L-041 | If | If a byte of a tag's span is not in the image, then the system shall give the tag no raw value. |
-| R-A2L-042 | If | If a tag's length is more than 1 MiB, then the system shall give the tag no raw value. |
-| R-A2L-043 | U | The system shall read a tag's raw value as its datatype, in its byte order. |
-| R-A2L-044 | U | The system shall read a signed datatype as two's complement. |
-| R-A2L-045 | U | The system shall read FLOAT16_IEEE, FLOAT32_IEEE and FLOAT64_IEEE as IEEE 754 binary16, binary32 and binary64. |
-| R-A2L-046 | If | If a tag has no datatype the system can read, then the system shall give the tag no raw value. |
-| R-A2L-047 | If | If a tag is a multi-value tag, then the system shall give it one raw value per element. |
-| R-A2L-048 | When | When the system writes bytes into the loaded image in place, the system shall show in the tag table each tag's raw and physical values read from the written bytes. |
-| R-A2L-049 | When | When the system writes bytes into the loaded image in place, the system shall keep the tag table's first shown row. |
-| R-A2L-050 | If | If a tag has no raw value, then the system shall give it the conversion status missing. |
-| R-A2L-051 | If | If a tag has no conversion method, then the system shall give it a physical value equal to its raw value. |
-| R-A2L-052 | If | If a tag has no conversion method, then the system shall give it the conversion status identity. |
-| R-A2L-053 | When | When a tag's conversion method is IDENTICAL, the system shall give it a physical value equal to its raw value. |
-| R-A2L-054 | When | When a tag's conversion method is LINEAR, the system shall give it the physical value a × raw + b. |
-| R-A2L-055 | If | If a LINEAR conversion method lacks a or b, then the system shall use 1 for a missing a and 0 for a missing b. |
-| R-A2L-056 | When | When a tag's conversion method is RAT_FUNC, the system shall give it the physical value that solves the RAT_FUNC equation for its raw value. |
-| R-A2L-057 | If | If a RAT_FUNC equation has two solutions, then the system shall take the one inside the tag's limits, or the one closer to 0 when both or neither are inside. |
+| R-A2L.40 | When | When every byte of a tag's span is in the image, the system shall read the tag's raw bytes. |
+| R-A2L.41 | If | If a byte of a tag's span is not in the image, then the system shall give the tag no raw value. |
+| R-A2L.42 | If | If a tag's length is more than 1 MiB, then the system shall give the tag no raw value. |
+| R-A2L.43 | U | The system shall read a tag's raw value as its datatype, in its byte order. |
+| R-A2L.44 | U | The system shall read a signed datatype as two's complement. |
+| R-A2L.45 | U | The system shall read FLOAT16_IEEE, FLOAT32_IEEE and FLOAT64_IEEE as IEEE 754 binary16, binary32 and binary64. |
+| R-A2L.46 | If | If a tag has no datatype the system can read, then the system shall give the tag no raw value. |
+| R-A2L.47 | If | If a tag is a multi-value tag, then the system shall give it one raw value per element. |
+| R-A2L.48 | When | When the system writes bytes into the loaded image in place, the system shall show in the tag table each tag's raw and physical values read from the written bytes. |
+| R-A2L.49 | When | When the system writes bytes into the loaded image in place, the system shall keep the tag table's first shown row. |
+| R-A2L.50 | If | If a tag has no raw value, then the system shall give it the conversion status missing. |
+| R-A2L.51 | If | If a tag has no conversion method, then the system shall give it a physical value equal to its raw value. |
+| R-A2L.52 | If | If a tag has no conversion method, then the system shall give it the conversion status identity. |
+| R-A2L.53 | When | When a tag's conversion method is IDENTICAL, the system shall give it a physical value equal to its raw value. |
+| R-A2L.54 | When | When a tag's conversion method is LINEAR, the system shall give it the physical value a × raw + b. |
+| R-A2L.55 | If | If a LINEAR conversion method lacks a or b, then the system shall use 1 for a missing a and 0 for a missing b. |
+| R-A2L.56 | When | When a tag's conversion method is RAT_FUNC, the system shall give it the physical value that solves the RAT_FUNC equation for its raw value. |
+| R-A2L.57 | If | If a RAT_FUNC equation has two solutions, then the system shall take the one inside the tag's limits, or the one closer to 0 when both or neither are inside. |
 | R-A2L-058.1 | If | If a RAT_FUNC equation has no solution for a tag's raw value, then the system shall give the tag the conversion error `RAT_FUNC has no solution for this value`. |
 | R-A2L-058.2 | If | If a RAT_FUNC equation has no real root for a tag's raw value, then the system shall give the tag the conversion error `RAT_FUNC has no real root for this value`. |
 | R-A2L-058.3 | If | If every root of a RAT_FUNC equation has a zero denominator, then the system shall give the tag the conversion error `RAT_FUNC root has a zero denominator`. |
-| R-A2L-059 | When | When a tag's conversion method is TAB_VERB, the system shall give it the text its COMPU_VTAB pairs with its raw value. |
-| R-A2L-060 | When | When a tag's conversion method is FORM, the system shall give it the conversion status unsupported. |
-| R-A2L-061 | When | When a tag's conversion method is TAB_INTP, the system shall interpolate its physical value linearly between the two table pairs around its raw value. |
-| R-A2L-062 | If | If a TAB_INTP raw value is outside the table, then the system shall give the physical value of the nearest end of the table. |
-| R-A2L-063 | When | When a tag's conversion method is TAB_NOINTP, the system shall give it the physical value of the table pair whose raw value is nearest to its raw value. |
-| R-A2L-064 | If | If a conversion method names a table that does not exist, then the system shall give the tag the conversion error `lookup table missing`. |
-| R-A2L-065 | If | If a conversion method names an empty table, then the system shall give the tag the conversion error `lookup table is empty`. |
-| R-A2L-066 | If | If a tag's conversion method has a type this list does not name, then the system shall give it the conversion status unknown method. |
+| R-A2L.59 | When | When a tag's conversion method is TAB_VERB, the system shall give it the text its COMPU_VTAB pairs with its raw value. |
+| R-A2L.60 | When | When a tag's conversion method is FORM, the system shall give it the conversion status unsupported. |
+| R-A2L.61 | When | When a tag's conversion method is TAB_INTP, the system shall interpolate its physical value linearly between the two table pairs around its raw value. |
+| R-A2L.62 | If | If a TAB_INTP raw value is outside the table, then the system shall give the physical value of the nearest end of the table. |
+| R-A2L.63 | When | When a tag's conversion method is TAB_NOINTP, the system shall give it the physical value of the table pair whose raw value is nearest to its raw value. |
+| R-A2L.64 | If | If a conversion method names a table that does not exist, then the system shall give the tag the conversion error `lookup table missing`. |
+| R-A2L.65 | If | If a conversion method names an empty table, then the system shall give the tag the conversion error `lookup table is empty`. |
+| R-A2L.66 | If | If a tag's conversion method has a type this list does not name, then the system shall give it the conversion status unknown method. |
 
 #### S2.4 · Checking tags against the image (CTX-A2L-CHECK)
 
@@ -1623,20 +1623,20 @@ Replaces: the "A2L Decode Validation" block, R-A2L-002, R-A2L-ISSUE-RECONCILE-00
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-A2L-070 | When | When an A2L file and a primary image are both loaded, the system shall check each tag that has an address and a length against the image. |
-| R-A2L-071 | If | If only a MAC file is loaded besides the A2L file, then the system shall check no tag. |
-| R-A2L-072 | If | If a tag has no address and is not virtual, then the system shall mark its schema as not complete. |
-| R-A2L-073 | If | If a checked tag's physical value is outside its limits, then the system shall mark the value as outside the limits. |
-| R-A2L-074 | When | When an A2L file is loaded, the system shall show the A2L summary in the Workspace "Context" pane. |
-| R-A2L-075 | When | When the system shows the A2L summary, the system shall list the parse errors under the heading `A2L parse errors:`, one `- <error>` line each. |
-| R-A2L-076 | When | When the system shows the A2L summary, the system shall list the sections under the heading `A2L Sections:`, one `- <name> <begin words> (lines <first>-<last>)` line each, indented by depth. |
-| R-A2L-077 | When | When the system shows the A2L summary, the system shall list the tags under the heading `A2L Tags:`, one `- <section> <name>: <address> len=<length> mem=<region> <tag status text>` line each. |
-| R-A2L-078 | If | If the A2L summary has more than 500 lines, then the system shall replace the rest with the line `... truncated <k> additional tag lines ...`. |
-| R-A2L-079 | If | If no A2L file is loaded, then the system shall show `No A2L loaded.` in the A2L summary. |
+| R-A2L.70 | When | When an A2L file and a primary image are both loaded, the system shall check each tag that has an address and a length against the image. |
+| R-A2L.71 | If | If only a MAC file is loaded besides the A2L file, then the system shall check no tag. |
+| R-A2L.72 | If | If a tag has no address and is not virtual, then the system shall mark its schema as not complete. |
+| R-A2L.73 | If | If a checked tag's physical value is outside its limits, then the system shall mark the value as outside the limits. |
+| R-A2L.74 | When | When an A2L file is loaded, the system shall show the A2L summary in the Workspace "Context" pane. |
+| R-A2L.75 | When | When the system shows the A2L summary, the system shall list the parse errors under the heading `A2L parse errors:`, one `- <error>` line each. |
+| R-A2L.76 | When | When the system shows the A2L summary, the system shall list the sections under the heading `A2L Sections:`, one `- <name> <begin words> (lines <first>-<last>)` line each, indented by depth. |
+| R-A2L.77 | When | When the system shows the A2L summary, the system shall list the tags under the heading `A2L Tags:`, one `- <section> <name>: <address> len=<length> mem=<region> <tag status text>` line each. |
+| R-A2L.78 | If | If the A2L summary has more than 500 lines, then the system shall replace the rest with the line `... truncated <k> additional tag lines ...`. |
+| R-A2L.79 | If | If no A2L file is loaded, then the system shall show `No A2L loaded.` in the A2L summary. |
 
 #### S2.5 · The A2L Explorer (CTX-A2L-SCREEN)
 
-Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068, 069, R-A2L-ISSUE-RECONCILE-002. File-derived text on this screen follows S1's R-TUI-103 family (the A2L Explorer joins its list of views).
+Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068, 069, R-A2L-ISSUE-RECONCILE-002. File-derived text on this screen follows S1's safe-text rows R-TUI-103.1 … R-TUI.105 (the A2L Explorer joins its list of views).
 
 **Layout and table**
 
@@ -1668,15 +1668,15 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-A2L-080 | If | If an ERROR A2L issue names a tag, ignoring case, then the system shall show the tag's row red. |
-| R-A2L-081 | If | If a WARNING A2L issue names a tag, then the system shall not change the tag's row colour. |
-| R-A2L-082 | If | If an A2L issue names no tag shown in the table, then the system shall change no row. |
-| R-A2L-083 | If | If no ERROR A2L issue names a tag and its schema is not complete, then the system shall show its row red. |
-| R-A2L-084 | If | If no row-colour rule above applies and the tag is in image, then the system shall show its row green. |
-| R-A2L-085 | If | If no row-colour rule above applies and the tag is out of image, then the system shall show its row white. |
-| R-A2L-086 | If | If no row-colour rule above applies and the tag is virtual or its source is formula, then the system shall show its row white. |
-| R-A2L-087 | If | If no row-colour rule above applies, then the system shall show the tag's row grey. |
-| R-A2L-088 | When | When the system colours a row, the system shall apply the colour to every cell of the row. |
+| R-A2L.80 | If | If an ERROR A2L issue names a tag, ignoring case, then the system shall show the tag's row red. |
+| R-A2L.81 | If | If a WARNING A2L issue names a tag, then the system shall not change the tag's row colour. |
+| R-A2L.82 | If | If an A2L issue names no tag shown in the table, then the system shall change no row. |
+| R-A2L.83 | If | If no ERROR A2L issue names a tag and its schema is not complete, then the system shall show its row red. |
+| R-A2L.84 | If | If no row-colour rule above applies and the tag is in image, then the system shall show its row green. |
+| R-A2L.85 | If | If no row-colour rule above applies and the tag is out of image, then the system shall show its row white. |
+| R-A2L.86 | If | If no row-colour rule above applies and the tag is virtual or its source is formula, then the system shall show its row white. |
+| R-A2L.87 | If | If no row-colour rule above applies, then the system shall show the tag's row grey. |
+| R-A2L.88 | When | When the system colours a row, the system shall apply the colour to every cell of the row. |
 
 **Filter**
 
@@ -1697,16 +1697,16 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-A2L-090 | When | When the operator presses `Find next`, the system shall move the cursor to the next filtered tag, after the current one, whose shown fields contain the find text, ignoring case. |
-| R-A2L-091 | If | If no filtered tag after the current one matches, then the system shall continue the search from the first filtered tag. |
-| R-A2L-092 | When | When the operator edits the find text, the system shall start the next search from the first filtered tag. |
-| R-A2L-093 | When | When a find moves to a tag, the system shall show the page that holds it. |
-| R-A2L-094 | When | When a find moves to a tag, the system shall show its address near the top of the hex pane. |
-| R-A2L-095 | When | When a find moves to a tag, the system shall show the status `Tag find: <name> (row <i>)`. |
-| R-A2L-096 | If | If no filtered tag matches the find text, then the system shall show the status `Tag find: no match.` |
-| R-A2L-097 | If | If the find text is empty, then the system shall show the status `Tag find query is empty.` |
-| R-A2L-098 | If | If the tag table is empty, then the system shall show the status `No A2L tags to search.` |
-| R-A2L-099 | When | When the system compares the find text with the address, the system shall compare it with the address as the table shows it. |
+| R-A2L.90 | When | When the operator presses `Find next`, the system shall move the cursor to the next filtered tag, after the current one, whose shown fields contain the find text, ignoring case. |
+| R-A2L.91 | If | If no filtered tag after the current one matches, then the system shall continue the search from the first filtered tag. |
+| R-A2L.92 | When | When the operator edits the find text, the system shall start the next search from the first filtered tag. |
+| R-A2L.93 | When | When a find moves to a tag, the system shall show the page that holds it. |
+| R-A2L.94 | When | When a find moves to a tag, the system shall show its address near the top of the hex pane. |
+| R-A2L.95 | When | When a find moves to a tag, the system shall show the status `Tag find: <name> (row <i>)`. |
+| R-A2L.96 | If | If no filtered tag matches the find text, then the system shall show the status `Tag find: no match.` |
+| R-A2L.97 | If | If the find text is empty, then the system shall show the status `Tag find query is empty.` |
+| R-A2L.98 | If | If the tag table is empty, then the system shall show the status `No A2L tags to search.` |
+| R-A2L.99 | When | When the system compares the find text with the address, the system shall compare it with the address as the table shows it. |
 
 **Paging** (both tables; the MAC table is in S2.6)
 
@@ -1740,13 +1740,13 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-A2L-100 | When | When the operator selects a tag row, the system shall show the tag's address near the top of the hex pane. |
-| R-A2L-101 | When | When the operator selects a tag row, the system shall highlight in the hex pane the tag's span, up to 4,096 bytes. |
-| R-A2L-102 | If | If the selected tag has no length, then the system shall highlight 1 byte. |
-| R-A2L-103 | When | When the operator selects a tag row, the system shall show the status `Tag at <address>`. |
-| R-A2L-104 | If | If the selected tag has no address, then the system shall leave the hex pane unchanged. |
-| R-A2L-105 | When | When the system writes bytes into the loaded image in place, the system shall keep the tag table's highlighted row. |
-| R-A2L-106 | When | When the system writes bytes into the loaded image in place, the system shall keep the tags the tag table lists. |
+| R-A2L.100 | When | When the operator selects a tag row, the system shall show the tag's address near the top of the hex pane. |
+| R-A2L.101 | When | When the operator selects a tag row, the system shall highlight in the hex pane the tag's span, up to 4,096 bytes. |
+| R-A2L.102 | If | If the selected tag has no length, then the system shall highlight 1 byte. |
+| R-A2L.103 | When | When the operator selects a tag row, the system shall show the status `Tag at <address>`. |
+| R-A2L.104 | If | If the selected tag has no address, then the system shall leave the hex pane unchanged. |
+| R-A2L.105 | When | When the system writes bytes into the loaded image in place, the system shall keep the tag table's highlighted row. |
+| R-A2L.106 | When | When the system writes bytes into the loaded image in place, the system shall keep the tags the tag table lists. |
 
 **Export to JSON**
 
@@ -1762,21 +1762,21 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-A2L-110 | When | When the operator presses `d` on the A2L Explorer with a row highlighted, the system shall open the description window for that tag. |
-| R-A2L-111 | If | If no row is highlighted when the operator presses `d`, then the system shall show the status `A2L: no tag row under the cursor.` |
-| R-A2L-112 | When | When the system opens the description window, the system shall title it `Parameter: <name>`. |
-| R-A2L-113 | When | When the description window shows a CURVE or MAP, the system shall show its kind, name, description, address, byte count, unit and conversion method. |
-| R-A2L-114 | When | When the description window shows a CURVE or MAP, the system shall show one `Axis <i>:` line per axis. |
-| R-A2L-115 | When | When the description window shows a CURVE or MAP whose values are in the image, the system shall show the table of its axis points and values. |
-| R-A2L-116 | If | If a value in the point table is outside the tag's limits, then the system shall mark it `(!)`. |
-| R-A2L-117 | When | When the description window shows a CURVE or MAP whose values are in the image, the system shall show the shape of its values as a one-line bar chart after `y shape:`. |
-| R-A2L-118 | If | If the tag is not a CURVE or MAP, then the system shall show its value after `Scalar value:` and the line `(this characteristic is not a CURVE/MAP - no point table)`. |
-| R-A2L-119 | If | If the point table of a CURVE or MAP cannot be built, then the system shall show `Status: <reason> - point table unavailable`. |
-| R-A2L-119a | When | When the operator presses `Close` or Esc in the description window, the system shall close the window. |
-| R-A2L-120 | If | If a point of a CURVE's point table has no axis value, then the system shall show the point's index, counted from 0, as its x. |
-| R-A2L-121 | If | If a CURVE's point table holds at least one point and no point has an axis value, then the system shall show the line `x: point index (axis points unavailable)` once, directly above the table header. |
-| R-A2L-122 | If | If a CURVE's point table holds at least one point and no point has an axis value, then the system shall show each point-table row without a note. |
-| R-A2L-123 | If | If some, but not all, points of a CURVE's point table have an axis value, then the system shall end each point-table row whose point has no axis value with `   (index (axis points unavailable))`. |
+| R-A2L.110 | When | When the operator presses `d` on the A2L Explorer with a row highlighted, the system shall open the description window for that tag. |
+| R-A2L.111 | If | If no row is highlighted when the operator presses `d`, then the system shall show the status `A2L: no tag row under the cursor.` |
+| R-A2L.112 | When | When the system opens the description window, the system shall title it `Parameter: <name>`. |
+| R-A2L.113 | When | When the description window shows a CURVE or MAP, the system shall show its kind, name, description, address, byte count, unit and conversion method. |
+| R-A2L.114 | When | When the description window shows a CURVE or MAP, the system shall show one `Axis <i>:` line per axis. |
+| R-A2L.115 | When | When the description window shows a CURVE or MAP whose values are in the image, the system shall show the table of its axis points and values. |
+| R-A2L.116 | If | If a value in the point table is outside the tag's limits, then the system shall mark it `(!)`. |
+| R-A2L.117 | When | When the description window shows a CURVE or MAP whose values are in the image, the system shall show the shape of its values as a one-line bar chart after `y shape:`. |
+| R-A2L.118 | If | If the tag is not a CURVE or MAP, then the system shall show its value after `Scalar value:` and the line `(this characteristic is not a CURVE/MAP - no point table)`. |
+| R-A2L.119 | If | If the point table of a CURVE or MAP cannot be built, then the system shall show `Status: <reason> - point table unavailable`. |
+| R-A2L.124 | When | When the operator presses `Close` or Esc in the description window, the system shall close the window. |
+| R-A2L.120 | If | If a point of a CURVE's point table has no axis value, then the system shall show the point's index, counted from 0, as its x. |
+| R-A2L.121 | If | If a CURVE's point table holds at least one point and no point has an axis value, then the system shall show the line `x: point index (axis points unavailable)` once, directly above the table header. |
+| R-A2L.122 | If | If a CURVE's point table holds at least one point and no point has an axis value, then the system shall show each point-table row without a note. |
+| R-A2L.123 | If | If some, but not all, points of a CURVE's point table have an axis value, then the system shall end each point-table row whose point has no axis value with `   (index (axis points unavailable))`. |
 | R-TUI-042a.4 | U | The system shall show the Address and Length cells of every tag table row painted whole at every horizontal scroll position. |
 | R-TUI-042a.5 | While | While the name width *w* of the tag table is less than 34 cells, the system shall show a tag name longer than *w* characters in the Tag cell as its *painted tag name*: its first ⌊(*w* − 1)/2⌋ characters, `…` and its last ⌈(*w* − 1)/2⌉ characters. |
 | R-TUI-042a.6 | If | If a tag name holds a character outside U+0021 … U+007E, then the system shall show each such character that the Tag cell's *painted tag name* keeps as U+FFFD. |
@@ -1976,7 +1976,7 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-DEF.111 | When | When an axis is a FIX_AXIS with FIX_AXIS_PAR_DIST o d n, the system shall take o + k·d as its stored point k. |
 | R-A2L-DEF.112 | When | When an axis is a FIX_AXIS with a FIX_AXIS_PAR_LIST, the system shall take the numbers of the list in file order as its stored points. |
 | R-A2L-DEF.113 | When | When an axis is a COM_AXIS, the system shall read its points from the AXIS_PTS_X component of its axis object's record, at the axis object's address. |
-| R-A2L-DEF.114 | When | When the system reads the points of a COM_AXIS, the system shall read them in the byte order that R-A2L-024 … 027 give its axis object. |
+| R-A2L-DEF.114 | When | When the system reads the points of a COM_AXIS, the system shall read them in the byte order that R-A2L.24 … R-A2L.27 give its axis object. |
 | R-A2L-DEF.115 | When | When a record layout has a NO_AXIS_PTS_X or NO_AXIS_PTS_Y component, the system shall take the number that component holds in the image as the current count of axis X or Y. |
 | R-A2L-DEF.116.1 | If | If a record layout the system reads for an axis has a FIX_NO_AXIS_PTS_X or FIX_NO_AXIS_PTS_Y line whose number is 0 or more than the axis's point count, then the system shall give the definition the refusal `A2L-DEF-AXIS-CURRENT` with the message `<axis name>: the record holds <c> points, outside 1 to <n>`. |
 | R-A2L-DEF.116.2 | If | If the NO_AXIS_PTS_X or NO_AXIS_PTS_Y component of an axis's record holds in the image a number below 1 or above the axis's point count, then the system shall give the decode the refusal `A2L-DEF-AXIS-CURRENT` with the message `<axis name>: the record holds <c> points, outside 1 to <n>`. |
@@ -2200,7 +2200,7 @@ Replaces: R-TUI-039, R-TUI-070, R-TUI-071; MAC behaviour no row stated.
 | R-A2L-LIST.028 | When | When the system has ranked the closest names of the highlighted missing name, the system shall add to the detail card the line `closest <names joined by ' · '>`, or `closest —` when there is none. |
 | R-A2L-LIST.029 | When | When a list-mode row of a duplicate name becomes the highlighted row, the system shall show the tag's detail card followed by the line `duplicate of pasted #<p>`. |
 | R-A2L-LIST.030 | When | When a list-mode row of a hidden name becomes the highlighted row, the system shall show the tag's detail card followed by the line `hidden by the active filter mode`. |
-| R-A2L-LIST.031 | When | When the operator selects a list-mode row of a found, duplicate or hidden name, the system shall show the tag in the hex pane as R-A2L-100, R-A2L-101 and R-A2L-103 say. |
+| R-A2L-LIST.031 | When | When the operator selects a list-mode row of a found, duplicate or hidden name, the system shall show the tag in the hex pane as R-A2L.100, R-A2L.101 and R-A2L.103 say. |
 | R-A2L-LIST.032 | When | When the operator presses Esc in the filter box while it shows no dropdown and the viewer is in list mode, the system shall clear the filter text. |
 | R-A2L-LIST.033 | When | When a paste route delivers a text whose pasted names number 2 or more to the filter box with its filter field `name` or `all`, the system shall replace the box text with those names joined by `, ` and put the cursor at its start. |
 | R-A2L-LIST.034 | If | If a text a paste route delivers to the filter box holds unsafe paste characters and 2 or more pasted names, then the system shall remove them before taking its pasted names. |
@@ -2490,15 +2490,15 @@ map sheet       Four boxes in one column, each a title and its lines:
 | Id | Form | Requirement |
 |---|---|---|
 | R-VAL.30 | If | If the A2L file has a parse error (S2 R-A2L-001.4 … 001.6), then the system shall raise the ERROR issue `A2L_STRUCTURE_ERROR` with the parse error as its message. |
-| R-VAL-031 | If | If two or more tags have the same name, ignoring case, then the system shall raise one ERROR issue `A2L_DUPLICATE_SYMBOL` with the message `A2L symbol '<name>' is defined multiple times.` |
+| R-VAL.31 | If | If two or more tags have the same name, ignoring case, then the system shall raise one ERROR issue `A2L_DUPLICATE_SYMBOL` with the message `A2L symbol '<name>' is defined multiple times.` |
 | R-VAL-032.1 | If | If an A2L section's name is not an ASAM block name and the section is not inside an IF_DATA block, then the system shall raise the WARNING issue `A2L_UNRECOGNIZED_BLOCK` with the section's line number and the message `Unrecognized A2L block '<NAME>'.` |
 | R-VAL-032.2 | U | The system shall raise no `A2L_UNRECOGNIZED_BLOCK` issue for an A2L section whose name is an ASAM block name. |
 | R-VAL-032.3 | U | The system shall raise no `A2L_UNRECOGNIZED_BLOCK` issue for an A2L section inside an IF_DATA block. |
-| R-VAL-033 | If | If a GROUP or FUNCTION refers, inline or in a child REF_CHARACTERISTIC, REF_MEASUREMENT, DEF_CHARACTERISTIC, IN_MEASUREMENT or OUT_MEASUREMENT block, to a name that no tag has, then the system shall raise the WARNING issue `A2L_BROKEN_REFERENCE` with the message `<GROUP\|FUNCTION> references unknown symbol '<name>'.` |
+| R-VAL.33 | If | If a GROUP or FUNCTION refers, inline or in a child REF_CHARACTERISTIC, REF_MEASUREMENT, DEF_CHARACTERISTIC, IN_MEASUREMENT or OUT_MEASUREMENT block, to a name that no tag has, then the system shall raise the WARNING issue `A2L_BROKEN_REFERENCE` with the message `<GROUP\|FUNCTION> references unknown symbol '<name>'.` |
 | R-VAL.34 | U | The system shall compare a reference with tag names respecting case. |
-| R-VAL.35 | If | If a tag's schema is not complete (S2 R-A2L-072) and no ERROR A2L issue names it, then the system shall raise the ERROR issue `A2L_TAG_SCHEMA_INCOMPLETE` with the message `A2L tag '<name>' is schema-incomplete: <reason>.` |
+| R-VAL.35 | If | If a tag's schema is not complete (S2 R-A2L.72) and no ERROR A2L issue names it, then the system shall raise the ERROR issue `A2L_TAG_SCHEMA_INCOMPLETE` with the message `A2L tag '<name>' is schema-incomplete: <reason>.` |
 | R-VAL.36 | If | If a tag's address is more than 0xFFFFFFFF, then the system shall raise the WARNING issue `A2L_ADDRESS_EXCEEDS_32BIT` with the message `A2L tag '<name>' address <address> exceeds the 32-bit address range (> 0xFFFFFFFF).` |
-| R-VAL.37 | If | If a tag's BYTE_ORDER value is not a byte order (S2 R-A2L-028), then the system shall raise the WARNING issue `A2L_UNKNOWN_BYTE_ORDER` with the message `A2L tag '<name>' has unknown byte order '<value>'.` |
+| R-VAL.37 | If | If a tag's BYTE_ORDER value is not a byte order (S2 R-A2L.28), then the system shall raise the WARNING issue `A2L_UNKNOWN_BYTE_ORDER` with the message `A2L tag '<name>' has unknown byte order '<value>'.` |
 | R-VAL.38 | If | If an A2L issue would name an unnamed tag, then the system shall use `Unnamed A2L tag at address <address>` in its message, or `Unnamed A2L tag (no address recorded)` when the tag has no address. |
 
 **Between files** (primary session)
@@ -2527,7 +2527,7 @@ map sheet       Four boxes in one column, each a title and its lines:
 
 #### S3.3 · The Issues screen (CTX-ISSUES-SCREEN)
 
-Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED.1. File-derived text here follows S1's R-TUI-103 family (the Issues view is on its list).
+Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED.1. File-derived text here follows S1's safe-text rows R-TUI-103.1 … R-TUI.105 (the Issues view is on its list).
 
 | Id | Form | Requirement |
 |---|---|---|
@@ -2564,7 +2564,7 @@ Replaces: R-TUI-025, R-TUI-042 part (b), R-ISSUES-HEXPANE-001, R-ISSUES-RELATED.
 
 #### S3.4 · Colours and the legend (CTX-LEGEND)
 
-Replaces: the A2L and MAC colour blocks (their rules are S2 R-A2L-080 … 088 and R-MAC.31 … R-MAC.35), amendments C and F, R-LEGEND-SOURCE.1, R-LEGEND-MODAL-001, R-LEGEND-GEOMETRY-001, R-TUI.47.
+Replaces: the A2L and MAC colour blocks (their rules are S2 R-A2L.80 … R-A2L.88 and R-MAC.31 … R-MAC.35), amendments C and F, R-LEGEND-SOURCE.1, R-LEGEND-MODAL-001, R-LEGEND-GEOMETRY-001, R-TUI.47.
 
 | Id | Form | Requirement |
 |---|---|---|
@@ -2780,7 +2780,7 @@ memory strip    The one-row band above the Workspace panes: the whole image span
 
 #### S4.5 · Jumps and marks
 
-Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC.54 … R-MAC.56); these rows set where any jump lands.
+Selecting an A2L tag or a MAC record is in S2 (R-A2L.100 … R-A2L.104, R-MAC.54 … R-MAC.56); these rows set where any jump lands.
 
 | Id | Form | Requirement |
 |---|---|---|
@@ -3545,7 +3545,7 @@ refused list    The requests the system refuses while a session action runs:
   variant       v, the palette's Select variant, v in the Load-result panel.
   unload        U, the palette's Unload all, an unload in the Loaded panel.
   Save project  s, Ctrl+S, the palette's Save project.
-  Patch Editor  the requests S10 R-PE-110 lists (Add … Write file, both Edit JSON
+  Patch Editor  the requests S10 R-PE.110 lists (Add … Write file, both Edit JSON
                 dialogs and their results), Ctrl+Z, Ctrl+Y, and the accept of the
                 Patch Editor's unsaved-document question.
 session         The loaded image, MAC and A2L files, the change document, the open
@@ -3734,7 +3734,7 @@ Shared with S2 R-TUI-019.3 (A2L and MAC page sizes) and S4 (the main hex view's 
 
 #### S6.8 · Session actions: the busy refusal and the quit question (CTX-BUSY; batch-100)
 
-What each session action does, refuses on its own and reports on failure stays in its chapter (S5, S2, S11; D6-42). This section holds what happens around it. Rows that live with their surface: the Patch Editor's refused controls and its read-only paste buffer during a project load (S10 R-PE-110, R-PE.111); Generate new report keeps the session's regions during a session action (S12 R-RPT-002.28).
+What each session action does, refuses on its own and reports on failure stays in its chapter (S5, S2, S11; D6-42). This section holds what happens around it. Rows that live with their surface: the Patch Editor's refused controls and its read-only paste buffer during a project load (S10 R-PE.110, R-PE.111); Generate new report keeps the session's regions during a session action (S12 R-RPT-002.28).
 
 #### S6.8a · Keys and refusals while a session action runs (from batch-100 HLR-177, HLR-177a)
 
@@ -5053,15 +5053,15 @@ The Run checks button and its help text are S10 (R-PATCH-CHECKS-CLARITY-001).
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-CHK-PE-001 | When | When a check run started from the Patch Editor ends, the system shall show one result row per entry, in document order, on the Checks tab. |
-| R-CHK-PE-002 | When | When a check run started from the Patch Editor ends, the system shall colour each result row with its outcome colour. |
-| R-CHK-PE-003 | When | When a check run that is not blocked ends, the system shall show the count line as the Checks tab status. |
+| R-CHK-PE.1 | When | When a check run started from the Patch Editor ends, the system shall show one result row per entry, in document order, on the Checks tab. |
+| R-CHK-PE.2 | When | When a check run started from the Patch Editor ends, the system shall colour each result row with its outcome colour. |
+| R-CHK-PE.3 | When | When a check run that is not blocked ends, the system shall show the count line as the Checks tab status. |
 | R-CHK-PE.4 | If | If a check run started from the Patch Editor was blocked, then the system shall show the blocked line as the Checks tab status. |
 | R-CHK-PE.5 | When | When a check run started from the Patch Editor ends, the system shall show the patch strip on the Checks tab. |
 | R-CHK-PE.6 | When | When a check run started from the Patch Editor ends, the system shall write its count line or blocked line to the status log. |
 | R-CHK-PE.7 | When | When a check run started from the Patch Editor ends, the system shall write one status line `[<code>] <severity>: <message>` per finding of the document. |
-| R-CHK-PE-008 | While | While the Checks tab is shown and a current run with n entries exists, the system shall show the inspector subtitle `<n> checked`. |
-| R-CHK-PE-009 | While | While the Checks tab is shown and no current run exists, the system shall show the inspector subtitle `no run yet`. |
+| R-CHK-PE.8 | While | While the Checks tab is shown and a current run with n entries exists, the system shall show the inspector subtitle `<n> checked`. |
+| R-CHK-PE.9 | While | While the Checks tab is shown and no current run exists, the system shall show the inspector subtitle `no run yet`. |
 | R-CHK-PE.10 | While | While no current run exists, the system shall show `No check run yet: press Run checks.` as the Checks tab status. |
 | R-CHK-PE.11 | While | While no current run exists, the system shall show the patch strip with zero counts and an empty bar. |
 | R-CHK-PE.12 | While | While no current run exists, the system shall show no result row on the Checks tab. |
@@ -5084,7 +5084,7 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-CHKS.6 | When | When the Checks screen shows a current run, the system shall lead each non-empty group with its group header. |
 | R-CHKS.7 | When | When the Checks screen shows a current run, the system shall colour each group header and result row with the group's outcome colour. |
 | R-CHKS.8 | When | When the Checks screen shows a current run, the system shall show the aggregate line above the grouped list. |
-| R-CHKS-009 | While | While no current run exists, the system shall show the aggregate line with zero counts and an empty bar. |
+| R-CHKS.9 | While | While no current run exists, the system shall show the aggregate line with zero counts and an empty bar. |
 | R-CHKS.10 | If | If a current run holds more than 40 entries, then the system shall show the first 40 result rows in group order and the note `More check entries than shown — see the Patch Editor.` |
 | R-CHKS.11 | If | If a current run holds no entry, then the system shall show the note `No check entries to group.` |
 | R-CHKS.12 | When | When a result row's entry is linked, the system shall show the entry's linkage symbol in a cell beside the row. |
@@ -5095,10 +5095,10 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-CHKED-001 | When | When the operator opens the Check Editor, the system shall list in the ledger's pages every parameter of the loaded A2L, one row each. |
-| R-CHKED-002 | If | If no A2L is loaded, then the system shall show the line `No A2L parameters — load an A2L (^L) to list them.` under the ledger. |
+| R-CHKED.1 | When | When the operator opens the Check Editor, the system shall list in the ledger's pages every parameter of the loaded A2L, one row each. |
+| R-CHKED.2 | If | If no A2L is loaded, then the system shall show the line `No A2L parameters — load an A2L (^L) to list them.` under the ledger. |
 | R-CHKED.3 | When | When the operator types in Filter, the system shall list only the parameters whose name contains the filter text, ignoring case. |
-| R-CHKED-004 | If | If no parameter matches the filter, then the system shall show the line `No parameter matches the filter.` under the ledger. |
+| R-CHKED.4 | If | If no parameter matches the filter, then the system shall show the line `No parameter matches the filter.` under the ledger. |
 | R-CHKED.5 | U | The system shall show every ledger address in full. |
 | R-CHKED.6 | If | If a parameter name is wider than its column, then the system shall show its first dot-separated part, one `…` and the end of the name that fills the column. |
 | R-CHKED.7 | When | When the operator highlights a ledger row, the system shall show its address, its Fmt · Unit and its name on the full-name line. |
@@ -5120,13 +5120,13 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-CHKED.23 | U | The system shall show the struck text `APPLY — not available` in the Check Editor's action row. |
 | R-CHKED.24 | When | When the operator presses Write .chk.json, the system shall write the spec of the declared fields. |
 | R-CHKED.25 | When | When the system builds a spec, the system shall take as the expected bytes of a field included in this session the image bytes of its range. |
-| R-CHKED-026 | When | When the system builds a spec, the system shall take as the expected bytes of a field loaded from a spec the bytes that spec declared. |
-| R-CHKED-027 | If | If a field is not a declared field, then the system shall leave it out of the spec. |
+| R-CHKED.26 | When | When the system builds a spec, the system shall take as the expected bytes of a field loaded from a spec the bytes that spec declared. |
+| R-CHKED.27 | If | If a field is not a declared field, then the system shall leave it out of the spec. |
 | R-CHKED.28 | If | If fields were left out of a spec, then the system shall show the status `Check Editor: <k> field(s) outside the loaded image — not declared.` |
 | R-CHKED.29 | When | When the operator writes a spec, the system shall name it after the Write as input, or `spec.chk.json` when the input is empty. |
 | R-CHKED.30 | If | If the Write as name does not end with `.chk.json`, then the system shall append `.chk.json` to it. |
 | R-CHKED.31 | When | When the operator writes a spec, the system shall place it in the check home. |
-| R-CHKED-032 | When | When a spec is written, the system shall show the status `Check Editor: wrote <listed name> (<n> fields, kind=check).`, where `<listed name>` is the written file's value in the Spec list: `checks/<name>` with a project open, `<name>` without one. |
+| R-CHKED.32 | When | When a spec is written, the system shall show the status `Check Editor: wrote <listed name> (<n> fields, kind=check).`, where `<listed name>` is the written file's value in the Spec list: `checks/<name>` with a project open, `<name>` without one. |
 | R-CHKED.33 | When | When a spec is written, the system shall refresh the spec lists of the Check Editor, the Patch Editor and the A2B Diff screen. |
 | R-CHKED.34 | If | If the writer refuses a spec, then the system shall show the status `Check Editor: spec NOT written.` |
 | R-CHKED.35 | If | If the writer refuses a spec, then the system shall show `Write refused: <codes>.` as the Fields status. |
@@ -5138,7 +5138,7 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-CHKED-041.1 | When | When the operator picks a spec, the system shall replace the field set with one field per entry of the spec. |
 | R-CHKED-041.2 | When | When the operator picks a spec, the system shall include the named parameter of each entry that has one, in entry order. |
 | R-CHKED-041.3 | If | If an entry of a picked spec has no named parameter, then the system shall load it as a memory row with no label. |
-| R-CHKED-042 | When | When the operator picks a spec, the system shall set the Write as input to the spec's name ending in `.chk.json`. |
+| R-CHKED.42 | When | When the operator picks a spec, the system shall set the Write as input to the spec's name ending in `.chk.json`. |
 | R-CHKED.43 | When | When the operator picks a spec, the system shall show the status `Check Editor: loaded '<name>' (<n> fields).` |
 | R-CHKED.44 | If | If the picked file is a link or lies outside its folder, then the system shall refuse it with the status `Check Editor: file '<name>' is outside the patches folder — not loaded.` |
 | R-CHKED.45 | If | If the picked file carries an ERROR finding, then the system shall write one status line `[<code>] <severity>: <message>` per finding. |
@@ -5153,7 +5153,7 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-CHKED.54 | When | When the system writes a spec, the system shall keep the field set unchanged. |
 | R-CHKED.55 | If | If the loaded A2L no longer lists a parameter included in this session when the operator returns to the Check Editor, then the system shall drop that parameter from the field set. |
 | R-CHKED.56 | If | If the loaded A2L no longer lists a parameter loaded from a spec when the operator returns to the Check Editor, then the system shall replace that parameter in the field set with a memory row with no label that has the address, byte count and expected bytes of its spec entry. |
-| R-CHKED-057 | When | When the system makes an in-place write to the loaded image, the system shall clear the Check Editor's validation results. |
+| R-CHKED.57 | When | When the system makes an in-place write to the loaded image, the system shall clear the Check Editor's validation results. |
 | R-CHKED.58 | U | The system shall show every widget with an id of the Check Editor in at least one state of the Check Editor. |
 
 
@@ -5191,8 +5191,8 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-B102-BULK-001 | When | When the operator activates the parameter bulk-add control, the system shall open a modal containing a multiline text area, the instruction `Separate names with new lines, commas, semicolons or spaces.`, an include action and a close action. |
-| R-B102-BULK-002 | When | When the operator confirms a bulk list, the system shall split the text on new lines, commas, semicolons and whitespace, trim each token and ignore empty tokens. |
+| R-B102-BULK.1 | When | When the operator activates the parameter bulk-add control, the system shall open a modal containing a multiline text area, the instruction `Separate names with new lines, commas, semicolons or spaces.`, an include action and a close action. |
+| R-B102-BULK.2 | When | When the operator confirms a bulk list, the system shall split the text on new lines, commas, semicolons and whitespace, trim each token and ignore empty tokens. |
 | R-B102-BULK-003.1 | When | When one or more parsed names exactly match available A2L parameter names, the system shall include each matching name once, preserving the list order and existing picks. |
 | R-B102-BULK-003.2 | When | When one or more parsed names exactly match available A2L parameter names, the system shall add no second pick of a name that is already included. |
 | R-B102-BULK-004.1 | When | When a bulk list that parses to at least one parameter name completes, the system shall paint the summary `Included <n> · already included <n> · not found <n>`. |
@@ -5209,11 +5209,11 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-B102-PE-005 | When | When the operator re-enters the Patch Editor while the same A2L signature remains active, the system shall preserve the picker filter, page and highlighted parameter. |
-| R-B102-SEL-001 | When | When the Check Editor receives A2L parameters, the system shall store them in the shared picker and render at most 200 parameter rows for the current filter and page. |
+| R-B102-PE.5 | When | When the operator re-enters the Patch Editor while the same A2L signature remains active, the system shall preserve the picker filter, page and highlighted parameter. |
+| R-B102-SEL.1 | When | When the Check Editor receives A2L parameters, the system shall store them in the shared picker and render at most 200 parameter rows for the current filter and page. |
 | R-B102-SEL-002.1 | When | When the operator changes the parameter filter, the system shall debounce the rebuild for 150 ms and then render the first matching page. |
 | R-B102-SEL-002.2 | While | While the filtered result has more than 200 parameters, the system shall render the count `<shown> of <total> shown — refine filter.` |
-| R-B102-SEL-003 | When | When the operator activates include on a highlighted picker row, the system shall toggle only that row's mark and refresh the collected-fields preview without rebuilding the parameter ledger. |
+| R-B102-SEL.3 | When | When the operator activates include on a highlighted picker row, the system shall toggle only that row's mark and refresh the collected-fields preview without rebuilding the parameter ledger. |
 | R-B102-SEL-004.1 | When | When the operator reopens the Check Editor with the same A2L signature, the system shall preserve the current filter page and included parameters. |
 | R-B102-SEL-004.2 | When | When the operator reopens the Check Editor with the same A2L signature, the system shall not repopulate the picker. |
 | R-B102-SEL-005.1 | When | When a filtered result has more than 200 rows and the operator activates next or previous, the system shall render the adjacent page. |
@@ -5792,7 +5792,7 @@ Reading the file, the load status and the finding lines are S8's (R-CHG-001.19 �
 | R-CHG-004.1 | U | The system shall edit one change document at a time in the Patch Editor. |
 | R-PE.40 | U | The system shall show one ledger row per entry, in document order. |
 | R-PE-LEDGER.1 | U | The system shall show the Kind, Address and Value / bytes cells of each ledger row in the role colours of CTX-PE-LEDGER. |
-| R-PE-041 | While | While the Patch script or Inspector tab is shown, the system shall show the ledger subtitle of CTX-PE-LEDGER as the landing pane's border subtitle. |
+| R-PE.41 | While | While the Patch script or Inspector tab is shown, the system shall show the ledger subtitle of CTX-PE-LEDGER as the landing pane's border subtitle. |
 | R-PE.42 | U | The system shall show every ledger address in full. |
 | R-PE.43 | If | If a Value / bytes, Status or Linkage cell is wider than its column, then the system shall show its start and one `…`. |
 | R-PE.44 | If | If the document has no entry and no finding, then the system shall show the ledger line `No entries yet: Add one, paste a change-set or Load a file.` |
@@ -5891,7 +5891,7 @@ S8 owns what these controls do: Validate (R-CHG-VAL.1 … .4), the apply and its
 
 | Id | Form | Requirement |
 |---|---|---|
-| R-PE-110 | While | While a session action runs, the system shall refuse Add, Edit, Remove, Load, a dropdown pick, Refresh, Parse pasted, Validate, Apply loaded changes, Save, Run checks, Execute scope, Undo and Redo (buttons, Ctrl+Z and Ctrl+Y), Write file, a stage, both Edit JSON popups and their results, and the accept of the unsaved-changes popup. |
+| R-PE.110 | While | While a session action runs, the system shall refuse Add, Edit, Remove, Load, a dropdown pick, Refresh, Parse pasted, Validate, Apply loaded changes, Save, Run checks, Execute scope, Undo and Redo (buttons, Ctrl+Z and Ctrl+Y), Write file, a stage, both Edit JSON popups and their results, and the accept of the unsaved-changes popup. |
 | R-PE.111 | While | While a project load runs, the system shall make the paste buffer read-only. |
 
 #### S10.9 · Checks and the execution scope (CTX-PE)
@@ -6101,7 +6101,7 @@ The check run and its display are S9 (S9.1, S9.2); running a scope is S11.
 | R-PE-BENCH.80 | When | When a record stage writes the document, the system shall add one undo step and set the dirty flag. |
 | R-PE-BENCH.81 | If | If the record's span intersects an entry of the document without equalling its span, then the system shall refuse the record stage with Inc 8's status `Patch Editor: <name> overlaps the entry at 0x<X> — remove that entry first.` |
 | R-PE-BENCH.82 | When | When a record stage acts, the system shall run its encode off the UI thread. |
-| R-PE-BENCH.83 | If | If a session action is running when a record stage's encode ends, then the system shall refuse the stage with the busy line of R-PE-110 and leave the document and the bench edit unchanged. |
+| R-PE-BENCH.83 | If | If a session action is running when a record stage's encode ends, then the system shall refuse the stage with the busy line of R-PE.110 and leave the document and the bench edit unchanged. |
 | R-PE-BENCH.90 | U | The system shall paint every element text, axis label, name, unit, refusal message and notice of the bench and the op line as plain text. |
 | R-PE-BENCH.91 | U | The system shall replace every control character of CTX-PE-DEF plain text by U+FFFD in every text the bench and the op line paint. |
 | R-PE-BENCH.92 | U | The system shall write a name, an element name or an operand in an Inc 9 status message as its status echo of CTX-PE-BENCH. |

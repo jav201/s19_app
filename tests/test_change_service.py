@@ -470,7 +470,7 @@ def test_run_checks_default_seam_is_real_engine() -> None:
     with no injection and the status line states the three real aggregate
     counts.
 
-    Traces: R-PATCH-CHECKS-CLARITY-001.1, R-CHK-PE-003.
+    Traces: R-PATCH-CHECKS-CLARITY-001.1, R-CHK-PE.3.
     """
     service, mem_map, ranges = _service_with_image()
     assert service.check_runner is run_check_document
@@ -503,7 +503,7 @@ def test_run_checks_with_injected_runner_shapes_display() -> None:
     uncheckable→sev-warning, and the status message states the three
     aggregate counts.
 
-    Traces: R-CHK-PE-002, R-CHK-PE-003.
+    Traces: R-CHK-PE.2, R-CHK-PE.3.
     """
     service, mem_map, ranges = _service_with_image()
     stub = SimpleNamespace(

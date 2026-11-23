@@ -11,7 +11,7 @@ sources are strings or files under ``tmp_path``; census functions of
 tree; the margin-property and summary cases run inner sessions through
 ``pytester.runpytest_subprocess``.
 
-Rows guarded here: R-TST-001, R-TST-002, R-TST.3 .. R-TST.7, R-TST.10 .. R-TST.13,
+Rows guarded here: R-TST.1, R-TST.2, R-TST.3 .. R-TST.7, R-TST.10 .. R-TST.13,
 R-TST.15 .. R-TST.18, R-TST.20 .. R-TST.25, R-TST.30 .. R-TST.32 (static part),
 R-TST.40 .. R-TST.42, R-TST.43 .. R-TST.46, R-TST.50 .. R-TST.51,
 R-TST.80 .. R-TST.82,
@@ -370,7 +370,7 @@ class _App:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-001 — the marker registration
+# R-TST.1 — the marker registration
 # ---------------------------------------------------------------------------
 
 
@@ -388,7 +388,7 @@ def test_r_tst_001_serial_timing_marker_is_registered() -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-002 (with R-TST.5/5) — every timing arm carries the marker
+# R-TST.2 (with R-TST.5/5) — every timing arm carries the marker
 # ---------------------------------------------------------------------------
 
 
@@ -2232,7 +2232,7 @@ def test_r_tst_082_wrong_version_still_differs(monkeypatch) -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-TST-154 / 155 / 163 — the Inc 15 arms wait through the shared wait
+# R-TST.154 / R-TST.155 / R-TST.163 — the Inc 15 arms wait through the shared wait
 # ---------------------------------------------------------------------------
 
 
@@ -2448,7 +2448,7 @@ def _settled_bindings(tree) -> list:
 
 
 def test_r_tst_154_155_inc15_arms_wait_through_settled() -> None:
-    """R-TST-154, R-TST-155, R-TST-163: the nine table-D wait sites of the
+    """R-TST.154, R-TST.155, R-TST.163: the nine table-D wait sites of the
     four Inc 15 arms go through ``tests.b97_probes.settled``, pass their
     table-D descriptions verbatim and their pinned predicates, and sit as the
     statement directly after their trigger in the same block (a trigger that
@@ -2460,7 +2460,7 @@ def test_r_tst_154_155_inc15_arms_wait_through_settled() -> None:
         (module, arm) for (module, arm, _h, _t, _d, _p) in _INC15_WAIT_SITES
     )
 
-    # R-TST-155: the name ``settled`` the sites call is the shared wait.
+    # R-TST.155: the name ``settled`` the sites call is the shared wait.
     for module_rel in sorted({module for (module, *_rest) in _INC15_WAIT_SITES}):
         tree = ast.parse((REPO_ROOT / module_rel).read_text(encoding="utf-8"))
         assert _settled_bindings(tree) == ["from tests.b97_probes import settled"], (

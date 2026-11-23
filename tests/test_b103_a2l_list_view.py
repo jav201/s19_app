@@ -828,7 +828,7 @@ def _scrolled_write(case08, names, tmp_path, *, first_row: int | None, cursor_ro
 
 
 def test_r_a2l_list_036_4(case08, names, tmp_path) -> None:
-    """R-A2L-LIST.036/4 (E3A-07): with row 30 the first shown row, the in-place write keeps it (R-A2L-049/1)."""
+    """R-A2L-LIST.036/4 (E3A-07): with row 30 the first shown row, the in-place write keeps it (R-A2L.49/1)."""
     before, after, _ = _scrolled_write(case08, names, tmp_path, first_row=30, cursor_row=None)
     assert before[0] >= 29 and after[0] == before[0]
 

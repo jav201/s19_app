@@ -106,13 +106,13 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 |---|---|---|
 | HLR-001 · LLR-001.1 … .4 | **retired** | Code placement (batch-92 move of the hex renderer to `s19_app/render/hexview.py`). Hex rows are S4.1. |
 | HLR-002 · LLR-002.1 … .3 | **retired** | Code placement (range-index re-exports removed). |
-| HLR-003 · LLR-003.1 … .3 | **retired** | Code placement (`safe_text` moved to `s19_app/utils.py`). The safe-text behaviour is S1: R-TUI-103 … 103b. |
+| HLR-003 · LLR-003.1 … .3 | **retired** | Code placement (`safe_text` moved to `s19_app/utils.py`). The safe-text behaviour is S1: R-TUI.103 … R-TUI.105. |
 | HLR-004 · LLR-004.1 … .3 | **retired** | Code placement (palette constants moved to `s19_app/render/format.py`). Colours are S3 CTX-LEGEND and S6 CTX-THEME. |
 | HLR-005 · LLR-005.1, .2 | **absorbed** · S10: R-PE.12 … R-PE.19 | Unsaved-changes popup; a dropdown pick is guarded since batch-100 Inc 10 (R-PE.16, S10 D10-45; D10-20 done). |
 | HLR-006 · LLR-006.1, .2 | **retired** | Deleted behaviour: the variant dropdown and variant help were removed in batch-94 (S10 D10-4). |
 | HLR-007 · LLR-007.1, .2 | **absorbed** · S10: R-PE.80, R-PE.81 | The apply itself is S8.5. |
 | HLR-008 · LLR-008.1, .2 | **absorbed** · S10: R-PE.10, R-PE.11, R-TUI-052.1 … .3 | Refresh rescans the folder (D10-5). |
-| HLR-009 · LLR-009.1 … .3 | **absorbed** · S9: R-CHKED-001 … R-CHKED.53 | The Check Editor, S9.4 (D9-3). |
+| HLR-009 · LLR-009.1 … .3 | **absorbed** · S9: R-CHKED.1 … R-CHKED.53 | The Check Editor, S9.4 (D9-3). |
 | HLR-010 · LLR-010.1, .2 | **absorbed** · S14: R-DIFF-CHK.1 … R-DIFF-CHK.11 | Check-spec addendum of the diff report, S14.6 (D14-6). |
 | HLR-011 · LLR-011.1, .2 | **absorbed** · S9: R-CHKED.48 | Plain text on the Check Editor (S1 CTX-TEXT). |
 | HLR-012 · LLR-012.1, .2 | **absorbed** · S3: R-VAL-032 | S3 replaces the INFO re-label: standard block names raise no issue (D3-12). |
@@ -148,10 +148,10 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-142 · LLR-142.1, .2 | **absorbed** · S15: R-FLOW-SRC.1 … .10, R-FLOW-PATCH.4; S16: R-FB-ADD.17 | The Builder's A2L field is prototype first (S16 D16-25). |
 | HLR-143 · LLR-143.1, .2 | **absorbed** · S15: R-FLOW-RPT.1 … .14; S14: R-DIFF-FLOWCHG.1 … .8 | Flow report and flow changes in the diff report. |
 | HLR-144 · LLR-144.1 … .12 | **absorbed** · S10: R-TUI-063.1 … R-TUI-049.3 | The Patch Editor, S10.1 … S10.8 (D10-3, D10-12). |
-| HLR-145 · LLR-145.1 … .10 | **absorbed** · S9: R-CHKED-001 … R-CHKED.53 | The Check Editor, S9.4. |
+| HLR-145 · LLR-145.1 … .10 | **absorbed** · S9: R-CHKED.1 … R-CHKED.53 | The Check Editor, S9.4. |
 | HLR-146 · LLR-146.1 … .14 | **absorbed** · S16: R-TUI-059.20 … R-FB-PIPE.5 | The Flow Builder, S16.1 … S16.3. |
 | HLR-147 · LLR-147.1 … .13 | **absorbed** · S16: R-FX-SCR.1 … R-FX-WAIT.13 | Flow Execution, S16.7 … S16.9. |
-| HLR-148 · LLR-148.1 … .10 | **absorbed** · S5: R-CHIP-001.1 … .11; S7: R-WHELP.1 … .15; S9: R-CHKED-002, R-CHKED.17; S10: R-PE.60, R-PE.73; S16: R-FB-RUN.1 | Chips, help entries, empty-state lines. Glyph vocabularies (LLR-148.7) are design. |
+| HLR-148 · LLR-148.1 … .10 | **absorbed** · S5: R-CHIP-001.1 … .11; S7: R-WHELP.1 … .15; S9: R-CHKED.2, R-CHKED.17; S10: R-PE.60, R-PE.73; S16: R-FB-RUN.1 | Chips, help entries, empty-state lines. Glyph vocabularies (LLR-148.7) are design. |
 | HLR-149 · LLR-149.1 … .6 | **absorbed** · S10: R-TUI-064.1 … .3; S9: R-CHKED.49, R-CHKED.50; S16: R-FB-RIB.5, R-FB-RIB.6, R-FX-SIZE.1, R-FX-SIZE.2 | The four editor windows at 118 × 54 or more and below it. |
 | HLR-150 · LLR-150.1 … .7 | **absorbed** · S7: R-KEYBAR.1 … R-KEYBAR.15 | The key bar, S7.5. |
 | HLR-151 · LLR-151.1 | **absorbed** · S7: R-LOADDLG.1, R-LOADDLG.54, R-LOADDLG.60, R-LOADDLG.70 | LLR-151.1 (the Load project dialog) is superseded by batch-100 HLR-173 (Inc 9b): the one Load dialog, S7.2. S11 R-TUI-013.4 is retired (S11 D11-55). |
@@ -161,7 +161,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-155 · LLR-155.1 … .8 | **absorbed** · S5: R-TUI-002.5, R-TUI-006.1, R-TUI-006.2; S8: R-PATCH-SAVE-FOLDER-001.10, R-CHG-003.18, R-CHG-003.19; S11: R-TUI-012.14; S13: R-CRC-WRITE-001.5 … .26; S15: R-FLOW-WRITE.1 … .8, R-FLOW-CHAIN.1 … .10 | Private staging and exclusive create are design. Reports that probe a free name first: S14 D14-11, S15 D15-12. |
 | HLR-156 · LLR-156.1 … .4 | **absorbed** · S15: R-FLOW-PATCH.1 … .11, R-FLOW-RPT.1 … .14, R-FLOW-CHAIN.11 … .18 | PATCH step status. |
 | HLR-157 · LLR-157.1 … .4 | **absorbed** · S8: R-CHG-002.1, R-CHG-003.8, R-CHG-003.21, R-CHG-003.23 | Save-back writes source plus document (S8 D8-3); the Patch Editor controls are S10.8 (D10-12). |
-| HLR-158 · LLR-158.1 … .3 | **absorbed** · S2: R-A2L-024, R-A2L-025, R-A2L-026, R-A2L-027, R-A2L-056, R-A2L-057, R-A2L-058.1, R-A2L-058.2, R-A2L-058.3, R-A2L-006.7 | Decoding. Encoding is deferred with the symbol input (S10 D10-13, D10-42). |
+| HLR-158 · LLR-158.1 … .3 | **absorbed** · S2: R-A2L.24, R-A2L.25, R-A2L.26, R-A2L.27, R-A2L.56, R-A2L.57, R-A2L-058.1, R-A2L-058.2, R-A2L-058.3, R-A2L-006.7 | Decoding. Encoding is deferred with the symbol input (S10 D10-13, D10-42). |
 | HLR-159 · LLR-159.1, .2 | **absorbed** · S13: R-CRC-CHECK-002.1 … .4; S15: R-FLOW-CRC.1 … .8 | Empty and partly covered CRC targets. |
 | HLR-160 · LLR-160.1 … .5 | **absorbed** · S17: R-SEG-NAME.1 … R-SEG-PLACE.18 | Export names and placement, S17.7 (D17-12). |
 | HLR-161 · LLR-161.1, .2 | **absorbed** · S10: R-PE.31 | The help-window note is S7's (passed by S10). |
@@ -209,7 +209,7 @@ The table below replaces the earlier canon's table of batch ids. It holds no req
 | HLR-176c · LLR-176.1i … .1m, .1o, .1s, .2c, .2d | **absorbed** · S6: R-PROGRESS-END.1 … .5, R-PROGRESS-SHOWN.2, .4, R-PROGRESS-BAR.1, .5, R-PROGRESS-LINE.7; S12: R-RPT-LOG.1 … .4; S14: R-CMP-005.13 … .15, R-BEFORE-AFTER-REPORT-001.31 | Each action's own outcome text stays in its chapter (S5 R-TUI-012L.12, S2 R-A2L-004.1, S11, S12, S14); the report's end follows S6 R-PROGRESS-END.3 (S12 D12-30). |
 | HLR-176d · LLR-176.1h, .1j | **absorbed** · S6: R-PROGRESS-LINE.2, R-PROGRESS-END.2 | One owner of the status text while an action runs. |
 | HLR-177 · LLR-177.1 … .1k, .2 … .2c, .5, .5a, LLR-176.3 | **absorbed** · S6: R-PROGRESS-LINE.3, .5, R-PROGRESS-BAR.3, R-BUSY-RUN.1; S2: R-A2L-004.3, .6 … .12; S5: R-TUI-012L.5; S11: R-PROJ-RESET.1, R-LOADRES.2, R-PROJ-ROLLBACK.17, .18, R-TUI-013.17 | Worker threads, frozen requests and main-thread writes (.1, .1a, .1b, .1d, .1e, .1i) are implementation (S6 D6-33, S2 D2-33). The results and failures of each action (.1f … .1h, .1j, .1k, .2 … .2c) are in its chapter (S6 D6-42). The copy on the screen's thread is a held step (S6 D6-35, S5 D5-50). |
-| HLR-177a · LLR-177.3 … .3i | **absorbed** · S6: R-BUSY-REFUSE.1 … .8; S10: R-PE-110, R-PE.111; S12: R-RPT-002.28 | The busy line and the refused list are S6 CTX-BUSY; reports are never refused (R-BUSY-REFUSE.7). |
+| HLR-177a · LLR-177.3 … .3i | **absorbed** · S6: R-BUSY-REFUSE.1 … .8; S10: R-PE.110, R-PE.111; S12: R-RPT-002.28 | The busy line and the refused list are S6 CTX-BUSY; reports are never refused (R-BUSY-REFUSE.7). |
 | HLR-177b · LLR-177.4, .4a, .4b, .4d | **absorbed** · S6: R-SHELL-START.5, R-QUIT.1 … .6 | Supersedes S6 D6-9 for the "session action running" state (S6 D6-36). |
 | HLR-177c · LLR-177.4c, .4e | **absorbed** · S6: R-QUIT.7 … .12 | Quit waits for the end; withdrawn on a failure or unsaved work. |
 | HLR-178 · LLR-178.1 … .3 | **absorbed** · S11: R-TUI-013.12, .13, R-LOADRES.1 … R-LOADRES.18; S7: R-LOADDLG.83; S3: R-LEGEND.10 | Problem rows bounded at 102 (S11 D11-54); the panel's colours are the S3 palette. The open project's preview of the last load result (LLR-178.3, last sentence) is not built at 570b4b5: S7 R-LOADDLG.83 reads No (S7 D7-35). |

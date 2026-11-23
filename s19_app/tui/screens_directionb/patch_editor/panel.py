@@ -638,7 +638,7 @@ class PatchEditorPanel(
 
     def _refresh_inspector_subtitle(self) -> None:
         """The landing pane's border subtitle follows the tab (LLR-075.1,
-        R-PE-041): Patch script and Inspector show the ledger subtitle
+        R-PE.41): Patch script and Inspector show the ledger subtitle
         (``N entries``, `` ●`` while dirty), the JSON tab the schema token,
         the Checks tab its run state."""
         switchers = self.query("#patch_tab_switcher")
@@ -748,7 +748,7 @@ class PatchEditorPanel(
 
     def _refresh_dirty_indicator(self) -> None:
         """The ledger's dirty marker (:meth:`ActionsMixin._refresh_dirty_indicator`),
-        then the landing pane's copy of the ledger subtitle (R-PE-041)."""
+        then the landing pane's copy of the ledger subtitle (R-PE.41)."""
         super()._refresh_dirty_indicator()
         self._refresh_inspector_subtitle()
 

@@ -111,7 +111,7 @@ class ChecksDiffMixin:
             ``expected`` (a tuple of exactly ``size`` ints); they are
             declared as they are and the image is not read, so such a field
             is never skipped for lack of an image (amended *declared field*,
-            R-CHKED-026 / R-CHKED-027). Any other field takes the EXPECTED
+            R-CHKED.26 / R-CHKED.27). Any other field takes the EXPECTED
             bytes read from the loaded image's memory map at
             ``[address, address + size)`` — the current image state. Such a
             field whose address is missing, negative or not fully mapped in
@@ -138,7 +138,7 @@ class ChecksDiffMixin:
             if isinstance(spec_expected, tuple) and len(spec_expected) == size:
                 # A field loaded from a spec declares the spec's bytes at its
                 # own entry's range; the image is not read (amended "declared
-                # field", Inc 5 D9-11 / R-CHKED-026).
+                # field", Inc 5 D9-11 / R-CHKED.26).
                 entries.append(
                     ChangeEntry("bytes", address, spec_expected, value=None)
                 )
@@ -222,7 +222,7 @@ class ChecksDiffMixin:
                     f"Write refused: {codes or 'not written'}."
                 )
             else:
-                # R-CHKED-032: name the file as the Spec list lists it
+                # R-CHKED.32: name the file as the Spec list lists it
                 # (``checks/<n>`` in a project), not only its bare name.
                 home_prefix = self._spec_homes()[0][0]
                 self.set_status(
@@ -337,7 +337,7 @@ class ChecksDiffMixin:
             for entry in document.entries
         ]
         panel = self.query_one("#check_editor_panel", CheckEditorPanel)
-        # Inc 6 (R-CHKED-042): the Write-as input takes the bare file name —
+        # Inc 6 (R-CHKED.42): the Write-as input takes the bare file name —
         # the listed value would put ``library/`` into it.
         panel.load_spec(items, candidate.name)
         self.set_status(

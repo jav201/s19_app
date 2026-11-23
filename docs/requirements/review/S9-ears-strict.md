@@ -170,15 +170,15 @@ The Run checks button and its help text are S10 (R-PATCH-CHECKS-CLARITY-001).
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-CHK-PE-001 | When | When a check run started from the Patch Editor ends, the system shall show one result row per entry, in document order, on the Checks tab. | Yes; tested. |
-| R-CHK-PE-002 | When | When a check run started from the Patch Editor ends, the system shall colour each result row with its outcome colour. | Yes; tested. |
-| R-CHK-PE-003 | When | When a check run that is not blocked ends, the system shall show the count line as the Checks tab status. | Yes; tested. |
+| R-CHK-PE.1 | When | When a check run started from the Patch Editor ends, the system shall show one result row per entry, in document order, on the Checks tab. | Yes; tested. |
+| R-CHK-PE.2 | When | When a check run started from the Patch Editor ends, the system shall colour each result row with its outcome colour. | Yes; tested. |
+| R-CHK-PE.3 | When | When a check run that is not blocked ends, the system shall show the count line as the Checks tab status. | Yes; tested. |
 | R-CHK-PE.4 | If | If a check run started from the Patch Editor was blocked, then the system shall show the blocked line as the Checks tab status. | Yes; tested. |
 | R-CHK-PE.5 | When | When a check run started from the Patch Editor ends, the system shall show the patch strip on the Checks tab. | Yes; tested. |
 | R-CHK-PE.6 | When | When a check run started from the Patch Editor ends, the system shall write its count line or blocked line to the status log. | Yes. |
 | R-CHK-PE.7 | When | When a check run started from the Patch Editor ends, the system shall write one status line `[<code>] <severity>: <message>` per finding of the document. | Yes. |
-| R-CHK-PE-008 | While | While the Checks tab is shown and a current run with n entries exists, the system shall show the inspector subtitle `<n> checked`. | Partly: a current run with 0 entries shows `no run yet` (D9-10). |
-| R-CHK-PE-009 | While | While the Checks tab is shown and no current run exists, the system shall show the inspector subtitle `no run yet`. | Partly: a stale run keeps `<n> checked` (D9-10). |
+| R-CHK-PE.8 | While | While the Checks tab is shown and a current run with n entries exists, the system shall show the inspector subtitle `<n> checked`. | Partly: a current run with 0 entries shows `no run yet` (D9-10). |
+| R-CHK-PE.9 | While | While the Checks tab is shown and no current run exists, the system shall show the inspector subtitle `no run yet`. | Partly: a stale run keeps `<n> checked` (D9-10). |
 | R-CHK-PE.10 | While | While no current run exists, the system shall show `No check run yet: press Run checks.` as the Checks tab status. | Partly: shown before any run and after undo or redo; a run made stale by another document or image stays (D9-10). |
 | R-CHK-PE.11 | While | While no current run exists, the system shall show the patch strip with zero counts and an empty bar. | Partly: as R-CHK-PE.10 (D9-10). |
 | R-CHK-PE.12 | While | While no current run exists, the system shall show no result row on the Checks tab. | Partly: as R-CHK-PE.10 (D9-10). |
@@ -201,7 +201,7 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-CHKS.6 | When | When the Checks screen shows a current run, the system shall lead each non-empty group with its group header. | Yes; tested. |
 | R-CHKS.7 | When | When the Checks screen shows a current run, the system shall colour each group header and result row with the group's outcome colour. | Yes; tested. |
 | R-CHKS.8 | When | When the Checks screen shows a current run, the system shall show the aggregate line above the grouped list. | Yes; tested. |
-| R-CHKS-009 | While | While no current run exists, the system shall show the aggregate line with zero counts and an empty bar. | Partly: as R-CHKS.1 (D9-10); the cleared state is tested. |
+| R-CHKS.9 | While | While no current run exists, the system shall show the aggregate line with zero counts and an empty bar. | Partly: as R-CHKS.1 (D9-10); the cleared state is tested. |
 | R-CHKS.10 | If | If a current run holds more than 40 entries, then the system shall show the first 40 result rows in group order and the note `More check entries than shown — see the Patch Editor.` | Yes; tested. |
 | R-CHKS.11 | If | If a current run holds no entry, then the system shall show the note `No check entries to group.` | Yes; untested. |
 | R-CHKS.12 | When | When a result row's entry is linked, the system shall show the entry's linkage symbol in a cell beside the row. | Yes; tested. |
@@ -212,10 +212,10 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-CHKED-001 | When | When the operator opens the Check Editor, the system shall list in the ledger every parameter of the loaded A2L, one row each. | Yes; tested. |
-| R-CHKED-002 | If | If no A2L is loaded, then the system shall show the line `No A2L parameters — load an A2L (^L) to list them.` under the ledger. | Yes; tested. |
+| R-CHKED.1 | When | When the operator opens the Check Editor, the system shall list in the ledger every parameter of the loaded A2L, one row each. | Yes; tested. |
+| R-CHKED.2 | If | If no A2L is loaded, then the system shall show the line `No A2L parameters — load an A2L (^L) to list them.` under the ledger. | Yes; tested. |
 | R-CHKED.3 | When | When the operator types in Filter, the system shall list only the parameters whose name contains the filter text, ignoring case. | Yes. |
-| R-CHKED-004 | If | If no parameter matches the filter, then the system shall show the line `No parameter matches the filter.` under the ledger. | Yes; untested. |
+| R-CHKED.4 | If | If no parameter matches the filter, then the system shall show the line `No parameter matches the filter.` under the ledger. | Yes; untested. |
 | R-CHKED.5 | U | The system shall show every ledger address in full. | Yes; tested. |
 | R-CHKED.6 | If | If a parameter name is wider than its column, then the system shall show its first dot-separated part, one `…` and the end of the name that fills the column. | Yes; tested. |
 | R-CHKED.7 | When | When the operator highlights a ledger row, the system shall show its address, its Fmt · Unit and its name on the full-name line. | Yes; tested. |
@@ -237,13 +237,13 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-CHKED.23 | U | The system shall show the struck text `APPLY — not available` in the Check Editor's action row. | Yes. |
 | R-CHKED.24 | When | When the operator presses Write .chk.json, the system shall write the spec of the declared fields. | Yes; tested. |
 | R-CHKED.25 | When | When the system builds a spec, the system shall take as the expected bytes of a field included in this session the image bytes of its range. | Yes; tested. |
-| R-CHKED-026 | When | When the system builds a spec, the system shall take as the expected bytes of a field loaded from a spec the bytes that spec declared. | No: re-read from the image (D9-11). |
-| R-CHKED-027 | If | If a field is not a declared field, then the system shall leave it out of the spec. | Yes. |
+| R-CHKED.26 | When | When the system builds a spec, the system shall take as the expected bytes of a field loaded from a spec the bytes that spec declared. | No: re-read from the image (D9-11). |
+| R-CHKED.27 | If | If a field is not a declared field, then the system shall leave it out of the spec. | Yes. |
 | R-CHKED.28 | If | If fields were left out of a spec, then the system shall show the status `Check Editor: <k> field(s) outside the loaded image — not declared.` | Yes; untested. |
 | R-CHKED.29 | When | When the operator writes a spec, the system shall name it after the Write as input, or `spec.chk.json` when the input is empty. | Yes. |
 | R-CHKED.30 | If | If the Write as name does not end with `.chk.json`, then the system shall append `.chk.json` to it. | No: `.json` is appended, and the spec lists as PATCH (D9-14). |
 | R-CHKED.31 | When | When the operator writes a spec, the system shall place it in the check home. | Partly: always `workarea/patches/`, also with a project (D9-15). |
-| R-CHKED-032 | When | When a spec is written, the system shall show the status `Check Editor: wrote <name> (<n> fields, kind=check).` | Yes. |
+| R-CHKED.32 | When | When a spec is written, the system shall show the status `Check Editor: wrote <name> (<n> fields, kind=check).` | Yes. |
 | R-CHKED.33 | When | When a spec is written, the system shall refresh the spec lists of the Check Editor, the Patch Editor and the A2B Diff screen. | Yes; tested. |
 | R-CHKED.34 | If | If the writer refuses a spec, then the system shall show the status `Check Editor: spec NOT written.` | Yes. |
 | R-CHKED.35 | If | If the writer refuses a spec, then the system shall show `Write refused: <codes>.` as the Fields status. | Yes; tested. |
@@ -253,7 +253,7 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 | R-CHKED.39 | When | When a Validate run ends, the system shall write its count line to the status log. | Yes. |
 | R-CHKED.40 | When | When the operator opens the Check Editor or writes a spec, the system shall fill the Spec dropdown with the spec list. | Partly: lists `workarea/patches/` only (D9-15); tested. |
 | R-CHKED-041 | When | When the operator picks a spec, the system shall replace the included parameters and the memory rows with one memory row per entry of the spec. | Yes; tested. |
-| R-CHKED-042 | When | When the operator picks a spec, the system shall set the Write as input to the spec's name ending in `.chk.json`. | Yes. |
+| R-CHKED.42 | When | When the operator picks a spec, the system shall set the Write as input to the spec's name ending in `.chk.json`. | Yes. |
 | R-CHKED.43 | When | When the operator picks a spec, the system shall show the status `Check Editor: loaded '<name>' (<n> fields).` | Yes. |
 | R-CHKED.44 | If | If the picked file is a link or lies outside its folder, then the system shall refuse it with the status `Check Editor: file '<name>' is outside the patches folder — not loaded.` | Yes. |
 | R-CHKED.45 | If | If the picked file carries an ERROR finding, then the system shall write one status line `[<code>] <severity>: <message>` per finding. | Yes. |
@@ -292,8 +292,8 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 
 | # | The situation | Recommendation (applied) |
 |---|---|---|
-| D9-10 | The ledger glyphs refuse a run whose document or image changed (`change_service.py:3018-3023`), but the Checks tab rows, status, strip and subtitle and the Checks screen keep showing it (`check_rows` `:2799`, `check_display_rows` `:2878` read `last_check_result` only; load and paste do not reset it). The hex peek then reads the new image (`app.py:11443`). A 0-entry run shows `no run yet` (`screens_directionb.py:6670`). | One "current run" rule for every surface (CTX-CHECK-TEXT): a stale run shows the no-run state (R-CHK-PE-008 … R-CHK-PE.12, R-CHKS.1, R-CHKS.4, R-CHKS-009). |
-| D9-11 | Write and Validate take every field's expected bytes from the loaded image (`app.py:5832-5839`), then Validate compares them with that image (`:5919`): Validate can never fail, and loading a spec then writing it silently re-baselines it. | A field loaded from a spec keeps the spec's bytes; only new fields take the image's (R-CHKED.25, R-CHKED-026). Validate then answers "does this image still match the spec?". |
+| D9-10 | The ledger glyphs refuse a run whose document or image changed (`change_service.py:3018-3023`), but the Checks tab rows, status, strip and subtitle and the Checks screen keep showing it (`check_rows` `:2799`, `check_display_rows` `:2878` read `last_check_result` only; load and paste do not reset it). The hex peek then reads the new image (`app.py:11443`). A 0-entry run shows `no run yet` (`screens_directionb.py:6670`). | One "current run" rule for every surface (CTX-CHECK-TEXT): a stale run shows the no-run state (R-CHK-PE.8 … R-CHK-PE.12, R-CHKS.1, R-CHKS.4, R-CHKS.9). |
+| D9-11 | Write and Validate take every field's expected bytes from the loaded image (`app.py:5832-5839`), then Validate compares them with that image (`:5919`): Validate can never fail, and loading a spec then writing it silently re-baselines it. | A field loaded from a spec keeps the spec's bytes; only new fields take the image's (R-CHKED.25, R-CHKED.26). Validate then answers "does this image still match the spec?". |
 | D9-12 | `set_a2l_parameters` clears the included parameters (`screens_directionb.py:7071`) and runs on every screen entry (`app.py:7476`) and after every Write (`:5915`). | Keep the included parameters the new list still holds (R-CHKED.10). |
 | D9-13 | The JSON tab builds its own document (`"apply": false`, `size`, `name`, `screens_directionb.py:7198-7215`); Write writes another (`type`, `address`, `bytes` with expected bytes, `app.py:5843-5855`). | Show the document Write would write, serialised by S8's writer (R-CHKED.19). |
 | D9-14 | `Write as: myspec` is written as `myspec.json` (S8 `_safe_name`, `io.py:1657-1658`), which the lists label PATCH. | Append `.chk.json` when missing (R-CHKED.30). |
@@ -328,7 +328,7 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 **Received from later groups** (after all groups were written)
 
 - S9.1 (S8: CTX-CHGDOC, R-CHG-LINK.3, D8-16) → covered by the block above (CTX-CHECK cites both; no row uses `to_dict`).
-- S9.2 (S10: the check run on the Checks tab and the ledger glyphs) → covered by S9.1 and S9.2 (R-CHK-PE-008 … R-CHK-PE.16; glyphs R-CHK-PE.13, .15); the Run checks help stays S10's.
+- S9.2 (S10: the check run on the Checks tab and the ledger glyphs) → covered by S9.1 and S9.2 (R-CHK-PE.8 … R-CHK-PE.16; glyphs R-CHK-PE.13, .15); the Run checks help stays S10's.
 - S9.3 (S14: the check-spec folder) → covered by D9-15 and R-CHKED.31 (the check home of CTX-CHECK-EDITOR); S14 R-DIFF-CHK.1 lists the same folder (D14-17).
 - S9.4 (S15: CHECK runs the S9.1 engine) → covered by S9.1; S15 R-FLOW-CHECK.1 cites it.
 

@@ -626,12 +626,12 @@ def test_tc_b102_pe_04_missing_image_bytes_arm(tmp_path: Path) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# TC-B102-PE-05 — R-B102-PE-005 — re-entry preserves filter/page/highlight
+# TC-B102-PE-05 — R-B102-PE.5 — re-entry preserves filter/page/highlight
 # --------------------------------------------------------------------------- #
 
 
 def test_tc_b102_pe_05_reentry_preserves_filter_page_highlight(tmp_path: Path, monkeypatch) -> None:
-    """TC-B102-PE-05 (R-B102-PE-005, full): filter/page/highlight set in the
+    """TC-B102-PE-05 (R-B102-PE.5, full): filter/page/highlight set in the
     Patch A2L tab survive two workspace round-trips with the same A2L signature
     (2/2 reentradas).
 
@@ -746,7 +746,7 @@ def test_tc_b102_pe_06_empty_states_mirror_check(tmp_path: Path) -> None:
 
     RED on base: no ``#patch_tab_a2l`` / no Patch picker.
 
-    Traces: R-CHKED-002, R-CHKED-004 (the shared picker's empty-state lines; the
+    Traces: R-CHKED.2, R-CHKED.4 (the shared picker's empty-state lines; the
     Patch surface mirrors the Check Editor's, fix-round ruling P-182).
     """
 

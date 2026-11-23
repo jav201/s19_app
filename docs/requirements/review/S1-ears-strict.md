@@ -1,7 +1,7 @@
 # S1 — strict EARS pass over the part-67 proposal (2026-10-30)
 
 Input: `review/S1-chapter-proposed.md` (part 67 B, waiting for a verdict). Code read again: `base/s19_app/core.py`, `hexfile.py`, `cli.py`, `range_index.py`, `version.py`. No test was run.
-Code: Reconciled with s19_app 570b4b5 (batch-100) on 2026-11-01: rows and cites in S1.5 (CTX-TEXT, R-TUI-103 … 103b) and decision D-16 verified at 570b4b5; other cites refer to 093a7c0.
+Code: Reconciled with s19_app 570b4b5 (batch-100) on 2026-11-01: rows and cites in S1.5 (CTX-TEXT, R-TUI.103 … R-TUI.105) and decision D-16 verified at 570b4b5; other cites refer to 093a7c0.
 
 Result: **every row is now one sentence, one of the five EARS forms, one `shall`, one response.** No row needed a sixth form. No row uses `Where` (reason in rule E4).
 
@@ -33,7 +33,7 @@ These are the rows that broke more than form. Form-only breaks (two responses in
 
 | Row (proposal) | What did not make sense | Fix |
 |---|---|---|
-| R-READ-002 | "load the same records and the same image": the same as what? The row names no second load to compare with. | Ubiquitous: `The system shall treat CR, LF and CR LF as line ends.` |
+| R-READ.2 | "load the same records and the same image": the same as what? The row names no second load to compare with. | Ubiquitous: `The system shall treat CR, LF and CR LF as line ends.` |
 | R-VAL-002 | Trigger "When the system rejects a line" is the system's own response. The row then repeats what every reject row already says. | Dropped. One generic reject row, one "exactly one diagnostic" row, one precedence row, one "keep reading" row (R-VAL-002.1 … .4). |
 | R-PARSE.1 … R-PARSE.5, R-HEX.4, R-HEX-005.1 … R-HEX-005.6, R-HEX.6 | No precedence. A line with two defects (bad address *and* bad checksum) satisfies two rows, so two diagnostics are required; the code records one. The rows contradict the code and each other. | Line defects are listed in check order in the context note; R-VAL-002.3 says the first one gives the message. |
 | R-READ-006 | Says nothing of the limits the code applies on purpose: S5 is compared only while the tally is at most 0xFFFF (S6: 0xFFFFFF), and rejected lines that start with S1/S2/S3 count toward the tally. As written, the row asks for a mismatch notice the code deliberately does not give. | "Data-record tally" defined in CTX-S19; the limit is in the condition (R-READ-006.1, .2). |
@@ -91,7 +91,7 @@ CTX-LOAD  Loading a file
 |---|---|---|---|
 | R-READ-001.1 | When | When the system reads an empty line, the system shall create no record from it. | Does it; tested. |
 | R-READ-001.2 | When | When the system reads an empty line, the system shall record no diagnostic for it. | Does it; tested. |
-| R-READ-002 | U | The system shall treat CR, LF and CR LF as line ends. | Does it; tested for HEX, read from the code for S19. |
+| R-READ.2 | U | The system shall treat CR, LF and CR LF as line ends. | Does it; tested for HEX, read from the code for S19. |
 | R-VAL-002.1 | If | If a line before the end of reading has a line defect, then the system shall reject the line. | Does it for S19 and HEX, except L-1 in S19: code changes (D-3). |
 | R-VAL-002.2 | If | If a line before the end of reading has one or more line defects, then the system shall record exactly one diagnostic for it. | Does it; tested. |
 | R-VAL-002.3 | If | If a line has more than one line defect, then the system shall give its diagnostic the message of the first defect in check order. | Does it for S19; HEX after Q-C. |
@@ -146,12 +146,12 @@ CTX-S19  Motorola S-record (S19)
 |---|---|---|---|
 | R-PARSE.1 | If | If an S19 line has defect S-1, then the system shall record the diagnostic `Invalid S-record format: <line>`. | Does it; tested. |
 | R-PARSE.7 | If | If an S19 line has defect S-2, then the system shall record the diagnostic `Unsupported S-record type: <type>`. | Does it; tested. |
-| R-PARSE-002 | If | If an S19 line has defect S-3, then the system shall record the diagnostic `Invalid byte count hex: <count>`. | Partly: a sign, a space, `0x`, `_` pass today (decision 1). |
+| R-PARSE.2 | If | If an S19 line has defect S-3, then the system shall record the diagnostic `Invalid byte count hex: <count>`. | Partly: a sign, a space, `0x`, `_` pass today (decision 1). |
 | R-PARSE.8 | If | If an S19 line has defect S-4, then the system shall record the diagnostic `Length mismatch: expected <n> chars, found <m>`. | Does it; tested. |
 | R-PARSE.9 | If | If an S19 line has defect S-5, then the system shall record the diagnostic `Line too short for address field`. | Does it (read from the code); untested. |
-| R-PARSE.3 | If | If an S19 line has defect S-6, then the system shall record the diagnostic `Invalid address hex: <address>`. | Partly, as R-PARSE-002 (decision 1). |
-| R-PARSE.4 | If | If an S19 line has defect S-7, then the system shall record the diagnostic `Invalid data byte hex: <xx>` for the first such byte. | Partly, as R-PARSE-002 (decision 1). |
-| R-PARSE.5 | If | If an S19 line has defect S-8, then the system shall record the diagnostic `Invalid checksum hex: <xx>`. | Partly, as R-PARSE-002 (decision 1). |
+| R-PARSE.3 | If | If an S19 line has defect S-6, then the system shall record the diagnostic `Invalid address hex: <address>`. | Partly, as R-PARSE.2 (decision 1). |
+| R-PARSE.4 | If | If an S19 line has defect S-7, then the system shall record the diagnostic `Invalid data byte hex: <xx>` for the first such byte. | Partly, as R-PARSE.2 (decision 1). |
+| R-PARSE.5 | If | If an S19 line has defect S-8, then the system shall record the diagnostic `Invalid checksum hex: <xx>`. | Partly, as R-PARSE.2 (decision 1). |
 | R-PARSE.6 | U | The system shall read the hexadecimal digits a–f as the same values as A–F. | Does it (decision 1). |
 | R-VAL-001.1 | If | If an S19 record does not follow the checksum rule, then the system shall mark the record invalid. | Does it; tested. |
 | R-VAL-001.2 | If | If an S19 record does not follow the checksum rule, then the system shall record the diagnostic `Checksum mismatch: expected <XX>, found <YY>`. | Does it; tested. |
@@ -280,9 +280,9 @@ CTX-TEXT  Text from a file, on screen
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
 | R-TUI-103.1 | When | When the system displays file-derived text other than a painted name in one of the safe-text views, the system shall show each run of break characters as one space. | No: removes them today; code and one test change (D-6). A painted name removes them (D-16). |
-| R-TUI-103 | When | When the system displays file-derived text in one of the safe-text views, the system shall display no other control character. | Does it where the safe-text function is used (D-7). The status line and the message lines: every line passes it since batch-100 Inc 12a (`app.py:20161-20175`, `:20192-20211`; tested, `test_tc_b100_50_control_bytes_never_reach_the_status_log`; S6 D6-28 done). Painted names: tested in their groups (`test_tc_b100_42_project_rows_are_painted_literally`, `test_tc_b100_53_busy_line_paints_a_hostile_name_literally`). |
-| R-TUI-103a | When | When the system displays file-derived text other than a painted name in one of the safe-text views, the system shall display every other character unchanged and in the same order. | Does it; tested. A painted name removes Cf, Zl and Zp characters and cuts at 120 characters (D-16). |
-| R-TUI-103b | When | When the system displays file-derived text in one of the safe-text views, the system shall apply no markup that the text spells out. | Partly: the Select variant dialog (title and list) and the Reports dialog list still read markup (S7 D7-28, S11 D11-38); elsewhere tested. Example `sensor[red]` shows as the 11 characters `sensor[red]`. |
+| R-TUI.103 | When | When the system displays file-derived text in one of the safe-text views, the system shall display no other control character. | Does it where the safe-text function is used (D-7). The status line and the message lines: every line passes it since batch-100 Inc 12a (`app.py:20161-20175`, `:20192-20211`; tested, `test_tc_b100_50_control_bytes_never_reach_the_status_log`; S6 D6-28 done). Painted names: tested in their groups (`test_tc_b100_42_project_rows_are_painted_literally`, `test_tc_b100_53_busy_line_paints_a_hostile_name_literally`). |
+| R-TUI.104 | When | When the system displays file-derived text other than a painted name in one of the safe-text views, the system shall display every other character unchanged and in the same order. | Does it; tested. A painted name removes Cf, Zl and Zp characters and cuts at 120 characters (D-16). |
+| R-TUI.105 | When | When the system displays file-derived text in one of the safe-text views, the system shall apply no markup that the text spells out. | Partly: the Select variant dialog (title and list) and the Reports dialog list still read markup (S7 D7-28, S11 D11-38); elsewhere tested. Example `sensor[red]` shows as the 11 characters `sensor[red]`. |
 
 ### S1.6 · Version
 
@@ -312,7 +312,7 @@ Every open point now carries a recommendation, and the rows above already follow
 | D-11 | The command-line tool: runnable only as `python -m s19_app.cli`, 6 known defects, 2 of 15 behaviours tested. The README already says "the surface is going away … not being fixed". | **Remove it.** It would cost 59 rows and 6 fixes for a surface the project already dropped. D-12, D-13 and Q-F disappear with it. | One removal item (cli.py, its tests, the README section). |
 | D-14 | The version is written twice (pyproject.toml and s19_app/version.py), both 0.1.0, nothing checks they agree. Reports print it. | **One source:** `version.py` keeps it; pyproject reads it (`dynamic = ["version"]`). | Two-line change in pyproject.toml. |
 | D-15 | Three helper functions nothing uses; source comments carry batch history and requirement ids. | **Remove the helpers. Keep the requirement ids in comments** (code → requirement trace is mandatory); drop batch narrative only when a file is touched anyway. | Backlog item. |
-| D-16 | Conflict (batch-100, s19_app 570b4b5). R-TUI-103.1 and 103a (break characters as one space; every other character unchanged, D-6) against batch-100's painted names (LLR-173.3 … .3c, LLR-174.2i, LLR-176.1r, LLR-177.4a; `painted_names`, `project_gather_service.py:967-1009`): every Cc, Cf, Zl and Zp character is removed and a name is cut at 120 characters with "…". The Load dialog, the load question, the Save project dialog, the Load-result panel, the progress and busy lines and the quit question show names this way; the file status after a file load (`Loaded <name> (S19 only)` …, `app.py:17775-17792`) passes only the safe-text function and keeps format characters such as U+202E (batch backlog SE5-12a-2, open). The Load project dialog of this list is gone (Inc 9b). | **Batch-100 wins for painted names** (more recent, tested, and removing a bidi override is the safer rule; S7 D7-12). CTX-TEXT defines "painted name" and the painted-name views; R-TUI-103.1 and 103a leave painted names out; R-TUI-103 and 103b hold for them. "Load project" leaves the safe-text list; the batch-100 views join it. | Nothing in the code. The file status's format characters stay with the batch backlog (SE5-12a-2). |
+| D-16 | Conflict (batch-100, s19_app 570b4b5). R-TUI-103.1 and R-TUI.104 (break characters as one space; every other character unchanged, D-6) against batch-100's painted names (LLR-173.3 … .3c, LLR-174.2i, LLR-176.1r, LLR-177.4a; `painted_names`, `project_gather_service.py:967-1009`): every Cc, Cf, Zl and Zp character is removed and a name is cut at 120 characters with "…". The Load dialog, the load question, the Save project dialog, the Load-result panel, the progress and busy lines and the quit question show names this way; the file status after a file load (`Loaded <name> (S19 only)` …, `app.py:17775-17792`) passes only the safe-text function and keeps format characters such as U+202E (batch backlog SE5-12a-2, open). The Load project dialog of this list is gone (Inc 9b). | **Batch-100 wins for painted names** (more recent, tested, and removing a bidi override is the safer rule; S7 D7-12). CTX-TEXT defines "painted name" and the painted-name views; R-TUI-103.1 and R-TUI.104 leave painted names out; R-TUI.103 and R-TUI.105 hold for them. "Load project" leaves the safe-text list; the batch-100 views join it. | Nothing in the code. The file status's format characters stay with the batch backlog (SE5-12a-2). |
 | Q-A | The old note said a diagnostic carries "the stage that failed". The stage is shown only in a log warning, never on screen. | **Drop it from the definition.** The message already names the problem. | Nothing in the code. |
 | Q-C | A bad Intel HEX field gives Python's raw text (`invalid literal for int() with base 16: ''`), and a short line never reaches the length check. | **Same per-field wording as S19, and the length check before the field checks.** Messages become testable and both formats read alike. | Code change in the HEX reader, tests per message. |
 | Q-D | Unknown record type: S19 rejects the line; Intel HEX keeps a record with no bytes. | **Reject in both** (new HEX defect H-7). Same input defect, same outcome. | Small code change. |
@@ -326,15 +326,15 @@ Code-change items for the batch: D-3, D-4, D-5, D-6, D-8, D-11, D-14, Q-C, Q-D, 
 
 **Received from later groups** (after S6–S17 were written)
 
-- **Safe-text views**: S6, S7, S8, S9, S10, S11, S12, S13 and S14 each named views that show file-derived text; all are now in CTX-TEXT, so R-TUI-103, 103.1, 103a and 103b cover them. S16: the Flow windows were already listed. S17: the Split/Join view is listed, but its table, naming line and output labels skip the safe-text function today (S17 D17-21); the D-7 sweep covers it.
+- **Safe-text views**: S6, S7, S8, S9, S10, S11, S12, S13 and S14 each named views that show file-derived text; all are now in CTX-TEXT, so R-TUI.103, R-TUI-103.1, R-TUI.104 and R-TUI.105 cover them. S16: the Flow windows were already listed. S17: the Split/Join view is listed, but its table, naming line and output labels skip the safe-text function today (S17 D17-21); the D-7 sweep covers it.
 - **D-2 answered downstream**: save-back writes the bytes of a bad-checksum record and warns (S8 D8-26); the export does the same (S17 D17-34). S1 stays "keep as today".
 
 **Reconciled with batch-100 (s19_app 570b4b5)**
 
 - CTX-TEXT: "Load project" left the safe-text views (dialog retired, Inc 9b; S7 D7-12); the Load dialog, the load question, the Load-result panel, the progress line, the busy line and the quit question joined them (from S5, S6, S7, S11 and the sweep).
 - CTX-TEXT: terms "painted name" and "painted-name views" added (from S5, S6, S7, S11).
-- Rows changed in text: R-TUI-103.1, R-TUI-103a leave painted names out (D-16; batch-100 wins, S7 D7-12).
-- "Code today" changed: R-TUI-103 (status line and message lines scrubbed since Inc 12a, S6 D6-28 done); R-TUI-103b Yes → Partly (Select variant and Reports lists still read markup, S7 D7-28, S11 D11-38).
+- Rows changed in text: R-TUI-103.1, R-TUI.104 leave painted names out (D-16; batch-100 wins, S7 D7-12).
+- "Code today" changed: R-TUI.103 (status line and message lines scrubbed since Inc 12a, S6 D6-28 done); R-TUI.105 Yes → Partly (Select variant and Reports lists still read markup, S7 D7-28, S11 D11-38).
 - Decision added: D-16 (conflict). Superseded: none (D-6 stands for text that is not a painted name). Open and not ours: the file status keeps format characters (SE5-12a-2).
 
 ## 5. Counts

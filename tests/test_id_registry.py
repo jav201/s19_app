@@ -257,7 +257,7 @@ batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,
 are added (no support module). MEASURED: the guard reports 253 on the LAN Linux host.
 
 batch-101 Inc 2: 246 -> 248 (after batch-102). ``tests/support/suite_census.py`` and
-``tests/test_suite_hygiene.py`` (R-TST-001 .. 082) are added. MEASURED: the
+``tests/test_suite_hygiene.py`` (R-TST.1 .. R-TST.82) are added. MEASURED: the
 guard reports 241.
 
 batch-101 Inc 8: 248 -> 250 on the merge after Inc 2. ``tests/test_b101_crc_model_and_reasons.py``

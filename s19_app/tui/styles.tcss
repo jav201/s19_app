@@ -1740,7 +1740,7 @@ ModalScreen {
     height: 1fr;
 }
 
-/* --- Bulk-add popup (batch-102 Inc 4, US-102-04 / R-B102-BULK-001..007) ---
+/* --- Bulk-add popup (batch-102 Inc 4, US-102-04 / R-B102-BULK.1 .. R-B102-BULK-007) ---
  * Reuses the shared `.modal-dialog` box model. The multiline area is a FIXED
  * height (not 1fr) because this dialog is `height: auto` like the small
  * pickers — a fractional child would collapse the auto pass. The summary
@@ -3011,7 +3011,7 @@ ModalScreen {
 }
 
 /* batch-103 Inc 8: the ledger is the Patch script tab, with no border of
- * its own; its subtitle rides the landing pane (R-PE-041). */
+ * its own; its subtitle rides the landing pane (R-PE.41). */
 #patch_editor_panel #patch_win_script {
     height: 100%;
     padding: 0;

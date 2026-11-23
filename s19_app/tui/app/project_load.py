@@ -1065,7 +1065,7 @@ class ProjectLoadMixin:
             # so the old apply's controls go; the fresh service has no run.
             self._hide_replaced_document_controls(panel)
             self._refresh_patch_checks_tab(panel)
-        # Inc 6 (E3A-02, R-CHKS-009): a displayed Checks screen repaints
+        # Inc 6 (E3A-02, R-CHKS.9): a displayed Checks screen repaints
         # with the reset run state (a guarded no-op when not mounted).
         self.update_checks_view()
 

@@ -22,11 +22,11 @@ Two shapes of text:
 
 | Where | What did not make sense | Fix |
 |---|---|---|
-| Byte-order block | Precedence "1 tag, 2 layout, 3 existing tag endian, 4 default little". Step 3 is the same token as step 1, so it can never apply. The code has a step the text omits: BYTE_ORDER in the module's MOD_COMMON, before the default. | Rows follow the code (R-A2L-024 … 027); the dead step goes (D2-2). |
-| COMPU_METHOD table | FORM: "guarded/unsupported unless safe evaluation is enabled". Nothing can enable it, and the formula text is never even read. | FORM is plainly not converted (R-A2L-060, D2-4). |
-| COMPU_METHOD table | TAB_VERB is not in the table, yet the parsing block requires COMPU_VTAB. The code reads COMPU_VTAB and never uses it; a TAB_VERB tag shows its raw number as "unknown method". | Show the verbal text (R-A2L-059, D2-5). |
+| Byte-order block | Precedence "1 tag, 2 layout, 3 existing tag endian, 4 default little". Step 3 is the same token as step 1, so it can never apply. The code has a step the text omits: BYTE_ORDER in the module's MOD_COMMON, before the default. | Rows follow the code (R-A2L.24 … R-A2L.27); the dead step goes (D2-2). |
+| COMPU_METHOD table | FORM: "guarded/unsupported unless safe evaluation is enabled". Nothing can enable it, and the formula text is never even read. | FORM is plainly not converted (R-A2L.60, D2-4). |
+| COMPU_METHOD table | TAB_VERB is not in the table, yet the parsing block requires COMPU_VTAB. The code reads COMPU_VTAB and never uses it; a TAB_VERB tag shows its raw number as "unknown method". | Show the verbal text (R-A2L.59, D2-5). |
 | Viewer block | Fallback text "`n/a`, `ERR`, `MISS`, or equivalent". `MISS` appears nowhere in the code; `ERR` only as `ERR (<reason>)` in the Workspace summary; "or equivalent" cannot be tested. | One row per fallback with its exact text (S2.5). |
-| Viewer block | "Unit display precedence: UNIT, then COMPU_METHOD unit". True for the table only; the description window uses the opposite order and the detail card has no fallback. `UNIT "deg C"` is read as `"deg`. | One unit rule for every surface (R-A2L-030 … 032, D2-6). |
+| Viewer block | "Unit display precedence: UNIT, then COMPU_METHOD unit". True for the table only; the description window uses the opposite order and the detail card has no fallback. `UNIT "deg C"` is read as `"deg`. | One unit rule for every surface (R-A2L.30 … R-A2L.32, D2-6). |
 | Raw extraction block | Requires the field `overlap_conflict`. Nothing ever sets it; it is always `False`. `missing_ranges` is a list of single addresses, not ranges. | Field names leave the requirements; the dead field goes (D2-26). |
 | Decode validation block | Requires detecting "layout missing, compu method missing, byte order unresolved, size mismatch". These checks exist only inside `validate_characteristic`, which nothing calls; "byte order unresolved" can never happen (the default always applies). | Removed with the API (D2-1). |
 | Output API block | `get_raw_value`, `get_physical_value`, `validate_characteristic`: no caller in the app, and each one always describes the **first** tag of the file, whatever name is asked (a test marks it `xfail`). | Removed (D2-1). |
@@ -36,7 +36,7 @@ Two shapes of text:
 | R-A2L-007 | The `Invalid` filter does not show the red rows: it misses rows turned red by an issue and includes white (checked, absent) rows. | Invalid = red (R-A2L-007.7, D2-14). |
 | R-TUI-019 / 020 | Written as history: "without removing existing shortcuts", "must continue to route". | Present-tense rows per key and button. |
 | R-TUI-037 / 039 | CSS values (`3fr`, `min-width: 82`) and batch history inside the row. | The proportions as the operator sees them. |
-| RECONCILE-002 | Function names, O(1) lookup, call order inside `update_a2l_view`. The behaviour is one sentence. | Three rows (R-A2L-080 … 082). |
+| RECONCILE-002 | Function names, O(1) lookup, call order inside `update_a2l_view`. The behaviour is one sentence. | Three rows (R-A2L.80 … R-A2L.82). |
 | R-TUI-068 | The requirement is a return type (`tuple[Text, ...]`). Its amendment says per-cell accents are built but never visible. | Observable rows; the hidden accents go (D2-29). |
 | R-TUI-069 | Handler names, and a Textual rule ("members shall not be named `_nodes`") that is a design constraint, not product behaviour. | Card rows; the naming rule moves to the design notes (D2-27). |
 | R-TUI-071 | X, Y, N defined by class attributes. With no S19/HEX loaded the strip reads `0 of 0`, even when rows say `OK`. | Terms in CTX-MAC; the no-image case gets its own text (D2-24). |
@@ -248,32 +248,32 @@ Replaces: the "RECORD_LAYOUT Interpretation" block, the byte-order precedence, t
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-A2L-010 | When | When the system reads a CHARACTERISTIC, the system shall take its address from its header. | Yes; tested. |
-| R-A2L-011 | If | If a tag has an ECU_ADDRESS line, then the system shall take the tag's address from that line. | Yes; tested. |
-| R-A2L-012 | If | If a MEASUREMENT has no ECU_ADDRESS line, then the system shall give it no address. | Yes. |
-| R-A2L-013 | If | If a tag has a DATA_SIZE or LENGTH line, then the system shall take its length from that line. | Yes; tested. |
-| R-A2L-014 | If | If a MEASUREMENT has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its datatype × its MATRIX_DIM (1 when absent). | Yes; tested. |
-| R-A2L-015 | If | If a VALUE CHARACTERISTIC has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its datatype. | Yes; tested. |
-| R-A2L-016 | If | If a VAL_BLK CHARACTERISTIC has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its datatype × its MATRIX_DIM. | Yes. |
-| R-A2L-017 | If | If an ASCII CHARACTERISTIC has no DATA_SIZE or LENGTH line, then the system shall take its length from its NUMBER line. | Yes. |
-| R-A2L-018 | If | If a CURVE or MAP has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its whole record: the components of its record layout, with their alignment, for its number of axis points. | Partly: a deposit name with a datatype gives one element's size (D2-7). |
-| R-A2L-019 | If | If an axis of a CURVE or MAP takes its points from another section, then the system shall count the points of that section. | Yes; tested. |
-| R-A2L-020 | If | If the system cannot determine a tag's length, then the system shall give the tag no length. | Yes; tested. Includes CUBOID, MAP_BLOCK, an unknown record-layout line, a record over 1 MiB. |
-| R-A2L-021 | If | If a tag has a DATA_TYPE line, then the system shall take its datatype from that line. | Yes; tested. |
-| R-A2L-022 | If | If a CHARACTERISTIC's record layout names a datatype, then the system shall take the tag's datatype from the record layout. | Yes; tested. |
-| R-A2L-023 | If | If a CHARACTERISTIC's record layout names no datatype, then the system shall take the datatype the deposit name spells out. | Partly: today the size is guessed from the name, so `__SWORD_Z` reads as UWORD and `__FLOAT32_IEEE_Z` as ULONG (D2-8). |
-| R-A2L-024 | If | If a tag has a BYTE_ORDER line, then the system shall use that byte order for the tag. | Yes; tested. |
-| R-A2L-025 | If | If a tag has no BYTE_ORDER line and its record layout has one, then the system shall use the record layout's byte order. | Yes. |
-| R-A2L-026 | If | If neither a tag nor its record layout has a BYTE_ORDER line, then the system shall use the BYTE_ORDER of the MOD_COMMON of the tag's module. | Yes; tested. |
-| R-A2L-027 | If | If no BYTE_ORDER applies to a tag, then the system shall use little-endian. | Yes. |
-| R-A2L-028 | If | If a BYTE_ORDER line holds a value that is not a byte order, then the system shall raise the WARNING issue `A2L_UNKNOWN_BYTE_ORDER` for that tag. | No: ignored silently (D2-3). |
-| R-A2L-029 | If | If a BYTE_ORDER line holds a value that is not a byte order, then the system shall apply the next rule of R-A2L-024 … 027. | Yes. |
-| R-A2L-030 | If | If a tag has a UNIT or PHYS_UNIT line, then the system shall take as its unit the whole value of that line, without quotes. | Partly: PHYS_UNIT ignored, quotes kept, `"deg C"` cut to `"deg` (D2-6). |
-| R-A2L-031 | If | If a tag has no UNIT or PHYS_UNIT line, then the system shall take as its unit the unit of its conversion method. | Partly: only the tag table does it (D2-6). |
-| R-A2L-032 | U | The system shall show the same unit for a tag in the tag table, the detail card and the description window. | No: three different rules today (D2-6). |
-| R-A2L-033 | U | The system shall read a conversion method's unit from its conversion line, whether that line is the /begin line or a later one. | Partly: on the /begin line the format is read as the unit (D2-6). |
-| R-A2L-034 | U | The system shall give each tag the memory region of the MEMORY_SEGMENT that holds its address. | Yes; tested. |
-| R-A2L-035 | If | If no MEMORY_SEGMENT holds a tag's address, then the system shall give the tag the memory region unknown. | Yes; tested. |
+| R-A2L.10 | When | When the system reads a CHARACTERISTIC, the system shall take its address from its header. | Yes; tested. |
+| R-A2L.11 | If | If a tag has an ECU_ADDRESS line, then the system shall take the tag's address from that line. | Yes; tested. |
+| R-A2L.12 | If | If a MEASUREMENT has no ECU_ADDRESS line, then the system shall give it no address. | Yes. |
+| R-A2L.13 | If | If a tag has a DATA_SIZE or LENGTH line, then the system shall take its length from that line. | Yes; tested. |
+| R-A2L.14 | If | If a MEASUREMENT has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its datatype × its MATRIX_DIM (1 when absent). | Yes; tested. |
+| R-A2L.15 | If | If a VALUE CHARACTERISTIC has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its datatype. | Yes; tested. |
+| R-A2L.16 | If | If a VAL_BLK CHARACTERISTIC has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its datatype × its MATRIX_DIM. | Yes. |
+| R-A2L.17 | If | If an ASCII CHARACTERISTIC has no DATA_SIZE or LENGTH line, then the system shall take its length from its NUMBER line. | Yes. |
+| R-A2L.18 | If | If a CURVE or MAP has no DATA_SIZE or LENGTH line, then the system shall take its length as the size of its whole record: the components of its record layout, with their alignment, for its number of axis points. | Partly: a deposit name with a datatype gives one element's size (D2-7). |
+| R-A2L.19 | If | If an axis of a CURVE or MAP takes its points from another section, then the system shall count the points of that section. | Yes; tested. |
+| R-A2L.20 | If | If the system cannot determine a tag's length, then the system shall give the tag no length. | Yes; tested. Includes CUBOID, MAP_BLOCK, an unknown record-layout line, a record over 1 MiB. |
+| R-A2L.21 | If | If a tag has a DATA_TYPE line, then the system shall take its datatype from that line. | Yes; tested. |
+| R-A2L.22 | If | If a CHARACTERISTIC's record layout names a datatype, then the system shall take the tag's datatype from the record layout. | Yes; tested. |
+| R-A2L.23 | If | If a CHARACTERISTIC's record layout names no datatype, then the system shall take the datatype the deposit name spells out. | Partly: today the size is guessed from the name, so `__SWORD_Z` reads as UWORD and `__FLOAT32_IEEE_Z` as ULONG (D2-8). |
+| R-A2L.24 | If | If a tag has a BYTE_ORDER line, then the system shall use that byte order for the tag. | Yes; tested. |
+| R-A2L.25 | If | If a tag has no BYTE_ORDER line and its record layout has one, then the system shall use the record layout's byte order. | Yes. |
+| R-A2L.26 | If | If neither a tag nor its record layout has a BYTE_ORDER line, then the system shall use the BYTE_ORDER of the MOD_COMMON of the tag's module. | Yes; tested. |
+| R-A2L.27 | If | If no BYTE_ORDER applies to a tag, then the system shall use little-endian. | Yes. |
+| R-A2L.28 | If | If a BYTE_ORDER line holds a value that is not a byte order, then the system shall raise the WARNING issue `A2L_UNKNOWN_BYTE_ORDER` for that tag. | No: ignored silently (D2-3). |
+| R-A2L.29 | If | If a BYTE_ORDER line holds a value that is not a byte order, then the system shall apply the next rule of R-A2L.24 … R-A2L.27. | Yes. |
+| R-A2L.30 | If | If a tag has a UNIT or PHYS_UNIT line, then the system shall take as its unit the whole value of that line, without quotes. | Partly: PHYS_UNIT ignored, quotes kept, `"deg C"` cut to `"deg` (D2-6). |
+| R-A2L.31 | If | If a tag has no UNIT or PHYS_UNIT line, then the system shall take as its unit the unit of its conversion method. | Partly: only the tag table does it (D2-6). |
+| R-A2L.32 | U | The system shall show the same unit for a tag in the tag table, the detail card and the description window. | No: three different rules today (D2-6). |
+| R-A2L.33 | U | The system shall read a conversion method's unit from its conversion line, whether that line is the /begin line or a later one. | Partly: on the /begin line the format is read as the unit (D2-6). |
+| R-A2L.34 | U | The system shall give each tag the memory region of the MEMORY_SEGMENT that holds its address. | Yes; tested. |
+| R-A2L.35 | If | If no MEMORY_SEGMENT holds a tag's address, then the system shall give the tag the memory region unknown. | Yes; tested. |
 | R-A2L-036.1 | When | When the system reads a MEMORY_SEGMENT block, the system shall take the first word after `/begin MEMORY_SEGMENT` as the segment's name. | Yes; tested (`test_tc682_quoted_names_and_the_offset_field`). |
 | R-A2L-036.2 | When | When the system reads a MEMORY_SEGMENT block, the system shall take as its record line the first line that splits into at least five words, a quoted text counting as one word. | Yes; tested (`test_tc682_quoted_demo_a2l_segments_parse_to_full_rows`). |
 | R-A2L-036.3 | When | When the system reads a MEMORY_SEGMENT record line, the system shall take its fourth word as the segment's base and its fifth word as the segment's size. | Yes; tested (`test_tc682_unquoted_fixture_rows_parse_byte_identically`). |
@@ -287,33 +287,33 @@ Replaces: the "Raw Memory Extraction", "Raw Value Decoding" and "COMPU_METHOD Ex
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-A2L-040 | When | When every byte of a tag's span is in the image, the system shall read the tag's raw bytes. | Yes. |
-| R-A2L-041 | If | If a byte of a tag's span is not in the image, then the system shall give the tag no raw value. | Yes. |
-| R-A2L-042 | If | If a tag's length is more than 1 MiB, then the system shall give the tag no raw value. | Yes. |
-| R-A2L-043 | U | The system shall read a tag's raw value as its datatype, in its byte order. | Yes; tested. |
-| R-A2L-044 | U | The system shall read a signed datatype as two's complement. | Yes; tested. |
-| R-A2L-045 | U | The system shall read FLOAT16_IEEE, FLOAT32_IEEE and FLOAT64_IEEE as IEEE 754 binary16, binary32 and binary64. | Partly: FLOAT16 gives no value (D2-9). |
-| R-A2L-046 | If | If a tag has no datatype the system can read, then the system shall give the tag no raw value. | Yes. |
-| R-A2L-047 | If | If a tag is a multi-value tag, then the system shall give it one raw value per element. | No: the first element is read as a single value (D2-10). |
-| R-A2L-050 | If | If a tag has no raw value, then the system shall give it the conversion status missing. | Yes. |
-| R-A2L-051 | If | If a tag has no conversion method, then the system shall give it a physical value equal to its raw value. | Yes. |
-| R-A2L-052 | If | If a tag has no conversion method, then the system shall give it the conversion status identity. | Yes (status text `identity_fallback`). |
-| R-A2L-053 | When | When a tag's conversion method is IDENTICAL, the system shall give it a physical value equal to its raw value. | Yes; tested. |
-| R-A2L-054 | When | When a tag's conversion method is LINEAR, the system shall give it the physical value a × raw + b. | Yes; tested. |
-| R-A2L-055 | If | If a LINEAR conversion method lacks a or b, then the system shall use 1 for a missing a and 0 for a missing b. | Yes. |
-| R-A2L-056 | When | When a tag's conversion method is RAT_FUNC, the system shall give it the physical value that solves the RAT_FUNC equation for its raw value. | Yes; tested. |
-| R-A2L-057 | If | If a RAT_FUNC equation has two solutions, then the system shall take the one inside the tag's limits, or the one closer to 0 when both or neither are inside. | Yes; tested. |
+| R-A2L.40 | When | When every byte of a tag's span is in the image, the system shall read the tag's raw bytes. | Yes. |
+| R-A2L.41 | If | If a byte of a tag's span is not in the image, then the system shall give the tag no raw value. | Yes. |
+| R-A2L.42 | If | If a tag's length is more than 1 MiB, then the system shall give the tag no raw value. | Yes. |
+| R-A2L.43 | U | The system shall read a tag's raw value as its datatype, in its byte order. | Yes; tested. |
+| R-A2L.44 | U | The system shall read a signed datatype as two's complement. | Yes; tested. |
+| R-A2L.45 | U | The system shall read FLOAT16_IEEE, FLOAT32_IEEE and FLOAT64_IEEE as IEEE 754 binary16, binary32 and binary64. | Partly: FLOAT16 gives no value (D2-9). |
+| R-A2L.46 | If | If a tag has no datatype the system can read, then the system shall give the tag no raw value. | Yes. |
+| R-A2L.47 | If | If a tag is a multi-value tag, then the system shall give it one raw value per element. | No: the first element is read as a single value (D2-10). |
+| R-A2L.50 | If | If a tag has no raw value, then the system shall give it the conversion status missing. | Yes. |
+| R-A2L.51 | If | If a tag has no conversion method, then the system shall give it a physical value equal to its raw value. | Yes. |
+| R-A2L.52 | If | If a tag has no conversion method, then the system shall give it the conversion status identity. | Yes (status text `identity_fallback`). |
+| R-A2L.53 | When | When a tag's conversion method is IDENTICAL, the system shall give it a physical value equal to its raw value. | Yes; tested. |
+| R-A2L.54 | When | When a tag's conversion method is LINEAR, the system shall give it the physical value a × raw + b. | Yes; tested. |
+| R-A2L.55 | If | If a LINEAR conversion method lacks a or b, then the system shall use 1 for a missing a and 0 for a missing b. | Yes. |
+| R-A2L.56 | When | When a tag's conversion method is RAT_FUNC, the system shall give it the physical value that solves the RAT_FUNC equation for its raw value. | Yes; tested. |
+| R-A2L.57 | If | If a RAT_FUNC equation has two solutions, then the system shall take the one inside the tag's limits, or the one closer to 0 when both or neither are inside. | Yes; tested. |
 | R-A2L-058.1 | If | If a RAT_FUNC equation has no solution for a tag's raw value, then the system shall give the tag the conversion error `RAT_FUNC has no solution for this value`. | Yes; tested. |
 | R-A2L-058.2 | If | If a RAT_FUNC equation has no real root for a tag's raw value, then the system shall give the tag the conversion error `RAT_FUNC has no real root for this value`. | Yes; tested. |
 | R-A2L-058.3 | If | If every root of a RAT_FUNC equation has a zero denominator, then the system shall give the tag the conversion error `RAT_FUNC root has a zero denominator`. | Yes; tested. |
-| R-A2L-059 | When | When a tag's conversion method is TAB_VERB, the system shall give it the text its COMPU_VTAB pairs with its raw value. | No: shown as raw with status unknown method (D2-5). |
-| R-A2L-060 | When | When a tag's conversion method is FORM, the system shall give it the conversion status unsupported. | Yes. |
-| R-A2L-061 | When | When a tag's conversion method is TAB_INTP, the system shall interpolate its physical value linearly between the two table pairs around its raw value. | Yes; tested. |
-| R-A2L-062 | If | If a TAB_INTP raw value is outside the table, then the system shall give the physical value of the nearest end of the table. | Yes; tested. |
-| R-A2L-063 | When | When a tag's conversion method is TAB_NOINTP, the system shall give it the physical value of the table pair whose raw value is nearest to its raw value. | Yes. |
-| R-A2L-064 | If | If a conversion method names a table that does not exist, then the system shall give the tag the conversion error `lookup table missing`. | Yes. |
-| R-A2L-065 | If | If a conversion method names an empty table, then the system shall give the tag the conversion error `lookup table is empty`. | Yes. |
-| R-A2L-066 | If | If a tag's conversion method has a type this list does not name, then the system shall give it the conversion status unknown method. | Yes. |
+| R-A2L.59 | When | When a tag's conversion method is TAB_VERB, the system shall give it the text its COMPU_VTAB pairs with its raw value. | No: shown as raw with status unknown method (D2-5). |
+| R-A2L.60 | When | When a tag's conversion method is FORM, the system shall give it the conversion status unsupported. | Yes. |
+| R-A2L.61 | When | When a tag's conversion method is TAB_INTP, the system shall interpolate its physical value linearly between the two table pairs around its raw value. | Yes; tested. |
+| R-A2L.62 | If | If a TAB_INTP raw value is outside the table, then the system shall give the physical value of the nearest end of the table. | Yes; tested. |
+| R-A2L.63 | When | When a tag's conversion method is TAB_NOINTP, the system shall give it the physical value of the table pair whose raw value is nearest to its raw value. | Yes. |
+| R-A2L.64 | If | If a conversion method names a table that does not exist, then the system shall give the tag the conversion error `lookup table missing`. | Yes. |
+| R-A2L.65 | If | If a conversion method names an empty table, then the system shall give the tag the conversion error `lookup table is empty`. | Yes. |
+| R-A2L.66 | If | If a tag's conversion method has a type this list does not name, then the system shall give it the conversion status unknown method. | Yes. |
 
 ### S2.4 · Checking tags against the image (CTX-A2L-CHECK)
 
@@ -321,20 +321,20 @@ Replaces: the "A2L Decode Validation" block, R-A2L-002, R-A2L-ISSUE-RECONCILE-00
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-A2L-070 | When | When an A2L file and a primary image are both loaded, the system shall check each tag that has an address and a length against the image. | Yes; tested. |
-| R-A2L-071 | If | If only a MAC file is loaded besides the A2L file, then the system shall check no tag. | No: placeholder bytes make a 1-byte tag "in image" (D2-20). |
-| R-A2L-072 | If | If a tag has no address and is not virtual, then the system shall mark its schema as not complete. | Yes; tested. |
-| R-A2L-073 | If | If a checked tag's physical value is outside its limits, then the system shall mark the value as outside the limits. | Yes. |
-| R-A2L-074 | When | When an A2L file is loaded, the system shall show the A2L summary in the Workspace "Context" pane. | Yes; tested. |
-| R-A2L-075 | When | When the system shows the A2L summary, the system shall list the parse errors under the heading `A2L parse errors:`, one `- <error>` line each. | Yes; tested. |
-| R-A2L-076 | When | When the system shows the A2L summary, the system shall list the sections under the heading `A2L Sections:`, one `- <name> <header> (lines <first>-<last>)` line each, indented by depth. | Partly: hidden when any parse error exists (D2-12). |
-| R-A2L-077 | When | When the system shows the A2L summary, the system shall list the tags under the heading `A2L Tags:`, one `- <section> <name>: <address> len=<length> mem=<region> <tag status text>` line each. | Partly: hidden when any parse error exists (D2-12). |
-| R-A2L-078 | If | If the A2L summary has more than 500 lines, then the system shall replace the rest with the line `... truncated <k> additional tag lines ...`. | Yes; tested. |
-| R-A2L-079 | If | If no A2L file is loaded, then the system shall show `No A2L loaded.` in the A2L summary. | Yes. |
+| R-A2L.70 | When | When an A2L file and a primary image are both loaded, the system shall check each tag that has an address and a length against the image. | Yes; tested. |
+| R-A2L.71 | If | If only a MAC file is loaded besides the A2L file, then the system shall check no tag. | No: placeholder bytes make a 1-byte tag "in image" (D2-20). |
+| R-A2L.72 | If | If a tag has no address and is not virtual, then the system shall mark its schema as not complete. | Yes; tested. |
+| R-A2L.73 | If | If a checked tag's physical value is outside its limits, then the system shall mark the value as outside the limits. | Yes. |
+| R-A2L.74 | When | When an A2L file is loaded, the system shall show the A2L summary in the Workspace "Context" pane. | Yes; tested. |
+| R-A2L.75 | When | When the system shows the A2L summary, the system shall list the parse errors under the heading `A2L parse errors:`, one `- <error>` line each. | Yes; tested. |
+| R-A2L.76 | When | When the system shows the A2L summary, the system shall list the sections under the heading `A2L Sections:`, one `- <name> <header> (lines <first>-<last>)` line each, indented by depth. | Partly: hidden when any parse error exists (D2-12). |
+| R-A2L.77 | When | When the system shows the A2L summary, the system shall list the tags under the heading `A2L Tags:`, one `- <section> <name>: <address> len=<length> mem=<region> <tag status text>` line each. | Partly: hidden when any parse error exists (D2-12). |
+| R-A2L.78 | If | If the A2L summary has more than 500 lines, then the system shall replace the rest with the line `... truncated <k> additional tag lines ...`. | Yes; tested. |
+| R-A2L.79 | If | If no A2L file is loaded, then the system shall show `No A2L loaded.` in the A2L summary. | Yes. |
 
 ### S2.5 · The A2L Explorer (CTX-A2L-SCREEN)
 
-Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068, 069, R-A2L-ISSUE-RECONCILE-002. File-derived text on this screen follows S1's R-TUI-103 family (the A2L Explorer joins its list of views).
+Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068, 069, R-A2L-ISSUE-RECONCILE-002. File-derived text on this screen follows S1's safe-text rows R-TUI-103.1 … R-TUI.105 (the A2L Explorer joins its list of views).
 
 **Layout and table**
 
@@ -365,15 +365,15 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-A2L-080 | If | If an ERROR A2L issue names a tag, ignoring case, then the system shall show the tag's row red. | Yes; tested. |
-| R-A2L-081 | If | If a WARNING A2L issue names a tag, then the system shall not change the tag's row colour. | Yes; tested. |
-| R-A2L-082 | If | If an A2L issue names no tag shown in the table, then the system shall change no row. | Yes; tested. |
-| R-A2L-083 | If | If no ERROR A2L issue names a tag and its schema is not complete, then the system shall show its row red. | Yes; tested. |
-| R-A2L-084 | If | If no row-colour rule above applies and the tag is in image, then the system shall show its row green. | Yes; tested. |
-| R-A2L-085 | If | If no row-colour rule above applies and the tag is out of image, then the system shall show its row white. | Yes; tested. |
-| R-A2L-086 | If | If no row-colour rule above applies and the tag is virtual or its source is formula, then the system shall show its row white. | Yes; tested. |
-| R-A2L-087 | If | If no row-colour rule above applies, then the system shall show the tag's row grey. | Yes; tested. |
-| R-A2L-088 | When | When the system colours a row, the system shall apply the colour to every cell of the row. | Yes. |
+| R-A2L.80 | If | If an ERROR A2L issue names a tag, ignoring case, then the system shall show the tag's row red. | Yes; tested. |
+| R-A2L.81 | If | If a WARNING A2L issue names a tag, then the system shall not change the tag's row colour. | Yes; tested. |
+| R-A2L.82 | If | If an A2L issue names no tag shown in the table, then the system shall change no row. | Yes; tested. |
+| R-A2L.83 | If | If no ERROR A2L issue names a tag and its schema is not complete, then the system shall show its row red. | Yes; tested. |
+| R-A2L.84 | If | If no row-colour rule above applies and the tag is in image, then the system shall show its row green. | Yes; tested. |
+| R-A2L.85 | If | If no row-colour rule above applies and the tag is out of image, then the system shall show its row white. | Yes; tested. |
+| R-A2L.86 | If | If no row-colour rule above applies and the tag is virtual or its source is formula, then the system shall show its row white. | Yes; tested. |
+| R-A2L.87 | If | If no row-colour rule above applies, then the system shall show the tag's row grey. | Yes; tested. |
+| R-A2L.88 | When | When the system colours a row, the system shall apply the colour to every cell of the row. | Yes. |
 
 **Filter**
 
@@ -394,16 +394,16 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-A2L-090 | When | When the operator presses `Find next`, the system shall move the cursor to the next filtered tag, after the current one, whose shown fields contain the find text, ignoring case. | Yes; tested. |
-| R-A2L-091 | If | If no filtered tag after the current one matches, then the system shall continue the search from the first filtered tag. | Yes. |
-| R-A2L-092 | When | When the operator edits the find text, the system shall start the next search from the first filtered tag. | Yes. |
-| R-A2L-093 | When | When a find moves to a tag, the system shall show the page that holds it. | Yes. |
-| R-A2L-094 | When | When a find moves to a tag, the system shall show its address near the top of the hex pane. | Partly: highlighted, not placed near the top (D2-18). |
-| R-A2L-095 | When | When a find moves to a tag, the system shall show the status `Tag find: <name> (row <i>)`. | Yes. |
-| R-A2L-096 | If | If no filtered tag matches the find text, then the system shall show the status `Tag find: no match.` | Yes. |
-| R-A2L-097 | If | If the find text is empty, then the system shall show the status `Tag find query is empty.` | Yes. |
-| R-A2L-098 | If | If the tag table is empty, then the system shall show the status `No A2L tags to search.` | Yes. |
-| R-A2L-099 | When | When the system compares the find text with the address, the system shall compare it with the address as the table shows it. | No: compared with the decimal value (D2-15). |
+| R-A2L.90 | When | When the operator presses `Find next`, the system shall move the cursor to the next filtered tag, after the current one, whose shown fields contain the find text, ignoring case. | Yes; tested. |
+| R-A2L.91 | If | If no filtered tag after the current one matches, then the system shall continue the search from the first filtered tag. | Yes. |
+| R-A2L.92 | When | When the operator edits the find text, the system shall start the next search from the first filtered tag. | Yes. |
+| R-A2L.93 | When | When a find moves to a tag, the system shall show the page that holds it. | Yes. |
+| R-A2L.94 | When | When a find moves to a tag, the system shall show its address near the top of the hex pane. | Partly: highlighted, not placed near the top (D2-18). |
+| R-A2L.95 | When | When a find moves to a tag, the system shall show the status `Tag find: <name> (row <i>)`. | Yes. |
+| R-A2L.96 | If | If no filtered tag matches the find text, then the system shall show the status `Tag find: no match.` | Yes. |
+| R-A2L.97 | If | If the find text is empty, then the system shall show the status `Tag find query is empty.` | Yes. |
+| R-A2L.98 | If | If the tag table is empty, then the system shall show the status `No A2L tags to search.` | Yes. |
+| R-A2L.99 | When | When the system compares the find text with the address, the system shall compare it with the address as the table shows it. | No: compared with the decimal value (D2-15). |
 
 **Paging** (both tables; the MAC table is in S2.6)
 
@@ -437,11 +437,11 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-A2L-100 | When | When the operator selects a tag row, the system shall show the tag's address near the top of the hex pane. | Yes; tested. |
-| R-A2L-101 | When | When the operator selects a tag row, the system shall highlight in the hex pane the tag's span, up to 4,096 bytes. | Yes; tested. |
-| R-A2L-102 | If | If the selected tag has no length, then the system shall highlight 1 byte. | Yes. |
-| R-A2L-103 | When | When the operator selects a tag row, the system shall show the status `Tag at <address>`. | Yes; tested. |
-| R-A2L-104 | If | If the selected tag has no address, then the system shall leave the hex pane unchanged. | Yes. |
+| R-A2L.100 | When | When the operator selects a tag row, the system shall show the tag's address near the top of the hex pane. | Yes; tested. |
+| R-A2L.101 | When | When the operator selects a tag row, the system shall highlight in the hex pane the tag's span, up to 4,096 bytes. | Yes; tested. |
+| R-A2L.102 | If | If the selected tag has no length, then the system shall highlight 1 byte. | Yes. |
+| R-A2L.103 | When | When the operator selects a tag row, the system shall show the status `Tag at <address>`. | Yes; tested. |
+| R-A2L.104 | If | If the selected tag has no address, then the system shall leave the hex pane unchanged. | Yes. |
 
 **Export to JSON**
 
@@ -457,17 +457,17 @@ Replaces: the "A2L Viewer" block, R-A2L-003, 006, 007, R-TUI-019, 020, 037, 068,
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|
-| R-A2L-110 | When | When the operator presses `d` on the A2L Explorer with a row highlighted, the system shall open the description window for that tag. | Yes. |
-| R-A2L-111 | If | If no row is highlighted when the operator presses `d`, then the system shall show the status `A2L: no tag row under the cursor.` | Yes. |
-| R-A2L-112 | When | When the system opens the description window, the system shall title it `Parameter: <name>`. | Yes. |
-| R-A2L-113 | When | When the description window shows a CURVE or MAP, the system shall show its kind, name, description, address, byte count, unit and conversion method. | Yes; tested. |
-| R-A2L-114 | When | When the description window shows a CURVE or MAP, the system shall show one `Axis <i>:` line per axis. | Yes; tested. |
-| R-A2L-115 | When | When the description window shows a CURVE or MAP whose values are in the image, the system shall show the table of its axis points and values. | Yes; tested. |
-| R-A2L-116 | If | If a value in the point table is outside the tag's limits, then the system shall mark it `(!)`. | Yes; tested. |
-| R-A2L-117 | When | When the description window shows a CURVE or MAP whose values are in the image, the system shall show the shape of its values as a one-line bar chart after `y shape:`. | Yes; tested. |
-| R-A2L-118 | If | If the tag is not a CURVE or MAP, then the system shall show its value after `Scalar value:` and the line `(this characteristic is not a CURVE/MAP - no point table)`. | Yes; tested. |
-| R-A2L-119 | If | If the point table of a CURVE or MAP cannot be built, then the system shall show `Status: <reason> - point table unavailable`. | Yes; tested. |
-| R-A2L-119a | When | When the operator presses `Close` or Esc in the description window, the system shall close the window. | Yes; tested. |
+| R-A2L.110 | When | When the operator presses `d` on the A2L Explorer with a row highlighted, the system shall open the description window for that tag. | Yes. |
+| R-A2L.111 | If | If no row is highlighted when the operator presses `d`, then the system shall show the status `A2L: no tag row under the cursor.` | Yes. |
+| R-A2L.112 | When | When the system opens the description window, the system shall title it `Parameter: <name>`. | Yes. |
+| R-A2L.113 | When | When the description window shows a CURVE or MAP, the system shall show its kind, name, description, address, byte count, unit and conversion method. | Yes; tested. |
+| R-A2L.114 | When | When the description window shows a CURVE or MAP, the system shall show one `Axis <i>:` line per axis. | Yes; tested. |
+| R-A2L.115 | When | When the description window shows a CURVE or MAP whose values are in the image, the system shall show the table of its axis points and values. | Yes; tested. |
+| R-A2L.116 | If | If a value in the point table is outside the tag's limits, then the system shall mark it `(!)`. | Yes; tested. |
+| R-A2L.117 | When | When the description window shows a CURVE or MAP whose values are in the image, the system shall show the shape of its values as a one-line bar chart after `y shape:`. | Yes; tested. |
+| R-A2L.118 | If | If the tag is not a CURVE or MAP, then the system shall show its value after `Scalar value:` and the line `(this characteristic is not a CURVE/MAP - no point table)`. | Yes; tested. |
+| R-A2L.119 | If | If the point table of a CURVE or MAP cannot be built, then the system shall show `Status: <reason> - point table unavailable`. | Yes; tested. |
+| R-A2L.124 | When | When the operator presses `Close` or Esc in the description window, the system shall close the window. | Yes; tested. |
 
 ### S2.6 · MAC files and the MAC View (CTX-MAC)
 
@@ -548,8 +548,8 @@ D2-n are S2's decisions. "Code change" items become backlog for the batch that t
 
 | # | The situation | Recommendation (applied) |
 |---|---|---|
-| D2-2 | Byte order: the text omits MOD_COMMON and lists a step that can never apply. | Rows follow the code: tag → record layout → MOD_COMMON → little-endian (R-A2L-024 … 027). The dead step is removed from the code. |
-| D2-4 | FORM: "unsupported unless safe evaluation is enabled"; nothing can enable it. | State it plainly: FORM is not converted (R-A2L-060). No speculative row for a switch that does not exist. |
+| D2-2 | Byte order: the text omits MOD_COMMON and lists a step that can never apply. | Rows follow the code: tag → record layout → MOD_COMMON → little-endian (R-A2L.24 … R-A2L.27). The dead step is removed from the code. |
+| D2-4 | FORM: "unsupported unless safe evaluation is enabled"; nothing can enable it. | State it plainly: FORM is not converted (R-A2L.60). No speculative row for a switch that does not exist. |
 | D2-28 | R-A2L-006 lists 12 columns, R-TUI-068 builds 16. | The 16 columns as built (CTX-A2L-SCREEN). |
 | D2-27 | Layout rows carry CSS values and batch history; R-TUI-069 carries a Textual naming rule (`_nodes`, `_context`). | Rows state the proportions the operator sees. The naming rule is a real constraint, but of the code, not of the product: it moves to the design notes (`docs/ARCHITECTURE.md`). |
 | D2-30 | Batch-100 (Inc 9a, 9b) replaced `LoadFileScreen`, the old code pointer of R-A2L-004, with the Load dialog: an A2L file is loaded from a typed `.a2l` path or a recent entry (copied), a `.a2l` file of the Workarea Files list (read in place, `app.py:15615`), or the start-up path. The dialog's typed-path rule refuses a path that does not exist or has no supported suffix before the A2L load starts (`app.py:14812-14829`, `:14990-14993`). | Keep R-A2L-004.3 and .4 as the use-time look of the A2L load (the file can go between the dialog and the load, `app.py:15190-15201`, `:15231-15235`); the routes, the refusal texts of the dialog and the copy rules stay S5's and S7's. "A2L load" is defined in CTX-A2L-FILE. |
@@ -569,23 +569,23 @@ D2-n are S2's decisions. "Code change" items become backlog for the batch that t
 
 | # | The situation | Recommendation (applied) |
 |---|---|---|
-| D2-3 | A BYTE_ORDER value that is not a byte order is ignored silently, so the tag may decode with the wrong order and nobody sees it. | Raise the WARNING issue `A2L_UNKNOWN_BYTE_ORDER` for the tag (R-A2L-028). The new code goes to the issue list of S3. |
-| D2-5 | TAB_VERB is not recognised: COMPU_VTAB is read and never used; the tag shows its raw number with "unknown method". Enumerations (`ON`/`OFF`, gear names) are common in calibration files. | Show the COMPU_VTAB text (R-A2L-059). |
-| D2-6 | Units: `UNIT "deg C"` reads as `"deg`; PHYS_UNIT is ignored; three surfaces use three precedence rules; a conversion line on the /begin line puts the format where the unit belongs. | One rule everywhere: the tag's UNIT or PHYS_UNIT (whole text, no quotes), else the conversion method's unit (R-A2L-030 … 033). |
-| D2-7 | A CURVE or MAP whose deposit name spells a datatype gets the length of one element, not of its whole record. | Always the whole record (R-A2L-018). This also fixes how much of the image the tag is checked against. |
-| D2-8 | With no datatype in the record layout, the datatype is guessed from the deposit name by size: `__SWORD_Z` becomes UWORD (sign lost), `__FLOAT32_IEEE_Z` becomes ULONG (float read as integer). Wrong values, shown as correct. | Take the datatype the name spells out; if it spells none, no raw value (R-A2L-023, 046). |
-| D2-9 | FLOAT16_IEEE has a known size but decodes to nothing. | Decode it (Python reads binary16 directly) (R-A2L-045). |
-| D2-10 | A multi-value tag (CURVE, MAP, VAL_BLK, MATRIX_DIM > 1) shows its first element in Raw and Physical as if it were the tag's value; a MEASUREMENT with MATRIX_DIM 2 gives a size-mismatch error. | Read one value per element; the table shows `<n> values`; the description window keeps the points (R-A2L-047, R-A2L-006.9). |
+| D2-3 | A BYTE_ORDER value that is not a byte order is ignored silently, so the tag may decode with the wrong order and nobody sees it. | Raise the WARNING issue `A2L_UNKNOWN_BYTE_ORDER` for the tag (R-A2L.28). The new code goes to the issue list of S3. |
+| D2-5 | TAB_VERB is not recognised: COMPU_VTAB is read and never used; the tag shows its raw number with "unknown method". Enumerations (`ON`/`OFF`, gear names) are common in calibration files. | Show the COMPU_VTAB text (R-A2L.59). |
+| D2-6 | Units: `UNIT "deg C"` reads as `"deg`; PHYS_UNIT is ignored; three surfaces use three precedence rules; a conversion line on the /begin line puts the format where the unit belongs. | One rule everywhere: the tag's UNIT or PHYS_UNIT (whole text, no quotes), else the conversion method's unit (R-A2L.30 … R-A2L.33). |
+| D2-7 | A CURVE or MAP whose deposit name spells a datatype gets the length of one element, not of its whole record. | Always the whole record (R-A2L.18). This also fixes how much of the image the tag is checked against. |
+| D2-8 | With no datatype in the record layout, the datatype is guessed from the deposit name by size: `__SWORD_Z` becomes UWORD (sign lost), `__FLOAT32_IEEE_Z` becomes ULONG (float read as integer). Wrong values, shown as correct. | Take the datatype the name spells out; if it spells none, no raw value (R-A2L.23, R-A2L.46). |
+| D2-9 | FLOAT16_IEEE has a known size but decodes to nothing. | Decode it (Python reads binary16 directly) (R-A2L.45). |
+| D2-10 | A multi-value tag (CURVE, MAP, VAL_BLK, MATRIX_DIM > 1) shows its first element in Raw and Physical as if it were the tag's value; a MEASUREMENT with MATRIX_DIM 2 gives a size-mismatch error. | Read one value per element; the table shows `<n> values`; the description window keeps the points (R-A2L.47, R-A2L-006.9). |
 | D2-11 | Comments are stripped only in two places, so a commented-out `/begin` opens a section; `/end FOO` closes `/begin BAR` silently. | Strip comments before building sections; a mismatched /end is a parse error (R-A2L-001.2, 001.5). |
-| D2-12 | The A2L summary hides all sections and tags as soon as one parse error exists. | Show the errors first, then the sections and tags (R-A2L-076, 077). |
+| D2-12 | The A2L summary hides all sections and tags as soon as one parse error exists. | Show the errors first, then the sections and tags (R-A2L.76, R-A2L.77). |
 | D2-13 | `A2L loaded: <name>` also appears when the file had parse errors, which then show only as issues. | `A2L loaded with <n> parse errors: <name>` (R-A2L-004.2). |
 | D2-14 | The `Invalid` filter misses rows that are red because of an issue and includes white rows. | Invalid = the red rows (R-A2L-007.7). |
-| D2-15 | Filter and find compare the address with its decimal value, not the `0x…` the table shows; the filter also drops zero values. | Compare with the text as shown (R-A2L-007.5, R-A2L-099). |
+| D2-15 | Filter and find compare the address with its decimal value, not the `0x…` the table shows; the filter also drops zero values. | Compare with the text as shown (R-A2L-007.5, R-A2L.99). |
 | D2-16 | The A2L glyph `·` means both "not checked" and "out of image". | Same glyphs as the MAC View: ✓ in image, ⚠ out of image, · not checked (CTX-A2L-SCREEN). |
 | D2-17 | A one-sided limit shows `None..100` in the table and `..100` in the card. | `..100` in both (R-A2L-006.10). |
-| D2-18 | Find highlights the tag in the hex pane but does not bring it near the top, unlike row selection. | Same as row selection (R-A2L-094). |
+| D2-18 | Find highlights the tag in the hex pane but does not bring it near the top, unlike row selection. | Same as row selection (R-A2L.94). |
 | D2-19 | The filter-mode buttons show no active state; `No A2L tags.` appears both with nothing loaded and with a filter that matches nothing. | Mark the active mode; `No tag matches the filter.` for the second case (R-A2L-007.9, R-TUI-068.4). |
-| D2-20 | In a MAC-only session the hex view gets a placeholder byte 0 at each MAC address; a 1-byte A2L tag at one of them reads as "in image" (false green). | With no primary image, no tag is checked (R-A2L-071). The placeholder may stay for the hex view, but it is not an image. |
+| D2-20 | In a MAC-only session the hex view gets a placeholder byte 0 at each MAC address; a 1-byte A2L tag at one of them reads as "in image" (false green). | With no primary image, no tag is checked (R-A2L.71). The placeholder may stay for the hex view, but it is not an image. |
 | D2-21 | A MAC record out of the image shows OUT_OF_IMAGE (info) even when its address disagrees with the A2L (error). | Errors first (R-MAC.30). |
 | D2-22 | The MAC summary's `Neutral` count lumps warnings and info together. | One count per status (R-MAC.50). |
 | D2-23 | An empty MAC file shows `No MAC loaded.` while the status line says it loaded; `No MAC records parsed.` exists in the code but can never appear. | `MAC file has no records.` (R-MAC.53). |
@@ -597,8 +597,8 @@ D2-n are S2's decisions. "Code change" items become backlog for the batch that t
 - **S3** (issue producers): `A2L_UNRECOGNIZED_BLOCK` flags standard blocks (MOD_COMMON, MOD_PAR, AXIS_DESCR) as unrecognised: false warnings on every real file. `A2L_BROKEN_REFERENCE` misses nested `/begin REF_CHARACTERISTIC` blocks. `A2L_INVALID_ADDRESS` can never fire. Plus the new `A2L_UNKNOWN_BYTE_ORDER` (D2-3).
 - **S4**: every parse-OK MAC address gets an orange overlay in the hex view.
 - **S6 / S7**: the MAC View has no header or `?` chip unlike the A2L Explorer; the A2L help text still describes a "section tree".
-- **S10** (Patch Editor): `encode_physical_to_raw_bytes` (physical → raw) lives in `a2l.py` but is Patch Editor behaviour; its rows go there. Note for that review: decoding TAB_NOINTP takes the nearest pair (R-A2L-063) while encoding refuses a value not in the table. Reading approximates, writing must be exact, so the asymmetry looks right.
-- **S1**: the A2L Explorer (table and detail card) and the MAC View join the list of views in R-TUI-103 (file text shown verbatim, no control characters, no markup). Updated in `S1-ears-strict.md`.
+- **S10** (Patch Editor): `encode_physical_to_raw_bytes` (physical → raw) lives in `a2l.py` but is Patch Editor behaviour; its rows go there. Note for that review: decoding TAB_NOINTP takes the nearest pair (R-A2L.63) while encoding refuses a value not in the table. Reading approximates, writing must be exact, so the asymmetry looks right.
+- **S1**: the A2L Explorer (table and detail card) and the MAC View join the list of views in R-TUI.103 (file text shown verbatim, no control characters, no markup). Updated in `S1-ears-strict.md`.
 
 Code-change items for the batch: D2-3, D2-5 … D2-25, plus the removals D2-1, D2-26, D2-29.
 

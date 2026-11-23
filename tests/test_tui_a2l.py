@@ -23,7 +23,7 @@ from s19_app.tui.a2l import (
 
 
 def test_parse_a2l_file_extracts_nested_measurement_and_characteristic_tags(tmp_path: Path):
-    """Traces: R-A2L-005.1, R-A2L-011, R-A2L-013."""
+    """Traces: R-A2L-005.1, R-A2L.11, R-A2L.13."""
     a2l = tmp_path / "sample.a2l"
     a2l.write_text(
         "/begin PROJECT Demo\n"
@@ -95,7 +95,7 @@ def test_extract_a2l_tags_ignores_unrelated_sections():
 
 
 def test_validate_a2l_tags_marks_missing_address_or_length_invalid():
-    """Traces: R-A2L-072."""
+    """Traces: R-A2L.72."""
     tags = [{"section": "MEASUREMENT", "name": "RPM", "address": None, "length": 2}]
 
     results = validate_a2l_tags(tags, {0x1000: 0x01})
@@ -116,7 +116,7 @@ def test_validate_a2l_tags_marks_missing_address_or_length_invalid():
 
 
 def test_render_a2l_view_shows_tag_validation_status():
-    """Traces: R-A2L-077."""
+    """Traces: R-A2L.77."""
     a2l_data = {
         "sections": [{"name": "PROJECT", "meta": "Demo", "start_line": 1, "end_line": 8, "children": []}],
         "errors": [],
@@ -140,7 +140,7 @@ def test_render_a2l_view_shows_tag_validation_status():
 
 
 def test_validate_a2l_tags_without_mem_map_skips_image_check():
-    """Traces: R-A2L-070."""
+    """Traces: R-A2L.70."""
     tags = [{"section": "MEASUREMENT", "name": "A", "address": 0x1000, "length": 2}]
 
     results = validate_a2l_tags(tags, None)
@@ -151,7 +151,7 @@ def test_validate_a2l_tags_without_mem_map_skips_image_check():
 
 
 def test_validate_a2l_tags_virtual_without_address_skips_range():
-    """Traces: R-A2L-072."""
+    """Traces: R-A2L.72."""
     tags = [{"section": "MEASUREMENT", "name": "V", "virtual": True, "address": None, "length": None}]
 
     results = validate_a2l_tags(tags, {0x1000: 0x01})
@@ -162,7 +162,7 @@ def test_validate_a2l_tags_virtual_without_address_skips_range():
 
 
 def test_render_a2l_view_shows_out_of_image_status():
-    """Traces: R-A2L-077."""
+    """Traces: R-A2L.77."""
     assert format_tag_validation_status(
         {"schema_ok": True, "memory_checked": True, "in_memory": False}
     ) == "OUT(image)"
@@ -186,7 +186,7 @@ def test_parse_a2l_file_emits_stage_logs(tmp_path: Path, caplog: pytest.LogCaptu
 
 
 def test_render_a2l_view_supports_tag_line_truncation():
-    """Traces: R-A2L-078."""
+    """Traces: R-A2L.78."""
     a2l_data = {
         "sections": [{"name": "PROJECT", "meta": "Demo", "start_line": 1, "end_line": 8, "children": []}],
         "errors": [],
@@ -206,7 +206,7 @@ def test_render_a2l_view_supports_tag_line_truncation():
 
 
 def test_parse_a2l_file_extracts_layout_and_compu_maps(tmp_path: Path):
-    """Traces: R-A2L-022, R-A2L-033."""
+    """Traces: R-A2L.22, R-A2L.33."""
     a2l = tmp_path / "maps.a2l"
     a2l.write_text(
         "/begin PROJECT Demo\n"
@@ -238,7 +238,7 @@ def test_parse_a2l_file_extracts_layout_and_compu_maps(tmp_path: Path):
 
 
 def test_parse_compu_method_extracts_unit_from_body_conversion_line(tmp_path: Path):
-    """Traces: R-A2L-033."""
+    """Traces: R-A2L.33."""
     a2l = tmp_path / "compu_unit_body.a2l"
     a2l.write_text(
         "/begin PROJECT Demo\n"
@@ -259,7 +259,7 @@ def test_parse_compu_method_extracts_unit_from_body_conversion_line(tmp_path: Pa
 
 
 def test_enrich_a2l_tags_with_values_decodes_and_converts_linear(tmp_path: Path):
-    """Traces: R-A2L-054."""
+    """Traces: R-A2L.54."""
     a2l = tmp_path / "linear.a2l"
     a2l.write_text(
         "/begin PROJECT Demo\n"
@@ -287,7 +287,7 @@ def test_enrich_a2l_tags_with_values_decodes_and_converts_linear(tmp_path: Path)
 
 
 def test_enrich_a2l_tags_with_values_uses_tab_interp(tmp_path: Path):
-    """Traces: R-A2L-061."""
+    """Traces: R-A2L.61."""
     a2l = tmp_path / "tab.a2l"
     a2l.write_text(
         "/begin PROJECT Demo\n"
@@ -318,7 +318,7 @@ def test_enrich_a2l_tags_with_values_uses_tab_interp(tmp_path: Path):
 
 
 def test_characteristic_accessor_payloads(tmp_path: Path):
-    """Traces: R-A2L-053, R-A2L-040."""
+    """Traces: R-A2L.53, R-A2L.40."""
     a2l = tmp_path / "accessor.a2l"
     a2l.write_text(
         "/begin PROJECT Demo\n"

@@ -905,7 +905,7 @@ def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
             # the load-over (without this the no-marker assertion below
             # would pass even if the marker had never existed).
             marked = (
-                app.query_one("#patch_inspector").border_subtitle  # Inc 8 R-PE-041: #patch_win_script -> the landing pane's border
+                app.query_one("#patch_inspector").border_subtitle  # Inc 8 R-PE.41: #patch_win_script -> the landing pane's border
                 or ""
             )
             assert "●" in marked, marked
@@ -957,12 +957,12 @@ def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
                 lambda: (
                     "0 entries"
                     in (
-                        app.query_one("#patch_inspector").border_subtitle  # Inc 8 R-PE-041: #patch_win_script -> the landing pane's border
+                        app.query_one("#patch_inspector").border_subtitle  # Inc 8 R-PE.41: #patch_win_script -> the landing pane's border
                         or ""
                     )
                     and "●"
                     not in (
-                        app.query_one("#patch_inspector").border_subtitle  # Inc 8 R-PE-041: #patch_win_script -> the landing pane's border
+                        app.query_one("#patch_inspector").border_subtitle  # Inc 8 R-PE.41: #patch_win_script -> the landing pane's border
                         or ""
                     )
                 ),
@@ -1039,7 +1039,7 @@ def test_tc_b100_10_reset_leaves_the_patch_editor_clean_for_the_next_load(
                 "a clean session raised the dirty-load question"
             )
             subtitle = str(
-                app.query_one("#patch_inspector").border_subtitle  # Inc 8 R-PE-041: #patch_win_script -> the landing pane's border
+                app.query_one("#patch_inspector").border_subtitle  # Inc 8 R-PE.41: #patch_win_script -> the landing pane's border
             )
             assert "6 entries" in subtitle and "●" not in subtitle, subtitle
 

@@ -119,7 +119,7 @@ def test_at_s3_dynamic_notify_sites_pass_markup_false() -> None:
     verify drift/messages) without pinning line numbers, and leaves the two
     static-string notifies free.
 
-    Traces: R-TUI-103b.
+    Traces: R-TUI.105.
     """
     tree = ps.package_tree("app")
 

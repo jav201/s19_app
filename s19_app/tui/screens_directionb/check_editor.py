@@ -72,7 +72,7 @@ class CheckEditorPanel(ScrollableContainer):
         Bulk add (batch-102 Inc 4): the picker's ``Add list`` control posts
         ``BulkAddRequested`` and this panel pushes the
         :class:`BulkParameterAddScreen` modal for its picker
-        (R-B102-BULK-001); the modal applies through the picker's
+        (R-B102-BULK.1); the modal applies through the picker's
         ``include_names`` seam and the dismiss tail only refreshes the
         previews — never the ledger (R-B102-BULK-007).
 
@@ -817,7 +817,7 @@ class CheckEditorPanel(ScrollableContainer):
     def _on_a2l_parameter_picker_selection_changed(
         self, event: A2LParameterPicker.SelectionChanged
     ) -> None:
-        """One ledger row was included or excluded (R-B102-SEL-003): prune the
+        """One ledger row was included or excluded (R-B102-SEL.3): prune the
         spec bytes to the current picks, then refresh the
         Fields/JSON/Addendum previews and the left-column count. The
         document controls keep collecting ``items`` from the picker at
@@ -829,7 +829,7 @@ class CheckEditorPanel(ScrollableContainer):
     def _on_a2l_parameter_picker_bulk_add_requested(
         self, event: A2LParameterPicker.BulkAddRequested
     ) -> None:
-        """The picker's bulk-add control was activated (R-B102-BULK-001):
+        """The picker's bulk-add control was activated (R-B102-BULK.1):
         push the bulk modal for this panel's picker. The picker stays
         presentational (C-7, E3 ruling 5) — it only announces; the host
         owns the screen stack."""
@@ -982,7 +982,7 @@ class CheckEditorPanel(ScrollableContainer):
             container.mount(Static(text, classes=css_class, markup=False))
 
     def clear_check_results(self) -> None:
-        """Return the validation results to their mount state (R-CHKED-057).
+        """Return the validation results to their mount state (R-CHKED.57).
 
         Summary:
             The app calls this after it wrote bytes into the loaded image in

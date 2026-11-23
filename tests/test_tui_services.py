@@ -14,7 +14,7 @@ from s19_app.tui.services import a2l_service, validation_service
 
 
 def test_enrich_tags_and_render_merges_check_flags(monkeypatch):
-    """Traces: R-A2L-077."""
+    """Traces: R-A2L.77."""
     source_tags = [{"section": "MEASUREMENT", "name": "RPM", "address": 0x1000, "length": 2}]
     checked_tags = [{"section": "MEASUREMENT", "name": "RPM", "schema_ok": True, "in_memory": True}]
 

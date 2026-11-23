@@ -815,13 +815,13 @@ def _assert_cleared(first, after, row: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-CHKED-057/2, /3 - a save-back or a Save project commit clears the
+# R-CHKED.57/2, /3 - a save-back or a Save project commit clears the
 # Check Editor's validation results (E5 C-10)
 # ---------------------------------------------------------------------------
 def test_r_chked_057_2_save_back_clears_the_validation_results(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Case R-CHKED-057/2: the fixture image, ``0x8003`` applied as ``AA``, a
+    """Case R-CHKED.57/2: the fixture image, ``0x8003`` applied as ``AA``, a
     memory row ``0x8003`` size 1 added and Validate clicked (``0x8003-0x8003
     expected [AA] actual [AA] -> pass``); the entry edited to ``BB`` and *Save
     patched image as* confirmed -> key ``=``: 0 verdict rows and the status
@@ -855,7 +855,7 @@ def test_r_chked_057_2_save_back_clears_the_validation_results(
 def test_r_chked_057_3_save_project_commit_clears_the_validation_results(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Case R-CHKED-057/3: as /2 inside an open project, then a Save project
+    """Case R-CHKED.57/3: as /2 inside an open project, then a Save project
     commit by ``ctrl+s`` instead of the save-back -> key ``=``: 0 verdict rows
     and the status line ``Validate compares fields to the image``.
 

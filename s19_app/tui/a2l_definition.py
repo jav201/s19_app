@@ -2818,8 +2818,8 @@ def _resolve_datatype(
     tag: dict, a2l_data: dict, reads: dict[int, object]
 ) -> Optional[str]:
     """The datatype: the tag's own word, else the record layout's ``decode_type``
-    when that word is in the layout's tokens (R-A2L-022), else the datatype the
-    deposit name spells (R-A2L-023; wraps BL-I2-13), else ``None``.
+    when that word is in the layout's tokens (R-A2L.22), else the datatype the
+    deposit name spells (R-A2L.23; wraps BL-I2-13), else ``None``.
 
     The layout step is read once per walk (R-A2L-DEF.149): its result is
     ``reads[id(entry)]``, computed at the first object of the walk that names

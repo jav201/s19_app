@@ -8,9 +8,9 @@ Covers, through the shipped functions only (``parse_a2l_file``,
   a WARNING (rows R-VAL-032.1 .. .3).
 - F-29: a MEMORY_SEGMENT record is read whatever line shape it has, and a broken
   record gives no base and no size instead of a plausible wrong value
-  (rows R-A2L-036.1 .. .13, R-A2L-034).
+  (rows R-A2L-036.1 .. .13, R-A2L.34).
 - F-21: the CURVE index note is shown once above the table, not on each row
-  (rows R-A2L-120 .. 123).
+  (rows R-A2L.120 .. R-A2L.123).
 
 Every expected value is the requirement's exact value from
 ``.dev-flow/2026-11-01-batch-101/inc-11/01-requirements.md``. The ASAM block
@@ -483,7 +483,7 @@ def test_r_a2l_036_13_end_above_4_gib(tmp_path: Path, line: str, expected) -> No
 
 
 # ---------------------------------------------------------------------------
-# R-A2L-034 — the tags' memory region follows the segments
+# R-A2L.34 — the tags' memory region follows the segments
 # ---------------------------------------------------------------------------
 
 
@@ -503,7 +503,7 @@ def test_r_a2l_034_case_07_regions() -> None:
 
 
 # ---------------------------------------------------------------------------
-# R-A2L-120 .. 123 — the CURVE index note
+# R-A2L.120 .. R-A2L.123 — the CURVE index note
 # ---------------------------------------------------------------------------
 
 NOTE_TEXT = "x: point index (axis points unavailable)"
@@ -575,7 +575,7 @@ def test_r_a2l_122_rows_carry_no_note(tmp_path: Path) -> None:
 
 def test_r_a2l_123_mixed_points_keep_row_note() -> None:
     """Why: when only some points lack an axis value the reader must see which rows
-    are indexes; the once-line of R-A2L-121 is then absent."""
+    are indexes; the once-line of R-A2L.121 is then absent."""
 
     def point(x, y, note: Optional[str] = None) -> dict:
         return {"x": x, "y": y, "y_raw": y, "x_note": note, "outside_limits": False}

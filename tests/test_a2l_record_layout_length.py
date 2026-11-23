@@ -40,7 +40,7 @@ _RL_U16 = {"RL_U16": {"name": "RL_U16", "tokens": ["FNC_VALUES", "1", "UWORD", "
 
 
 def test_ac1_value_layout_resolves_to_element_size() -> None:
-    """Traces: R-A2L-015, R-A2L-022."""
+    """Traces: R-A2L.15, R-A2L.22."""
     header = {"deposit": "RL_U8", "char_type": "VALUE"}
 
     length = _infer_length_characteristic([], header, _RL_U8)
@@ -49,7 +49,7 @@ def test_ac1_value_layout_resolves_to_element_size() -> None:
 
 
 def test_ac1_wider_layout_resolves() -> None:
-    """Traces: R-A2L-015, R-A2L-022."""
+    """Traces: R-A2L.15, R-A2L.22."""
     header = {"deposit": "RL_U16", "char_type": "VALUE"}
 
     assert _infer_length_characteristic([], header, _RL_U16) == DATATYPE_SIZES["UWORD"]
@@ -62,7 +62,7 @@ def test_ac1_wider_layout_resolves() -> None:
 
 
 def test_ac1_case01_characteristic_gets_layout_length() -> None:
-    """Traces: R-A2L-015, R-A2L-022."""
+    """Traces: R-A2L.15, R-A2L.22."""
     data = parse_a2l_file(_CASE_01_A2L)
     by_name = {t["name"]: t for t in data["tags"] if t["section"] == "CHARACTERISTIC"}
 
@@ -71,7 +71,7 @@ def test_ac1_case01_characteristic_gets_layout_length() -> None:
 
 
 def test_ac2_layout_length_makes_characteristic_memory_checked() -> None:
-    """Traces: R-A2L-070."""
+    """Traces: R-A2L.70."""
     data = parse_a2l_file(_CASE_01_A2L)
     cal_a = next(t for t in data["tags"] if t.get("name") == "CAL_BLOCK_A")
     addr = cal_a["address"]
@@ -94,7 +94,7 @@ def test_ac2_layout_length_makes_characteristic_memory_checked() -> None:
 
 
 def test_ac3_curve_layout_stays_unsized() -> None:
-    """Traces: R-A2L-018, R-A2L-020."""
+    """Traces: R-A2L.18, R-A2L.20."""
     header = {"deposit": "RL_U8", "char_type": "CURVE"}
 
     assert _infer_length_characteristic([], header, _RL_U8) is None, (
@@ -104,7 +104,7 @@ def test_ac3_curve_layout_stays_unsized() -> None:
 
 
 def test_ac3_map_layout_stays_unsized() -> None:
-    """Traces: R-A2L-018, R-A2L-020."""
+    """Traces: R-A2L.18, R-A2L.20."""
     header = {"deposit": "RL_U8", "char_type": "MAP"}
 
     assert _infer_length_characteristic([], header, _RL_U8) is None
@@ -117,7 +117,7 @@ def test_ac3_map_layout_stays_unsized() -> None:
 
 
 def test_ac4_name_encoded_deposit_unchanged() -> None:
-    """Traces: R-A2L-023, R-A2L-015."""
+    """Traces: R-A2L.23, R-A2L.15."""
     header = {"deposit": "__UWORD_Z", "char_type": "VALUE"}
 
     # sizeof_from_deposit already sizes this; the layout fallback is never reached.
@@ -125,7 +125,7 @@ def test_ac4_name_encoded_deposit_unchanged() -> None:
 
 
 def test_ac4_absent_layout_stays_none() -> None:
-    """Traces: R-A2L-020."""
+    """Traces: R-A2L.20."""
     header = {"deposit": "RL_MISSING", "char_type": "VALUE"}
 
     assert _infer_length_characteristic([], header, _RL_U8) is None, (
@@ -134,7 +134,7 @@ def test_ac4_absent_layout_stays_none() -> None:
 
 
 def test_ac4_no_layout_map_is_safe() -> None:
-    """Traces: R-A2L-020."""
+    """Traces: R-A2L.20."""
     header = {"deposit": "RL_U8", "char_type": "VALUE"}
 
     # record_layouts_by_name omitted (legacy call shape) -> no resolution, None.

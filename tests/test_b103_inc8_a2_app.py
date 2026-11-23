@@ -1,6 +1,6 @@
 """Batch-103 Inc 8, group A: the app-level stage handler and its panel effects (E4, tester ``test-a``).
 
-Design under test: ``inc-8/01-requirements.md`` rows R-PE-DEF.50 ... .64, .73, R-PE.34, R-PE.35, R-PE-110 and the
+Design under test: ``inc-8/01-requirements.md`` rows R-PE-DEF.50 ... .64, .73, R-PE.34, R-PE.35, R-PE.110 and the
 nodes ``PatchMixin.on_staging_sheet_stage_requested`` (A3/A3'), ``PatchEditorPanel.note_staged`` and the sheet's
 staged mark of ``codewire/graph-inc8.md``. Cases: ``inc-8/02-test-cases-A.md``.
 
@@ -430,7 +430,7 @@ def test_r_pe_def_62_4_new_image_word_changes_the_staged_cue(tmp_path, defc):
     assert "1 (0x01)" in row
 
 
-# ------------------------------------------------------------------ R-PE-110 / .63 / .64 / .73
+# ------------------------------------------------------------------ R-PE.110 / .63 / .64 / .73
 
 
 def test_r_pe_110_1_stage_refused_while_a_session_action_runs(tmp_path, defc):
@@ -488,7 +488,7 @@ def test_r_pe_def_73_1_status_line_is_plain_text(tmp_path, defc):
 
 
 def test_control_the_busy_gate_is_what_keeps_the_document_unchanged(tmp_path, defc, monkeypatch):
-    """The oracle of R-PE-110/1 is not vacuous: with the busy check bypassed the same stage lands in the document,
+    """The oracle of R-PE.110/1 is not vacuous: with the busy check bypassed the same stage lands in the document,
     so ``entries == []`` in the test above fails exactly when the gate is missing."""
     monkeypatch.setattr(S19TuiApp, "_refuse_if_busy", lambda self: False)
 

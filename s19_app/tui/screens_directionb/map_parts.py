@@ -213,7 +213,7 @@ def _allocate_band_widths(
     Summary:
         Return one column count per run such that, in domain, the run widths
         plus the gap markers sum to at most ``bar_width`` and every run gets at
-        least one column (batch-77, R-TUI-103 / LLR-111.7). See ``Returns`` for
+        least one column (batch-77, R-TUI-103B.2 / LLR-111.7). See ``Returns`` for
         the two degenerate cases where the sum is strictly less. The bound lives HERE,
         in the producer, and not in a predicate over the emitted widgets: an
         output-shaped check can detect an overflow but cannot prevent one. The
@@ -278,7 +278,7 @@ def _allocate_band_widths(
     available = bar_width - n_gaps * fold
     if available < n_runs:
         # Out of domain: the bound is arithmetically unsatisfiable. The
-        # degradation rule is deliberately unspecified by R-TUI-103 — the only
+        # degradation rule is deliberately unspecified by R-TUI-103B.1 … R-TUI-103B.5 — the only
         # contracted properties are that this returns a width for every run
         # without raising, and that every run stays reachable in the region
         # list. One column each is the narrowest honest answer.

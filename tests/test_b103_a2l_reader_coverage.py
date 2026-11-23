@@ -1276,7 +1276,7 @@ def test_cov_read_39_ascii_number_error(tmp_path: Path) -> None:
 
 
 def test_cov_read_013_agree_no_declares(tmp_path: Path) -> None:
-    """R-A2L-013/2: a LENGTH agreeing with datatype x MATRIX_DIM keeps 4 with no
+    """R-A2L.13/2: a LENGTH agreeing with datatype x MATRIX_DIM keeps 4 with no
     ``declares the sizes`` error."""
     text = _body(meas("X", " ECU_ADDRESS 0x10", " MATRIX_DIM 2", " LENGTH 4"))
     data = _parse(tmp_path, text)
@@ -1777,7 +1777,7 @@ def test_cov_read_50_v161_characteristic_summary() -> None:
 
 
 def test_cov_read_076_077_exact(tmp_path: Path) -> None:
-    """R-A2L-076/1, /2 and R-A2L-077/1: errors, then sections, then tags."""
+    """R-A2L.76/1, /2 and R-A2L.77/1: errors, then sections, then tags."""
     data = parse_a2l_file(REPO_ROOT / "examples" / "case_00_public" / "merge_inc_test.a2l")
     view = render_a2l_view(data)
     i_err = view.index("A2L parse errors:")
@@ -1794,7 +1794,7 @@ def test_cov_read_076_077_exact(tmp_path: Path) -> None:
 
 
 def test_cov_read_076_mod_common_empty_meta(tmp_path: Path) -> None:
-    """R-A2L-076/3: a MOD_COMMON with no begin words reads ``- MOD_COMMON (lines
+    """R-A2L.76/3: a MOD_COMMON with no begin words reads ``- MOD_COMMON (lines
     <first>-<last>)``."""
     text = (
         "ASAP2_VERSION 1 71\n/project P\n/begin MODULE M \"\"\n"

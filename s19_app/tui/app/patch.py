@@ -356,7 +356,7 @@ class PatchMixin:
         """
         Summary:
             Stage one formula-bar edit of the staging sheet (Inc 8,
-            R-PE-DEF.51 / .57 … .64 / .73, R-PE-110): refuse while a session
+            R-PE-DEF.51 / .57 … .64 / .73, R-PE.110): refuse while a session
             action runs, describe the row again with the A2L loaded now,
             stage over the SOURCE view, report, and select the row after the
             staged one.
@@ -643,7 +643,7 @@ class PatchMixin:
             live aggregates. A run that is no longer current — after a
             document load, an image install, a project reset or an
             in-place write — renders as ``no run yet`` with zero counts and
-            no rows (R-CHK-PE-008 … -012). Pure render: reads the service,
+            no rows (R-CHK-PE.8 … R-CHK-PE.12). Pure render: reads the service,
             writes only the Checks tab.
 
         Args:
@@ -1788,7 +1788,7 @@ class PatchMixin:
         panel.set_undo_redo_enabled(service.history_depths())
         # R-TUI-058.6 (D10-23): the per-entry JSON edit stays enabled.
         panel.set_entry_edit_json_enabled(True)
-        # Inc 6 (R-CHK-PE-009 … -012): a load replaces the document, so any
+        # Inc 6 (R-CHK-PE.9 … R-CHK-PE.12): a load replaces the document, so any
         # completed run is no longer current — render ``no run yet``.
         self._refresh_patch_checks_tab(panel)
 
@@ -1852,13 +1852,13 @@ class PatchMixin:
 
     def _prefill_patch_editor(self) -> None:
         """Populate the Patch Editor's A2L picker on screen entry
-        (batch-102 Inc 5, R-B102-PE-001, R-B102-PE-005; C-7, I-ALP-2.3).
+        (batch-102 Inc 5, R-B102-PE-001, R-B102-PE.5; C-7, I-ALP-2.3).
 
         Hands the loaded A2L's measurable parameters to the picker's
         highlight-mode ledger with the safe Inc-2 ``_a2l_enriched_key``
         signature: re-entering the screen with the same A2L and image is a
         no-op that preserves the filter, the page and the highlight
-        (R-B102-PE-005). A not-yet-mounted panel (headless unit path) is
+        (R-B102-PE.5). A not-yet-mounted panel (headless unit path) is
         tolerated as a no-op, matching ``_prefill_check_editor``.
 
         C-7: the panel is presentational, so the I-ALP-2.3 snapshot adapter
@@ -1909,7 +1909,7 @@ class PatchMixin:
     def on_a2l_parameter_picker_bulk_add_requested(
         self, event: A2LParameterPicker.BulkAddRequested
     ) -> None:
-        """Push the shared bulk modal for the Patch picker (R-B102-BULK-001).
+        """Push the shared bulk modal for the Patch picker (R-B102-BULK.1).
 
         The Patch picker's own ``BulkAddRequested`` bubbles to the app (the
         Check Editor stops its own copy at the panel), so the Patch panel
@@ -1934,7 +1934,7 @@ class PatchMixin:
             write (an apply, a save-back or a Save project commit), so this
             helper is the in-place twin of :meth:`watch_current_file`. It
             also clears the Check Editor's validation results, whose verdict
-            rows judged the bytes before the write (R-CHKED-057), and it
+            rows judged the bytes before the write (R-CHKED.57), and it
             disarms a Split / Join export confirm, re-plans a displayed
             Split / Join preview and refreshes the three hex views and the
             A2L tag table's values, so every view over the image follows the
@@ -2072,8 +2072,8 @@ class PatchMixin:
             Recompute the A2L tags whose bytes the write changed and repaint
             the shown tag-table page in place, so the Raw and Physical cells
             read the written bytes while the listed tags, the first shown
-            row, the cursor and the scroll stay (R-A2L-048, -049, -105,
-            -106). Only the changed tags are recomputed, so a write costs
+            row, the cursor and the scroll stay (R-A2L.48, R-A2L.49, R-A2L.105,
+            R-A2L.106). Only the changed tags are recomputed, so a write costs
             far less than a full enrichment on a large A2L (E5 R-1: 3.95 s
             for 220,040 tags on case_06).
 

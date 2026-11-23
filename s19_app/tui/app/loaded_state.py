@@ -731,10 +731,10 @@ class LoadedStateMixin:
             # the dict, so it hides nothing.
             if loaded.mem_map is not previous_map:
                 self._hide_replaced_document_controls(panel)
-            # Inc 6 (R-CHK-PE-009 … -012): every install bumps the image
+            # Inc 6 (R-CHK-PE.9 … R-CHK-PE.12): every install bumps the image
             # generation, so the run ends (a MAC load included).
             self._refresh_patch_checks_tab(panel)
-        # Inc 6 (E3A-02, R-CHKS.4/R-CHKS-009): a displayed Checks screen
+        # Inc 6 (E3A-02, R-CHKS.4/R-CHKS.9): a displayed Checks screen
         # repaints with the no-run note (a guarded no-op when not mounted).
         self.update_checks_view()
         # F-09 (LLR-056.3): every load path — project load, loose-file

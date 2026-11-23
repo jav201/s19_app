@@ -37,7 +37,7 @@ class A2lPickerMixin:
         prepared_definitions=None,
         describe_context=None,
     ) -> None:
-        """Populate the A2L picker (R-B102-PE-001, R-B102-PE-005; C-7, I-ALP-2.3).
+        """Populate the A2L picker (R-B102-PE-001, R-B102-PE.5; C-7, I-ALP-2.3).
 
         Delegates rows, the caller-supplied signature and parsed A2L data to
         the embedded picker: it mounts at most one 200-row page and preserves
@@ -240,7 +240,7 @@ class A2lPickerMixin:
         re-assert the host's use-status surface and re-derive the tab widths
         (the measured table width exists only while the tab is shown). The
         document rows and the entry inputs are never touched here
-        (R-B102-PE-005, R-B102-PE-006).
+        (R-B102-PE.5, R-B102-PE-006).
 
         batch-103 Inc 8 (R-PE-DEF.10, .11): the staging sheet shows one row
         per name of the page, built from the picker's own population

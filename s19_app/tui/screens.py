@@ -882,7 +882,7 @@ class EntryJsonScreen(ModalScreen[Optional[str]]):
 
 
 class BulkParameterAddScreen(ModalScreen[Optional[dict]]):
-    """Bulk-add modal for A2L parameter names (US-102-04, R-B102-BULK-001..007).
+    """Bulk-add modal for A2L parameter names (US-102-04, R-B102-BULK.1 .. R-B102-BULK-007).
 
     Summary:
         The popup the Check Editor's ``Add list`` control opens (the picker
@@ -948,7 +948,7 @@ class BulkParameterAddScreen(ModalScreen[Optional[dict]]):
         >>> screen = BulkParameterAddScreen(picker)  # doctest: +SKIP
     """
 
-    #: The contract instruction (R-B102-BULK-001): painted verbatim, as a
+    #: The contract instruction (R-B102-BULK.1): painted verbatim, as a
     #: literal ``Text`` — never through a markup path.
     _INSTRUCTION = "Separate names with new lines, commas, semicolons or spaces."
 
@@ -1016,7 +1016,7 @@ class BulkParameterAddScreen(ModalScreen[Optional[dict]]):
     def _apply_list(self) -> None:
         """Parse the buffer, include the matches, paint the summary.
 
-        R-B102-BULK-002 (split on every separator via
+        R-B102-BULK.2 (split on every separator via
         :func:`parse_parameter_list`), R-B102-BULK-004 (the fixed-order
         summary), R-B102-BULK-005 (the exact no-match line), E3 ruling 8
         (the 64 KiB truncation notice). Neither the buffer nor any name is

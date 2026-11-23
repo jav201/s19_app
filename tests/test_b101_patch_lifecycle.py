@@ -11,9 +11,9 @@ Covers (cases of ``.dev-flow/2026-11-01-batch-101/inc-6/02-test-cases.md``):
     kept by a Save project.
   - R-TUI-049.3.2/1 .. /9 - the same for the save-back prompt (a redo with no
     step keeps it).
-  - R-CHK-PE-008 .. R-CHK-PE.12, R-CHK-PE.14 - the Checks tab (subtitle, status, strip, result
+  - R-CHK-PE.8 .. R-CHK-PE.12, R-CHK-PE.14 - the Checks tab (subtitle, status, strip, result
     rows, ledger glyphs) shows a run only while it is current.
-  - R-CHKS.1, R-CHKS.4, R-CHKS-009 - the Checks screen does the same, also while it
+  - R-CHKS.1, R-CHKS.4, R-CHKS.9 - the Checks screen does the same, also while it
     stays displayed.
 
 Written from the requirements (``01-requirements.md``) and the cases, never
@@ -572,13 +572,13 @@ def test_r_tui_049_3_2_prompt_redo_with_no_step_keeps_it(tmp_path: Path) -> None
 
 
 # --------------------------------------------------------------------------- #
-# R-CHK-PE-008 .. R-CHK-PE.14 - the Checks tab shows a current run only
+# R-CHK-PE.8 .. R-CHK-PE.14 - the Checks tab shows a current run only
 # --------------------------------------------------------------------------- #
 
 
 @pytest.mark.parametrize("case", ["two", "zero", "revert"])
 def test_r_chk_pe_008_subtitle(tmp_path: Path, case: str) -> None:
-    """R-CHK-PE-008/1 (``two``): a current 2-entry run reads ``2 checked``;
+    """R-CHK-PE.8/1 (``two``): a current 2-entry run reads ``2 checked``;
     /2 (``zero``): a current 0-entry run reads ``0 checked`` (base:
     ``no run yet``); /3 (``revert``): an Add ends the current state
     (``no run yet``) and the Remove that undoes it restores ``2 checked`` with
@@ -639,7 +639,7 @@ def _no_run_shown(app) -> bool:
 
 @pytest.mark.parametrize("how", ["load", "image", "project", "add", "apply", "mac"])
 def test_r_chk_pe_009_no_run(tmp_path: Path, how: str) -> None:
-    """R-CHK-PE-009/1 .. /6: the subtitle reads ``no run yet`` after another
+    """R-CHK-PE.9/1 .. /6: the subtitle reads ``no run yet`` after another
     document load, an image load, a project load, an Add, an apply of a check
     document that writes the image in place (/5, E3A-03), and a MAC load (/6).
     Base: ``2 checked`` (``1 checked`` for /5) stays."""
@@ -759,7 +759,7 @@ def test_r_chk_pe_014_glyph_after_save_back(tmp_path: Path) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# R-CHKS.1 / R-CHKS.4 / R-CHKS-009 - the Checks screen shows a current run only
+# R-CHKS.1 / R-CHKS.4 / R-CHKS.9 - the Checks screen shows a current run only
 # --------------------------------------------------------------------------- #
 
 
@@ -820,7 +820,7 @@ def test_r_chks_004_note_while_displayed(tmp_path: Path) -> None:
 
 
 def test_r_chks_009_zero_line(tmp_path: Path) -> None:
-    """R-CHKS-009/1: after a run and another document's load, the Checks
+    """R-CHKS.9/1: after a run and another document's load, the Checks
     screen's aggregate line reads ``Pass 0 / Fail 0 / Uncheck 0 ░░░░░░░░``."""
 
     async def scenario(app, pilot, log):
@@ -833,7 +833,7 @@ def test_r_chks_009_zero_line(tmp_path: Path) -> None:
 
 
 def test_r_chks_009_zero_line_while_displayed(tmp_path: Path) -> None:
-    """R-CHKS-009/2: the Checks screen stays displayed while a project loads
+    """R-CHKS.9/2: the Checks screen stays displayed while a project loads
     through the Load dialog (key ``p``); once the project is installed and the
     load-result panel is closed, the aggregate line reads zero without
     reopening the screen. Base: ``Pass 1 / Fail 1 / Uncheck 0``. Deviation from

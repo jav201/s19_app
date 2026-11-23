@@ -1,6 +1,6 @@
 """F841 cleanup — the dead ``header`` local is removed and the parse is unchanged.
 
-Batch-50 (US-F841 / R-A2L-010). ``extract_a2l_tags`` previously bound
+Batch-50 (US-F841 / R-A2L.10). ``extract_a2l_tags`` previously bound
 ``header = header_meas or header_char`` and never read it (the walk uses
 ``header_meas`` / ``header_char`` directly, ``a2l.py`` :975/:981/:1055/:1058).
 ``ruff --select F841`` flagged exactly that line. Removing a dead store cannot
@@ -37,7 +37,7 @@ _DEMO_A2L = _REPO_ROOT / "examples" / "case_00_public" / "ASAP2_Demo_V161.a2l"
 def test_tc094_no_f841_finding_in_a2l() -> None:
     """``ruff --select F841`` reports zero findings on ``a2l.py``.
 
-    Intent: R-A2L-010's numeric threshold is ``0 errors`` (pre-state: 1). This
+    Intent: R-A2L.10's numeric threshold is ``0 errors`` (pre-state: 1). This
     runs ruff over the whole module — so it catches BOTH the removed ``header``
     store and any accidental new dead store the edit might introduce — and
     asserts a clean exit. It **skips** (does not fail) when ruff is not

@@ -178,7 +178,7 @@ def _median_show(pilot, sheet, names, defs, a2l, image):
     return statistics.median(times)
 
 
-@pytest.mark.serial_timing  # R-TST-002: a timing arm runs serially (E4 integration)
+@pytest.mark.serial_timing  # R-TST.2: a timing arm runs serially (E4 integration)
 def test_r_pe_def_12_1_a_200_name_software_a_page_paints_within_half_a_second(softa_page):
     """load-sensitive: decide only on a quiet host; the load is printed beside the median."""
     a2l, names, defs, image = softa_page
@@ -195,7 +195,7 @@ def test_r_pe_def_12_1_a_200_name_software_a_page_paints_within_half_a_second(so
     run(drive)
 
 
-@pytest.mark.serial_timing  # R-TST-002: a timing arm runs serially (E4 integration)
+@pytest.mark.serial_timing  # R-TST.2: a timing arm runs serially (E4 integration)
 def test_r_pe_def_12_2_a_page_of_200_one_mebibyte_text_spans_paints_within_half_a_second(v171):
     """load-sensitive: decide only on a quiet host; the load is printed beside the median."""
     base = v171.defs[V171_ASCII]

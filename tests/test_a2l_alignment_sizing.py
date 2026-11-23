@@ -1,6 +1,6 @@
 """Alignment-aware CURVE/MAP length sizing — batch-56 (alignment-aware padding).
 
-Requirement ``R-A2L-016`` (HLR-A56): a CURVE/MAP whose RECORD_LAYOUT declares
+Requirement ``R-A2L.16`` (HLR-A56): a CURVE/MAP whose RECORD_LAYOUT declares
 ``ALIGNMENT_<CLASS> N`` directives in its body sizes CORRECTLY via a
 cumulative-offset walk that pads each component's start up to its datatype's
 declared alignment (R-B), with NO trailing pad (R-C) and no MOD_COMMON honoring

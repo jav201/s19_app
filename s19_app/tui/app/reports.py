@@ -1091,7 +1091,7 @@ class ReportsMixin:
                 - ``_scan_spec_files`` / ``_resolve_listed_file``
                   (via the Check Editor and A2B Diff pick guards)
                 - ``on_check_editor_panel_action_requested`` (the Write
-                  status names the home prefix, R-CHKED-032)
+                  status names the home prefix, R-CHKED.32)
         """
         project_dir = self._active_project_dir()
         if project_dir is None:

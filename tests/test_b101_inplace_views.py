@@ -10,7 +10,7 @@ Group W: what the A2L tag table, the three hex panes and the Split / Join
 window paint after an in-place write (a Patch Editor apply, a Patch Editor
 save-back, a Save project commit).
 
-  - R-A2L-048 / .049 / .105 / .106 - the tag table's Raw and Physical cells
+  - R-A2L.48 / .049 / .105 / .106 - the tag table's Raw and Physical cells
     read the written bytes, and the first shown row, the highlighted row and
     the listed tags stay;
   - R-TUI-004.7 / .8 / .9 - the main, A2L and MAC hex panes show the written
@@ -699,12 +699,12 @@ async def sj_scene(pilot, app, log, tmp_path: Path):
 
 
 # ---------------------------------------------------------------------------
-# R-A2L-048 - the tag table shows the values of the written bytes
+# R-A2L.48 - the tag table shows the values of the written bytes
 # ---------------------------------------------------------------------------
 
 
 def test_r_a2l_048_1_apply_shows_in_the_tag_table(tmp_path: Path, case08: Path) -> None:
-    """R-A2L-048 case /1: case 08 and its A2L, key ``2`` (``VALUE_0001`` Raw
+    """R-A2L.48 case /1: case 08 and its A2L, key ``2`` (``VALUE_0001`` Raw
     ``108``); key ``6``, a document ``0x0`` = ``93`` loaded and applied; key
     ``2`` -> the ``VALUE_0001`` row reads Raw ``147``, Physical ``147``.
 
@@ -733,7 +733,7 @@ def test_r_a2l_048_1_apply_shows_in_the_tag_table(tmp_path: Path, case08: Path) 
 def test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table(
     tmp_path: Path, case08: Path
 ) -> None:
-    """R-A2L-048 case /2: as /1 after the apply, the entry edited to ``55``
+    """R-A2L.48 case /2: as /1 after the apply, the entry edited to ``55``
     without a new apply, key ``2`` (the A2L Explorer displayed); ``ctrl+s``,
     Save project confirmed -> Raw ``85``, Physical ``85``.
 
@@ -760,7 +760,7 @@ def test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table(
 
 
 def test_r_a2l_048_3_save_back_shows_in_the_tag_table(tmp_path: Path, case08: Path) -> None:
-    """R-A2L-048 case /3: as /2 before ``ctrl+s``; *Save patched image as*
+    """R-A2L.48 case /3: as /2 before ``ctrl+s``; *Save patched image as*
     confirmed (Write file); key ``2`` -> Raw ``85``, Physical ``85``.
 
     Why: a save-back re-derives the image in place. Negative control: the
@@ -792,7 +792,7 @@ def painted_cell(app, index: int, column: int) -> str:
     A fixed column paints at its left edge regardless of the horizontal
     scroll, so its start is the plain prefix of render widths; every later
     column starts that prefix minus ``scroll_x``, clamped below the fixed
-    columns when the cell is the first partially visible one (R-A2L-048/4)."""
+    columns when the cell is the first partially visible one (R-A2L.48/4)."""
     table = tag_table(app)
     line = table.render_line(1 + index - int(table.scroll_y)).text
     columns = table.ordered_columns
@@ -805,13 +805,13 @@ def painted_cell(app, index: int, column: int) -> str:
     return line[start:start + columns[column].get_render_width(table)].strip()
 
 
-#: R-A2L-048/4: four bytes that make ``VALUE_0007`` (a big-endian FLOAT32 at
+#: R-A2L.48/4: four bytes that make ``VALUE_0007`` (a big-endian FLOAT32 at
 #: ``0x00040028``) read a 22-character value.
 WIDE_FLOAT = bytes.fromhex("EAA364C6")
 
 
 def test_r_a2l_048_4_a_wider_value_is_painted_whole(tmp_path: Path, case08: Path) -> None:
-    """R-A2L-048 case /4 (robustness, E5 QA-2): case 08 and its A2L, key ``2``
+    """R-A2L.48 case /4 (robustness, E5 QA-2): case 08 and its A2L, key ``2``
     (page 1; the Raw and Physical columns are 18 cells wide, the widest value
     they have painted); the cursor on ``VALUE_0007`` (row 14, Raw
     ``85.6589584350586``) and the table scrolled right so Raw is its first shown
@@ -895,7 +895,7 @@ def test_r_a2l_048_4_a_wider_value_is_painted_whole(tmp_path: Path, case08: Path
 
 
 def test_r_a2l_048_5_a_write_on_the_second_page_shows_there(tmp_path: Path, case08: Path) -> None:
-    """R-A2L-048 case /5 (robustness, E5 R-4): case 08 and its A2L, key ``2``,
+    """R-A2L.48 case /5 (robustness, E5 R-4): case 08 and its A2L, key ``2``,
     ``+`` (page 2: ``tags 201-400 / 462``); the cursor on page row 4
     (``MEASUREMENT_0021``: a 1-byte tag at ``0x00040F00``, Raw ``226``); key
     ``6``, ``0x00040F00`` = ``E1`` applied; key ``2`` -> the row reads Raw
@@ -971,12 +971,12 @@ def test_r_a2l_048_5_a_write_on_the_second_page_shows_there(tmp_path: Path, case
 
 
 # ---------------------------------------------------------------------------
-# R-A2L-049 / .105 / .106 - the table keeps its place and its tags
+# R-A2L.49 / .105 / .106 - the table keeps its place and its tags
 # ---------------------------------------------------------------------------
 
 
 async def first_shown_scenario(pilot, app, log, case08: Path, tmp_path: Path, raw_filter: str) -> None:
-    """The shared drive of R-A2L-049 /1 (``raw_filter`` empty) and /2."""
+    """The shared drive of R-A2L.49 /1 (``raw_filter`` empty) and /2."""
     await load_case(pilot, app, case08, a2l=True)
     await show_a2l(pilot, app)
     if raw_filter:
@@ -1013,8 +1013,8 @@ async def first_shown_scenario(pilot, app, log, case08: Path, tmp_path: Path, ra
 
 
 def test_r_a2l_049_1_first_shown_row_is_kept(tmp_path: Path, case08: Path) -> None:
-    """R-A2L-049 case /1: the table scrolled so the page's row 30 is the first
-    shown row; the apply of R-A2L-048/1 -> the first shown row is the same tag.
+    """R-A2L.49 case /1: the table scrolled so the page's row 30 is the first
+    shown row; the apply of R-A2L.48/1 -> the first shown row is the same tag.
 
     Why: a clear-and-refill repaint sends the table back to row 0 (E3
     architect P4: ``scroll_y`` 30 -> 0). The node first waits for the repaint
@@ -1031,7 +1031,7 @@ def test_r_a2l_049_1_first_shown_row_is_kept(tmp_path: Path, case08: Path) -> No
 def test_r_a2l_049_2_first_shown_row_is_kept_with_a_value_filter(
     tmp_path: Path, case08: Path
 ) -> None:
-    """R-A2L-049 case /2: as /1 with the filter on Raw, text ``1``; the table
+    """R-A2L.49 case /2: as /1 with the filter on Raw, text ``1``; the table
     scrolled so the page's row 30 is the first shown row -> the same tag
     stays first shown after the apply.
 
@@ -1045,8 +1045,8 @@ def test_r_a2l_049_2_first_shown_row_is_kept_with_a_value_filter(
 
 
 def test_r_a2l_105_1_highlighted_row_is_kept(tmp_path: Path, case08: Path) -> None:
-    """R-A2L-105 case /1: the cursor on the page's row 40; the apply of
-    R-A2L-048/1 -> cursor row 40, the same tag, and the detail card names that
+    """R-A2L.105 case /1: the cursor on the page's row 40; the apply of
+    R-A2L.48/1 -> cursor row 40, the same tag, and the detail card names that
     tag.
 
     Why: a clear-and-refill repaint puts the cursor on row 0 (P4: 40 -> 0) and
@@ -1093,7 +1093,7 @@ def test_r_a2l_105_1_highlighted_row_is_kept(tmp_path: Path, case08: Path) -> No
 
 
 def test_r_a2l_106_1_value_filter_rows_stay_listed(tmp_path: Path, case08: Path) -> None:
-    """R-A2L-106 case /1: case 08 and its A2L, key ``2``, the filter on Raw
+    """R-A2L.106 case /1: case 08 and its A2L, key ``2``, the filter on Raw
     with the text ``108`` (``VALUE_0001`` listed); key ``6``, ``0x0`` = ``93``
     applied; key ``2`` -> ``VALUE_0001`` is still listed with Raw ``147`` and
     the summary's ``tags <a>-<b> / <T>`` equals the one before.

@@ -1053,7 +1053,7 @@ def apportion(sizes: List[int], width: int) -> List[int]:
     """floor-one-then-largest-remainder, bounded by the MEASURED container.
 
     Rewritten from the shipped ``_allocate_band_widths``
-    (``screens_directionb.py:610``, R-TUI-103/LLR-111.7): one column per
+    (``screens_directionb.py:610``, R-TUI-103B.2/LLR-111.7): one column per
     block, the surplus apportioned by byte share, leftovers to the largest
     remainders. The bound lives HERE, in the producer, never in a predicate
     over emitted text — every block keeps >= 1 column (the 1-byte block

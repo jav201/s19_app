@@ -1,4 +1,4 @@
-"""Batch-103 Inc 8 E4, group P - the landing pane's border subtitle (R-PE-041) and the dirty
+"""Batch-103 Inc 8 E4, group P - the landing pane's border subtitle (R-PE.41) and the dirty
 writer w6 reached through ``PatchEditorPanel.note_staged`` (R-PE.34, R-PE-DEF.60 selection).
 
 Cases: ``02-test-cases-P.md``.  Entries are added through the shipped service and the app's own
@@ -52,7 +52,7 @@ async def _add_through_the_panel(pilot, app, panel, address: str, bytes_text: st
 
 
 # --------------------------------------------------------------------------- #
-# R-PE-041 - the ledger subtitle rides the landing pane
+# R-PE.41 - the ledger subtitle rides the landing pane
 # --------------------------------------------------------------------------- #
 
 COUNTS = [(0, "0 entries"), (1, "1 entry"), (3, "3 entries")]

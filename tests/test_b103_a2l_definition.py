@@ -2,7 +2,7 @@
 
 Design under test: ``.dev-flow/2026-11-05-batch-103/inc-2/01-requirements.md``
 rows R-A2L-DEF.1 ... .39 (2a part), .58.1, .58.2, .137, .139 and the cited
-R-A2L-010 ... R-A2L-063 rows, plus the acceptance cases AT-B103-I2-1 (2a arm)
+R-A2L.10 ... R-A2L.63 rows, plus the acceptance cases AT-B103-I2-1 (2a arm)
 and AT-B103-I2-3, one test per case of ``inc-2/02-test-cases.md``. The model
 is exercised only through its 2a public names (``describe_definition``,
 ``describe_definitions``, ``decode_definition``, ``display_text`` and the
@@ -1325,28 +1325,28 @@ def test_r_a2l_def_136_1_batch_describe_equals_per_name_describe(v171, c08):
 
 
 def test_r_a2l_010_def_1_address_from_a_characteristic_header(v171):
-    """R-A2L-010/def-1."""
+    """R-A2L.10/def-1."""
     assert describe_definition(V171_SWORD, v171).address == 0x810004
 
 
 def test_r_a2l_011_def_1_address_from_ecu_address(v171):
-    """R-A2L-011/def-1."""
+    """R-A2L.11/def-1."""
     assert describe_definition("ASAM.M.SCALAR.UBYTE.IDENTICAL", v171).address == 0x13A00
 
 
 def test_r_a2l_014_def_1_length_from_the_datatype_when_the_tag_lacks_it(tube):
-    """R-A2L-014/def-1 - TUBE sm: byte length 1, UBYTE (base: None)."""
+    """R-A2L.14/def-1 - TUBE sm: byte length 1, UBYTE (base: None)."""
     d = describe_definition("model.MainClass.gameController.sm", tube)
     assert d.byte_length == 1 and d.datatype == "UBYTE"
 
 
 def test_r_a2l_022_def_1_datatype_from_the_record_layout(v171):
-    """R-A2L-022/def-1."""
+    """R-A2L.22/def-1."""
     assert describe_definition(V171_SWORD, v171).datatype == "SWORD"
 
 
 def test_r_a2l_023_def_1_datatype_the_deposit_name_spells(tmp_path):
-    """R-A2L-023/def-1 - deposit ``__SWORD_Z``; FF FB big-endian -> -5 (the tag table reads UWORD)."""
+    """R-A2L.23/def-1 - deposit ``__SWORD_Z``; FF FB big-endian -> -5 (the tag table reads UWORD)."""
     rl = '/begin RECORD_LAYOUT __SWORD_Z\n  ALIGNMENT_BYTE 1\n/end RECORD_LAYOUT'
     a2l = _inline(tmp_path, rl, _val("DS", "0x10", "__SWORD_Z", "NO_COMPU_METHOD", "-32768", "32767"))
     d = describe_definition("DS", a2l)
@@ -1355,12 +1355,12 @@ def test_r_a2l_023_def_1_datatype_the_deposit_name_spells(tmp_path):
 
 
 def test_r_a2l_024_def_1_byte_order_of_the_tag(c08):
-    """R-A2L-024/def-1 - VALUE_0001 MSB_FIRST."""
+    """R-A2L.24/def-1 - VALUE_0001 MSB_FIRST."""
     assert describe_definition("VALUE_0001", c08["a2l"]).byte_order == "big"
 
 
 def test_r_a2l_025_def_1_byte_order_of_the_record_layout(tmp_path):
-    """R-A2L-025/def-1 - RL_BL with BYTE_ORDER MSB_LAST under a big-endian MOD_COMMON."""
+    """R-A2L.25/def-1 - RL_BL with BYTE_ORDER MSB_LAST under a big-endian MOD_COMMON."""
     rl = '/begin RECORD_LAYOUT RL_BL\n  FNC_VALUES 1 UWORD ROW_DIR DIRECT\n  BYTE_ORDER MSB_LAST\n/end RECORD_LAYOUT'
     a2l = _inline(tmp_path, rl, _val("BL", "0x10", "RL_BL"), _val("PL", "0x20", "RL_U16"))
     assert describe_definition("BL", a2l).byte_order == "little"
@@ -1368,14 +1368,14 @@ def test_r_a2l_025_def_1_byte_order_of_the_record_layout(tmp_path):
 
 
 def test_r_a2l_026_def_1_byte_order_of_mod_common(v171, tmp_path):
-    """R-A2L-026/def-1 - V171 MSB_LAST gives little; an MSB_FIRST MOD_COMMON gives big."""
+    """R-A2L.26/def-1 - V171 MSB_LAST gives little; an MSB_FIRST MOD_COMMON gives big."""
     assert describe_definition(V171_SWORD, v171).byte_order == "little"
     big = _inline(tmp_path, _val("BG", "0x10", "RL_U16"), byte_order="MSB_FIRST")
     assert describe_definition("BG", big).byte_order == "big"
 
 
 def test_r_a2l_027_def_1_default_byte_order(tmp_path):
-    """R-A2L-027/def-1 - no BYTE_ORDER anywhere: little."""
+    """R-A2L.27/def-1 - no BYTE_ORDER anywhere: little."""
     a2l = _inline(tmp_path, _val("DB", "0x10", "RL_U16"), byte_order=None)
     assert describe_definition("DB", a2l).byte_order == "little"
     big = _inline(tmp_path, _val("BG", "0x10", "RL_U16"), byte_order="MSB_FIRST")
@@ -1383,23 +1383,23 @@ def test_r_a2l_027_def_1_default_byte_order(tmp_path):
 
 
 def test_r_a2l_030_def_1_phys_unit(softa):
-    """R-A2L-030/def-1 - PHYS_UNIT "V" (base: tag unit None)."""
+    """R-A2L.30/def-1 - PHYS_UNIT "V" (base: tag unit None)."""
     assert describe_definition("BcpGxvlbvneyoAudnMhl.DRCDJ_XNIFM_DSURLVD_VSJMQJBMW", softa).unit == "V"
 
 
 def test_r_a2l_030_def_2_a_unit_with_a_space(tmp_path):
-    """R-A2L-030/def-2."""
+    """R-A2L.30/def-2."""
     a2l = _inline(tmp_path, _val("PU", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", 'PHYS_UNIT "deg C"'))
     assert describe_definition("PU", a2l).unit == "deg C"
 
 
 def test_r_a2l_031_def_1_the_methods_unit(v171):
-    """R-A2L-031/def-1 - no PHYS_UNIT; CM.IDENTICAL unit ``hours``."""
+    """R-A2L.31/def-1 - no PHYS_UNIT; CM.IDENTICAL unit ``hours``."""
     assert describe_definition(V171_UBYTE, v171).unit == "hours"
 
 
 def test_r_a2l_033_def_1_unit_on_the_begin_line(tmp_path):
-    """R-A2L-033/def-1 - ``/begin COMPU_METHOD CM_B "d" LINEAR "%.1" "km/h"``."""
+    """R-A2L.33/def-1 - ``/begin COMPU_METHOD CM_B "d" LINEAR "%.1" "km/h"``."""
     cm = '/begin COMPU_METHOD CM_B "d" LINEAR "%.1" "km/h"\n  COEFFS_LINEAR 1 0\n/end COMPU_METHOD'
     a2l = _inline(tmp_path, cm, _val("UB", "0x10", "RL_U16", "CM_B"))
     d = describe_definition("UB", a2l)
@@ -1407,63 +1407,63 @@ def test_r_a2l_033_def_1_unit_on_the_begin_line(tmp_path):
 
 
 def test_r_a2l_040_def_1_raw_bytes_are_read_from_the_image(v171):
-    """R-A2L-040/def-1 - 34 12 at 0x810004 -> stored 4660."""
+    """R-A2L.40/def-1 - 34 12 at 0x810004 -> stored 4660."""
     d = describe_definition(V171_SWORD, v171)
     assert _decoded(d, v171, _img(0x810004, bytes([0x34, 0x12]))).stored == 4660
 
 
 def test_r_a2l_043_def_1_byte_order_of_the_read(tmp_path):
-    """R-A2L-043/def-1 - big-endian 12 34 -> 4660."""
+    """R-A2L.43/def-1 - big-endian 12 34 -> 4660."""
     a2l = _inline(tmp_path, _val("BE", "0x10", "RL_U16"))
     assert _decoded(describe_definition("BE", a2l), a2l, _img(0x10, bytes([0x12, 0x34]))).stored == 4660
 
 
 def test_r_a2l_044_def_1_twos_complement(v171):
-    """R-A2L-044/def-1 - FB FF -> -5."""
+    """R-A2L.44/def-1 - FB FF -> -5."""
     d = describe_definition(V171_SWORD, v171)
     assert _decoded(d, v171, _img(0x810004, bytes([0xFB, 0xFF]))).text == "-5"
 
 
 def test_r_a2l_045_def_1_float16(tmp_path):
-    """R-A2L-045/def-1 - 3C 00 -> 1.0 (base: no value)."""
+    """R-A2L.45/def-1 - 3C 00 -> 1.0 (base: no value)."""
     a2l = _inline(tmp_path, _val("H1", "0x10", "RL_F16", "NO_COMPU_METHOD", "-100", "100"))
     assert _decoded(describe_definition("H1", a2l), a2l, _img(0x10, bytes([0x3C, 0x00]))).value == 1.0
 
 
 def test_r_a2l_045_def_2_float32(tmp_path):
-    """R-A2L-045/def-2 - 3F C0 00 00 -> 1.5."""
+    """R-A2L.45/def-2 - 3F C0 00 00 -> 1.5."""
     a2l = _inline(tmp_path, _val("H2", "0x10", "RL_F32", "NO_COMPU_METHOD", "-100", "100"))
     assert _decoded(describe_definition("H2", a2l), a2l, _img(0x10, bytes([0x3F, 0xC0, 0, 0]))).value == 1.5
 
 
 def test_r_a2l_045_def_3_float64(tmp_path):
-    """R-A2L-045/def-3 - -2.25."""
+    """R-A2L.45/def-3 - -2.25."""
     a2l = _inline(tmp_path, _val("H3", "0x10", "RL_F64", "NO_COMPU_METHOD", "-100", "100"))
     assert _decoded(describe_definition("H3", a2l), a2l, _img(0x10, struct.pack(">d", -2.25))).value == -2.25
 
 
 def test_r_a2l_051_def_1_no_compu_method(tmp_path):
-    """R-A2L-051/def-1 - UBYTE 07 -> 7."""
+    """R-A2L.51/def-1 - UBYTE 07 -> 7."""
     a2l = _inline(tmp_path, _val("NC", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
     assert _decoded(describe_definition("NC", a2l), a2l, {0x10: 7}).value == 7
 
 
 def test_r_a2l_053_def_1_identical(v171):
-    """R-A2L-053/def-1 - 07 00 -> 7."""
+    """R-A2L.53/def-1 - 07 00 -> 7."""
     d = describe_definition(V171_SWORD, v171)
     res = _decoded(d, v171, _img(0x810004, bytes([7, 0])))
     assert res.value == 7 and res.text == "7"
 
 
 def test_r_a2l_054_def_1_linear(c08):
-    """R-A2L-054/def-1 - the first CM_LIN_OFF object decodes to its planned physical value."""
+    """R-A2L.54/def-1 - the first CM_LIN_OFF object decodes to its planned physical value."""
     o = _first(c08, "CM_LIN_OFF")
     res = _decoded(describe_definition(o["name"], c08["a2l"]), c08["a2l"], c08["mem"])
     _planned_close(res, o["physical"])
 
 
 def test_r_a2l_055_def_1_linear_with_b_missing(tmp_path):
-    """R-A2L-055/def-1 - COEFFS_LINEAR 2 on stored 3 -> 6.0."""
+    """R-A2L.55/def-1 - COEFFS_LINEAR 2 on stored 3 -> 6.0."""
     a2l = _inline(tmp_path, _cm("CM_L2", "LINEAR", "2"), _val("LB", "0x10", "RL_U16", "CM_L2"))
     d = describe_definition("LB", a2l)
     assert d.coeffs_linear == (2.0, None)
@@ -1471,14 +1471,14 @@ def test_r_a2l_055_def_1_linear_with_b_missing(tmp_path):
 
 
 def test_r_a2l_056_def_1_rat_func(c08):
-    """R-A2L-056/def-1 - the first CM_RAT object decodes to its planned physical value."""
+    """R-A2L.56/def-1 - the first CM_RAT object decodes to its planned physical value."""
     o = _first(c08, "CM_RAT")
     res = _decoded(describe_definition(o["name"], c08["a2l"]), c08["a2l"], c08["mem"])
     _planned_close(res, o["physical"])
 
 
 def test_r_a2l_057_def_1_root_inside_the_limits(tmp_path):
-    """R-A2L-057/def-1 - raw = p^2, limits 0..10, stored 9 -> 3.0."""
+    """R-A2L.57/def-1 - raw = p^2, limits 0..10, stored 9 -> 3.0."""
     a2l = _inline(tmp_path, _cm("CM_S", "RAT_FUNC", "1", "0", "0", "0", "0", "1"),
                   _val("SQ", "0x10", "RL_U16", "CM_S", "0", "10"))
     assert _decoded(describe_definition("SQ", a2l), a2l, _img(0x10, bytes([0, 9]))).value == 3.0
@@ -1503,21 +1503,21 @@ def test_r_a2l_058_3_def_1_zero_denominator_message(tmp_path):
 
 
 def test_r_a2l_059_def_1_compu_vtab_text(v171):
-    """R-A2L-059/def-1 - raw 2 -> ``Square`` (base: raw 2, unknown method)."""
+    """R-A2L.59/def-1 - raw 2 -> ``Square`` (base: raw 2, unknown method)."""
     d = describe_definition(V171_ENUM, v171)
     res = _decoded(d, v171, _img(0x810004, bytes([2, 0])))
     assert (res.stored, res.value, res.text) == (2, "Square", "Square")
 
 
 def test_r_a2l_059_def_2_text_of_a_masked_enum(tmp_path):
-    """R-A2L-059/def-2 - UWORD enum, mask 0x00F0, word 00 10 -> ON."""
+    """R-A2L.59/def-2 - UWORD enum, mask 0x00F0, word 00 10 -> ON."""
     a2l = _inline(tmp_path, *_enum_blocks("CM_M", "VT_M", "2", '0 "OFF"', '1 "ON"'),
                   _val("ME", "0x10", "RL_U16", "CM_M", "0", "65535", "BIT_MASK 0x00F0"))
     assert _decoded(describe_definition("ME", a2l), a2l, _img(0x10, bytes([0x00, 0x10]))).text == "ON"
 
 
 def test_r_a2l_061_def_1_tab_intp(c08):
-    """R-A2L-061/def-1 - the first CM_TAB_INTP object decodes to its planned value."""
+    """R-A2L.61/def-1 - the first CM_TAB_INTP object decodes to its planned value."""
     o = _first(c08, "CM_TAB_INTP")
     res = _decoded(describe_definition(o["name"], c08["a2l"]), c08["a2l"], c08["mem"])
     _planned_close(res, o["physical"])
@@ -1531,14 +1531,14 @@ def _with_raw(c08: dict, o: dict, raw: int) -> dict[int, int]:
 
 
 def test_r_a2l_062_def_1_tab_intp_outside_the_table(c08):
-    """R-A2L-062/def-1 - stored 500 -> 40.0 (the last table point)."""
+    """R-A2L.62/def-1 - stored 500 -> 40.0 (the last table point)."""
     o = _first(c08, "CM_TAB_INTP")
     d = describe_definition(o["name"], c08["a2l"])
     assert _decoded(d, c08["a2l"], _with_raw(c08, o, 500)).value == 40.0
 
 
 def test_r_a2l_063_def_1_tab_nointp_nearest(c08):
-    """R-A2L-063/def-1 - stored 6 -> 20.0 (raw 4 is nearest)."""
+    """R-A2L.63/def-1 - stored 6 -> 20.0 (raw 4 is nearest)."""
     o = _first(c08, "CM_TAB_NOINTP")
     d = describe_definition(o["name"], c08["a2l"])
     assert _decoded(d, c08["a2l"], _with_raw(c08, o, 6)).value == 20.0
@@ -1563,7 +1563,7 @@ def test_r_a2l_def_39_4_display_text_of_non_finite_values_direct(v171):
 def test_at_b103_i2_1_asam_demo_scalar_kinds_decode_to_the_text_the_a2l_gives(v171):
     """AT-B103-I2-1 (2a arm) - the ten V171 objects: build and decode over the demo image.
 
-    Rows .2, .3, .14, .15, .27, .30, .33 and cited R-A2L-059. The encode, apply
+    Rows .2, .3, .14, .15, .27, .30, .33 and cited R-A2L.59. The encode, apply
     and re-decode arm and the seven A2L-DEF-OVERLAP refusals wait for 2b.
     """
     image: dict[int, int] = {}

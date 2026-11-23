@@ -365,7 +365,7 @@ def test_at075a_titles(tmp_path: Path) -> None:
             # batch-97 Inc-4 (named supersession, HLR-144): the CHECKS and
             # JSON windows became tabs of ONE bordered inspector, whose title
             # and subtitle follow the active tab — read them per tab.
-            # Inc 8 R-TUI-063.6 / R-PE-041: the ledger has no border; its title and subtitle
+            # Inc 8 R-TUI-063.6 / R-PE.41: the ledger has no border; its title and subtitle
             # are the landing pane's (title LANDS IN; subtitle = the ledger's while Patch script shows).
             outcomes["script"] = _window_chrome(app, "patch_inspector")
             panel = app.query_one("#patch_editor_panel")
@@ -379,7 +379,7 @@ def test_at075a_titles(tmp_path: Path) -> None:
             app.query_one("#patch_entry_value_input", Input).value = "added"
             app.query_one("#patch_entry_add_button", Button).press()
             await pilot.pause()
-            # Inc 8 R-PE-041: the entry count shows on the landing pane while Patch script
+            # Inc 8 R-PE.41: the entry count shows on the landing pane while Patch script
             # (or Inspector) is the shown tab, so the tab is selected again before the read.
             panel.query_one("#patch_tab_script", Button).press()
             await pilot.pause()

@@ -12,7 +12,7 @@ Group: where a document lives and what the three lists show.
     project: ``checks/<n>``, ``patches/<n>``, then the common library as
     ``library/<n>``; a library pick opens it; links and linked folders are
     refused with the row's exact text; the unsaved-changes popup checks again.
-  - R-CHKED.31 / R-CHKED.34 / R-CHKED.40 / R-CHKED-042 / R-CHKED.44 - the Check Editor writes into the
+  - R-CHKED.31 / R-CHKED.34 / R-CHKED.40 / R-CHKED.42 / R-CHKED.44 - the Check Editor writes into the
     check home, lists it, sets Write as to the bare name, refuses links.
   - R-DIFF-CHK.1 / .3 / .5 / .8 - the A2B Diff check-spec list follows the
     spec list.
@@ -757,7 +757,7 @@ def test_r_chked_031_write_home(tmp_path: Path, arm: str) -> None:
     ``w.chk.json``) -> ``proj/checks/w.chk.json``; ``workarea/patches/`` holds
     only ``w.chk.json``, unchanged; the status names the project copy,
     ``Check Editor: wrote checks/w.chk.json (1 fields, kind=check).``
-    (R-CHKED-032/3, E5 C-9). never-overwrites: a ``checks/s1.chk.json``
+    (R-CHKED.32/3, E5 C-9). never-overwrites: a ``checks/s1.chk.json``
     that already exists keeps its bytes and the new spec takes another name.
 
     Negative control: Write without the check home -> the file lands in
@@ -808,7 +808,7 @@ def test_r_chked_031_write_home(tmp_path: Path, arm: str) -> None:
 
 @pytest.mark.parametrize("arm", ["project", "no-project", "collision"])
 def test_r_chked_032_write_status_names_the_home(tmp_path: Path, arm: str) -> None:
-    """Cases R-CHKED-032/1, /2 and /4 (E5 C-9 = SEC E5-2): the Write status
+    """Cases R-CHKED.32/1, /2 and /4 (E5 C-9 = SEC E5-2): the Write status
     names the written file as the Spec list lists it. /1: in a project, Write
     as ``s1.chk.json`` -> exactly ``Check Editor: wrote checks/s1.chk.json (1
     fields, kind=check).``. /2: with no project the bare name, as before. /4:
@@ -880,7 +880,7 @@ def test_r_chked_034_linked_check_home(tmp_path: Path) -> None:
 
 
 # ===========================================================================
-# R-CHKED.40 / R-CHKED-042 / R-CHKED.44 - the Spec list
+# R-CHKED.40 / R-CHKED.42 / R-CHKED.44 - the Spec list
 # ===========================================================================
 
 
@@ -942,7 +942,7 @@ def test_r_chked_040_spec_list(tmp_path: Path, arm: str) -> None:
 
 
 def test_r_chked_042_write_as_bare_name(tmp_path: Path) -> None:
-    """Case R-CHKED-042/1 (revised D-3): a pick of ``library/w.chk.json`` in a
+    """Case R-CHKED.42/1 (revised D-3): a pick of ``library/w.chk.json`` in a
     project sets the Write as input to the bare file name ``w.chk.json`` (no
     folder part); the status is ``Check Editor: loaded 'library/w.chk.json'
     (1 fields).``

@@ -1,6 +1,6 @@
 # S4 — Hex view & Memory Map: context notes and strict EARS rows (2026-10-30)
 
-Input: `REQUIREMENTS.by-module.md` chapter S4 (lines 1320–2185, 866 lines): 22 blocks — R-TUI-004, R-TUI-007, R-TUI-009, R-TUI.10, R-TUI-017, R-TUI-018, R-TUI.38, R-TUI-040, R-TUI-026 (superseded), R-TUI-041, R-WS-HEXROW-001, R-TUI-050/051 (retired), 060, 061, 062, 067, 072, 073, 074, and R-TUI-103's band-bar clause (its safe-text clause is in S1). Earlier analysis: `review/weak-point-check.md` (ambiguity families H1–H7).
+Input: `REQUIREMENTS.by-module.md` chapter S4 (lines 1320–2185, 866 lines): 22 blocks — R-TUI-004, R-TUI-007, R-TUI-009, R-TUI.10, R-TUI-017, R-TUI-018, R-TUI.38, R-TUI-040, R-TUI-026 (superseded), R-TUI-041, R-WS-HEXROW-001, R-TUI-050/051 (retired), 060, 061, 062, 067, 072, 073, 074, and R-TUI.103's band-bar clause (its safe-text clause is in S1). Earlier analysis: `review/weak-point-check.md` (ambiguity families H1–H7).
 Code: `s19_app/render/hexview.py`, `format.py`, `tui/services/entropy_service.py`, `tui/entropy_style.py`, the Memory Map parts of `tui/screens_directionb.py`, the S4 functions of `app.py`, the `#hex_*`, `#map_*`, `band-*` rules of `styles.tcss`. Two read-only code readings, every fact with `file:line`. No test was run.
 
 Result:
@@ -35,7 +35,7 @@ Result:
 | R-TUI-018 / 040 | Where the target lands differs by view and by action: main view somewhere in its page with no scroll, A2L/MAC search and go-to on row 65, selections near the top. | One rule: the target row is second from the top (D4-2). |
 | R-TUI.38 | "resumes from the first address visible" holds, but all three hex views share one search state: a query typed in the MAC view continues from a hit in the Workspace, and its highlight appears in all three. | One search state per view (D4-4). |
 | R-TUI-050 / 051 | Retired (entropy viewer modal), still ~80 lines of text. | Marked retired; the code is confirmed gone. |
-| R-TUI-103 (band-bar clause) | Shares its id with an unrelated safe-text rule (S1). | New ids R-TUI-103B.x here. |
+| R-TUI.103 (band-bar clause) | Shares its id with an unrelated safe-text rule (S1). | New ids R-TUI-103B.x here. |
 
 ---
 
@@ -195,7 +195,7 @@ Form column: U = ubiquitous. "Code today": **Yes**, **Yes; tested**, **Partly** 
 
 ### S4.5 · Jumps and marks
 
-Selecting an A2L tag or a MAC record is in S2 (R-A2L-100 … 104, R-MAC.54 … R-MAC.56); these rows set where any jump lands.
+Selecting an A2L tag or a MAC record is in S2 (R-A2L.100 … R-A2L.104, R-MAC.54 … R-MAC.56); these rows set where any jump lands.
 
 | Id | Form | Requirement | Code today |
 |---|---|---|---|

@@ -221,7 +221,7 @@ def test_parse_a2l_file_reports_unclosed_section(tmp_path):
 
 
 def test_render_a2l_view_shows_sections():
-    """Traces: R-A2L-076."""
+    """Traces: R-A2L.76."""
     data = {
         "sections": [
             {"name": "PROJECT", "meta": "Demo", "start_line": 1, "end_line": 3, "children": []}
@@ -235,7 +235,7 @@ def test_render_a2l_view_shows_sections():
 
 
 def test_render_a2l_view_shows_nested_sections():
-    """Traces: R-A2L-076."""
+    """Traces: R-A2L.76."""
     data = {
         "sections": [
             {
@@ -264,7 +264,7 @@ def test_render_a2l_view_shows_nested_sections():
 
 
 def test_render_a2l_view_shows_errors():
-    """Traces: R-A2L-075."""
+    """Traces: R-A2L.75."""
     data = {"sections": [], "errors": ["Line 1: /end without /begin"]}
 
     output = render_a2l_view(data)
@@ -273,7 +273,7 @@ def test_render_a2l_view_shows_errors():
 
 
 def test_validate_a2l_tags_matches_memory():
-    """Traces: R-A2L-070."""
+    """Traces: R-A2L.70."""
     tags = [
         {"section": "MEASUREMENT", "name": "A", "address": 0x1000, "length": 2},
         {"section": "MEASUREMENT", "name": "B", "address": 0x2000, "length": 2},

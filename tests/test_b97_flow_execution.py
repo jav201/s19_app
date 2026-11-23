@@ -2114,7 +2114,7 @@ def test_tc_b97_flow_execution_css_section_is_scoped() -> None:
     pe_picker = inserted("/* --- Patch A2L tab (batch-102 Inc 5", "#patch_editor_panel #patch_param_controls,\n#patch_editor_panel #patch_param_use_row", "db1a8f7 patch picker block")
     old = supersede(old, "#patch_editor_panel #patch_json_view,", pe_picker + "#patch_editor_panel #patch_json_view,", "db1a8f7 patch picker anchor")
     # 894bb3db (batch-103 Inc 8, group P: the staging sheet over LANDS IN; R-TUI-063.1, .3,
-    # R-PE-DEF.1.1, .2, .74, R-PE-041): one named supersession per in-place edit of a b514b07
+    # R-PE-DEF.1.1, .2, .74, R-PE.41): one named supersession per in-place edit of a b514b07
     # rule (E4 integration, ruling RR-5; reconciled with evidence-e4/impl-p/css_law_probe.py).
     # Each `before` is the exact old text, located exactly once; the `startswith` assertion
     # below is not edited. The `.ce-row` / `.ce-label` re-scope (#patch_win_a2l ->
@@ -2136,9 +2136,9 @@ def test_tc_b97_flow_execution_css_section_is_scoped() -> None:
         "    border: round $rule;\n    border-title-color: #969aad;      /* insight_style.DGRAY */\n"
         "    border-subtitle-color: #969aad;   /* insight_style.DGRAY */\n}\n",
         "/* batch-103 Inc 8: the ledger is the Patch script tab, with no border of\n"
-        " * its own; its subtitle rides the landing pane (R-PE-041). */\n"
+        " * its own; its subtitle rides the landing pane (R-PE.41). */\n"
         "#patch_editor_panel #patch_win_script {\n    height: 100%;\n    padding: 0;\n}\n",
-        "894bb3db Inc 8 R-PE-041 borderless #patch_win_script",
+        "894bb3db Inc 8 R-PE.41 borderless #patch_win_script",
     )
     old = supersede(
         old,

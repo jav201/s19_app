@@ -26,8 +26,8 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 | D-4 | Intel HEX type 02: wrap at 64 KiB; the sample file becomes the test | R-HEX.2 | open |
 | D-5 | Out-of-order findings carry the physical line number | R-IMG.3 | open |
 | D-6 | Safe text: a run of tab / line breaks shows as one space | R-TUI-103.1 | open |
-| D-7 | Sweep the screens not yet on the safe-text list (with S4) | R-TUI-103 | open |
-| D-7+ | Apply the safe-text function to the views added from S6–S14 (CTX-TEXT list) | R-TUI-103, 103.1, 103a, 103b | open |
+| D-7 | Sweep the screens not yet on the safe-text list (with S4) | R-TUI.103 | open |
+| D-7+ | Apply the safe-text function to the views added from S6–S14 (CTX-TEXT list) | R-TUI.103, R-TUI-103.1, R-TUI.104, R-TUI.105 | open |
 | D-8 | Remove the two checks that can never fire | — | open |
 | D-11 | Remove the command-line tool (cli.py, its tests, README section) | — | open |
 | D-14 | Version in one place (pyproject reads version.py) | R-VER.1 | open |
@@ -41,24 +41,24 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 | Id | Change | Rows | Status |
 |---|---|---|---|
 | D2-1 | Remove `get_raw_value` / `get_physical_value` / `validate_characteristic` and tests | — | open |
-| D2-2 | Remove the dead "existing tag endian" step | R-A2L-024 … 027 | open |
-| D2-3 | Raise `A2L_UNKNOWN_BYTE_ORDER` | R-A2L-028, R-VAL.37 | open |
-| D2-5 | TAB_VERB shows the COMPU_VTAB text | R-A2L-059 | open |
-| D2-6 | One unit rule (UNIT/PHYS_UNIT whole text, then conversion unit); conversion line on /begin | R-A2L-030 … 033 | open |
-| D2-7 | CURVE/MAP length = whole record | R-A2L-018 | open |
-| D2-8 | Datatype from the deposit name, not guessed by size | R-A2L-023 | open |
-| D2-9 | Decode FLOAT16 | R-A2L-045 | open |
-| D2-10 | Multi-value tags: one value per element; table shows `<n> values` | R-A2L-047, R-A2L-006.9 | open |
+| D2-2 | Remove the dead "existing tag endian" step | R-A2L.24 … R-A2L.27 | open |
+| D2-3 | Raise `A2L_UNKNOWN_BYTE_ORDER` | R-A2L.28, R-VAL.37 | open |
+| D2-5 | TAB_VERB shows the COMPU_VTAB text | R-A2L.59 | open |
+| D2-6 | One unit rule (UNIT/PHYS_UNIT whole text, then conversion unit); conversion line on /begin | R-A2L.30 … R-A2L.33 | open |
+| D2-7 | CURVE/MAP length = whole record | R-A2L.18 | open |
+| D2-8 | Datatype from the deposit name, not guessed by size | R-A2L.23 | open |
+| D2-9 | Decode FLOAT16 | R-A2L.45 | open |
+| D2-10 | Multi-value tags: one value per element; table shows `<n> values` | R-A2L.47, R-A2L-006.9 | open |
 | D2-11 | Strip comments before sections; mismatched /end is a parse error | R-A2L-001.2, 001.5 | open |
-| D2-12 | A2L summary shows errors, then sections and tags | R-A2L-076, 077 | open |
+| D2-12 | A2L summary shows errors, then sections and tags | R-A2L.76, R-A2L.77 | open |
 | D2-13 | `A2L loaded with <n> parse errors` | R-A2L-004.2 | open (re-verified at 570b4b5) |
 | D2-14 | `Invalid` filter = red rows | R-A2L-007.7 | open |
-| D2-15 | Filter / find compare the address as shown | R-A2L-007.5, R-A2L-099 | open |
+| D2-15 | Filter / find compare the address as shown | R-A2L-007.5, R-A2L.99 | open |
 | D2-16 | A2L glyphs ✓ / ⚠ / · | R-A2L-006.2 | open |
 | D2-17 | One-sided limit shows `..100` | R-A2L-006.10 | open |
-| D2-18 | Find brings the address near the top | R-A2L-094 | open |
+| D2-18 | Find brings the address near the top | R-A2L.94 | open |
 | D2-19 | Active filter-mode button; `No tag matches the filter.` | R-A2L-007.9, R-TUI-068.4 | open |
-| D2-20 | MAC-only session: no tag checked | R-A2L-071 | open (re-verified at 570b4b5) |
+| D2-20 | MAC-only session: no tag checked | R-A2L.71 | open (re-verified at 570b4b5) |
 | D2-21 | MAC status order: errors first | R-MAC.30 | open |
 | D2-22 | MAC summary: one count per status | R-MAC.50 | open |
 | D2-23 | `MAC file has no records.` | R-MAC.53 | open |
@@ -76,10 +76,10 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 | D3-7 | Remove the dead jump-to-source code and `_format_validation_issue_line` | — | done (batch-101 Inc 12) |
 | D3-8 | Remove the unused issue page-size setting and capped branch | — | open |
 | D3-9 | "Only in A2L / MAC" warnings only when the other file is loaded | R-VAL.45, R-VAL.46 | open |
-| D3-10 | A2L structure checks in every session with an A2L | R-VAL.30 … R-VAL-033 | open |
+| D3-10 | A2L structure checks in every session with an A2L | R-VAL.30 … R-VAL.33 | open |
 | D3-11 | Run the A2L structure rules once | — | open |
 | D3-12 | Standard block names recognised; remove the display triage | R-VAL-032 | open |
-| D3-13 | Broken references: check child REF/DEF/IN/OUT blocks | R-VAL-033 | open |
+| D3-13 | Broken references: check child REF/DEF/IN/OUT blocks | R-VAL.33 | open |
 | D3-14 | Line diagnostics and MAC read failure become issues; integrity notices deduped | R-VAL.13, R-VAL.17, R-VAL.18 | open |
 | D3-15 | Overlap issues from the loaded image, both formats, whole tag span | R-VAL.41, R-VAL.43 | open |
 | D3-16 | Tag with no length: not checked, no issue | R-VAL.42, R-VAL.53 | open |
@@ -221,8 +221,8 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 |---|---|---|---|
 | D9-7 | Remove `run_checks_for_project` and its test-only caller (the headless project-run test) | — | done (batch-101 Inc 4) |
 | D9-8 | Remove the hidden `#check_preview_toggle_button` and its handler | — | done (batch-101 Inc 12) |
-| D9-10 | One "current run" rule: the Checks tab (rows, status, strip, subtitle) and the Checks screen show the no-run state when the document or the image differs from the run's (the stamp the ledger glyphs already use); a 0-entry run shows `0 checked` | R-CHK-PE-008 … R-CHK-PE.12, R-CHKS.1, R-CHKS.4, R-CHKS-009 | open |
-| D9-11 | Check Editor: a field loaded from a spec keeps the spec's expected bytes; only new fields take the image's bytes (Write and Validate) | R-CHKED.25, R-CHKED-026 | open |
+| D9-10 | One "current run" rule: the Checks tab (rows, status, strip, subtitle) and the Checks screen show the no-run state when the document or the image differs from the run's (the stamp the ledger glyphs already use); a 0-entry run shows `0 checked` | R-CHK-PE.8 … R-CHK-PE.12, R-CHKS.1, R-CHKS.4, R-CHKS.9 | open |
+| D9-11 | Check Editor: a field loaded from a spec keeps the spec's expected bytes; only new fields take the image's bytes (Write and Validate) | R-CHKED.25, R-CHKED.26 | open |
 | D9-12 | Check Editor: keep the included parameters the new A2L list still holds on screen entry and after Write | R-CHKED.10 | open |
 | D9-13 | Check Editor JSON tab shows the document Write would write (S8 serialiser) | R-CHKED.19 | open |
 | D9-14 | Check Editor Write: append `.chk.json` when the name lacks it | R-CHKED.30 | open |
@@ -325,7 +325,7 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 | D13-30 | `x` refuses unless a primary (S19 / Intel HEX) is loaded; a MAC-only session gets the no-file status | R-OPS-003.2, .3 | open |
 | D13-31 | CRC Designer: `Invalid parameters: <field> is not a number: <text>` (also on Save) | R-CRC-DESIGNER-002.5, R-CRC-TEMPLATE-001.8 | open |
 | D13-32 | CRC Designer Save: refuse a device name with the shared rule (`workspace.py:1803`) | R-CRC-TEMPLATE-001.7 | open |
-| D13-33 | CRC Designer and Operations dialog join S1's safe-text views (control characters; S1 D-7 sweep) | R-TUI-103 (S1) | open |
+| D13-33 | CRC Designer and Operations dialog join S1's safe-text views (control characters; S1 D-7 sweep) | R-TUI.103 (S1) | open |
 | D13-40, 41, 42 | Prototype round first (Operations dialog with one operation; CRC Designer column widths so preset names read whole, toggle state word; coverage-window range colour from the S3 palette, JSON strip title without code names) | R-OPS-002.1, R-TUI-100.1 | needs prototype |
 
 ## S14 — A↔B compare & diff reports
@@ -388,7 +388,7 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 | D17-13 | Remove `segment_ops.slice_ranges` and `segment_ops.write_bin_with_sidecar` (tests only) and their tests | — | open |
 | D17-14 | Sanitiser: remove the device-name prefix with the superscript normalisation and the `segment_<index>` fallback (no effect: every name starts with `<stem>_`, no row name is empty); drop their test cases | — | open |
 | D17-20 | Naming sample, output label and per-file labels show the name the export writes (segment part), not the raw row name | R-SEG-PREV.4 | open |
-| D17-21 | Table, naming line, output label and per-file rows: A2L names through the safe-text function (with S1 D-7) | S1 R-TUI-103 | open |
+| D17-21 | Table, naming line, output label and per-file rows: A2L names through the safe-text function (with S1 D-7) | S1 R-TUI.103 | open |
 | D17-22 | Join concat: count an empty join file (state line + confirm); its BIN sidecar holds the lowest selected base | R-SEG-PREV.9, R-SEG-EXP.5, R-SEG-OUT.11 | open |
 | D17-23 | Concat summary prints the real base (lowest selected base), not `0x00000000` | R-SEG-PREV.17 | open |
 | D17-24 | Band in split mode: fill only with gaps fill; uncovered row span with gaps skip is absent | R-SEG-PREV.2 | open |
