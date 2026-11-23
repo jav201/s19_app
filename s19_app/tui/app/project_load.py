@@ -1415,8 +1415,14 @@ class ProjectLoadMixin:
                     a2l_files[0] if a2l_files else None, self.current_a2l_path
                 ),
             )
+            # D-13 (R-A2L-REFRESH.050, P-349): take the worker's collector
+            # hold before the worker thread starts, so the thread's own
+            # start-up allocations cannot run a collection on it.
+            gc.disable()
             self._project_load_worker(request)
         except BaseException:
+            if not gc.isenabled():
+                gc.enable()
             self._busy_fail("project_load", gen)
             raise
 
@@ -1428,7 +1434,8 @@ class ProjectLoadMixin:
         # D-13: the whole project worker (parse, payload, preparation) runs
         # with the cycle collector disabled — parse and describe churn
         # enough objects that mid-run generational collections hold the GIL
-        # and starve the UI busy tick. Every outcome re-enables it
+        # and starve the UI busy tick. The dispatch already took the hold
+        # before this thread started; every outcome re-enables it
         # (R-A2L-REFRESH.050/.051).
         gc.disable()
         try:

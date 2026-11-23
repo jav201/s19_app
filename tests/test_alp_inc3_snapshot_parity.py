@@ -1759,6 +1759,131 @@ def test_r_a2l_refresh_050_project_worker_runs_no_collection(
 
 @pytest.mark.parametrize(
     "arm",
+    ["started", "dispatch-fails"],
+    ids=[f"R-A2L-REFRESH.050/hold-{i}" for i in range(1, 3)],
+)
+def test_r_a2l_refresh_050_project_worker_held_from_dispatch(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str
+) -> None:
+    """R-A2L-REFRESH.050 (P-349, ruling E4-7) / D-13: the project load takes
+    the collector hold on the UI thread BEFORE Textual starts the worker
+    thread. A hold taken only by the worker body leaves the thread's own
+    start-up allocations free to run a collection on it, which holds the GIL
+    and makes the busy tick late (the node above caught one generation-0
+    collection there). Deterministic: the oracle reads the collector state,
+    not a clock and not whether an allocation count crossed the threshold.
+
+    A spy on ``run_worker`` (group ``project_load`` only) records
+    ``gc.isenabled()`` when the dispatch hands the work over, wraps the work
+    and records it again as the first step on the worker thread; a
+    ``gc.callbacks`` hook records every collection start with its thread.
+    ``started``: the collector is off at both points, no collection runs on
+    the worker thread from its first step to the end of the worker body, and
+    it is on again after the load (R-A2L-REFRESH.051).
+    ``dispatch-fails``: the dispatch raises with the hold already taken; the
+    busy run ends as failed and the collector is on again after the route
+    ends (R-A2L-REFRESH.051 — no outcome, a failed start included, may leave
+    it off)."""
+    import gc
+
+    _guard_project_route()
+
+    base = tmp_path / "app"
+    src = tmp_path / "src"
+    src.mkdir(parents=True)
+    old = _old_a2l(src / "old.a2l")
+    img1 = _write_image(src / "img1.s19", dict(IMG1))
+
+    at_dispatch: list = []
+    on_worker: list = []
+    events: list = []
+    outcomes: list = []
+    gc_at_end: list = []
+
+    def on_collect(phase: str, info: dict) -> None:
+        if phase == "start":
+            events.append(("collect", threading.get_ident()))
+
+    async def body(app, pilot):
+        _mount_views(app)
+        await pilot.pause()
+        _seed_project3(app.workarea, "proj_a", a2l=old, image=img1)
+        real_run_worker = app.run_worker
+
+        def spy_run_worker(work, *args, **kwargs):
+            if kwargs.get("group") != "project_load":
+                return real_run_worker(work, *args, **kwargs)
+            at_dispatch.append(gc.isenabled())
+            if arm == "dispatch-fails":
+                raise RuntimeError("dispatch boom")
+
+            def held_work():
+                ident = threading.get_ident()
+                on_worker.append(gc.isenabled())
+                exit_marker = ("exit", ident)
+                events.append(("enter", ident))
+                try:
+                    return work()
+                finally:
+                    events.append(exit_marker)
+
+            return real_run_worker(held_work, *args, **kwargs)
+
+        monkeypatch.setattr(app, "run_worker", spy_run_worker)
+        _arm_outcomes(app, monkeypatch, outcomes)
+        if arm == "dispatch-fails":
+            # The kickoff is called directly (as test_b100_busy's
+            # kickoff-raise node does) so the RuntimeError leaves the
+            # request here instead of panicking the app.
+            with pytest.raises(RuntimeError, match="dispatch boom"):
+                app._handle_load_project("proj_a")
+        else:
+            await _load_project(app, pilot, "proj_a")
+        await settle_workers(pilot)
+        gc_at_end.append(gc.isenabled())
+        return None
+
+    gc.callbacks.append(on_collect)
+    try:
+        _run(base, body)
+    finally:
+        gc.callbacks.remove(on_collect)
+
+    assert at_dispatch == [False], (
+        "R-A2L-REFRESH.050: the collector was not held when the project "
+        f"worker was dispatched (before its thread started): {at_dispatch}"
+    )
+    if arm == "dispatch-fails":
+        assert on_worker == [], on_worker
+        assert [key for key, _ in outcomes] == ["project_load"], outcomes
+        assert outcomes[0][1].endswith(" failed"), outcomes
+        assert gc_at_end == [True], (
+            "R-A2L-REFRESH.051: the collector stayed disabled after the "
+            f"project worker dispatch failed: {gc_at_end}"
+        )
+        return
+    assert on_worker == [False], (
+        "R-A2L-REFRESH.050: the collector was enabled when the project "
+        f"worker thread began its work: {on_worker}"
+    )
+    enters = [i for i, (kind, _) in enumerate(events) if kind == "enter"]
+    assert len(enters) == 1, events
+    worker = events[enters[0]][1]
+    end = events.index(("exit", worker), enters[0])
+    on_thread = [
+        event for event in events[enters[0]:end] if event == ("collect", worker)
+    ]
+    assert on_thread == [], (
+        "R-A2L-REFRESH.050: a collection ran on the project worker thread "
+        f"during the worker: {len(on_thread)}"
+    )
+    assert gc_at_end == [True], (
+        f"R-A2L-REFRESH.051: gc disabled after the project load: {gc_at_end}"
+    )
+
+
+@pytest.mark.parametrize(
+    "arm",
     ["refusal", "worker-failure", "superseded"],
     ids=[f"R-A2L-REFRESH.051/{i}" for i in range(4, 7)],
 )
