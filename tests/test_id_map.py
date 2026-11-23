@@ -712,7 +712,7 @@ _L31 = "R-ZZT-031\tR-ZZT.31\trename\tREQUIREMENTS.md:11@ef5ab17c"
 
 
 def test_rewrite_file_dash_tail_lists_are_shorthand_and_unchanged():
-    """Renaming only the head of `R-X-010, -011` strands the tail on a dead id. R-DOC-IDMAP.18/4"""
+    """Renaming only the head of `R-ZZT-010, -011` strands the tail on a dead id. R-DOC-IDMAP.18/4"""
     text = b"R-ZZT-010, -011\nR-ZZT-031 / -034 / -040\n"
     new, hits, skips = _rw("t.md", text, (_L10, _L31))
     assert (new, hits, len(skips)) == (text, [], 2)

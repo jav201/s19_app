@@ -321,7 +321,7 @@ _DOTTED_TAIL_RE = re.compile(r"^(.+?)(?:\.[0-9]+[a-z]?)$")
 
 
 def s0_citations(text: str) -> List[Tuple[int, str]]:
-    """N11 -- ``(line, id)`` for every id cited in the second cell of an S0.2 ``| HLR-`` line.
+    """N11 -- ``(line, id)`` for every id cited in the second cell of an S0.2 ``| HLR-`` or ``| R-`` line.
 
     A full id sets the current stem (the id without its last ``.n``); an abbreviation
     ``.n`` right after a comma or ``...`` expands to ``<stem>.n``. Cells do not share a stem.
@@ -334,7 +334,7 @@ def s0_citations(text: str) -> List[Tuple[int, str]]:
     cited: List[Tuple[int, str]] = []
     for i in range(start, stop):
         line = lines[i]
-        if not line.startswith("| HLR-"):
+        if not line.startswith(("| HLR-", "| R-")):
             continue
         cells = _cells(line)
         if len(cells) < 2:
@@ -357,8 +357,8 @@ def s0_citations(text: str) -> List[Tuple[int, str]]:
 def test_canon_s0_table_cites_existing_rows() -> None:
     """R-DOC-CANON.8 -- every id cited in an absorbing cell of S0.2 is a row of the canon.
 
-    Why: S0.2 is how a retired batch id (HLR-/LLR-) is traced to the rows that absorbed
-    it. A pointer to a row that was renamed or never written sends the trace to nothing,
+    Why: S0.2 is how a retired batch id (HLR-/LLR-) or an R-form id with no row is traced
+    to the rows that absorbed it. A pointer to a row that was renamed or never written sends the trace to nothing,
     and nothing else in the flow would notice. The bound keeps a parser that finds no
     ids from passing for lack of anything to check.
     """
