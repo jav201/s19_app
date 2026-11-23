@@ -2144,6 +2144,24 @@ _FINAL_NAME_ALLOWLIST = {
             "_drop_orphan_md",
         }
     ),
+    # P-279 I3 (R-A2L-CACHE.008/.011/.012/.024/.026): the A2L parse cache
+    # writes only inside the per-user cache folder — outside every work
+    # area, so outside LLR-155.3's invariant (the record_recent_source
+    # precedent). ``_Dir.replace`` makes a stored entry appear in one step
+    # (``os.replace`` of its own ``.tmp-`` file, dir-fd relative);
+    # ``_Dir.unlink`` / ``_unlink_quiet`` are the one delete primitive, used
+    # by eviction (``_evict_in``: least recently used entries and stale
+    # temporary files) and ``--clear-a2l-cache`` (``_clear_in``), never on a
+    # foreign file (R-A2L-CACHE.014) or through a link (R-A2L-CACHE.059).
+    "s19_app/tui/a2l_cache.py": frozenset(
+        {
+            "_clear_in",
+            "_evict_in",
+            "_unlink_quiet",
+            "replace",
+            "unlink",
+        }
+    ),
     # A2L JSON dump (operator-picked export target): overwriting the chosen
     # path IS the action's semantics (see the allow-list intro).
     "s19_app/tui/app/a2l_view.py": frozenset(
