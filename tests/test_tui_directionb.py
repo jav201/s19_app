@@ -4763,6 +4763,45 @@ def test_at071b_disjoint_same_band_regions_stay_separate(tmp_path: Path) -> None
     )
 
 
+def test_r_tui_065_1_region_row_size_is_human_readable(tmp_path: Path) -> None:
+    """A region row prints its size human-readable: 6144 bytes show as
+    ``6.0 KiB``, never as the raw count.
+
+    Traces: R-TUI-065.1, R-TUI-073.1.
+
+    Intent (I9-TC-02): ``test_at071b_...`` reads ``256 B``, which a raw byte
+    count also prints, so no test failed when the rule broke. One 0xFF block of
+    6 KiB makes the two renderings differ.
+    """
+    from s19_app.core import S19File
+    from s19_app.tui.changes import emit_s19_from_mem_map
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    block = 0x80000000
+    size = 6144
+    mem_map = {block + i: 0xFF for i in range(size)}
+    path = tmp_path / "one_6k.s19"
+    path.write_text(
+        emit_s19_from_mem_map(mem_map, [(block, block + size)]), encoding="ascii"
+    )
+    loaded = build_loaded_s19(path, S19File(str(path)), a2l_path=None, a2l_data=None)
+
+    async def _drive() -> "list":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            return [_widget_plain(row) for row in _region_rows(app)]
+
+    texts = asyncio.run(_drive())
+    assert len(texts) == 1, f"one block must render as one region row; got {texts}"
+    assert "6.0 KiB" in texts[0], f"size not human-readable; got {texts[0]!r}"
+    assert "6144" not in texts[0], f"raw byte count shown; got {texts[0]!r}"
+
+
 def test_map_band_view_survives_rerender(tmp_path: Path) -> None:
     """A second ``update_memory_map`` re-renders the band view without a
     DuplicateIds crash or doubled region rows (regression: the re-mounted band

@@ -3138,6 +3138,8 @@ def test_at064b_json_popup_edit_confirm_cancel_and_geometry(
 ) -> None:
     """JSON popup: Confirm applies the edited change-set; Cancel is a no-op.
 
+    Traces: R-TUI-053.1, R-TUI-053.2, R-TUI-053.4, R-PE-JSON.1.
+
     Intent (AT-064b, US-064b / LLR-064b.1/.2/.3, C-12 output-then-consume,
     Q-07 paste-seed): for a PASTE-authored document (``source_path is None``)
     the operator opens the JSON popup, edits the JSON to add a NEW entry, and

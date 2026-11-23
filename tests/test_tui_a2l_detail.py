@@ -446,3 +446,48 @@ def test_summary_count() -> None:
         assert "1 in image" in plain, f"summary missing in-image count; got {plain!r}"
 
     _drive_mixed((120, 30), _observe)
+
+
+def test_r_a2l_screen_1_in_image_count_is_green() -> None:
+    """The ``<K> in image`` count in ``#a2l_tags_summary`` is drawn in green, and
+    the ``Page ...`` text beside it is not.
+
+    Traces: R-A2L-SCREEN.1.
+
+    Intent (I9-TC-01): the legend names this count "in-image counter (green)",
+    so an operator relies on the colour. ``test_summary_count`` reads only
+    ``.plain`` and cannot fail when the colour goes; this reads the rendered
+    spans. Arm A is the summary the load produced (``update_a2l_tags_view``);
+    arm B is the summary after ``_repaint_a2l_tag_cells`` rebuilt it.
+    """
+    green = "#54efae"  # CTX-LEGEND "Green #54efae" (= insight_style GREEN)
+
+    def _check(app: S19TuiApp, arm: str) -> None:
+        from textual.widgets import Label
+
+        content = app.query_one("#a2l_tags_summary", Label).render()
+        plain = content.plain
+        start = plain.index("1 in image")
+        end = start + len("1 in image")
+        green_spans = [
+            span
+            for span in content.spans
+            if span.style.foreground is not None
+            and span.style.foreground.hex.lower() == green
+        ]
+        assert any(s.start == start and s.end == end for s in green_spans), (
+            f"arm {arm}: no {green} span covers exactly '1 in image' "
+            f"({start}, {end}); green spans {green_spans!r} in {plain!r}"
+        )
+        page_start = plain.index("Page ")
+        page_end = page_start + len("Page ")
+        assert not any(
+            s.start < page_end and s.end > page_start for s in green_spans
+        ), f"arm {arm}: a {green} span touches 'Page ...': {green_spans!r}"
+
+    async def _observe(app: S19TuiApp, pilot: object) -> None:
+        _check(app, "A (after load)")
+        app._repaint_a2l_tag_cells()
+        _check(app, "B (after repaint)")
+
+    _drive_mixed((120, 30), _observe)
